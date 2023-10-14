@@ -1,8 +1,7 @@
 ﻿# Mile.HyperV Definition References
 
 Mile.HyperV uses both Hypervisor Top Level Functional Specification v6.0b and
-MIT licensed Hyper-V headers from Microsoft to create the Hyper-V definition
-headers.
+MIT licensed Hyper-V headers from Microsoft to create the definition headers.
 
 ## Hypervisor Top Level Functional Specification
 
