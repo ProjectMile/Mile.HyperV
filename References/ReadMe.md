@@ -7,7 +7,7 @@ headers.
 ## Hypervisor Top Level Functional Specification
 
 - [Microsoft's all version archive]
-- [Mile.HyperV's local PDF archive]]
+- [Mile.HyperV's local PDF archive]
 
 [Microsoft's all version archive]: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/tlfs
 [Mile.HyperV's local PDF archive]: Hypervisor Top Level Functional Specification v6.0b.pdf
