@@ -7,3 +7,4 @@ The lightweight library for Hyper-V guest interfaces.
 ## Documents
 
 - [License](License.md)
+- [Mile.HyperV Definition References](References/ReadMe.md)
