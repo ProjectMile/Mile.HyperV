@@ -10,7 +10,7 @@ headers.
 - [Mile.HyperV's local PDF archive]
 
 [Microsoft's all version archive]: https://github.com/MicrosoftDocs/Virtualization-Documentation/tree/live/tlfs
-[Mile.HyperV's local PDF archive]: Hypervisor Top Level Functional Specification v6.0b.pdf
+[Mile.HyperV's local PDF archive]: Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
 
 ## MIT licensed Hyper-V headers from Microsoft
 
