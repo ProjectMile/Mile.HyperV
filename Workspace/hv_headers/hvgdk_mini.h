@@ -14,11 +14,6 @@
 #ifndef _UAPI_HV_HVGDK_MINI_H
 #define _UAPI_HV_HVGDK_MINI_H
 
-struct hv_u128 {
-	__u64 low_part;
-	__u64 high_part;
-} __packed;
-
 /* hypercall status code */
 #define __HV_STATUS_DEF(OP) \
 	OP(HV_STATUS_SUCCESS,				0x0) \
