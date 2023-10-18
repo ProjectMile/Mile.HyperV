@@ -113,67 +113,6 @@ pub const MSR_HYPERCALL_ADDR_MASK: u64 = !0xfff;
 pub const MSR_SIEFP_SIMP_ACTIVE: u64 = 1;
 pub const MSR_SIEFP_SIMP_ADDR_MASK: u64 = !0xfff;
 
-#[derive(Debug)]
-#[repr(u16)]
-pub enum HvError {
-    InvalidHypercallCode = 0x0002,
-    InvalidHypercallInput = 0x0003,
-    InvalidAlignment = 0x0004,
-    InvalidParameter = 0x0005,
-    AccessDenied = 0x0006,
-    InvalidPartitionState = 0x0007,
-    OperationDenied = 0x0008,
-    UnknownProperty = 0x0009,
-    PropertyValueOutOfRange = 0x000A,
-    InsufficientMemory = 0x000B,
-    PartitionTooDeep = 0x000C,
-    InvalidPartitionId = 0x000D,
-    InvalidVpIndex = 0x000E,
-    NotFound = 0x0010,
-    InvalidPortId = 0x0011,
-    InvalidConnectionId = 0x0012,
-    InsufficientBuffers = 0x0013,
-    NotAcknowledged = 0x0014,
-    InvalidVpState = 0x0015,
-    Acknowledged = 0x0016,
-    InvalidSaveRestoreState = 0x0017,
-    InvalidSynicState = 0x0018,
-    ObjectInUse = 0x0019,
-    InvalidProximityDomainInfo = 0x001A,
-    NoData = 0x001B,
-    Inactive = 0x001C,
-    NoResources = 0x001D,
-    FeatureUnavailable = 0x001E,
-    PartialPacket = 0x001F,
-    ProcessorFeatureNotSupported = 0x0020,
-    ProcessorCacheLineFlushSizeIncompatible = 0x0030,
-    InsufficientBuffer = 0x0033,
-    IncompatibleProcessor = 0x0037,
-    InsufficientDeviceDomains = 0x0038,
-    CpuidFeatureValidationError = 0x003C,
-    CpuidXsaveFeatureValidationError = 0x003D,
-    ProcessorStartupTimeout = 0x003E,
-    SmxEnabled = 0x003F,
-    InvalidLpIndex = 0x0041,
-    InvalidRegisterValue = 0x0050,
-    InvalidVtlState = 0x0051,
-    NxNotDetected = 0x0055,
-    InvalidDeviceId = 0x0057,
-    InvalidDeviceState = 0x0058,
-    PendingPageRequests = 0x0059,
-    PageRequestInvalid = 0x0060,
-    KeyAlreadyExists = 0x0065,
-    DeviceAlreadyInDomain = 0x0066,
-    InvalidCpuGroupId = 0x006F,
-    InvalidCpuGroupState = 0x0070,
-    OperationFailed = 0x0071,
-    NotAllowedWithNestedVirtActive = 0x0072,
-    InsufficientRootMemory = 0x0073,
-    EventBufferAlreadyFreed = 0x0074,
-}
-
-pub type HvResult<T> = Result<T, HvError>;
-
 #[repr(C)]
 #[derive(Copy, Clone, AsBytes, Debug, FromBytes, FromZeroes)]
 pub struct HvMessageHeader {
