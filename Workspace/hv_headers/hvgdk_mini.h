@@ -17,9 +17,6 @@
 /* TODO not in hv headers */
 #define HV_LINUX_VENDOR_ID              0x8100
 
-#define HV_PARTITION_ID_INVALID		((__u64) 0)
-#define HV_PARTITION_ID_SELF		((__u64)-1)
-
 /* Hyper-V specific model specific registers (MSRs) */
 
 /* HV_X64_SYNTHETIC_MSR */

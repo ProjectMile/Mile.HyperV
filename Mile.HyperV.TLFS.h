@@ -160,4 +160,60 @@ typedef HV_UINT32 HV_SPA_PAGE_OFFSET;
 #define HV_LARGE_PAGE_MASK (HV_LARGE_PAGE_SIZE - 1)
 #define HV_1GB_PAGE_MASK (HV_1GB_PAGE_SIZE - 1)
 
+/*
+ * Partition Management Data Types
+ */
+
+typedef HV_UINT64 HV_PARTITION_ID;
+typedef HV_PARTITION_ID *PHV_PARTITION_ID;
+typedef const HV_PARTITION_ID* PCHV_PARTITION_ID;
+
+#define HV_PARTITION_ID_INVALID ((HV_PARTITION_ID)0x0)
+#define HV_PARTITION_ID_SELF ((HV_PARTITION_ID)-1)
+
+typedef struct _HV_PARTITION_PRIVILEGE_MASK
+{
+    HV_UINT64 AccessVpRunTimeMsr : 1;
+    HV_UINT64 AccessPartitionReferenceCounter : 1;
+    HV_UINT64 AccessSynicMsrs : 1;
+    HV_UINT64 AccessSyntheticTimerMsrs : 1;
+    HV_UINT64 AccessApicMsrs : 1;
+    HV_UINT64 AccessHypercallMsrs : 1;
+    HV_UINT64 AccessVpIndex : 1;
+    HV_UINT64 AccessResetMsr : 1;
+    HV_UINT64 AccessStatsMsr : 1;
+    HV_UINT64 AccessPartitionReferenceTsc : 1;
+    HV_UINT64 AccessGuestIdleMsr : 1;
+    HV_UINT64 AccessFrequencyMsrs : 1;
+    HV_UINT64 AccessDebugMsrs : 1;
+    HV_UINT64 AccessReenlightenmentControls : 1;
+    HV_UINT64 AccessRootSchedulerMsr : 1;
+    HV_UINT64 Reserved1 : 17;
+
+    HV_UINT64 CreatePartitions : 1;
+    HV_UINT64 AccessPartitionId : 1;
+    HV_UINT64 AccessMemoryPool : 1;
+    HV_UINT64 AdjustMessageBuffers : 1;
+    HV_UINT64 PostMessages : 1;
+    HV_UINT64 SignalEvents : 1;
+    HV_UINT64 CreatePort : 1;
+    HV_UINT64 ConnectPort : 1;
+    HV_UINT64 AccessStats : 1;
+    HV_UINT64 Reserved2 : 2;
+    HV_UINT64 Debugging : 1;
+    HV_UINT64 CpuManagement : 1;
+    HV_UINT64 ConfigureProfiler : 1;
+    HV_UINT64 AccessVpExitTracing : 1;
+    HV_UINT64 EnableExtendedGvaRangesFlushVaList : 1;
+    HV_UINT64 AccessVsm : 1;
+    HV_UINT64 AccessVpRegisters : 1;
+    HV_UINT64 Reserved3 : 1;
+    HV_UINT64 FastHypercallOutput : 1;
+    HV_UINT64 EnableExtendedHypercalls : 1;
+    HV_UINT64 StartVirtualProcessor : 1;
+    HV_UINT64 PrivilegeIsolation : 1;
+    HV_UINT64 Reserved4 : 9;
+
+} HV_PARTITION_PRIVILEGE_MASK;
+
 #endif // !MILE_HYPERV_TLFS
