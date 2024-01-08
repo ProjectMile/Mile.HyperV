@@ -1,12 +1,16 @@
 ﻿# Mile.HyperV Definition References
 
-Mile.HyperV uses Microsoft Hypervisor Wrappers library, Hypervisor Top Level
-Functional Specification v6.0b and MIT licensed Hyper-V headers from Microsoft
-to create the definition headers.
+Mile.HyperV uses Microsoft Hypervisor Wrappers, Microsoft Independent Guest
+Virtual Machine, Hypervisor Top Level Functional Specification v6.0b and MIT
+licensed Hyper-V headers from Microsoft to create the definition headers.
 
-## Microsoft Hypervisor Wrappers library
+## Microsoft Hypervisor Wrappers
 
 https://github.com/rust-vmm/mshv
+
+## Microsoft Independent Guest Virtual Machine
+
+https://github.com/microsoft/igvm
 
 ## Hypervisor Top Level Functional Specification
 
