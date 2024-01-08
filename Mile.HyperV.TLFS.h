@@ -131,6 +131,7 @@ typedef const HV_GVA_PAGE_NUMBER* PCHV_GVA_PAGE_NUMBER;
 
 typedef HV_UINT32 HV_SPA_PAGE_OFFSET;
 
+/* 5-level paging enabled */
 #define X64_CR4_LA57 0x0000000000001000
 
 #define X64_PTE_PRESENT 0x1
@@ -144,8 +145,11 @@ typedef HV_UINT32 HV_SPA_PAGE_OFFSET;
 #define X64_PAGE_SHIFT 12
 #define X64_PTE_BITS 9
 
+/* Number of bytes in a page for X64. */
 #define X64_PAGE_SIZE 0x1000
+/* Number of bytes in a large page for X64. */
 #define X64_LARGE_PAGE_SIZE 0x200000
+/* Number of bytes in a 1GB page for X64. */
 #define X64_1GB_PAGE_SIZE 0x40000000
 
 #define HV_X64_MAX_PAGE_NUMBER (UINT64_MAX/X64_PAGE_SIZE)
