@@ -11,28 +11,6 @@ use zerocopy::AsBytes;
 use zerocopy::FromBytes;
 use zerocopy::FromZeroes;
 
-const X64_CR4_LA57: u64 = 0x0000000000001000; // 5-level paging enabled
-
-const X64_PTE_PRESENT: u64 = 1;
-const X64_PTE_READ_WRITE: u64 = 1 << 1;
-const X64_PTE_ACCESSED: u64 = 1 << 5;
-const X64_PTE_DIRTY: u64 = 1 << 6;
-const X64_PTE_LARGE_PAGE: u64 = 1 << 7;
-
-const PAGE_TABLE_ENTRY_COUNT: usize = 512;
-
-const X64_PAGE_SHIFT: u64 = 12;
-const X64_PTE_BITS: u64 = 9;
-
-/// Number of bytes in a page for X64.
-pub const X64_PAGE_SIZE: u64 = 4096;
-
-/// Number of bytes in a large page for X64.
-pub const X64_LARGE_PAGE_SIZE: u64 = 0x200000;
-
-/// Number of bytes in a 1GB page for X64.
-pub const X64_1GB_PAGE_SIZE: u64 = 0x40000000;
-
 #[derive(Copy, Clone, PartialEq, Eq, AsBytes, FromBytes, FromZeroes)]
 #[repr(transparent)]
 pub struct PageTableEntry {

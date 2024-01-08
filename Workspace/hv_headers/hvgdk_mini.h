@@ -16,9 +16,6 @@
 
 /* TODO not in hv headers */
 #define HV_LINUX_VENDOR_ID              0x8100
-#define HV_HYP_PAGE_SHIFT		12
-#define HV_HYP_PAGE_SIZE		BIT(HV_HYP_PAGE_SHIFT)
-#define HV_HYP_PAGE_MASK		(~(HV_HYP_PAGE_SIZE - 1))
 
 #define HV_PARTITION_ID_INVALID		((__u64) 0)
 #define HV_PARTITION_ID_SELF		((__u64)-1)
