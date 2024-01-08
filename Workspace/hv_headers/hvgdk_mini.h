@@ -116,39 +116,6 @@
 /* TSC invariant control */
 #define HV_X64_MSR_TSC_INVARIANT_CONTROL	0x40000118
 
-/*
- * Version info reported by hypervisor
- * Changed to a union for convenience
- */
-union hv_hypervisor_version_info {
-	struct {
-		__u32 build_number;
-
-		__u32 minor_version : 16;
-		__u32 major_version : 16;
-
-		__u32 service_pack;
-
-		__u32 service_number : 24;
-		__u32 service_branch : 8;
-	};
-	struct {
-		__u32 eax;
-		__u32 ebx;
-		__u32 ecx;
-		__u32 edx;
-	};
-};
-
-/* HV_CPUID_FUNCTION */
-#define HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS	0x40000000
-#define HYPERV_CPUID_VERSION			0x40000002
-
-/* HV_X64_ENLIGHTENMENT_INFORMATION */
-
-/* DeprecateAutoEoi */
-#define HV_DEPRECATING_AEOI_RECOMMENDED		BIT(9)
-
 #define HV_MAXIMUM_PROCESSORS       2048
 
 #define HV_MAX_VP_INDEX			(HV_MAXIMUM_PROCESSORS - 1)
