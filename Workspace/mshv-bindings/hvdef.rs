@@ -5,10 +5,6 @@
 #![allow(dead_code)]
 use zerocopy::{AsBytes, FromBytes, FromZeroes};
 
-pub const HV_CALL_POST_MESSAGE: u64 = 0x005c;
-pub const HV_CALL_SIGNAL_EVENT: u64 = 0x005d;
-pub const HV_CALL_RETARGET_DEVICE_INTERRUPT: u64 = 0x007e;
-
 pub const MSR_HYPERCALL_ACTIVE: u64 = 1;
 pub const MSR_HYPERCALL_LOCKED: u64 = 2;
 pub const MSR_HYPERCALL_ADDR_MASK: u64 = !0xfff;
