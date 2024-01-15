@@ -5,7 +5,7 @@
  *
  * LICENSE:   The MIT License
  *
- * DEVELOPER: MouriNaruto (Kenji.Mouri@Outlook.com)
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
 #ifndef MILE_HYPERV_TLFS
