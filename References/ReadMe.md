@@ -41,3 +41,15 @@ Here is the extracted reference from the mentioned patch created by Microsoft.
 - [hvgdk_mini.h](hvgdk_mini.h)
 - [hvhdk.h](hvhdk.h)
 - [hvhdk_mini.h](hvhdk_mini.h)
+
+## Hyper-V Hypercall List
+
+According to Hypervisor Top Level Functional Specification and MIT licensed 
+Hyper-V headers from Microsoft, I create a list for knowing which hypercalls
+need to be contained in Mile.HyperV.
+
+All items from Appendix A of Hypervisor Top Level Functional Specification. All
+yellow items are defined in MIT licensed Hyper-V headers from Microsoft. All 
+green items are detail defined in Hypervisor Top Level Functional Specification.
+
+- [HvCallList.xlsx](HvCallList.xlsx)
