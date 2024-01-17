@@ -158,6 +158,11 @@ typedef struct _HV_HYPERVISOR_NESTED_VIRTUALIZATION_FEATURES
  * Hypercall Code
  */
 
+/* Detailed definitions in TLS, but Nested Virtualization only */
+
+#define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00AF
+#define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00B0
+
 /* Defined Hypercall ID in TLFS, but have no detailed definitions */
 
 #define HVCALL_CREATE_PARTITION 0x0040
