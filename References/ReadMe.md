@@ -1,8 +1,10 @@
 ﻿# Mile.HyperV Definition References
 
 Mile.HyperV uses Microsoft Hypervisor Wrappers, Microsoft Independent Guest
-Virtual Machine, Hypervisor Top Level Functional Specification v6.0b and MIT
-licensed Hyper-V headers from Microsoft to create the definition headers.
+Virtual Machine, Hypervisor Top Level Functional Specification v6.0b, MIT
+licensed Hyper-V headers from Microsoft, Archive of Hypervisor (Windows Drivers)
+documentations from Microsoft in 2013, FreeBSD and Hyper-V integration support
+for macOS to create the definition headers.
 
 ## Microsoft Hypervisor Wrappers
 
@@ -41,6 +43,18 @@ Here is the extracted reference from the mentioned patch created by Microsoft.
 - [hvgdk_mini.h](hvgdk_mini.h)
 - [hvhdk.h](hvhdk.h)
 - [hvhdk_mini.h](hvhdk_mini.h)
+
+## Archive of Hypervisor (Windows Drivers) documentations from Microsoft in 2013
+
+https://gerhart01.github.io/
+
+## FreeBSD
+
+https://github.com/freebsd/freebsd-src
+
+## Hyper-V integration support for macOS
+
+https://github.com/acidanthera/MacHyperVSupport
 
 ## Hyper-V Hypercall List
 
