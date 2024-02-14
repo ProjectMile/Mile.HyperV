@@ -13,6 +13,14 @@
 
 #include <stdint.h>
 
+#ifdef _MSC_VER
+#if (_MSC_VER >= 1200)
+#pragma warning(push)
+#endif
+/* nonstandard extension used : nameless struct/union */
+#pragma warning(disable:4201)
+#endif
+
 #ifndef DECLSPEC_ALIGN
 #if (_MSC_VER >= 1300) && !defined(MIDL_PASS)
 #define DECLSPEC_ALIGN(x)   __declspec(align(x))
@@ -519,5 +527,14 @@ typedef union _HV_CPUID_RESULT
 #define HVCALL_SIGNAL_EVENT 0x005D
 #define HVCALL_RETARGET_INTERRUPT 0x007E
 #define HVCALL_ASSERT_VIRTUAL_INTERRUPT 0x0094
+
+#ifdef _MSC_VER
+#if (_MSC_VER >= 1200)
+#pragma warning(pop)
+#else
+/* nonstandard extension used : nameless struct/union */
+#pragma warning(default:4201)
+#endif
+#endif
 
 #endif /* !MILE_HYPERV_TLFS */
