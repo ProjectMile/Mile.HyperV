@@ -387,12 +387,12 @@ typedef union _HV_CPUID_RESULT
     HV_UINT32 AsUINT32[4];
 
     struct {
-        UINT32 ReservedEax;
-        UINT32 ReservedEbx : 24;
-        UINT32 InitialApicId : 8;
-        UINT32 ReservedEcx : 31;
-        UINT32 HypervisorPresent : 1;
-        UINT32 ReservedEdx;
+        HV_UINT32 ReservedEax;
+        HV_UINT32 ReservedEbx : 24;
+        HV_UINT32 InitialApicId : 8;
+        HV_UINT32 ReservedEcx : 31;
+        HV_UINT32 HypervisorPresent : 1;
+        HV_UINT32 ReservedEdx;
     } VersionAndFeatures;
 
     HV_VENDOR_AND_MAX_FUNCTION HvVendorAndMaxFunction;
