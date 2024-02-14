@@ -228,7 +228,7 @@ typedef union _HV_PARTITION_PRIVILEGE_MASK
         HV_UINT64 StartVirtualProcessor : 1;
         HV_UINT64 PrivilegeIsolation : 1;
         HV_UINT64 Reserved4 : 9;
-    } Privileges;
+    };
 } HV_PARTITION_PRIVILEGE_MASK, *PHV_PARTITION_PRIVILEGE_MASK;
 
 /*
@@ -382,7 +382,7 @@ typedef union _HV_CPUID_RESULT
         HV_UINT32 Ebx;
         HV_UINT32 Ecx;
         HV_UINT32 Edx;
-    } CpuId;
+    };
 
     HV_UINT32 AsUINT32[4];
 
