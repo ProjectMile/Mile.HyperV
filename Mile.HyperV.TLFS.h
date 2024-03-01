@@ -467,6 +467,19 @@ typedef union _HV_X64_MSR_GUEST_OS_ID_CONTENTS
 
 #define HV_X64_MSR_HYPERCALL 0x40000001
 
+typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Enable : 1;
+        HV_UINT64 Locked : 1;
+        HV_UINT64 ReservedP : 10;
+        HV_UINT64 GpaPageNumber : 52;
+    };
+} HV_X64_MSR_HYPERCALL_CONTENTS, *PHV_X64_MSR_HYPERCALL_CONTENTS;
+
 /* MSR used to provide vcpu index */
 
 #define HV_X64_MSR_VP_INDEX 0x40000002
@@ -596,8 +609,39 @@ typedef union _HV_X64_MSR_GUEST_OS_ID_CONTENTS
 #define HV_X64_MSR_NESTED_SINT15 0x4000109F
 
 /*
- * Hypercall Code
+ * Hypercall
  */
+
+typedef union _HV_X64_HYPERCALL_INPUT
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT32 CallCode : 16;
+        HV_UINT32 IsFast : 1;
+        HV_UINT32 VariableHeaderSize : 9;
+        HV_UINT32 Reserved1 : 5;
+        HV_UINT32 IsNested : 1;
+        HV_UINT32 CountOfElements : 12;
+        HV_UINT32 Reserved2 : 4;
+        HV_UINT32 RepStartIndex : 12;
+        HV_UINT32 Reserved3 : 4;
+    }; 
+} HV_X64_HYPERCALL_INPUT, *PHV_X64_HYPERCALL_INPUT;
+
+typedef union _HV_X64_HYPERCALL_OUTPUT
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT16 CallStatus;
+        HV_UINT16 Reserved1;
+        HV_UINT32 ElementsProcessed : 12;
+        HV_UINT32 Reserved2 : 20;
+    };
+} HV_X64_HYPERCALL_OUTPUT, *PHV_X64_HYPERCALL_OUTPUT;
 
 #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE 0x0002
 #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST 0x0003
