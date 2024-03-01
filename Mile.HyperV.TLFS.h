@@ -412,6 +412,57 @@ typedef union _HV_CPUID_RESULT
 
 #define HV_X64_MSR_GUEST_OS_ID 0x40000000
 
+typedef enum _HV_GUEST_OS_MICROSOFT_IDS
+{ 
+    HvGuestOsMicrosoftUndefined = 0x00,
+    HvGuestOsMicrosoftMSDOS = 0x01,
+    HvGuestOsMicrosoftWindows3x = 0x02,
+    HvGuestOsMicrosoftWindows9x = 0x03,
+    HvGuestOsMicrosoftWindowsNT = 0x04,
+    HvGuestOsMicrosoftWindowsCE = 0x05
+} HV_GUEST_OS_MICROSOFT_IDS, *PHV_GUEST_OS_MICROSOFT_IDS;
+
+typedef enum _HV_GUEST_OS_VENDOR
+{
+    HvGuestOsVendorMicrosoft = 0x0001,
+    HvGuestOsVendorHPE = 0x0002,
+    HvGuestOsVendorLANCOM = 0x0200,
+} HV_GUEST_OS_VENDOR, *PHV_GUEST_OS_VENDOR;
+
+typedef enum _HV_GUEST_OS_OPENSOURCE_TYPES
+{
+    HvGuestOsOpenSourceUndefined = 0x0,
+    HvGuestOsOpenSourceLinux = 0x1,
+    HvGuestOsOpenSourceFreeBSD = 0x2,
+    HvGuestOsOpenSourceXen = 0x3,
+    HvGuestOsOpenSourceIllumos = 0x4,
+} HV_GUEST_OS_OPENSOURCE_TYPES, *PHV_GUEST_OS_OPENSOURCE_TYPES;
+
+typedef union _HV_X64_MSR_GUEST_OS_ID_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 BuildNumber : 16;
+        HV_UINT64 ServiceVersion : 8;
+        HV_UINT64 MinorVersion : 8;
+        HV_UINT64 MajorVersion : 8;
+        HV_UINT64 OsId : 8;
+        HV_UINT64 VendorId : 15;
+        HV_UINT64 OpenSource : 1;
+    };
+
+    struct
+    {
+        HV_UINT64 BuildNumber : 16;
+        HV_UINT64 Version : 32;
+        HV_UINT64 OsId : 8;
+        HV_UINT64 OsType : 7;
+        HV_UINT64 OpenSource : 1;
+    };
+} HV_X64_MSR_GUEST_OS_ID_CONTENTS, *PHV_X64_MSR_GUEST_OS_ID_CONTENTS;
+
 /* MSR used to setup pages used to communicate with the hypervisor. */
 
 #define HV_X64_MSR_HYPERCALL 0x40000001
