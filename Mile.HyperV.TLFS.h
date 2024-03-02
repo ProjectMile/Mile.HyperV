@@ -566,6 +566,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterPendingEvent1 = 0x00010005,
 
     /* Interruptible notification register */
+
     HvX64RegisterDeliverabilityNotifications = 0x00010006,
 
     /* X64 User-Mode Registers */
@@ -990,6 +991,239 @@ typedef enum _HV_REGISTER_NAME
 } HV_REGISTER_NAME;
 typedef HV_REGISTER_NAME* PHV_REGISTER_NAME;
 typedef const HV_REGISTER_NAME* PCHV_REGISTER_NAME;
+
+typedef union _HV_X64_FP_REGISTER
+{
+    HV_UINT128 AsUINT128;
+
+    struct
+    {
+        HV_UINT64 Mantissa;
+        HV_UINT64 BiasedExponent : 15;
+        HV_UINT64 Sign : 1;
+        HV_UINT64 Reserved : 48;
+    };
+} HV_X64_FP_REGISTER, *PHV_X64_FP_REGISTER;
+
+typedef union _HV_X64_FP_CONTROL_STATUS_REGISTER
+{
+    HV_UINT128 AsUINT128;
+
+    struct
+    {
+        HV_UINT16 FpControl;
+        HV_UINT16 FpStatus;
+        HV_UINT8 FpTag;
+        HV_UINT8 IgnNe : 1;
+        HV_UINT8 Reserved : 7;
+        HV_UINT16 LastFpOp;
+        union
+        {
+            HV_UINT64 LastFpRip;
+            struct
+            {
+                HV_UINT32 LastFpEip;
+                HV_UINT16 LastFpCs;
+                HV_UINT16 Padding;
+            };
+        };
+    };
+} HV_X64_FP_CONTROL_STATUS_REGISTER, *PHV_X64_FP_CONTROL_STATUS_REGISTER;
+
+typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
+{
+    HV_UINT128 AsUINT128;
+
+    struct
+    {
+        union
+        {
+            HV_UINT64 LastFpRdp;
+            struct
+            {
+                HV_UINT32 LastFpDp;
+                HV_UINT16 LastFpDs;
+                HV_UINT16 Padding;
+            };
+        };
+        HV_UINT32 XmmStatusControl;
+        HV_UINT32 XmmStatusControlMask;
+    };
+} HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
+
+typedef struct _HV_X64_SEGMENT_REGISTER
+{
+    HV_UINT64 Base;
+    HV_UINT32 Limit;
+    HV_UINT16 Selector;
+    union
+    {
+        struct
+        {
+            HV_UINT16 SegmentType : 4;
+            HV_UINT16 NonSystemSegment : 1;
+            HV_UINT16 DescriptorPrivilegeLevel : 2;
+            HV_UINT16 Present : 1;
+            HV_UINT16 Reserved : 4;
+            HV_UINT16 Available : 1;
+            HV_UINT16 Long : 1;
+            HV_UINT16 Default : 1;
+            HV_UINT16 Granularity : 1;
+        };
+        HV_UINT16 Attributes;
+    };
+} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
+
+typedef struct _HV_X64_TABLE_REGISTER
+{
+    HV_UINT16 Pad[3];
+    HV_UINT16 Limit;
+    HV_UINT64 Base;
+} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
+
+typedef union _HV_EXPLICIT_SUSPEND_REGISTER
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Suspended : 1;
+        HV_UINT64 Reserved : 63;
+    };
+} HV_EXPLICIT_SUSPEND_REGISTER, *PHV_EXPLICIT_SUSPEND_REGISTER;
+
+typedef union _HV_INTERCEPT_SUSPEND_REGISTER
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Suspended : 1;
+        HV_UINT64 TlbLocked : 1;
+        HV_UINT64 Reserved : 62;
+    };
+} HV_INTERCEPT_SUSPEND_REGISTER, *PHV_INTERCEPT_SUSPEND_REGISTER;
+
+typedef union _HV_DISPATCH_SUSPEND_REGISTER
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Suspended : 1;
+        HV_UINT64 Reserved : 63;
+    };
+} HV_DISPATCH_SUSPEND_REGISTER, *PHV_DISPATCH_SUSPEND_REGISTER;
+
+typedef struct _HV_X64_INTERRUPT_STATE_REGISTER
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 InterruptShadow : 1;
+        HV_UINT64 NmiMasked : 1;
+        HV_UINT64 Reserved : 62;
+    };
+} HV_X64_INTERRUPT_STATE_REGISTER, *PHV_X64_INTERRUPT_STATE_REGISTER;
+
+typedef enum _HV_X64_PENDING_INTERRUPTION_TYPE
+{
+    HvX64PendingInterrupt = 0,
+    HvX64PendingNmi = 2,
+    HvX64PendingException = 3,
+    HvX64PendingSoftwareInterrupt = 4,
+    HvX64PendingPrivilegedSoftwareException = 5,
+    HvX64PendingSoftwareException = 6
+} HV_X64_PENDING_INTERRUPTION_TYPE, *PHV_X64_PENDING_INTERRUPTION_TYPE;
+
+typedef union _HV_X64_PENDING_INTERRUPTION_REGISTER
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT32 InterruptionPending : 1;
+        HV_UINT32 InterruptionType : 3;
+        HV_UINT32 DeliverErrorCode : 1;
+        HV_UINT32 InstructionLength : 4;
+        HV_UINT32 NestedEvent : 1;
+        HV_UINT32 Reserved : 6;
+        HV_UINT32 InterruptionVector : 16;
+        HV_UINT32 ErrorCode;
+    };
+} HV_X64_PENDING_INTERRUPTION_REGISTER, *PHV_X64_PENDING_INTERRUPTION_REGISTER;
+
+typedef union _HV_X64_MSR_NPIEP_CONFIG_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 PreventsGdt : 1;
+        HV_UINT64 PreventsIdt : 1;
+        HV_UINT64 PreventsLdt : 1;
+        HV_UINT64 PreventsTr : 1;
+        HV_UINT64 Reserved : 60;
+    };
+} HV_X64_MSR_NPIEP_CONFIG_CONTENTS, *PHV_X64_MSR_NPIEP_CONFIG_CONTENTS;
+
+typedef union _HV_X64_PENDING_EXCEPTION_EVENT
+{
+    HV_UINT64 AsUINT64[2];
+
+    struct
+    {
+        HV_UINT32 EventPending : 1;
+        HV_UINT32 EventType : 3;
+        HV_UINT32 Reserved0 : 4;
+        HV_UINT32 DeliverErrorCode : 1;
+        HV_UINT32 Reserved1 : 7;
+        HV_UINT32 Vector : 16;
+        HV_UINT32 ErrorCode;
+        HV_UINT64 ExceptionParameter;
+    };
+} HV_X64_PENDING_EXCEPTION_EVENT, *PHV_X64_PENDING_EXCEPTION_EVENT;
+
+typedef union _HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT
+{
+    HV_UINT64 AsUINT64[2];
+
+    struct
+    {
+        HV_UINT32 EventPending : 1;
+        HV_UINT32 EventType : 3;
+        HV_UINT32 Reserved0 : 4;
+        HV_UINT32 Reserved1 : 8;
+        HV_UINT32 Parameter0 : 16;
+        HV_UINT32 Code;
+        HV_UINT64 Parameter1;
+    } ;
+} HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT, *PHV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT;
+
+typedef union _HV_REGISTER_VALUE
+{
+    HV_UINT128 Reg128;
+    HV_UINT64 Reg64;
+    HV_UINT32 Reg32;
+    HV_UINT16 Reg16;
+    HV_UINT8 Reg8;
+    HV_X64_FP_REGISTER Fp;
+    HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
+    HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
+    HV_X64_SEGMENT_REGISTER Segment;
+    HV_X64_TABLE_REGISTER Table;
+    HV_EXPLICIT_SUSPEND_REGISTER ExplicitSuspend;
+    HV_INTERCEPT_SUSPEND_REGISTER InterceptSuspend;
+    HV_DISPATCH_SUSPEND_REGISTER SispatchSuspend;
+    HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
+    HV_X64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
+    HV_X64_MSR_NPIEP_CONFIG_CONTENTS NpiepConfig;
+    HV_X64_PENDING_EXCEPTION_EVENT PendingExceptionEvent;
+    HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT PendingVirtualizationFaultEvent;
+} HV_REGISTER_VALUE;
+typedef HV_REGISTER_VALUE* PHV_REGISTER_VALUE;
+typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 
 /* MSR used to reset the guest OS. */
 
