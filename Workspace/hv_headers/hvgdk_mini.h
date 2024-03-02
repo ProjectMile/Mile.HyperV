@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: MIT */
+﻿/* SPDX-License-Identifier: MIT */
 /*
  * Copyright (c) 2023, Microsoft Corporation.
  *
@@ -22,27 +22,6 @@
 #define HV_MAX_VP_INDEX			(HV_MAXIMUM_PROCESSORS - 1)
 #define HV_VP_INDEX_SELF		((__u32)-2)
 #define HV_ANY_VP			((__u32)-1)
-
-/*
- * Some macros - i.e. GENMASK_ULL and BIT_ULL - are not currently supported by
- * userspace rust bindings generation tool.
- * As the below are not currently needed in userspace, don't export them and
- * avoid the issue altogether for now.
- */
-#if defined(__KERNEL__)
-
-/* HV_HYPERCALL_INPUT */
-#define HV_HYPERCALL_RESULT_MASK	GENMASK_ULL(15, 0)
-#define HV_HYPERCALL_FAST_BIT		BIT(16)
-#define HV_HYPERCALL_VARHEAD_OFFSET	17
-#define HV_HYPERCALL_NESTED		BIT(31)
-#define HV_HYPERCALL_REP_COMP_OFFSET	32
-#define HV_HYPERCALL_REP_COMP_1		BIT_ULL(32)
-#define HV_HYPERCALL_REP_COMP_MASK	GENMASK_ULL(43, 32)
-#define HV_HYPERCALL_REP_START_OFFSET	48
-#define HV_HYPERCALL_REP_START_MASK	GENMASK_ULL(59, 48)
-
-#endif /* __KERNEL__ */
 
 union hv_gpa_page_range {
 	u64 address_space;
