@@ -1,13 +1,9 @@
-// Copyright © 2020, Microsoft Corporation
+﻿// Copyright © 2020, Microsoft Corporation
 //
 // SPDX-License-Identifier: Apache-2.0 OR BSD-3-Clause
 //
 #![allow(dead_code)]
 use zerocopy::{AsBytes, FromBytes, FromZeroes};
-
-pub const MSR_HYPERCALL_ACTIVE: u64 = 1;
-pub const MSR_HYPERCALL_LOCKED: u64 = 2;
-pub const MSR_HYPERCALL_ADDR_MASK: u64 = !0xfff;
 
 pub const MSR_SIEFP_SIMP_ACTIVE: u64 = 1;
 pub const MSR_SIEFP_SIMP_ADDR_MASK: u64 = !0xfff;

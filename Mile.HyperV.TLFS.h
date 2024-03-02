@@ -501,7 +501,9 @@ typedef enum _HV_REGISTER_NAME
 
     HvRegisterExplicitSuspend = 0x00000000,
     HvRegisterInterceptSuspend = 0x00000001,
+    HvRegisterInstructionEmulationHints = 0x00000002,
     HvRegisterDispatchSuspend = 0x00000003,
+    HvRegisterInternalActivityState = 0x00000004,
 
     /* Version */
 
@@ -587,6 +589,46 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterRip = 0x00020010,
     HvX64RegisterRflags = 0x00020011,
 
+    /* Arm64 User-Mode Registers */
+
+    HvArm64RegisterX0 = 0x00020000,
+    HvArm64RegisterX1 = 0x00020001,
+    HvArm64RegisterX2 = 0x00020002,
+    HvArm64RegisterX3 = 0x00020003,
+    HvArm64RegisterX4 = 0x00020004,
+    HvArm64RegisterX5 = 0x00020005,
+    HvArm64RegisterX6 = 0x00020006,
+    HvArm64RegisterX7 = 0x00020007,
+    HvArm64RegisterX8 = 0x00020008,
+    HvArm64RegisterX9 = 0x00020009,
+    HvArm64RegisterX10 = 0x0002000A,
+    HvArm64RegisterX11 = 0x0002000B,
+    HvArm64RegisterX12 = 0x0002000C,
+    HvArm64RegisterX13 = 0x0002000D,
+    HvArm64RegisterX14 = 0x0002000E,
+    HvArm64RegisterX15 = 0x0002000F,
+    HvArm64RegisterX16 = 0x00020010,
+    HvArm64RegisterX17 = 0x00020011,
+    HvArm64RegisterX18 = 0x00020012,
+    HvArm64RegisterX19 = 0x00020013,
+    HvArm64RegisterX20 = 0x00020014,
+    HvArm64RegisterX21 = 0x00020015,
+    HvArm64RegisterX22 = 0x00020016,
+    HvArm64RegisterX23 = 0x00020017,
+    HvArm64RegisterX24 = 0x00020018,
+    HvArm64RegisterX25 = 0x00020019,
+    HvArm64RegisterX26 = 0x0002001A,
+    HvArm64RegisterX27 = 0x0002001B,
+    HvArm64RegisterX28 = 0x0002001C,
+    HvArm64RegisterXFp = 0x0002001D,
+    HvArm64RegisterXLr = 0x0002001E,
+    /* alias for either El0/x depending on Cpsr.SPSel */
+    HvArm64RegisterXSp = 0x0002001F,
+    HvArm64RegisterXSpEl0 = 0x00020020,
+    HvArm64RegisterXSpElx = 0x00020021,
+    HvArm64RegisterXPc = 0x00020022,
+    HvArm64RegisterCpsr = 0x00020023,
+
     /* X64 Floating Point and Vector Registers */
 
     HvX64RegisterXmm0 = 0x00030000,
@@ -624,6 +666,18 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterCr4 = 0x00040003,
     HvX64RegisterCr8 = 0x00040004,
     HvX64RegisterXfem = 0x00040005,
+
+    /* Arm64 Control Registers */
+
+    HvArm64RegisterSctlrEl1 = 0x00040002,
+    HvArm64RegisterTtbr0El1 = 0x00040005,
+    HvArm64RegisterTtbr1El1 = 0x00040006,
+    HvArm64RegisterTcrEl1 = 0x00040007,
+    HvArm64RegisterEsrEl1 = 0x00040008,
+    HvArm64RegisterFarEl1 = 0x00040009,
+    HvArm64RegisterElrEl1 = 0x00040015,
+    HvArm64RegisterMairEl1 = 0x0004000B,
+    HvArm64RegisterVbarEl1 = 0x0004000C,
 
     /* X64 Intermediate Control Registers */
 
@@ -722,6 +776,8 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterTscAux= 0x0008007B,
     HvX64RegisterBndcfgs = 0x0008007C,
     HvX64RegisterDebugCtl = 0x0008007D,
+    HvX64RegisterMCount = 0x0008007E,
+    HvX64RegisterACount = 0x0008007F,
     HvX64RegisterSgxLaunchControl0 = 0x00080080,
     HvX64RegisterSgxLaunchControl1 = 0x00080081,
     HvX64RegisterSgxLaunchControl2 = 0x00080082,
@@ -729,7 +785,26 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterSpecCtrl = 0x00080084,
     HvX64RegisterPredCmd = 0x00080085,
     HvX64RegisterVirtSpecCtrl = 0x00080086,
+    HvX64RegisterTscVirtualOffset = 0x00080087,
+    HvX64RegisterTsxCtrl = 0x00080088,
+    HvX64RegisterMsrMcUpdatePatchLevel = 0x00080089,
+    HvX64RegisterAvailable1 = 0x0008008A,
+    HvX64RegisterXss = 0x0008008B,
+    HvX64RegisterUCet = 0x0008008C,
+    HvX64RegisterSCet = 0x0008008D,
+    HvX64RegisterSsp = 0x0008008E,
+    HvX64RegisterPl0Ssp = 0x0008008F,
+    HvX64RegisterPl1Ssp = 0x00080090,
+    HvX64RegisterPl2Ssp = 0x00080091,
+    HvX64RegisterPl3Ssp = 0x00080092,
+    HvX64RegisterInterruptSspTableAddr = 0x00080093,
+    HvX64RegisterTscVirtualMultiplier = 0x00080094,
+    HvX64RegisterTscDeadline = 0x00080095,
     HvX64RegisterTscAdjust = 0x00080096,
+    HvX64RegisterPasid = 0x00080097,
+    HvX64RegisterUmwaitControl = 0x00080098,
+    HvX64RegisterXfd = 0x00080099,
+    HvX64RegisterXfdErr = 0x0008009A,  
 
     /* Other MSRs */
  
@@ -791,6 +866,10 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterVpAssistPage = 0x00090013,
     HvRegisterVpRootSignalCount = 0x00090014,
     HvRegisterReferenceTsc = 0x00090017,
+    HvRegisterVpConfig = 0x00090018,
+    HvRegisterGhcb = 0x00090019,
+    HvRegisterReferenceTscSequence = 0x0009001A,
+    HvRegisterGuestSchedulerEvent = 0x0009001B,
     HvX64RegisterRegPage = 0x0009001C,
 
     /* Performance statistics MSRs  */
@@ -890,6 +969,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterVsmVina = 0x000D0005,
     HvRegisterVsmCapabilities = 0x000D0006,
     HvRegisterVsmPartitionConfig = 0x000D0007,
+    HvRegisterGuestVsmPartitionConfig = 0x000D0008,
     HvRegisterVsmVpSecureConfigVtl0 = 0x000D0010,
     HvRegisterVsmVpSecureConfigVtl1 = 0x000D0011,
     HvRegisterVsmVpSecureConfigVtl2 = 0x000D0012,
