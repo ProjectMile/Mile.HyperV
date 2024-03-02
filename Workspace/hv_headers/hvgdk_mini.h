@@ -246,37 +246,6 @@ union hv_register_vsm_partition_config {
 	};
 };
 
-struct hv_nested_enlightenments_control {
-	struct {
-		__u32 directhypercall : 1;
-		__u32 reserved : 31;
-	} __packed features;
-	struct {
-		__u32 inter_partition_comm : 1;
-		__u32 reserved : 31;
-	} __packed hypercall_controls;
-} __packed;
-
-/* Define virtual processor assist page structure. */
-struct hv_vp_assist_page {
-	__u32 apic_assist;
-	__u32 reserved1;
-	__u32 vtl_entry_reason;
-	__u32 vtl_reserved;
-	__u64 vtl_ret_x64rax;
-	__u64 vtl_ret_x64rcx;
-	struct hv_nested_enlightenments_control nested_control;
-	__u8 enlighten_vmentry;
-	__u8 reserved2[7];
-	__u64 current_nested_vmcs;
-	__u8 synthetic_time_unhalted_timer_expired;
-	__u8 reserved3[7];
-	__u8 virtualization_fault_information[40];
-	__u8 reserved4[8];
-	__u8 intercept_message[256];
-	__u8 vtl_ret_actions[256];
-} __packed;
-
 /*
  * Arch compatibility regs for use with hv_set/get_register
  */

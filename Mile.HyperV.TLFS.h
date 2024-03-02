@@ -49,6 +49,10 @@ typedef struct DECLSPEC_ALIGN(16) _HV_UINT128
     HV_UINT64 HighPart;
 } HV_UINT128, *PHV_UINT128;
 
+typedef HV_UINT8 HV_BOOLEAN;
+typedef HV_BOOLEAN* PHV_BOOLEAN;
+typedef const HV_BOOLEAN* PCHV_BOOLEAN;
+
 /*
  * Hypercall Status Code
  */
@@ -1198,7 +1202,7 @@ typedef union _HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT
         HV_UINT32 Parameter0 : 16;
         HV_UINT32 Code;
         HV_UINT64 Parameter1;
-    } ;
+    };
 } HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT, *PHV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT;
 
 typedef union _HV_REGISTER_VALUE
@@ -1224,6 +1228,60 @@ typedef union _HV_REGISTER_VALUE
 } HV_REGISTER_VALUE;
 typedef HV_REGISTER_VALUE* PHV_REGISTER_VALUE;
 typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
+
+typedef union _HV_X64_MSR_SYNMC_STATUS_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT16 McaErrorCode;
+        union
+        {
+            HV_UINT16 ModelSpecificErrorCode;
+            struct
+            {
+                HV_UINT16 ErrorDetail : 14;
+                HV_UINT16 HypervisorError : 1;
+                HV_UINT16 SoftwareError : 1;
+            };
+        };
+        struct
+        {
+            HV_UINT32 Reserved : 23;
+            HV_UINT32 ActionRequired : 1;
+            HV_UINT32 Signaling : 1;
+            /* Hypervisor/virt stack context corrupt */
+            HV_UINT32 ContextCorrupt : 1;
+            HV_UINT32 AddressValid : 1;
+            HV_UINT32 MiscValid : 1;
+            HV_UINT32 ErrorEnabled : 1;
+            /* Uncorrected error */
+            HV_UINT32 Uncorrected : 1;
+            /* Error overflow */
+            HV_UINT32 Overflow : 1;
+            /* Register valid */
+            HV_UINT32 Valid : 1;
+        };
+    };   
+} HV_X64_MSR_SYNMC_STATUS_CONTENTS, *PHV_X64_MSR_SYNMC_STATUS_CONTENTS;
+
+#define HV_SYNMC_MCA_ERROR_CODE (0x0001) /* Unclassified error */
+
+typedef HV_UINT64 HV_X64_MSR_SYNMC_ADDR_CONTENTS;
+typedef HV_UINT64 HV_X64_MSR_SYNMC_MISC_CONTENTS;
+
+typedef HV_X64_MSR_SYNMC_ADDR_CONTENTS *PHV_X64_MSR_SYNMC_ADDR_CONTENTS;
+typedef HV_X64_MSR_SYNMC_MISC_CONTENTS *PHV_X64_MSR_SYNMC_MISC_CONTENTS;
+
+typedef struct _HV_SYNMC_X64_EVENT
+{
+    HV_X64_MSR_SYNMC_STATUS_CONTENTS Status;
+    HV_X64_MSR_SYNMC_ADDR_CONTENTS Addr;
+    HV_X64_MSR_SYNMC_MISC_CONTENTS Misc;
+    HV_BOOLEAN RipValid;
+    HV_BOOLEAN EipValid;
+} HV_SYNMC_X64_EVENT, *PHV_SYNMC_X64_EVENT;
 
 /* MSR used to reset the guest OS. */
 
@@ -1259,6 +1317,125 @@ typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 #define HV_X64_MSR_ICR 0x40000071
 #define HV_X64_MSR_TPR 0x40000072
 #define HV_X64_MSR_VP_ASSIST_PAGE 0x40000073
+
+typedef enum _HV_VTL_ENTRY_REASON
+{
+    /* This reason is reserved and is not used. */
+    HvVtlEntryReserved = 0,
+    /* Indicates entry due to a VTL call from a lower VTL. */
+    HvVtlEntryVtlCall = 1,
+    /* Indicates entry due to an interrupt targeted to the VTL. */
+    HvVtlEntryInterrupt = 2
+} HV_VTL_ENTRY_REASON, *PHV_VTL_ENTRY_REASON;
+
+typedef struct _HV_VP_VTL_CONTROL
+{
+    /* The hypervisor updates the entry reason with an indication as to why */
+    /* the VTL was entered on the virtual processor. */
+    HV_VTL_ENTRY_REASON EntryReason;
+    /* This flag determines whether the VINA interrupt line is asserted. */
+    union
+    {
+        HV_UINT8 AsUINT8;
+
+        struct
+        {
+            HV_UINT8 VinaAsserted : 1;
+            HV_UINT8 VinaReservedZ : 7;
+        };
+    } VinaStatus;
+    HV_UINT8 ReservedZ00;
+    HV_UINT16 ReservedZ01;
+    /* A guest updates the VtlReturn* fields to provide the register values */
+    /* to restore on VTL return. The specific register values that are */
+    /* restored will vary based on whether the VTL is 32-bit or 64-bit. */
+    union
+    {
+        struct
+        {
+            HV_UINT64 VtlReturnX64Rax;
+            HV_UINT64 VtlReturnX64Rcx;
+        };
+        struct
+        {
+            HV_UINT32 VtlReturnX86Eax;
+            HV_UINT32 VtlReturnX86Ecx;
+            HV_UINT32 VtlReturnX86Edx;
+            HV_UINT32 ReservedZ1;
+        };
+    };
+} HV_VP_VTL_CONTROL, *PHV_VP_VTL_CONTROL;
+
+/* Control structure that allows a hypervisor to indicate to its parent */
+/* hypervisor which nested enlightenment privileges are to be granted to the*/
+/* current nested guest context. */
+typedef struct _HV_NESTED_ENLIGHTENMENTS_CONTROL
+{
+    struct
+    {
+        HV_UINT32 DirectHypercall : 1;
+        HV_UINT32 VirtualizationException : 1;
+        HV_UINT32 Reserved : 30;
+    } Features;
+
+    struct
+    {
+        HV_UINT32 InterPartitionCommunication : 1;
+        HV_UINT32 Reserved : 31;
+    } HypercallControls;
+} HV_NESTED_ENLIGHTENMENTS_CONTROL, *PHV_NESTED_ENLIGHTENMENTS_CONTROL;
+
+/* The virtualization fault information area contains the current fault code */
+/* and fault parameters for the VP. It is 16 byte aligned.*/
+/* It's 40 bytes according to MIT licensed Hyper-V headers from Microsoft. */
+typedef struct _HV_VIRTUALIZATION_FAULT_INFORMATION
+{
+    HV_UINT16 Parameter0;
+    HV_UINT16 Reserved0;
+    HV_UINT32 Code;
+    HV_UINT64 Parameter1;
+    HV_UINT64 Parameter2; /* Guess according to BugCheck */
+    HV_UINT64 Parameter3; /* Guess according to BugCheck */
+    HV_UINT64 Parameter4; /* Guess according to BugCheck */
+} HV_VIRTUALIZATION_FAULT_INFORMATION, *PHV_VIRTUALIZATION_FAULT_INFORMATION;
+
+typedef union _HV_VP_ASSIST_PAGE
+{
+    struct
+    {
+        /* APIC assist for optimized EOI processing. */
+        /* HV_VIRTUAL_APIC_ASSIST ApicAssist; */
+        HV_UINT32 ApicAssist;
+        HV_UINT32 ReservedZ0;
+        /* VP-VTL control information */
+        HV_VP_VTL_CONTROL VtlControl;
+        HV_NESTED_ENLIGHTENMENTS_CONTROL NestedEnlightenmentsControl;
+        HV_BOOLEAN EnlightenVmEntry;
+        HV_UINT8 ReservedZ1[7];
+        HV_GPA CurrentNestedVmcs;
+        HV_BOOLEAN SyntheticTimeUnhaltedTimerExpired;
+        HV_UINT8 ReservedZ2[7];
+        /* VirtualizationFaultInformation must be 16 byte aligned. */
+        HV_VIRTUALIZATION_FAULT_INFORMATION VirtualizationFaultInformation;
+        HV_UINT8 ReservedZ3[8];
+        HV_UINT8 InterceptMessage[256];
+        HV_UINT8 VtlReturnActions[256];
+    };
+    HV_UINT8 ReservedZBytePadding[HV_PAGE_SIZE];
+} HV_VP_ASSIST_PAGE, *PHV_VP_ASSIST_PAGE;
+
+typedef enum _HV_GENERIC_SET_FORMAT
+{
+    HvGenericSetSparse4k,
+    HvGenericSetAll
+} HV_GENERIC_SET_FORMAT, *PHV_GENERIC_SET_FORMAT;
+
+typedef struct _HV_VP_SET
+{
+    HV_UINT64 Format;
+    HV_UINT64 ValidBanksMask;
+    HV_UINT64 BankContents[];
+} HV_VP_SET, *PHV_VP_SET;
 
 /* Define synthetic interrupt controller model specific registers. */
 
@@ -1315,8 +1492,11 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
 
     struct
     {
+        /* Reserved bits */
         HV_UINT64 Reserved : 62;
-        HV_UINT64 CrashMessage : 1; 
+        /* P3 is the PA of the message, P4 is the length in bytes */
+        HV_UINT64 CrashMessage : 1;
+        /* Log contents of crash parameter system register */
         HV_UINT64 CrashNotify : 1;
     };
 } HV_CRASH_CTL_REG_CONTENTS;
