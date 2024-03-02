@@ -992,6 +992,12 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterVsmVpSecureConfigVtl14 = 0x000D001E,
     HvRegisterVsmVpWaitForTlbLock = 0x000D0020,
 
+    /* Mask Registers */
+
+    HvX64RegisterCrInterceptControl = 0x000E0000,
+    HvX64RegisterCrInterceptCr0Mask = 0x000E0001,
+    HvX64RegisterCrInterceptCr4Mask = 0x000E0002,
+    HvX64RegisterCrInterceptIa32MiscEnableMask = 0x000E0003
 } HV_REGISTER_NAME;
 typedef HV_REGISTER_NAME* PHV_REGISTER_NAME;
 typedef const HV_REGISTER_NAME* PCHV_REGISTER_NAME;
@@ -1119,7 +1125,7 @@ typedef union _HV_DISPATCH_SUSPEND_REGISTER
     };
 } HV_DISPATCH_SUSPEND_REGISTER, *PHV_DISPATCH_SUSPEND_REGISTER;
 
-typedef struct _HV_X64_INTERRUPT_STATE_REGISTER
+typedef union _HV_X64_INTERRUPT_STATE_REGISTER
 {
     HV_UINT64 AsUINT64;
 
@@ -1318,6 +1324,86 @@ typedef struct _HV_SYNMC_X64_EVENT
 #define HV_X64_MSR_TPR 0x40000072
 #define HV_X64_MSR_VP_ASSIST_PAGE 0x40000073
 
+typedef HV_UINT8 HV_VTL;
+typedef HV_VTL* PHV_VTL;
+typedef const HV_VTL* PCHV_VTL;
+
+#define HV_NUM_VTLS 2
+#define HV_INVALID_VTL ((HV_VTL)-1)
+#define HV_VTL_ALL 0xF
+
+/* Input for targeting a specific VTL. */
+typedef union _HV_INPUT_VTL
+{
+    HV_UINT8 AsUINT8;
+
+    struct
+    {
+        HV_UINT8 TargetVtl : 4;
+        HV_UINT8 UseTargetVtl : 1;
+        HV_UINT8 ReservedZ : 3;
+    };
+} HV_INPUT_VTL, *PHV_INPUT_VTL;
+
+typedef union _HV_REGISTER_VSM_PARTITION_STATUS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 EnabledVtlSet : 16;
+        HV_UINT64 MaximumVtl : 4;
+        HV_UINT64 MbecEnabledVtlSet : 16;
+        HV_UINT64 ReservedZ : 28;
+    };
+} HV_REGISTER_VSM_PARTITION_STATUS, *PHV_REGISTER_VSM_PARTITION_STATUS;
+
+typedef union _HV_REGISTER_VSM_VP_STATUS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 ActiveVtl : 4;
+        HV_UINT64 ActiveMbecEnabled : 1;
+        HV_UINT64 ReservedZ0 : 11;
+        HV_UINT64 EnabledVtlSet : 16;
+        HV_UINT64 ReservedZ1 : 32;
+    };
+} HV_REGISTER_VSM_VP_STATUS, *PHV_REGISTER_VSM_VP_STATUS;
+
+typedef union _HV_REGISTER_VSM_PARTITION_CONFIG
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 EnableVtlProtection : 1;
+        HV_UINT64 DefaultVtlProtectionMask : 4;
+        HV_UINT64 ZeroMemoryOnReset : 1;
+        HV_UINT64 DenyLowerVtlStartup : 1;
+        HV_UINT64 InterceptAcceptance : 1;
+        HV_UINT64 InterceptEnableVtlProtection : 1;
+        HV_UINT64 InterceptVpStartup : 1;
+        HV_UINT64 InterceptCpuidUnimplemented : 1;
+        HV_UINT64 InterceptUnrecoverableException : 1;
+        HV_UINT64 InterceptPage : 1;
+        HV_UINT64 ReservedZ : 51;
+    };
+} HV_REGISTER_VSM_PARTITION_CONFIG, *PHV_REGISTER_VSM_PARTITION_CONFIG;
+
+typedef union _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 MbecEnabled : 1;
+        HV_UINT64 TlbLocked : 1;
+        HV_UINT64 ReservedZ : 62;
+    };
+} HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG, *PHV_REGISTER_VSM_VP_SECURE_VTL_CONFIG;
+
 typedef enum _HV_VTL_ENTRY_REASON
 {
     /* This reason is reserved and is not used. */
@@ -1327,6 +1413,18 @@ typedef enum _HV_VTL_ENTRY_REASON
     /* Indicates entry due to an interrupt targeted to the VTL. */
     HvVtlEntryInterrupt = 2
 } HV_VTL_ENTRY_REASON, *PHV_VTL_ENTRY_REASON;
+
+typedef union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 VtlCallOffset : 12;
+        HV_UINT64 VtlReturnOffset : 12;
+        HV_UINT64 ReservedZ : 40;
+    };
+} HV_REGISTER_VSM_CODE_PAGE_OFFSETS, *PHV_REGISTER_VSM_CODE_PAGE_OFFSETS;
 
 typedef struct _HV_VP_VTL_CONTROL
 {
@@ -1365,6 +1463,55 @@ typedef struct _HV_VP_VTL_CONTROL
         };
     };
 } HV_VP_VTL_CONTROL, *PHV_VP_VTL_CONTROL;
+
+typedef union _HV_REGISTER_VSM_VINA
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Vector : 8;
+        HV_UINT64 Enabled : 1;
+        HV_UINT64 AutoReset : 1;
+        HV_UINT64 AutoEoi : 1;
+        HV_UINT64 ReservedP : 53;
+    };
+} HV_REGISTER_VSM_VINA, *PHV_REGISTER_VSM_VINA;
+
+typedef union _HV_REGISTER_CR_INTERCEPT_CONTROL
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Cr0Write : 1; /* 0x0000000000000001 */
+        HV_UINT64 Cr4Write : 1; /* 0x0000000000000002 */
+        HV_UINT64 XCr0Write : 1; /* 0x0000000000000004 */
+        HV_UINT64 IA32MiscEnableRead : 1; /* 0x0000000000000008 */
+        HV_UINT64 IA32MiscEnableWrite : 1; /* 0x0000000000000010 */
+        HV_UINT64 MsrLstarRead : 1; /* 0x0000000000000020 */
+        HV_UINT64 MsrLstarWrite : 1; /* 0x0000000000000040 */
+        HV_UINT64 MsrStarRead : 1; /* 0x0000000000000080 */
+        HV_UINT64 MsrStarWrite : 1; /* 0x0000000000000100 */
+        HV_UINT64 MsrCstarRead : 1; /* 0x0000000000000200 */
+        HV_UINT64 MsrCstarWrite : 1; /* 0x0000000000000400 */
+        HV_UINT64 ApicBaseMsrRead : 1; /* 0x0000000000000800 */
+        HV_UINT64 ApicBaseMsrWrite : 1; /* 0x0000000000001000 */
+        HV_UINT64 MsrEferRead : 1; /* 0x0000000000002000 */
+        HV_UINT64 MsrEferWrite : 1; /* 0x0000000000004000 */
+        HV_UINT64 GdtrWrite : 1; /* 0x0000000000008000 */
+        HV_UINT64 IdtrWrite : 1; /* 0x0000000000010000 */
+        HV_UINT64 LdtrWrite : 1; /* 0x0000000000020000 */
+        HV_UINT64 TrWrite : 1; /* 0x0000000000040000 */
+        HV_UINT64 MsrSysenterCsWrite : 1; /* 0x0000000000080000 */
+        HV_UINT64 MsrSysenterEipWrite : 1; /* 0x0000000000100000 */
+        HV_UINT64 MsrSysenterEspWrite : 1; /* 0x0000000000200000 */
+        HV_UINT64 MsrSfmaskWrite : 1; /* 0x0000000000400000 */
+        HV_UINT64 MsrTscAuxWrite : 1; /* 0x0000000000800000 */
+        HV_UINT64 MsrSgxLaunchControlWrite : 1; /* 0x0000000001000000 */
+        HV_UINT64 RsvdZ : 39;
+    };
+} HV_REGISTER_CR_INTERCEPT_CONTROL, *PHV_REGISTER_CR_INTERCEPT_CONTROL;
 
 /* Control structure that allows a hypervisor to indicate to its parent */
 /* hypervisor which nested enlightenment privileges are to be granted to the*/
@@ -1507,6 +1654,42 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
 #define HV_X64_MSR_TSC_EMULATION_CONTROL 0x40000107
 #define HV_X64_MSR_TSC_EMULATION_STATUS 0x40000108
 
+typedef union _HV_REENLIGHTENMENT_CONTROL
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Vector : 8;
+        HV_UINT64 RsvdZ1 : 8;
+        HV_UINT64 Enabled : 1;
+        HV_UINT64 RsvdZ2 : 15;
+        HV_UINT64 TargetVp : 32;
+    };
+} HV_REENLIGHTENMENT_CONTROL, *PHV_REENLIGHTENMENT_CONTROL;
+
+typedef union _HV_TSC_EMULATION_CONTROL
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Enabled : 1;
+        HV_UINT64 RsvdZ : 63;
+    };
+} HV_TSC_EMULATION_CONTROL, *PHV_TSC_EMULATION_CONTROL;
+
+typedef union _HV_TSC_EMULATION_STATUS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 InProgress : 1;
+        HV_UINT64 RsvdP1 : 63;
+    };
+} HV_TSC_EMULATION_STATUS, *PHV_TSC_EMULATION_STATUS;
+
 /* Synthetic Time-Unhalted Timer MSRs */
 
 #define HV_X64_MSR_STIME_UNHALTED_TIMER_CONFIG 0x40000114
@@ -1540,6 +1723,218 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
 #define HV_X64_MSR_NESTED_SINT13 0x4000109D
 #define HV_X64_MSR_NESTED_SINT14 0x4000109E
 #define HV_X64_MSR_NESTED_SINT15 0x4000109F
+
+/*
+ * Nested Virtualization
+ */
+
+typedef struct _VM_PARTITION_ASSIST_PAGE
+{
+    HV_UINT32 TlbLockCount;
+} VM_PARTITION_ASSIST_PAGE, * PVM_PARTITION_ASSIST_PAGE;
+
+#define HV_VMX_SYNTHETIC_EXIT_REASON_TRAP_AFTER_FLUSH 0x10000031
+
+typedef union _HV_GPA_PAGE_RANGE
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 AdditionalPages : 11;
+        HV_UINT64 LargePage : 1;
+        HV_UINT64 BasePfn : 52;
+    };
+    struct
+    {
+        HV_UINT64 Reserved0 : 12;
+        HV_UINT64 PageSize : 1;
+        HV_UINT64 Reserved1 : 8;
+        HV_UINT64 BaseLargePfn : 43;
+    };
+} HV_GPA_PAGE_RANGE, *PHV_GPA_PAGE_RANGE;
+
+/* Below is the type definition for the enlightened VMCS. The corresponding */
+/* Intel physical VMCS encoding for each field can be found in 16.11.4. Note */
+/* that some enlightened VMCS fields are synthetic, and therefore will not */
+/* have a corresponding physical VMCS encoding. */
+typedef struct _HV_VMX_ENLIGHTENED_VMCS
+{
+    HV_UINT32 VersionNumber;
+    HV_UINT32 AbortIndicator;
+    HV_UINT16 HostEsSelector;
+    HV_UINT16 HostCsSelector;
+    HV_UINT16 HostSsSelector;
+    HV_UINT16 HostDsSelector;
+    HV_UINT16 HostFsSelector;
+    HV_UINT16 HostGsSelector;
+    HV_UINT16 HostTrSelector;
+    HV_UINT64 HostPat;
+    HV_UINT64 HostEfer;
+    HV_UINT64 HostCr0;
+    HV_UINT64 HostCr3;
+    HV_UINT64 HostCr4;
+    HV_UINT64 HostSysenterEspMsr;
+    HV_UINT64 HostSysenterEipMsr;
+    HV_UINT64 HostRip;
+    HV_UINT32 HostSysenterCsMsr;
+    HV_UINT32 PinControls;
+    HV_UINT32 ExitControls;
+    HV_UINT32 SecondaryProcessorControls;
+    HV_GPA IoBitmapA;
+    HV_GPA IoBitmapB;
+    HV_GPA MsrBitmap;
+    HV_UINT16 GuestEsSelector;
+    HV_UINT16 GuestCsSelector;
+    HV_UINT16 GuestSsSelector;
+    HV_UINT16 GuestDsSelector;
+    HV_UINT16 GuestFsSelector;
+    HV_UINT16 GuestGsSelector;
+    HV_UINT16 GuestLdtrSelector;
+    HV_UINT16 GuestTrSelector;
+    HV_UINT32 GuestEsLimit;
+    HV_UINT32 GuestCsLimit;
+    HV_UINT32 GuestSsLimit;
+    HV_UINT32 GuestDsLimit;
+    HV_UINT32 GuestFsLimit;
+    HV_UINT32 GuestGsLimit;
+    HV_UINT32 GuestLdtrLimit;
+    HV_UINT32 GuestTrLimit;
+    HV_UINT32 GuestGdtrLimit;
+    HV_UINT32 GuestIdtrLimit;
+    HV_UINT32 GuestEsAttributes;
+    HV_UINT32 GuestCsAttributes;
+    HV_UINT32 GuestSsAttributes;
+    HV_UINT32 GuestDsAttributes;
+    HV_UINT32 GuestFsAttributes;
+    HV_UINT32 GuestGsAttributes;
+    HV_UINT32 GuestLdtrAttributes;
+    HV_UINT32 GuestTrAttributes;
+    HV_UINT64 GuestEsBase;
+    HV_UINT64 GuestCsBase;
+    HV_UINT64 GuestSsBase;
+    HV_UINT64 GuestDsBase;
+    HV_UINT64 GuestFsBase;
+    HV_UINT64 GuestGsBase;
+    HV_UINT64 GuestLdtrBase;
+    HV_UINT64 GuestTrBase;
+    HV_UINT64 GuestGdtrBase;
+    HV_UINT64 GuestIdtrBase;
+    HV_UINT64 Rsvd1[3];
+    HV_GPA ExitMsrStoreAddress;
+    HV_GPA ExitMsrLoadAddress;
+    HV_GPA EntryMsrLoadAddress;
+    HV_UINT64 Cr3Target0;
+    HV_UINT64 Cr3Target1;
+    HV_UINT64 Cr3Target2;
+    HV_UINT64 Cr3Target3;
+    HV_UINT32 PfecMask;
+    HV_UINT32 PfecMatch;
+    HV_UINT32 Cr3TargetCount;
+    HV_UINT32 ExitMsrStoreCount;
+    HV_UINT32 ExitMsrLoadCount;
+    HV_UINT32 EntryMsrLoadCount;
+    HV_UINT64 TscOffset;
+    HV_GPA VirtualApicPage;
+    HV_GPA GuestWorkingVmcsPtr;
+    HV_UINT64 GuestIa32DebugCtl;
+    HV_UINT64 GuestPat;
+    HV_UINT64 GuestEfer;
+    HV_UINT64 GuestPdpte0;
+    HV_UINT64 GuestPdpte1;
+    HV_UINT64 GuestPdpte2;
+    HV_UINT64 GuestPdpte3;
+    HV_UINT64 GuestPendingDebugExceptions;
+    HV_UINT64 GuestSysenterEspMsr;
+    HV_UINT64 GuestSysenterEipMsr;
+    HV_UINT32 GuestSleepState;
+    HV_UINT32 GuestSysenterCsMsr;
+    HV_UINT64 Cr0GuestHostMask;
+    HV_UINT64 Cr4GuestHostMask;
+    HV_UINT64 Cr0ReadShadow;
+    HV_UINT64 Cr4ReadShadow;
+    HV_UINT64 GuestCr0;
+    HV_UINT64 GuestCr3;
+    HV_UINT64 GuestCr4;
+    HV_UINT64 GuestDr7;
+    HV_UINT64 HostFsBase;
+    HV_UINT64 HostGsBase;
+    HV_UINT64 HostTrBase;
+    HV_UINT64 HostGdtrBase;
+    HV_UINT64 HostIdtrBase;
+    HV_UINT64 HostRsp;
+    HV_UINT64 EptRoot;
+    HV_UINT16 Vpid;
+    HV_UINT16 Rsvd2[3];
+    HV_UINT64 Rsvd3[5];
+    HV_UINT64 ExitEptFaultGpa;
+    HV_UINT32 ExitInstructionError;
+    HV_UINT32 ExitReason;
+    HV_UINT32 ExitInterruptionInfo;
+    HV_UINT32 ExitExceptionErrorCode;
+    HV_UINT32 ExitIdtVectoringInfo;
+    HV_UINT32 ExitIdtVectoringErrorCode;
+    HV_UINT32 ExitInstructionLength;
+    HV_UINT32 ExitInstructionInfo;
+    HV_UINT64 ExitQualification;
+    HV_UINT64 ExitIoInstructionEcx;
+    HV_UINT64 ExitIoInstructionEsi;
+    HV_UINT64 ExitIoInstructionEdi;
+    HV_UINT64 ExitIoInstructionEip;
+    HV_UINT64 GuestLinearAddress;
+    HV_UINT64 GuestRsp;
+    HV_UINT64 GuestRflags;
+    HV_UINT32 GuestInterruptibility;
+    HV_UINT32 ProcessorControls;
+    HV_UINT32 ExceptionBitmap;
+    HV_UINT32 EntryControls;
+    HV_UINT32 EntryInterruptInfo;
+    HV_UINT32 EntryExceptionErrorCode;
+    HV_UINT32 EntryInstructionLength;
+    HV_UINT32 TprThreshold;
+    HV_UINT64 GuestRip;
+    HV_UINT32 CleanFields;
+    HV_UINT32 Rsvd4;
+    HV_UINT32 SyntheticControls;
+    union
+    {
+        HV_UINT32 AsUINT32;
+
+        struct
+        {
+            HV_UINT32 NestedFlushVirtualHypercall : 1;
+            HV_UINT32 MsrBitmap : 1;
+            HV_UINT32 Reserved : 30;
+        };
+    } EnlightenmentsControl;
+    HV_UINT32 VpId;
+    HV_UINT64 VmId;
+    HV_UINT64 PartitionAssistPage;
+    HV_UINT64 Rsvd5[4];
+    HV_UINT64 GuestBndcfgs;
+    HV_UINT64 Rsvd6[7];
+    HV_UINT64 XssExitingBitmap;
+    HV_UINT64 EnclsExitingBitmap;
+    HV_UINT64 Rsvd7[6];
+} HV_VMX_ENLIGHTENED_VMCS, *PHV_VMX_ENLIGHTENED_VMCS;
+
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE (0)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP (1 << 0)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP (1 << 1)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2 (1 << 2)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1 (1 << 3)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_PROC (1 << 4)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT (1 << 5)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_ENTRY (1 << 6)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EXCPN (1 << 7)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR (1 << 8)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT (1 << 9)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC (1 << 10)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1 (1 << 11)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2 (1 << 12)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER (1 << 13)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1 (1 << 14)
+#define HV_VMX_ENLIGHTENED_CLEAN_FIELD_ENLIGHTENMENTSCONTROL (1 << 15)
 
 /*
  * Hypercall

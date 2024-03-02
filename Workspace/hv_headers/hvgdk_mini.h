@@ -17,21 +17,6 @@
 /* TODO not in hv headers */
 #define HV_LINUX_VENDOR_ID              0x8100
 
-union hv_gpa_page_range {
-	u64 address_space;
-	struct {
-		u64 additional_pages:11;
-		u64 largepage:1;
-		u64 basepfn:52;
-	} page;
-	struct {
-		u64 reserved:12;
-		u64 page_size:1;
-		u64 reserved1:8;
-		u64 base_large_pfn:43;
-	};
-};
-
 /* Define the number of synthetic interrupt sources. */
 #define HV_SYNIC_SINT_COUNT (16)
 
@@ -217,34 +202,8 @@ struct hv_message_page {
 	struct hv_message sint_message[HV_SYNIC_SINT_COUNT];
 } __packed;
 
-union hv_input_vtl {
-	__u8 as_uint8;
-	struct {
-		__u8 target_vtl : 4;
-		__u8 use_target_vtl : 1;
-		__u8 reserved_z : 3;
-	};
-} __packed;
-
 /* Note: not in hvgdk_mini.h */
 #define HV_SUPPORTS_REGISTER_DELIVERABILITY_NOTIFICATIONS
-
-union hv_register_vsm_partition_config {
-	__u64 as_u64;
-	struct {
-		__u64 enable_vtl_protection : 1;
-		__u64 default_vtl_protection_mask : 4;
-		__u64 zero_memory_on_reset : 1;
-		__u64 deny_lower_vtl_startup : 1;
-		__u64 intercept_acceptance : 1;
-		__u64 intercept_enable_vtl_protection : 1;
-		__u64 intercept_vp_startup : 1;
-		__u64 intercept_cpuid_unimplemented : 1;
-		__u64 intercept_unrecoverable_exception : 1;
-		__u64 intercept_page : 1;
-		__u64 mbz : 51;
-	};
-};
 
 /*
  * Arch compatibility regs for use with hv_set/get_register
