@@ -2296,6 +2296,30 @@ typedef enum _HV_CALL_CODE
     HvCallCount
 } HV_CALL_CODE, *PHV_CALL_CODE;
 
+/* Type of Normal Hypercall calling convention */
+typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_CALL_TYPE)(
+    HV_X64_HYPERCALL_INPUT HypercallInput,
+    HV_GPA InputParameters,
+    HV_GPA OutputParameters);
+
+/* Type of Fast Hypercall calling convention */
+typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_FAST_CALL_TYPE)(
+    HV_X64_HYPERCALL_INPUT HypercallInput,
+    HV_UINT64 InputParameter1,
+    HV_UINT64 InputParameter2);
+
+/* Type of XMM Fast Hypercall (Extended Fast Hypercall) calling convention */
+/*typedef HV_X64_HYPERCALL_OUTPUT(*__vectorcall PHV_X64_XMM_FAST_CALL_TYPE)(
+    HV_X64_HYPERCALL_INPUT HypercallInput,
+    HV_UINT64 Parameter1,
+    HV_UINT64 Parameter2,
+    __m128 Parameter3,
+    __m128 Parameter4,
+    __m128 Parameter5,
+    __m128 Parameter6,
+    __m128 Parameter7,
+    __m128 Parameter8);*/
+
 /* HvCallReserved0000 | 0x0000 */
 
 /* HvCallSwitchVirtualAddressSpace | 0x0001 */
