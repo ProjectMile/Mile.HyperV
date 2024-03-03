@@ -17,13 +17,13 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
 - [x] Chapter 5
 - [x] Chapter 6
 - [x] Chapter 7
-- [ ] Chapter 8
-- [ ] Chapter 9
-- [ ] Chapter 10
-- [ ] Chapter 11
-- [ ] Chapter 12
-- [ ] Chapter 13
-- [ ] Chapter 14
+- [x] Chapter 8
+- [ ] Chapter 9 (9.3 and onwards still left)
+- [ ] Chapter 10 (10.4 and onwards still left)
+- [ ] Chapter 11 (11.8 and onwards still left)
+- [ ] Chapter 12 (12.4 and onwards still left)
+- [ ] Chapter 13 (13.2.2 and onwards still left)
+- [ ] Chapter 14 (14.4 and onwards still left)
 - [ ] Chapter 15 (15.15.2 and onwards still left)
 - [ ] Chapter 16 (16.13 and onwards still left)
 - [x] Appendix A

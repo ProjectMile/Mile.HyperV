@@ -1399,6 +1399,19 @@ typedef struct _HV_SYNMC_X64_EVENT
 #define HV_X64_MSR_TPR 0x40000072
 #define HV_X64_MSR_VP_ASSIST_PAGE 0x40000073
 
+#define HV_VIRTUAL_APIC_NO_EOI_REQUIRED 0x0
+
+typedef union _HV_VIRTUAL_APIC_ASSIST
+{
+    HV_UINT32 ApicFlags;
+
+    struct
+    {
+        HV_UINT32 NoEOIRequired : 1;
+        HV_UINT32 ReservedZ : 31;
+    };
+} HV_VIRTUAL_APIC_ASSIST, *PHV_VIRTUAL_APIC_ASSIST;
+
 typedef HV_UINT8 HV_VTL;
 typedef HV_VTL* PHV_VTL;
 typedef const HV_VTL* PCHV_VTL;
