@@ -114,15 +114,6 @@ struct hv_output_withdraw_memory {
 	__u64 gpa_page_list[0];
 } __packed;
 
-/* HV Map GPA (Guest Physical Address) Flags */
-#define HV_MAP_GPA_PERMISSIONS_NONE     0x0
-#define HV_MAP_GPA_READABLE             0x1
-#define HV_MAP_GPA_WRITABLE             0x2
-#define HV_MAP_GPA_KERNEL_EXECUTABLE    0x4
-#define HV_MAP_GPA_USER_EXECUTABLE      0x8
-#define HV_MAP_GPA_EXECUTABLE           0xC
-#define HV_MAP_GPA_PERMISSIONS_MASK     0xF
-
 struct hv_input_map_gpa_pages {
 	__u64 target_partition_id;
 	__u64 target_gpa_base;

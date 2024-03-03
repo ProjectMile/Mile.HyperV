@@ -138,12 +138,6 @@ union hv_intercept_parameters {
 	/* N.B. Other intercept types do not have any parameters. */
 };
 
-/* Access types for the install intercept hypercall parameter */
-#define HV_INTERCEPT_ACCESS_MASK_NONE		0x00
-#define HV_INTERCEPT_ACCESS_MASK_READ		0X01
-#define HV_INTERCEPT_ACCESS_MASK_WRITE		0x02
-#define HV_INTERCEPT_ACCESS_MASK_EXECUTE	0x04
-
 struct hv_input_install_intercept {
 	__u64 partition_id;
 	__u32 access_type;	/* mask */

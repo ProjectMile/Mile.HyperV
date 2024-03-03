@@ -2,8 +2,6 @@
 
 The lightweight library for Hyper-V guest interfaces.
 
-**Work In Progress**
-
 ## Usage
 
 Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
@@ -22,10 +20,10 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
 - [x] Chapter 10
 - [x] Chapter 11
 - [x] Chapter 12
-- [ ] Chapter 13 (13.2.2 and onwards still left)
-- [ ] Chapter 14 (14.4 and onwards still left)
-- [ ] Chapter 15 (15.15.2 and onwards still left)
-- [ ] Chapter 16 (16.13 and onwards still left)
+- [x] Chapter 13
+- [x] Chapter 14
+- [x] Chapter 15
+- [x] Chapter 16
 - [x] Appendix A
 - [x] Appendix B
 - [x] Appendix C
