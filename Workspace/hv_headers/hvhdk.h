@@ -590,40 +590,6 @@ union hv_output_get_vp_cpuid_values {
 	} __packed;
 };
 
-enum hv_translate_gva_result_code {
-	HV_TRANSLATE_GVA_SUCCESS			= 0,
-
-	/* Translation failures. */
-	HV_TRANSLATE_GVA_PAGE_NOT_PRESENT		= 1,
-	HV_TRANSLATE_GVA_PRIVILEGE_VIOLATION		= 2,
-	HV_TRANSLATE_GVA_INVALID_PAGE_TABLE_FLAGS	= 3,
-
-	/* GPA access failures. */
-	HV_TRANSLATE_GVA_GPA_UNMAPPED			= 4,
-	HV_TRANSLATE_GVA_GPA_NO_READ_ACCESS		= 5,
-	HV_TRANSLATE_GVA_GPA_NO_WRITE_ACCESS		= 6,
-	HV_TRANSLATE_GVA_GPA_ILLEGAL_OVERLAY_ACCESS	= 7,
-
-	/*
-	 * Intercept for memory access by either
-	 *  - a higher VTL
-	 *  - a nested hypervisor (due to a violation of the nested page table)
-	 */
-	HV_TRANSLATE_GVA_INTERCEPT			= 8,
-
-	HV_TRANSLATE_GVA_GPA_UNACCEPTED			= 9,
-};
-
-union hv_translate_gva_result {
-	__u64 as_uint64;
-	struct {
-		__u32 result_code; /* enum hv_translate_hva_result_code */
-		__u32 cache_type : 8;
-		__u32 overlay_page : 1;
-		__u32 reserved : 23;
-	} __packed;
-};
-
 /* Define synthetic interrupt controller flag constants. */
 #define HV_EVENT_FLAGS_COUNT		(256 * 8)
 #define HV_EVENT_FLAGS_BYTE_COUNT	(256)
@@ -1061,19 +1027,6 @@ struct hv_async_completion_message_payload {
 	__u32 status;
 	__u32 completion_count;
 	__u64 sub_status;
-} __packed;
-
-struct hv_input_translate_virtual_address {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 padding;
-	__u64 control_flags;
-	__u64 gva_page;
-} __packed;
-
-struct hv_output_translate_virtual_address {
-	union hv_translate_gva_result translation_result;
-	__u64 gpa_page;
 } __packed;
 
 enum hv_cache_type {

@@ -29,20 +29,6 @@
 /* mshv assigned SINT for doorbell */
 #define HV_SYNIC_DOORBELL_SINT_INDEX     HV_SYNIC_FIRST_UNUSED_SINT_INDEX
 
-enum hv_interrupt_type {
-	HV_X64_INTERRUPT_TYPE_FIXED		= 0x0000,
-	HV_X64_INTERRUPT_TYPE_LOWESTPRIORITY	= 0x0001,
-	HV_X64_INTERRUPT_TYPE_SMI		= 0x0002,
-	HV_X64_INTERRUPT_TYPE_REMOTEREAD	= 0x0003,
-	HV_X64_INTERRUPT_TYPE_NMI		= 0x0004,
-	HV_X64_INTERRUPT_TYPE_INIT		= 0x0005,
-	HV_X64_INTERRUPT_TYPE_SIPI		= 0x0006,
-	HV_X64_INTERRUPT_TYPE_EXTINT		= 0x0007,
-	HV_X64_INTERRUPT_TYPE_LOCALINT0		= 0x0008,
-	HV_X64_INTERRUPT_TYPE_LOCALINT1		= 0x0009,
-	HV_X64_INTERRUPT_TYPE_MAXIMUM		= 0x000A,
-};
-
 /* Define synthetic interrupt source. */
 union hv_synic_sint {
 	__u64 as_uint64;
@@ -235,52 +221,6 @@ struct hv_message_page {
 #define HV_MSR_CRASH_CTL	(HV_X64_MSR_CRASH_CTL)
 
 // bunch of stuff in between
-
-union hv_msi_entry {
-	u64 as_uint64;
-	struct {
-		u32 address;
-		u32 data;
-	} __packed;
-};
-
-enum hv_interrupt_source {
-	HV_INTERRUPT_SOURCE_MSI = 1, /* MSI and MSI-X */
-	HV_INTERRUPT_SOURCE_IOAPIC,
-};
-
-union hv_ioapic_rte {
-	u64 as_uint64;
-
-	struct {
-		u32 vector:8;
-		u32 delivery_mode:3;
-		u32 destination_mode:1;
-		u32 delivery_status:1;
-		u32 interrupt_polarity:1;
-		u32 remote_irr:1;
-		u32 trigger_mode:1;
-		u32 interrupt_mask:1;
-		u32 reserved1:15;
-
-		u32 reserved2:24;
-		u32 destination_id:8;
-	};
-
-	struct {
-		u32 low_uint32;
-		u32 high_uint32;
-	};
-} __packed;
-
-struct hv_interrupt_entry {
-	u32 source; /* enum hv_interrupt_source */
-	u32 reserved1;
-	union {
-		union hv_msi_entry msi_entry;
-		union hv_ioapic_rte ioapic_rte;
-	};
-} __packed;
 
 enum hv_intercept_type {
 	HV_INTERCEPT_TYPE_X64_IO_PORT			= 0X00000000,
