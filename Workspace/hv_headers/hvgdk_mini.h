@@ -236,31 +236,6 @@ struct hv_message_page {
 
 // bunch of stuff in between
 
-struct hv_register_assoc {
-	__u32 name;			/* enum hv_register_name */
-	__u32 reserved1;
-	__u64 reserved2;
-	union hv_register_value value;
-} __packed;
-
-struct hv_input_get_vp_registers {
-	__u64 partition_id;
-	__u32 vp_index;
-	union hv_input_vtl input_vtl;
-	__u8  rsvd_z8;
-	__u16 rsvd_z16;
-	__u32 names[];
-} __packed;
-
-struct hv_input_set_vp_registers {
-	__u64 partition_id;
-	__u32 vp_index;
-	union hv_input_vtl input_vtl;
-	__u8  rsvd_z8;
-	__u16 rsvd_z16;
-	struct hv_register_assoc elements[];
-} __packed;
-
 union hv_msi_entry {
 	u64 as_uint64;
 	struct {

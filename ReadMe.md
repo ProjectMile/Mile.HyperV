@@ -16,7 +16,7 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
 - [x] Chapter 4
 - [x] Chapter 5
 - [x] Chapter 6
-- [ ] Chapter 7 (7.10 and onwards still left)
+- [x] Chapter 7
 - [ ] Chapter 8
 - [ ] Chapter 9
 - [ ] Chapter 10

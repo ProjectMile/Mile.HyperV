@@ -1659,6 +1659,10 @@ typedef struct _HV_VP_SET
     HV_UINT64 BankContents[];
 } HV_VP_SET, *PHV_VP_SET;
 
+typedef HV_UINT32 HV_APIC_ID;
+typedef HV_APIC_ID* PHV_APIC_ID;
+typedef const HV_APIC_ID* PCHV_APIC_ID;
+
 /* Define synthetic interrupt controller model specific registers. */
 
 #define HV_X64_MSR_SCONTROL 0x40000080
@@ -2475,11 +2479,37 @@ typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_FAST_CALL_TYPE)(
 
 /* HvCallGetVpRegisters | 0x0050 */
 
+typedef struct _HV_INPUT_GET_VP_REGISTERS
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_INPUT_VTL InputVtl;
+    HV_UINT8 Padding[3];
+    HV_REGISTER_NAME Names[];
+} HV_INPUT_GET_VP_REGISTERS, *PHV_INPUT_GET_VP_REGISTERS;
 
+typedef struct _HV_OUTPUT_GET_VP_REGISTERS
+{
+    HV_REGISTER_VALUE Values[];
+} HV_OUTPUT_GET_VP_REGISTERS, *PHV_OUTPUT_GET_VP_REGISTERS;
 
 /* HvCallSetVpRegisters | 0x0051 */
 
+typedef struct _HV_REGISTER_ASSOC
+{
+    HV_REGISTER_NAME Name;
+    HV_UINT8 Padding[12];
+    HV_REGISTER_VALUE Value;
+} HV_REGISTER_ASSOC, *PHV_REGISTER_ASSOC;
 
+typedef struct _HV_INPUT_SET_VP_REGISTERS
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_INPUT_VTL InputVtl;
+    HV_UINT8 Padding[3];
+    HV_REGISTER_ASSOC Elements[];
+} HV_INPUT_SET_VP_REGISTERS, *PHV_INPUT_SET_VP_REGISTERS;
 
 /* HvCallTranslateVirtualAddress | 0x0052 */
 
@@ -2635,11 +2665,72 @@ typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_FAST_CALL_TYPE)(
 
 /* HvCallStartVirtualProcessor | 0x0099 */
 
+typedef struct _HV_INITIAL_VP_CONTEXT
+{
+    HV_UINT64 Rip;
+    HV_UINT64 Rsp;
+    HV_UINT64 Rflags;
 
+    /* Segment selector registers together with their hidden state. */
+
+    HV_X64_SEGMENT_REGISTER Cs;
+    HV_X64_SEGMENT_REGISTER Ds;
+    HV_X64_SEGMENT_REGISTER Es;
+    HV_X64_SEGMENT_REGISTER Fs;
+    HV_X64_SEGMENT_REGISTER Gs;
+    HV_X64_SEGMENT_REGISTER Ss;
+    HV_X64_SEGMENT_REGISTER Tr;
+    HV_X64_SEGMENT_REGISTER Ldtr;
+
+    /* Global and Interrupt Descriptor tables */
+
+    HV_X64_TABLE_REGISTER Idtr;
+    HV_X64_TABLE_REGISTER Gdtr;
+
+    /* Control registers and MSR's */
+
+    HV_UINT64 Efer;
+    HV_UINT64 Cr0;
+    HV_UINT64 Cr3;
+    HV_UINT64 Cr4;
+    HV_UINT64 MsrCrPat;
+} HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
+
+typedef struct _HV_INPUT_START_VIRTUAL_PROCESSOR
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL TargetVtl;
+    HV_UINT8 Padding[3];
+    HV_INITIAL_VP_CONTEXT VpContext;
+} HV_INPUT_START_VIRTUAL_PROCESSOR, *PHV_INPUT_START_VIRTUAL_PROCESSOR;
 
 /* HvCallGetVpIndexFromApicId | 0x009A */
 
+typedef struct _HV_APIC_ID_ASSOC
+{
+    HV_APIC_ID ApicId;
+    HV_UINT32 Padding;
+} HV_APIC_ID_ASSOC, *PHV_APIC_ID_ASSOC;
 
+typedef struct _HV_VP_INDEX_ASSOC
+{
+    HV_VP_INDEX VpIndex;
+    HV_UINT32 Padding;
+} HV_VP_INDEX_ASSOC, *PHV_VP_INDEX_ASSOC;
+
+typedef struct _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VTL TargetVtl;
+    HV_UINT8 Padding[7];
+    HV_APIC_ID_ASSOC Elements[];
+} HV_INPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_INPUT_GET_VP_INDEX_FROM_APIC_ID;
+
+typedef struct _HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID
+{
+    HV_VP_INDEX_ASSOC Elements[];
+} HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 /* HvCallReserved009b | 0x009B */
 /* HvCallReserved009c | 0x009C */
