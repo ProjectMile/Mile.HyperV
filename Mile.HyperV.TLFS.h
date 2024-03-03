@@ -1384,6 +1384,27 @@ typedef struct _HV_SYNMC_X64_EVENT
 
 #define HV_X64_MSR_REFERENCE_TSC 0x40000021
 
+typedef union _HV_X64_MSR_REFERENCE_TSC_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Enable : 1;
+        HV_UINT64 ReservedP : 11;
+        HV_UINT64 GpaPageNumber : 52;
+    };
+} HV_X64_MSR_REFERENCE_TSC_CONTENTS, *PHV_X64_MSR_REFERENCE_TSC_CONTENTS;
+
+typedef struct _HV_REFERENCE_TSC_PAGE
+{
+    volatile HV_UINT32 TscSequence;
+    HV_UINT32 Reserved1;
+    volatile HV_UINT64 TscScale;
+    volatile HV_INT64 TscOffset;
+    HV_UINT64 Reserved2[509];
+} HV_REFERENCE_TSC_PAGE, *PHV_REFERENCE_TSC_PAGE;
+
 /* MSR used to retrieve the TSC frequency */
 
 #define HV_X64_MSR_TSC_FREQUENCY 0x40000022
@@ -1705,6 +1726,60 @@ typedef const HV_APIC_ID* PCHV_APIC_ID;
 #define HV_X64_MSR_SINT14 0x4000009E
 #define HV_X64_MSR_SINT15 0x4000009F
 
+typedef union _HV_SYNIC_SCONTROL
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Enable : 1;
+        HV_UINT64 Preserved : 63;
+    };
+} HV_SYNIC_SCONTROL, *PHV_SYNIC_SCONTROL;
+
+#define HV_SYNIC_VERSION 0x00000001
+
+typedef union _HV_SYNIC_SIEFP
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 SiefpEnabled : 1;
+        HV_UINT64 Preserved : 11;
+        HV_UINT64 BaseSiefpGpa : 52;
+    };
+} HV_SYNIC_SIEFP, *PHV_SYNIC_SIEFP;
+
+typedef union _HV_SYNIC_SIMP
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 SimpEnabled : 1;
+        HV_UINT64 Preserved : 11;
+        HV_UINT64 BaseSimpGpa : 52;
+    };
+} HV_SYNIC_SIMP, *PHV_SYNIC_SIMP;
+
+typedef union _HV_SYNIC_SINT
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Vector : 8;
+        HV_UINT64 Preserved : 8;
+        HV_UINT64 Masked : 1;
+        HV_UINT64 AutoEoi : 1;
+        HV_UINT64 Polling : 1;
+        HV_UINT64 AsIntercept : 1;
+        HV_UINT64 Proxy : 1;
+        HV_UINT64 Preserved1 : 43;
+    };
+} HV_SYNIC_SINT, *PHV_SYNIC_SINT;
+
 /* Synthetic Timer MSRs. Four timers per vcpu. */
 
 #define HV_X64_MSR_STIMER0_CONFIG 0x400000B0
@@ -1715,6 +1790,24 @@ typedef const HV_APIC_ID* PCHV_APIC_ID;
 #define HV_X64_MSR_STIMER2_COUNT 0x400000B5
 #define HV_X64_MSR_STIMER3_CONFIG 0x400000B6
 #define HV_X64_MSR_STIMER3_COUNT 0x400000B7
+
+typedef union _HV_X64_MSR_STIMER_CONFIG_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT64 Enable : 1;
+        HV_UINT64 Periodic : 1;
+        HV_UINT64 Lazy : 1;
+        HV_UINT64 AutoEnable : 1;
+        HV_UINT64 ApicVector : 8;
+        HV_UINT64 DirectMode : 1;
+        HV_UINT64 ReservedZ1 : 3;
+        HV_UINT64 SINTx : 4;
+        HV_UINT64 ReservedZ2 : 44;
+    };
+} HV_X64_MSR_STIMER_CONFIG_CONTENTS, *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
 
 /* Hyper-V guest idle MSR */
 
@@ -2009,6 +2102,260 @@ typedef struct _HV_DEVICE_INTERRUPT_TARGET
         HV_UINT64 ProcessorSet[ANYSIZE_ARRAY];
     };
 } HV_DEVICE_INTERRUPT_TARGET, *PHV_DEVICE_INTERRUPT_TARGET;
+
+/*
+ * Inter-Partition Communication
+ */
+
+#define HV_SYNIC_SINT_COUNT 16
+
+typedef HV_UINT32 HV_SYNIC_SINT_INDEX;
+typedef HV_SYNIC_SINT_INDEX* PHV_SYNIC_SINT_INDEX;
+typedef const HV_SYNIC_SINT_INDEX* PCHV_SYNIC_SINT_INDEX;
+
+typedef union _HV_PORT_ID
+{
+    HV_UINT32 AsUINT32;
+
+    struct
+    {
+        HV_UINT32 Id : 24;
+        HV_UINT32 Reserved : 8;
+    };
+} HV_PORT_ID, *PHV_PORT_ID;
+
+typedef enum _HV_PORT_TYPE
+{
+    HvPortTypeMessage = 1,
+    HvPortTypeEvent = 2,
+    HvPortTypeMonitor = 3,
+    HvPortTypeDoorbell = 4 /* Root Partition only */
+} HV_PORT_TYPE, *PHV_PORT_TYPE;
+
+typedef struct _HV_PORT_INFO
+{
+    HV_PORT_TYPE PortType;
+    HV_UINT32 ReservedZ;
+    union
+    {
+        struct
+        {
+            HV_SYNIC_SINT_INDEX TargetSint;
+            HV_VP_INDEX TargetVp;
+            HV_UINT64 ReservedZ;
+        } MessagePortInfo;
+        struct
+        {
+            HV_SYNIC_SINT_INDEX TargetSint;
+            HV_VP_INDEX TargetVp;
+            HV_UINT16 BaseFlagNumber;
+            HV_UINT16 FlagCount;
+            HV_UINT32 ReservedZ;
+        } EventPortInfo;
+        struct
+        {
+            HV_GPA MonitorAddress;
+            HV_UINT64 ReservedZ;
+        } MonitorPortInfo;
+        struct
+        {
+            HV_UINT32 TargetSint;
+            HV_UINT32 TargetVp;
+            HV_UINT64 ReservedZ;
+        } DoorbellPortInfo;
+    };
+} HV_PORT_INFO, *PHV_PORT_INFO;
+
+typedef union _HV_CONNECTION_ID
+{
+    HV_UINT32 AsUINT32;
+
+    struct
+    {
+        HV_UINT32 Id : 24;
+        HV_UINT32 Reserved : 8;
+    };
+} HV_CONNECTION_ID, *PHV_CONNECTION_ID;
+
+typedef struct _HV_CONNECTION_INFO
+{
+    HV_PORT_TYPE PortType;
+    HV_UINT32 Padding;
+    union
+    {
+        struct
+        {
+            HV_UINT64 ReservedZ;
+        } MessageConnectionInfo;
+        struct
+        {
+            HV_UINT64 ReservedZ;
+        } EventConnectionInfo;
+        struct
+        {
+            HV_GPA MonitorAddress;
+        } MonitorConnectionInfo;
+        struct
+        {
+            HV_UINT64 Gpa;
+            HV_UINT64 TriggerValue;
+            HV_UINT64 Flags;
+        } DoorbellConnectionInfo;
+    };
+} HV_CONNECTION_INFO, *PHV_CONNECTION_INFO;
+
+typedef struct _HV_MONITOR_TRIGGER_GROUP
+{
+    HV_UINT64 AsUINT64;
+
+    struct
+    {
+        HV_UINT32 Pending;
+        HV_UINT32 Armed;
+    };
+} HV_MONITOR_TRIGGER_GROUP, *PHV_MONITOR_TRIGGER_GROUP;
+
+typedef struct _HV_MONITOR_PARAMETER
+{
+    HV_CONNECTION_ID ConnectionId;
+    HV_UINT16 FlagNumber;
+    HV_UINT16 ReservedZ;
+} HV_MONITOR_PARAMETER, *PHV_MONITOR_PARAMETER;
+
+typedef union _HV_MONITOR_TRIGGER_STATE
+{
+    HV_UINT32 AsUINT32;
+
+    struct
+    {
+        HV_UINT32 GroupEnable : 4;
+        HV_UINT32 ReservedZ : 27;
+    };
+} HV_MONITOR_TRIGGER_STATE, *PHV_MONITOR_TRIGGER_STATE;
+
+typedef struct _HV_MONITOR_PAGE
+{
+    HV_MONITOR_TRIGGER_STATE TriggerState;
+    HV_UINT32 Reserved1;
+    HV_MONITOR_TRIGGER_GROUP TriggerGroup[4];
+    HV_UINT8 Reserved2[536];
+    HV_UINT16 Latency[4][32];
+    HV_UINT8 Reserved3[256];
+    HV_MONITOR_PARAMETER Parameter[4][32];
+    HV_UINT8 Reserved4[1984];
+} HV_MONITOR_PAGE, *PHV_MONITOR_PAGE;
+typedef volatile HV_MONITOR_PAGE* PVHV_MONITOR_PAGE;
+
+/* SynIC messages encode the message type as a 32-bit number. */
+typedef enum _HV_MESSAGE_TYPE
+{
+    HvMessageTypeNone = 0x00000000,
+
+    /* Memory access messages */
+
+    HvMessageTypeUnmappedGpa = 0x80000000,
+    HvMessageTypeGpaIntercept = 0x80000001,
+
+    /* Timer notifications messages*/
+
+    HvMessageTimerExpired = 0x80000010,
+
+    /* Error messages */
+
+    HvMessageTypeInvalidVpRegisterValue = 0x80000020,
+    HvMessageTypeUnrecoverableException = 0x80000021,
+    HvMessageTypeUnsupportedFeature = 0x80000022,
+    HvMessageTypeTlbPageSizeMismatch = 0x80000023,
+
+    /*
+     * Opaque intercept message. The original intercept message is only
+     * accessible from the mapped intercept message page.
+     */
+    HvMessageTypeOpaqueIntercept = 0x8000003F,
+
+    /* Trace buffer complete messages */
+
+    HvMessageTypeEventLogBuffersComplete = 0x80000040,
+
+    /* Hypercall intercept */
+
+    HvMessageTypeHypercallIntercept = 0x80000050,
+
+    /* SynIC intercepts */
+
+    HvMessageTypeSynicEventIntercept = 0x80000060,
+    HvMessageTypeSynicSintIntercept = 0x80000061,
+    HvMessageTypeSynicSintDeliverable = 0x80000062,
+
+    /* Async call completion intercept */
+
+    HvMessageTypeAsyncCallCompletion = 0x80000070,
+
+    /* Root scheduler messages */
+
+    HvMessageTypeSchedulerVpSignalBitset = 0x80000100,
+    HvMessageTypeSchedulerVpSignalPair = 0x80000101,
+
+    /* Platform-specific processor intercept messages */
+
+    HvMessageTypeX64IoPortIntercept = 0x80010000,
+    HvMessageTypeMsrIntercept = 0x80010001,
+    HvMessageTypeX64CpuidIntercept = 0x80010002,
+    HvMessageTypeExceptionIntercept = 0x80010003,
+    HvMessageTypeX64ApicEoi = 0x80010004,
+    HvMessageTypeX64LegacyFpError = 0x80010005,
+    HvMessageTypeRegisterIntercept = 0x80010006,
+    HvMessageTypeX64Halt = 0x80010007,
+    HvMessageTypeX64InterruptionDeliverable = 0x80010008,
+    HvMessageTypeX64SipiIntercept = 0x80010009
+} HV_MESSAGE_TYPE, *PHV_MESSAGE_TYPE;
+
+#define HV_MESSAGE_TYPE_HYPERVISOR_MASK 0x80000000
+
+typedef union _HV_MESSAGE_FLAGS
+{
+    HV_UINT8 AsUINT8;
+
+    struct
+    {
+        HV_UINT8 MessagePending : 1;
+        HV_UINT8 Reserved : 7;
+    };
+} HV_MESSAGE_FLAGS, *PHV_MESSAGE_FLAGS;
+
+#define HV_MESSAGE_SIZE 256
+#define HV_MESSAGE_MAX_PAYLOAD_BYTE_COUNT 240
+#define HV_MESSAGE_MAX_PAYLOAD_QWORD_COUNT 30
+
+typedef struct _HV_MESSAGE_HEADER
+{
+    HV_MESSAGE_TYPE MessageType;
+    HV_UINT8 PayloadSize;
+    HV_MESSAGE_FLAGS MessageFlags;
+    HV_UINT16 Reserved;
+    union
+    {
+        HV_UINT64 OriginationId;
+        HV_PARTITION_ID Sender;
+        HV_PORT_ID Port;
+    };
+} HV_MESSAGE_HEADER, *PHV_MESSAGE_HEADER;
+
+typedef struct _HV_MESSAGE
+{
+    HV_MESSAGE_HEADER Header;
+    HV_UINT64 Payload[HV_MESSAGE_MAX_PAYLOAD_QWORD_COUNT];
+} HV_MESSAGE, *PHV_MESSAGE;
+
+#define HV_EVENT_FLAGS_COUNT (256 * 8)
+#define HV_EVENT_FLAGS_BYTE_COUNT 256
+#define HV_EVENT_FLAGS_DWORD_COUNT 64
+
+typedef union _HV_SYNIC_EVENT_FLAGS
+{
+    HV_UINT8 Flags8[HV_EVENT_FLAGS_BYTE_COUNT];
+    HV_UINT32 Flags32[HV_EVENT_FLAGS_DWORD_COUNT];
+} HV_SYNIC_EVENT_FLAGS, *PHV_SYNIC_EVENT_FLAGS;
 
 /*
  * Nested Virtualization
@@ -2796,11 +3143,23 @@ typedef struct _HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS
 
 /* HvCallPostMessage | 0x005C */
 
-
+typedef struct _HV_INPUT_POST_MESSAGE
+{
+    HV_CONNECTION_ID ConnectionId;
+    HV_UINT32 Padding;
+    HV_MESSAGE_TYPE MessageType;
+    HV_UINT32 PayloadSize;
+    HV_UINT64 Message[HV_MESSAGE_MAX_PAYLOAD_QWORD_COUNT];
+} HV_INPUT_POST_MESSAGE, *PHV_INPUT_POST_MESSAGE;
 
 /* HvCallSignalEvent | 0x005D */
 
-
+typedef struct _HV_INPUT_SIGNAL_EVENT
+{
+    HV_CONNECTION_ID ConnectionId;
+    HV_UINT16 FlagNumber;
+    HV_UINT16 ReservedZ;
+} HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
 
 /* HvCallSavePartitionState | 0x005E */
 

@@ -29,21 +29,6 @@
 /* mshv assigned SINT for doorbell */
 #define HV_SYNIC_DOORBELL_SINT_INDEX     HV_SYNIC_FIRST_UNUSED_SINT_INDEX
 
-/* Define synthetic interrupt source. */
-union hv_synic_sint {
-	__u64 as_uint64;
-	struct {
-		__u64 vector : 8;
-		__u64 reserved1 : 8;
-		__u64 masked : 1;
-		__u64 auto_eoi : 1;
-		__u64 polling : 1;
-		__u64 as_intercept : 1;
-		__u64 proxy : 1;
-		__u64 reserved2 : 43;
-	} __packed;
-};
-
 union hv_x64_xsave_xfem_register {
 	__u64 as_uint64;
 	struct {
@@ -73,114 +58,12 @@ union hv_x64_xsave_xfem_register {
 /* Define the number of synthetic timers */
 #define HV_SYNIC_STIMER_COUNT	(4)
 
-/* Define port identifier type. */
-union hv_port_id {
-	__u32 asu32;
-	struct {
-		__u32 id : 24;
-		__u32 reserved : 8;
-	} __packed u; // TODO remove this u
-};
-
-#define HV_MESSAGE_SIZE			(256)
-#define HV_MESSAGE_PAYLOAD_BYTE_COUNT	(240)
-#define HV_MESSAGE_PAYLOAD_QWORD_COUNT	(30)
-
-/* Define hypervisor message types. */
-enum hv_message_type {
-	HVMSG_NONE				= 0x00000000,
-
-	/* Memory access messages. */
-	HVMSG_UNMAPPED_GPA			= 0x80000000,
-	HVMSG_GPA_INTERCEPT			= 0x80000001,
-
-	/* Timer notification messages. */
-	HVMSG_TIMER_EXPIRED			= 0x80000010,
-
-	/* Error messages. */
-	HVMSG_INVALID_VP_REGISTER_VALUE		= 0x80000020,
-	HVMSG_UNRECOVERABLE_EXCEPTION		= 0x80000021,
-	HVMSG_UNSUPPORTED_FEATURE		= 0x80000022,
-
-	/*
-	 * Opaque intercept message. The original intercept message is only
-	 * accessible from the mapped intercept message page.
-	 */
-	HVMSG_OPAQUE_INTERCEPT			= 0x8000003F,
-
-	/* Trace buffer complete messages. */
-	HVMSG_EVENTLOG_BUFFERCOMPLETE		= 0x80000040,
-
-	/* Hypercall intercept */
-	HVMSG_HYPERCALL_INTERCEPT		= 0x80000050,
-
-	/* SynIC intercepts */
-	HVMSG_SYNIC_EVENT_INTERCEPT		= 0x80000060,
-	HVMSG_SYNIC_SINT_INTERCEPT		= 0x80000061,
-	HVMSG_SYNIC_SINT_DELIVERABLE	= 0x80000062,
-
-	/* Async call completion intercept */
-	HVMSG_ASYNC_CALL_COMPLETION		= 0x80000070,
-
-	/* Root scheduler messages */
-	HVMSG_SCHEDULER_VP_SIGNAL_BITSET	= 0x80000100,
-	HVMSG_SCHEDULER_VP_SIGNAL_PAIR		= 0x80000101,
-
-	/* Platform-specific processor intercept messages. */
-	HVMSG_X64_IO_PORT_INTERCEPT		= 0x80010000,
-	HVMSG_X64_MSR_INTERCEPT			= 0x80010001,
-	HVMSG_X64_CPUID_INTERCEPT		= 0x80010002,
-	HVMSG_X64_EXCEPTION_INTERCEPT		= 0x80010003,
-	HVMSG_X64_APIC_EOI			= 0x80010004,
-	HVMSG_X64_LEGACY_FP_ERROR		= 0x80010005,
-	HVMSG_X64_IOMMU_PRQ			= 0x80010006,
-	HVMSG_X64_HALT				= 0x80010007,
-	HVMSG_X64_INTERRUPTION_DELIVERABLE	= 0x80010008,
-	HVMSG_X64_SIPI_INTERCEPT		= 0x80010009,
-};
-
-/* Define the format of the SIMP register */
-union hv_synic_simp {
-	__u64 as_uint64;
-	struct {
-		__u64 simp_enabled : 1;
-		__u64 preserved : 11;
-		__u64 base_simp_gpa : 52;
-	} __packed;
-};
-
-union hv_message_flags {
-	__u8 asu8;
-	struct {
-		__u8 msg_pending : 1;
-		__u8 reserved : 7;
-	} __packed;
-};
-
-struct hv_message_header {
-	__u32 message_type;
-	__u8 payload_size;
-	union hv_message_flags message_flags;
-	__u8 reserved[2];
-	union {
-		__u64 sender;
-		union hv_port_id port;
-	};
-} __packed;
-
 /*
  * Message format for notifications delivered via
  * intercept message(as_intercept=1)
  */
 struct hv_notification_message_payload {
 	__u32 sint_index;
-} __packed;
-
-struct hv_message {
-	struct hv_message_header header;
-	union {
-		__u64 payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
-	} u;
 } __packed;
 
 /* Define the synthetic interrupt message page layout. */
