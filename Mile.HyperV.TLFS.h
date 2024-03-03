@@ -2296,6 +2296,437 @@ typedef enum _HV_CALL_CODE
     HvCallCount
 } HV_CALL_CODE, *PHV_CALL_CODE;
 
+/* HvCallReserved0000 | 0x0000 */
+
+/* HvCallSwitchVirtualAddressSpace | 0x0001 */
+
+
+
+/* HvCallFlushVirtualAddressSpace | 0x0002 */
+
+
+
+/* HvCallFlushVirtualAddressList | 0x0003 */
+
+
+
+/* HvCallGetLogicalProcessorRunTime | 0x0004 */
+
+
+
+/* HvCallDeprecated0005 | 0x0005 */
+/* HvCallDeprecated0006 | 0x0006 */
+/* HvCallDeprecated0007 | 0x0007 */
+
+/* HvCallNotifyLongSpinWait | 0x0008 */
+
+
+
+/* HvCallParkedVirtualProcessors | 0x0009 */
+
+
+
+/* HvCallInvokeHypervisorDebugger | 0x000A */
+
+
+
+/* HvCallSendSyntheticClusterIpi | 0x000B */
+
+
+
+/* HvCallModifyVtlProtectionMask | 0x000C */
+
+
+
+/* HvCallEnablePartitionVtl | 0x000D */
+
+
+
+/* HvCallDisablePartitionVtl | 0x000E */
+
+
+
+/* HvCallEnableVpVtl | 0x000F */
+
+
+
+/* HvCallDisableVpVtl | 0x0010 */
+
+
+
+/* HvCallVtlCall | 0x0011 */
+
+
+
+/* HvCallVtlReturn | 0x0012 */
+
+
+
+/* HvCallFlushVirtualAddressSpaceEx | 0x0013 */
+
+
+
+/* HvCallFlushVirtualAddressListEx | 0x0014 */
+
+
+
+/* HvCallSendSyntheticClusterIpiEx | 0x0015 */
+
+
+
+/* HvCallReserved0016 | 0x0016 */
+/* HvCallReserved0017 | 0x0017 */
+/* HvCallReserved0018 | 0x0018 */
+/* HvCallReserved0019 | 0x0019 */
+/* HvCallReserved001a | 0x001A */
+/* HvCallReserved001b | 0x001B */
+/* HvCallReserved001c | 0x001C */
+/* HvCallReserved001d | 0x001D */
+/* HvCallReserved001e | 0x001E */
+/* HvCallReserved001f | 0x001F */
+/* HvCallReserved0020 | 0x0020 */
+/* HvCallReserved0021 | 0x0021 */
+/* HvCallReserved0022 | 0x0022 */
+/* HvCallReserved0023 | 0x0023 */
+/* HvCallReserved0024 | 0x0024 */
+/* HvCallReserved0025 | 0x0025 */
+/* HvCallReserved0026 | 0x0026 */
+/* HvCallReserved0027 | 0x0027 */
+/* HvCallReserved0028 | 0x0028 */
+/* HvCallReserved0029 | 0x0029 */
+/* HvCallReserved002a | 0x002A */
+/* HvCallReserved002b | 0x002B */
+/* HvCallReserved002c | 0x002C */
+/* HvCallReserved002d | 0x002D */
+/* HvCallReserved002e | 0x002E */
+/* HvCallReserved002f | 0x002F */
+/* HvCallReserved0030 | 0x0030 */
+/* HvCallReserved0031 | 0x0031 */
+/* HvCallReserved0032 | 0x0032 */
+/* HvCallReserved0033 | 0x0033 */
+/* HvCallReserved0034 | 0x0034 */
+/* HvCallReserved0035 | 0x0035 */
+/* HvCallReserved0036 | 0x0036 */
+/* HvCallReserved0037 | 0x0037 */
+/* HvCallReserved0038 | 0x0038 */
+/* HvCallReserved0039 | 0x0039 */
+/* HvCallReserved003a | 0x003A */
+/* HvCallReserved003b | 0x003B */
+/* HvCallReserved003c | 0x003C */
+/* HvCallReserved003d | 0x003D */
+/* HvCallReserved003e | 0x003E */
+/* HvCallReserved003f | 0x003F */
+
+/* HvCallCreatePartition | 0x0040 */
+
+/* HvCallInitializePartition | 0x0041 */
+
+/* HvCallFinalizePartition | 0x0042 */
+
+/* HvCallDeletePartition | 0x0043 */
+
+/* HvCallGetPartitionProperty | 0x0044 */
+
+/* HvCallSetPartitionProperty | 0x0045 */
+
+/* HvCallGetPartitionId | 0x0046 */
+
+/* HvCallGetNextChildPartition | 0x0047 */
+
+/* HvCallDepositMemory | 0x0048 */
+
+/* HvCallWithdrawMemory | 0x0049 */
+
+/* HvCallGetMemoryBalance | 0x004A */
+
+/* HvCallMapGpaPages | 0x004B */
+
+/* HvCallUnmapGpaPages | 0x004C */
+
+/* HvCallInstallIntercept | 0x004D */
+
+/* HvCallCreateVp | 0x004E */
+
+/* HvCallDeleteVp | 0x004F */
+
+/* HvCallGetVpRegisters | 0x0050 */
+
+
+
+/* HvCallSetVpRegisters | 0x0051 */
+
+
+
+/* HvCallTranslateVirtualAddress | 0x0052 */
+
+
+
+/* HvCallReadGpa | 0x0053 */
+
+/* HvCallWriteGpa | 0x0054 */
+
+/* HvCallAssertVirtualInterruptDeprecated | 0x0055 */
+
+/* HvCallClearVirtualInterrupt | 0x0056 */
+
+/* HvCallCreatePortDeprecated | 0x0057 */
+
+/* HvCallDeletePort | 0x0058 */
+
+/* HvCallConnectPortDeprecated | 0x0059 */
+
+/* HvCallGetPortProperty | 0x005A */
+
+/* HvCallDisconnectPort | 0x005B */
+
+/* HvCallPostMessage | 0x005C */
+
+
+
+/* HvCallSignalEvent | 0x005D */
+
+
+
+/* HvCallSavePartitionState | 0x005E */
+
+/* HvCallRestorePartitionState | 0x005F */
+
+/* HvCallInitializeEventLogBufferGroup | 0x0060 */
+
+/* HvCallFinalizeEventLogBufferGroup | 0x0061 */
+
+/* HvCallCreateEventLogBuffer | 0x0062 */
+
+/* HvCallDeleteEventLogBuffer | 0x0063 */
+
+/* HvCallMapEventLogBuffer | 0x0064 */
+
+/* HvCallUnmapEventLogBuffer | 0x0065 */
+
+/* HvCallSetEventLogGroupSources | 0x0066 */
+
+/* HvCallReleaseEventLogBuffer | 0x0067 */
+
+/* HvCallFlushEventLogBuffer | 0x0068 */
+
+/* HvCallPostDebugData | 0x0069 */
+
+/* HvCallRetrieveDebugData | 0x006A */
+
+/* HvCallResetDebugSession | 0x006B */
+
+/* HvCallMapStatsPage | 0x006C */
+
+/* HvCallUnmapStatsPage | 0x006D */
+
+/* HvCallMapSparseGpaPages | 0x006E */
+
+/* HvCallSetSystemProperty | 0x006F */
+
+/* HvCallSetPortProperty | 0x0070 */
+
+/* HvCallOutputDebugCharacter | 0x0071 */
+
+/* HvCallEchoIncrement | 0x0072 */
+
+/* HvCallPerfNop | 0x0073 */
+
+/* HvCallPerfNopInput | 0x0074 */
+
+/* HvCallPerfNopOutput | 0x0075 */
+
+/* HvCallAddLogicalProcessor | 0x0076 */
+
+/* HvCallRemoveLogicalProcessor | 0x0077 */
+
+/* HvCallQueryNumaDistance | 0x0078 */
+
+/* HvCallSetLogicalProcessorProperty | 0x0079 */
+
+/* HvCallGetLogicalProcessorProperty | 0x007A */
+
+/* HvCallGetSystemProperty | 0x007B */
+
+/* HvCallMapDeviceInterrupt | 0x007C */
+
+/* HvCallUnmapDeviceInterrupt | 0x007D */
+
+/* HvCallRetargetDeviceInterrupt | 0x007E */
+
+
+
+/* HvCallReserved007f | 0x007F */
+
+/* HvCallMapDevicePages | 0x0080 */
+
+/* HvCallUnmapDevicePages | 0x0081 */
+
+/* HvCallAttachDevice | 0x0082 */
+
+/* HvCallDetachDevice | 0x0083 */
+
+/* HvCallNotifyStandbyTransition | 0x0084 */
+
+/* HvCallPrepareForSleep | 0x0085 */
+
+/* HvCallPrepareForHibernate | 0x0086 */
+
+/* HvCallNotifyPartitionEvent | 0x0087 */
+
+/* HvCallGetLogicalProcessorRegisters | 0x0088 */
+
+/* HvCallSetLogicalProcessorRegisters | 0x0089 */
+
+/* HvCallQueryAssociatedLpsforMca | 0x008A */
+
+/* HvCallNotifyRingEmpty | 0x008B */
+
+/* HvCallInjectSyntheticMachineCheck | 0x008C */
+
+/* HvCallScrubPartition | 0x008D */
+
+/* HvCallCollectLivedump | 0x008E */
+
+/* HvCallDisableHypervisor | 0x008F */
+
+/* HvCallModifySparseGpaPages | 0x0090 */
+
+/* HvCallRegisterInterceptResult | 0x0091 */
+
+/* HvCallUnregisterInterceptResult | 0x0092 */
+
+/* HvCallReserved0093 | 0x0093 */
+
+/* HvCallAssertVirtualInterrupt | 0x0094 */
+
+
+
+/* HvCallCreatePort | 0x0095 */
+
+/* HvCallConnectPort | 0x0096 */
+
+/* HvCallGetSpaPageList | 0x0097 */
+
+/* HvCallReserved0098 | 0x0098 */
+
+/* HvCallStartVirtualProcessor | 0x0099 */
+
+
+
+/* HvCallGetVpIndexFromApicId | 0x009A */
+
+
+
+/* HvCallReserved009b | 0x009B */
+/* HvCallReserved009c | 0x009C */
+/* HvCallReserved009d | 0x009D */
+/* HvCallReserved009e | 0x009E */
+/* HvCallReserved009f | 0x009F */
+/* HvCallReserved00a0 | 0x00A0 */
+/* HvCallReserved00a1 | 0x00A1 */
+/* HvCallReserved00a2 | 0x00A2 */
+/* HvCallReserved00a3 | 0x00A3 */
+/* HvCallReserved00a4 | 0x00A4 */
+/* HvCallReserved00a5 | 0x00A5 */
+/* HvCallReserved00a6 | 0x00A6 */
+/* HvCallReserved00a7 | 0x00A7 */
+/* HvCallReserved00a8 | 0x00A8 */
+/* HvCallReserved00a9 | 0x00A9 */
+/* HvCallReserved00aa | 0x00AA */
+/* HvCallReserved00ab | 0x00AB */
+/* HvCallReserved00ac | 0x00AC */
+/* HvCallReserved00ad | 0x00AD */
+/* HvCallReserved00ae | 0x00AE */
+
+/* HvCallFlushGuestPhysicalAddressSpace | 0x00AF */
+
+
+
+/* HvCallFlushGuestPhysicalAddressList | 0x00B0 */
+
+
+
+/* HvCallReserved00b1 | 0x00B1 */
+/* HvCallReserved00b2 | 0x00B2 */
+/* HvCallReserved00b3 | 0x00B3 */
+/* HvCallReserved00b4 | 0x00B4 */
+/* HvCallReserved00b5 | 0x00B5 */
+/* HvCallReserved00b6 | 0x00B6 */
+/* HvCallReserved00b7 | 0x00B7 */
+/* HvCallReserved00b8 | 0x00B8 */
+/* HvCallReserved00b9 | 0x00B9 */
+/* HvCallReserved00ba | 0x00BA */
+/* HvCallReserved00bb | 0x00BB */
+/* HvCallReserved00bc | 0x00BC */
+/* HvCallReserved00bd | 0x00BD */
+/* HvCallReserved00be | 0x00BE */
+/* HvCallReserved00bf | 0x00BF */
+
+/* HvCallSignalEventDirect | 0x00C0 */
+
+/* HvCallPostMessageDirect | 0x00C1 */
+
+/* HvCallDispatchVp | 0x00C2 */
+
+/* HvCallReserved00c3 | 0x00C3 */
+/* HvCallReserved00c4 | 0x00C4 */
+/* HvCallReserved00c5 | 0x00C5 */
+/* HvCallReserved00c6 | 0x00C6 */
+/* HvCallReserved00c7 | 0x00C7 */
+/* HvCallReserved00c8 | 0x00C8 */
+
+/* HvCallGetGpaPagesAccessStates | 0x00C9 */
+
+/* HvCallReserved00ca | 0x00CA */
+/* HvCallReserved00cb | 0x00CB */
+/* HvCallReserved00cc | 0x00CC */
+/* HvCallReserved00cd | 0x00CD */
+/* HvCallReserved00ce | 0x00CE */
+/* HvCallReserved00cf | 0x00CF */
+/* HvCallReserved00d0 | 0x00D0 */
+/* HvCallReserved00d1 | 0x00D1 */
+/* HvCallReserved00d2 | 0x00D2 */
+/* HvCallReserved00d3 | 0x00D3 */
+/* HvCallReserved00d4 | 0x00D4 */
+/* HvCallReserved00d5 | 0x00D5 */
+/* HvCallReserved00d6 | 0x00D6 */
+/* HvCallReserved00d7 | 0x00D7 */
+/* HvCallReserved00d8 | 0x00D8 */
+/* HvCallReserved00d9 | 0x00D9 */
+/* HvCallReserved00da | 0x00DA */
+/* HvCallReserved00db | 0x00DB */
+/* HvCallReserved00dc | 0x00DC */
+/* HvCallReserved00dd | 0x00DD */
+/* HvCallReserved00de | 0x00DE */
+/* HvCallReserved00df | 0x00DF */
+/* HvCallReserved00e0 | 0x00E0 */
+
+/* HvCallMapVpStatePage | 0x00E1 */
+
+/* HvCallUnmapVpStatePage | 0x00E2 */
+
+/* HvCallGetVpState | 0x00E3 */
+
+/* HvCallSetVpState | 0x00E4 */
+
+/* HvCallReserved00e5 | 0x00E5 */
+/* HvCallReserved00e6 | 0x00E6 */
+/* HvCallReserved00e7 | 0x00E7 */
+/* HvCallReserved00e8 | 0x00E8 */
+/* HvCallReserved00e9 | 0x00E9 */
+/* HvCallReserved00ea | 0x00EA */
+/* HvCallReserved00eb | 0x00EB */
+/* HvCallReserved00ec | 0x00EC */
+/* HvCallReserved00ed | 0x00ED */
+/* HvCallReserved00ee | 0x00EE */
+/* HvCallReserved00ef | 0x00EF */
+/* HvCallReserved00f0 | 0x00F0 */
+/* HvCallReserved00f1 | 0x00F1 */
+/* HvCallReserved00f2 | 0x00F2 */
+/* HvCallReserved00f3 | 0x00F3 */
+
+/* HvCallGetVpCpuidValues | 0x00F4 */
+
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
