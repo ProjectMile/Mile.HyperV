@@ -249,7 +249,11 @@ typedef enum _HV_CPUID_FUNCTION
     HvCpuIdFunctionMsHvEnlightenmentInformation = 0x40000004,
     HvCpuIdFunctionMsHvImplementationLimits = 0x40000005,
     HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
-    HvCpuIdFunctionMaxReserved = 0x40000006
+    HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
+    HvCpuIdFunctionMsHvSvmFeatures = 0x40000008,
+    HvCpuIdFunctionMsHvNestedHvFeatures = 0x40000009,
+    HvCpuIdFunctionMsHvNestedVirtFeatures = 0x4000000A,
+    HvCpuIdFunctionMaxReserved = 0x4000000A
 } HV_CPUID_FUNCTION, *PHV_CPUID_FUNCTION;
 
 #define HV_CPUID_HV_VENDOR_MICROSOFT "Microsoft Hv"
@@ -378,6 +382,73 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_HARDWARE_FEATURES, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES;
 
+/* Structure name is guessed according to TLFS naming style */
+typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
+{
+    HV_UINT32 StartLogicalProcessor : 1;
+    HV_UINT32 CreateRootVirtualProcessor : 1;
+    HV_UINT32 PerformanceCounterSync : 1;
+    HV_UINT32 Reserved : 28;
+    HV_UINT32 ReservedIdentityBit : 1;
+    HV_UINT32 ProcessorPowerManagement : 1;
+    HV_UINT32 MwaitIdleStates : 1;
+    HV_UINT32 LogicalProcessorIdling : 1;
+    HV_UINT32 Reserved1 : 29;
+    HV_UINT32 RemapGuestUncached : 1;
+    HV_UINT32 Reserved2 : 31;
+    HV_UINT32 ReservedEdx;
+} HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+
+/* Structure name is guessed according to TLFS naming style */
+typedef struct _HV_HYPERVISOR_SVM_FEATURES
+{
+    HV_UINT32 SvmSupported : 1;
+    HV_UINT32 Reserved : 10;
+    HV_UINT32 MaxPasidSpacePasidCount : 21;
+    HV_UINT32 ReservedEbx;
+    HV_UINT32 ReservedEcx;
+    HV_UINT32 ReservedEdx;
+} HV_HYPERVISOR_SVM_FEATURES, *PHV_HYPERVISOR_SVM_FEATURES;
+
+/* Structure name is guessed according to TLFS naming style */
+typedef struct _HV_HYPERVISOR_NESTED_HV_FEATURES
+{
+    HV_UINT32 Reserved : 2;
+    HV_UINT32 AccessSynicRegs : 1;
+    HV_UINT32 Reserved1 : 1;
+    HV_UINT32 AccessIntrCtrlRegs : 1;
+    HV_UINT32 AccessHypercallMsrs : 1;
+    HV_UINT32 AccessVpIndex : 1;
+    HV_UINT32 Reserved2 : 5;
+    HV_UINT32 AccessReenlightenmentControls : 1;
+    HV_UINT32 Reserved3 : 19;
+    HV_UINT32 ReservedEbx;
+    HV_UINT32 ReservedEcx;
+    HV_UINT32 Reserved4 : 4;
+    HV_UINT32 XmmRegistersForFastHypercallAvailable : 1;
+    HV_UINT32 Reserved5 : 10;
+    HV_UINT32 FastHypercallOutputAvailable : 1;
+    HV_UINT32 Reserved6 : 1;
+    HV_UINT32 SintPollingModeAvailable : 1;
+    HV_UINT32 Reserved7 : 14;
+} HV_HYPERVISOR_NESTED_HV_FEATURES, *PHV_HYPERVISOR_NESTED_HV_FEATURES;
+
+/* Structure name and member name is guessed according to TLFS naming style */
+typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
+{
+    HV_UINT32 EnlightenedVmcsVersionLow : 8;
+    HV_UINT32 EnlightenedVmcsVersionHigh : 8;
+    HV_UINT32 Reserved : 1;
+    HV_UINT32 NestedFlushVirtualHypercall : 1;
+    HV_UINT32 FlushGuestPhysicalHypercall : 1;
+    HV_UINT32 MsrBitmap : 1;
+    HV_UINT32 VirtualizationException : 1;
+    HV_UINT32 Reserved1 : 11;
+    HV_UINT32 ReservedEbx;
+    HV_UINT32 ReservedEcx;
+    HV_UINT32 ReservedEdx;
+} HV_HYPERVISOR_NESTED_VIRT_FEATURES, *PHV_HYPERVISOR_NESTED_VIRT_FEATURES;
+
 typedef union _HV_CPUID_RESULT
 {
     struct
@@ -406,6 +477,10 @@ typedef union _HV_CPUID_RESULT
     HV_X64_ENLIGHTENMENT_INFORMATION MsHvEnlightenmentInformation;
     HV_IMPLEMENTATION_LIMITS MsHvImplementationLimits;
     HV_X64_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
+    HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
+    HV_HYPERVISOR_SVM_FEATURES MsHvSvmFeatures;
+    HV_HYPERVISOR_NESTED_HV_FEATURES MsHvNestedHvFeatures;
+    HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
 } HV_CPUID_RESULT, *PHV_CPUID_RESULT;
 
 /*

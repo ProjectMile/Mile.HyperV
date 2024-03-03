@@ -11,7 +11,7 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
 ## TLFS 6.0b Synchronization Status
 
 - [x] Chapter 1
-- [ ] Chapter 2 (2.4.8, 2.4.9, 2.4.10 and 2.4.11 still left)
+- [x] Chapter 2
 - [x] Chapter 3
 - [x] Chapter 4
 - [x] Chapter 5
