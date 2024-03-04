@@ -215,6 +215,96 @@ typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
 typedef HV_UINT64 HV_NANO100_TIME, *PHV_NANO100_TIME;
 typedef HV_UINT64 HV_NANO100_DURATION, *PHV_NANO100_DURATION;
 
+typedef union _HV_X64_FP_REGISTER
+{
+    HV_UINT128 AsUINT128;
+    struct
+    {
+        HV_UINT64 Mantissa;
+        HV_UINT64 BiasedExponent : 15;
+        HV_UINT64 Sign : 1;
+        HV_UINT64 Reserved : 48;
+    };
+} HV_X64_FP_REGISTER, *PHV_X64_FP_REGISTER;
+
+typedef union _HV_X64_FP_CONTROL_STATUS_REGISTER
+{
+    HV_UINT128 AsUINT128;
+    struct
+    {
+        HV_UINT16 FpControl;
+        HV_UINT16 FpStatus;
+        HV_UINT8 FpTag;
+        HV_UINT8 IgnNe : 1;
+        HV_UINT8 Reserved : 7;
+        HV_UINT16 LastFpOp;
+        union
+        {
+            /* Long Mode */
+            HV_UINT64 LastFpRip;
+            /* 32 Bit Mode */
+            struct
+            {
+                HV_UINT32 LastFpEip;
+                HV_UINT16 LastFpCs;
+                HV_UINT16 Padding;
+            };
+        };
+    };
+} HV_X64_FP_CONTROL_STATUS_REGISTER, *PHV_X64_FP_CONTROL_STATUS_REGISTER;
+
+typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
+{
+    HV_UINT128 AsUINT128;
+    struct
+    {
+        union
+        {
+            /* Long Mode */
+            HV_UINT64 LastFpRdp;
+            /* 32 Bit Mode */
+            struct
+            {
+                HV_UINT32 LastFpDp;
+                HV_UINT16 LastFpDs;
+                HV_UINT16 Padding;
+            };
+        };
+        HV_UINT32 XmmStatusControl;
+        HV_UINT32 XmmStatusControlMask;
+    };
+} HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
+
+typedef struct _HV_X64_SEGMENT_REGISTER
+{
+    HV_UINT64 Base;
+    HV_UINT32 Limit;
+    HV_UINT16 Selector;
+    union
+    {
+        struct
+        {
+            HV_UINT16 SegmentType : 4;
+            HV_UINT16 NonSystemSegment : 1;
+            HV_UINT16 DescriptorPrivilegeLevel : 2;
+            HV_UINT16 Present : 1;
+            HV_UINT16 Reserved : 4;
+            HV_UINT16 Available : 1;
+            HV_UINT16 Long : 1;
+            HV_UINT16 Default : 1;
+            HV_UINT16 Granularity : 1;
+        };
+        HV_UINT16 Attributes;
+    };
+} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
+
+typedef struct _HV_X64_TABLE_REGISTER
+{
+    HV_UINT16 Pad[3];
+    HV_UINT16 Limit;
+    HV_UINT64 Base;
+} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
+
 /******************************************************************************/
 
 typedef HV_UINT8 HV_BOOLEAN;
@@ -1152,95 +1242,6 @@ typedef enum _HV_REGISTER_NAME
 } HV_REGISTER_NAME;
 typedef HV_REGISTER_NAME* PHV_REGISTER_NAME;
 typedef const HV_REGISTER_NAME* PCHV_REGISTER_NAME;
-
-typedef union _HV_X64_FP_REGISTER
-{
-    HV_UINT128 AsUINT128;
-
-    struct
-    {
-        HV_UINT64 Mantissa;
-        HV_UINT64 BiasedExponent : 15;
-        HV_UINT64 Sign : 1;
-        HV_UINT64 Reserved : 48;
-    };
-} HV_X64_FP_REGISTER, *PHV_X64_FP_REGISTER;
-
-typedef union _HV_X64_FP_CONTROL_STATUS_REGISTER
-{
-    HV_UINT128 AsUINT128;
-
-    struct
-    {
-        HV_UINT16 FpControl;
-        HV_UINT16 FpStatus;
-        HV_UINT8 FpTag;
-        HV_UINT8 IgnNe : 1;
-        HV_UINT8 Reserved : 7;
-        HV_UINT16 LastFpOp;
-        union
-        {
-            HV_UINT64 LastFpRip;
-            struct
-            {
-                HV_UINT32 LastFpEip;
-                HV_UINT16 LastFpCs;
-                HV_UINT16 Padding;
-            };
-        };
-    };
-} HV_X64_FP_CONTROL_STATUS_REGISTER, *PHV_X64_FP_CONTROL_STATUS_REGISTER;
-
-typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
-{
-    HV_UINT128 AsUINT128;
-
-    struct
-    {
-        union
-        {
-            HV_UINT64 LastFpRdp;
-            struct
-            {
-                HV_UINT32 LastFpDp;
-                HV_UINT16 LastFpDs;
-                HV_UINT16 Padding;
-            };
-        };
-        HV_UINT32 XmmStatusControl;
-        HV_UINT32 XmmStatusControlMask;
-    };
-} HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
-
-typedef struct _HV_X64_SEGMENT_REGISTER
-{
-    HV_UINT64 Base;
-    HV_UINT32 Limit;
-    HV_UINT16 Selector;
-    union
-    {
-        struct
-        {
-            HV_UINT16 SegmentType : 4;
-            HV_UINT16 NonSystemSegment : 1;
-            HV_UINT16 DescriptorPrivilegeLevel : 2;
-            HV_UINT16 Present : 1;
-            HV_UINT16 Reserved : 4;
-            HV_UINT16 Available : 1;
-            HV_UINT16 Long : 1;
-            HV_UINT16 Default : 1;
-            HV_UINT16 Granularity : 1;
-        };
-        HV_UINT16 Attributes;
-    };
-} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
-
-typedef struct _HV_X64_TABLE_REGISTER
-{
-    HV_UINT16 Pad[3];
-    HV_UINT16 Limit;
-    HV_UINT64 Base;
-} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
 
 typedef union _HV_EXPLICIT_SUSPEND_REGISTER
 {

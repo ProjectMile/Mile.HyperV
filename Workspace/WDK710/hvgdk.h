@@ -27,8 +27,6 @@ Author:
 #pragma warning(disable:4214) // bit field types other than int
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 
-/******************************************************************************/
-
 //
 // An architecture is a set of processor instruction sets and operating modes
 //
@@ -39,95 +37,6 @@ typedef enum _HV_ARCHITECTURE
     HvArchitectureX86,
     HvArchitectureMaximum
 } HV_ARCHITECTURE, *PHV_ARCHITECTURE;
-
-typedef union _HV_X64_FP_REGISTER
-{
-    HV_UINT128 AsUINT128;
-    struct
-    {
-        UINT64 Mantissa;
-        UINT64 BiasedExponent:15;
-        UINT64 Sign:1;
-        UINT64 Reserved:48;
-    };
-} HV_X64_FP_REGISTER, *PHV_X64_FP_REGISTER;
-
-typedef union _HV_X64_FP_CONTROL_STATUS_REGISTER
-{
-    HV_UINT128 AsUINT128;
-    struct
-    {
-        UINT16 FpControl;
-        UINT16 FpStatus;
-        UINT8  FpTag;
-        UINT8  IgnNe:1;
-        UINT8  Reserved:7;
-        UINT16 LastFpOp;
-        union
-        {
-            // Long Mode
-            UINT64 LastFpRip;
-            // 32 Bit Mode
-            struct
-            {
-                UINT32 LastFpEip;
-                UINT16 LastFpCs;
-            };
-        };
-    };
-} HV_X64_FP_CONTROL_STATUS_REGISTER, *PHV_X64_FP_CONTROL_STATUS_REGISTER;
-
-typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
-{
-    HV_UINT128 AsUINT128;
-    struct
-    {
-        union
-        {
-            // Long Mode
-            UINT64 LastFpRdp;
-            // 32 Bit Mode
-            struct
-            {
-                UINT32 LastFpDp;
-                UINT16 LastFpDs;
-            };
-        };
-        UINT32 XmmStatusControl;
-        UINT32 XmmStatusControlMask;
-    };
-} HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
-
-typedef struct _HV_X64_SEGMENT_REGISTER
-{
-    UINT64 Base;
-    UINT32 Limit;
-    UINT16 Selector;
-    union
-    {
-        struct
-        {
-            UINT16 SegmentType:4;
-            UINT16 NonSystemSegment:1;
-            UINT16 DescriptorPrivilegeLevel:2;
-            UINT16 Present:1;
-            UINT16 Reserved:4;
-            UINT16 Available:1;
-            UINT16 Long:1;
-            UINT16 Default:1;
-            UINT16 Granularity:1;
-        };
-        UINT16 Attributes;
-    };
-
-} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
-
-typedef struct _HV_X64_TABLE_REGISTER
-{
-    UINT16     Pad[3];
-    UINT16     Limit;
-    UINT64     Base;
-} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
 
 typedef union _HV_X64_FP_MMX_REGISTER
 {
@@ -425,6 +334,8 @@ typedef struct _HV_VP_CONTEXT
     };
 
 } HV_VP_CONTEXT, *PHV_VP_CONTEXT;
+
+/******************************************************************************/
 
 #define HV_X64_MSR_STATS_PARTITION_RETAIL_PAGE      0x400000E0
 #if defined(_PERF_FEATURES_ENABLED_)
