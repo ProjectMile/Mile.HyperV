@@ -195,24 +195,24 @@ typedef union _HV_PARTITION_PRIVILEGE_MASK
 {
     HV_UINT64 AsUINT64;
 
-    struct
-    {
-        HV_UINT64 AccessVpRunTimeMsr : 1;
+    struct {
+        HV_UINT64 AccessVpRunTimeReg : 1;
         HV_UINT64 AccessPartitionReferenceCounter : 1;
-        HV_UINT64 AccessSynicMsrs : 1;
-        HV_UINT64 AccessSyntheticTimerMsrs : 1;
-        HV_UINT64 AccessApicMsrs : 1;
+        HV_UINT64 AccessSynicRegs : 1;
+        HV_UINT64 AccessSyntheticTimerRegs : 1;
+        HV_UINT64 AccessIntrCtrlRegs : 1;
         HV_UINT64 AccessHypercallMsrs : 1;
         HV_UINT64 AccessVpIndex : 1;
-        HV_UINT64 AccessResetMsr : 1;
-        HV_UINT64 AccessStatsMsr : 1;
+        HV_UINT64 AccessResetReg : 1;
+        HV_UINT64 AccessStatsReg : 1;
         HV_UINT64 AccessPartitionReferenceTsc : 1;
-        HV_UINT64 AccessGuestIdleMsr : 1;
-        HV_UINT64 AccessFrequencyMsrs : 1;
-        HV_UINT64 AccessDebugMsrs : 1;
+        HV_UINT64 AccessGuestIdleReg : 1;
+        HV_UINT64 AccessFrequencyRegs : 1;
+        HV_UINT64 AccessDebugRegs : 1;
         HV_UINT64 AccessReenlightenmentControls : 1;
-        HV_UINT64 AccessRootSchedulerMsr : 1;
-        HV_UINT64 Reserved1 : 17;
+        HV_UINT64 AccessRootSchedulerReg : 1;
+        HV_UINT64 AccessTscInvariantControls : 1;
+        HV_UINT64 Reserved1 : 16;
         HV_UINT64 CreatePartitions : 1;
         HV_UINT64 AccessPartitionId : 1;
         HV_UINT64 AccessMemoryPool : 1;
@@ -227,15 +227,15 @@ typedef union _HV_PARTITION_PRIVILEGE_MASK
         HV_UINT64 CpuManagement : 1;
         HV_UINT64 ConfigureProfiler : 1;
         HV_UINT64 AccessVpExitTracing : 1;
-        HV_UINT64 EnableExtendedGvaRangesFlushVaList : 1;
+        HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
         HV_UINT64 AccessVsm : 1;
         HV_UINT64 AccessVpRegisters : 1;
-        HV_UINT64 Reserved3 : 1;
+        HV_UINT64 UnusedBit : 1;
         HV_UINT64 FastHypercallOutput : 1;
         HV_UINT64 EnableExtendedHypercalls : 1;
         HV_UINT64 StartVirtualProcessor : 1;
-        HV_UINT64 PrivilegeIsolation : 1;
-        HV_UINT64 Reserved4 : 9;
+        HV_UINT64 Isolation : 1;
+        HV_UINT64 Reserved3 : 9;
     };
 } HV_PARTITION_PRIVILEGE_MASK, *PHV_PARTITION_PRIVILEGE_MASK;
 
@@ -299,8 +299,13 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES
 {
     HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
     HV_UINT32 MaxSupportedCState : 4;
-    HV_UINT32 Reserved : 28;
-    HV_UINT32 MwaitAvailableDeprecated : 1;
+    HV_UINT32 HpetNeededForC3PowerState_Deprecated : 1;
+    HV_UINT32 InvariantMperfAvailable : 1;
+    HV_UINT32 SupervisorShadowStackAvailable : 1;
+    HV_UINT32 ArchPmuAvailable : 1;
+    HV_UINT32 ExceptionTrapInterceptAvailable : 1;
+    HV_UINT32 Reserved : 23;
+    HV_UINT32 MwaitAvailable_Deprecated : 1;
     HV_UINT32 GuestDebuggingAvailable : 1;
     HV_UINT32 PerformanceMonitorsAvailable : 1;
     HV_UINT32 CpuDynamicPartitioningAvailable : 1;
@@ -316,7 +321,7 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES
     HV_UINT32 DisableHypervisorAvailable : 1;
     HV_UINT32 ExtendedGvaRangesForFlushVirtualAddressListAvailable : 1;
     HV_UINT32 FastHypercallOutputAvailable : 1;
-    HV_UINT32 SvmFeaturesAvailable : 1;
+    HV_UINT32 PasidFeaturesAvailable : 1;
     HV_UINT32 SintPollingModeAvailable : 1;
     HV_UINT32 HypercallMsrLockAvailable : 1;
     HV_UINT32 DirectSyntheticTimers : 1;
@@ -329,7 +334,9 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES
     HV_UINT32 LbrAvailable : 1;
     HV_UINT32 IptAvailable : 1;
     HV_UINT32 CrossVtlFlushAvailable : 1;
-    HV_UINT32 Reserved1 : 3;
+    HV_UINT32 IdleSpecCtrlAvailable : 1;
+    HV_UINT32 TranslateGvaFlagsAvailable : 1;
+    HV_UINT32 ApicEoiInterceptAvailable : 1;
 } HV_X64_HYPERVISOR_FEATURES, *PHV_X64_HYPERVISOR_FEATURES;
 
 typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
@@ -2728,7 +2735,7 @@ typedef union _HV_X64_HYPERCALL_OUTPUT
 /* Rep: Rep call a.k.a repeat call */
 /* Reserved: Have mentioned reserved in TLFS document */
 /* Undocumented: Undocumented but found in Microsoft documents and sources */
-/* Symbols: Undocumented and only found in Windows symbols */
+/* Symbols: Undocumented and only found in Windows Kit symbols */
 typedef enum _HV_CALL_CODE
 {
     HvCallReserved0000 = 0x0000, /* Undocumented */
