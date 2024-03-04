@@ -40,14 +40,14 @@ hypervisor ABIs" to try to make their mshv implementation merge to the mainline.
 - [Mile.HyperV's local Outlook Unicode MSG archive]
 
 [Online version from linux-hyperv mailing list]: https://lore.kernel.org/linux-hyperv/1696010501-24584-1-git-send-email-nunodasneves@linux.microsoft.com/T/#m265e35e841d29ec27c7e60887c1c7566585fc0ff
-[Mile.HyperV's local Outlook Unicode MSG archive]: patch-v4-1315-uapi-hyperv-add-mshv-driver-headers-defining-hypervisor-abis.msg
+[Mile.HyperV's local Outlook Unicode MSG archive]: MSHV/patch-v4-1315-uapi-hyperv-add-mshv-driver-headers-defining-hypervisor-abis.msg
 
 Here is the extracted reference from the mentioned patch created by Microsoft.
 
-- [hvgdk.h](hvgdk.h)
-- [hvgdk_mini.h](hvgdk_mini.h)
-- [hvhdk.h](hvhdk.h)
-- [hvhdk_mini.h](hvhdk_mini.h)
+- [MSHV/hvgdk.h](MSHV/hvgdk.h)
+- [MSHV/hvgdk_mini.h](MSHV/hvgdk_mini.h)
+- [MSHV/hvhdk.h](MSHV/hvhdk.h)
+- [MSHV/hvhdk_mini.h](MSHV/hvhdk_mini.h)
 
 ## Archive of Hypervisor (Windows Drivers) documentations from Microsoft in 2013
 
