@@ -14,16 +14,18 @@
 #include <stdint.h>
 
 #ifdef _MSC_VER
+#if _MSC_VER > 1000
+#pragma once
+#endif
 #if (_MSC_VER >= 1200)
 #pragma warning(push)
 #endif
-/* nonstandard extension used : nameless struct/union */
-#pragma warning(disable:4201)
+#pragma warning(disable:4201) /* nameless struct/union */
 #endif
 
 #ifndef DECLSPEC_ALIGN
 #if (_MSC_VER >= 1300) && !defined(MIDL_PASS)
-#define DECLSPEC_ALIGN(x)   __declspec(align(x))
+#define DECLSPEC_ALIGN(x) __declspec(align(x))
 #else
 #define DECLSPEC_ALIGN(x)
 #endif
@@ -32,10 +34,6 @@
 #ifndef ANYSIZE_ARRAY
 #define ANYSIZE_ARRAY 1
 #endif
-
-/*
- * Simple Scalar Types
- */
 
 typedef int8_t HV_INT8, *PHV_INT8;
 typedef int16_t HV_INT16, *PHV_INT16;
@@ -47,21 +45,90 @@ typedef uint16_t HV_UINT16, *PHV_UINT16;
 typedef uint32_t HV_UINT32, *PHV_UINT32;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
 
+/* Define a 128bit type. */
 typedef struct DECLSPEC_ALIGN(16) _HV_UINT128
 {
-    HV_UINT64 LowPart;
-    HV_UINT64 HighPart;
+    HV_UINT64 Low64;
+    HV_UINT64 High64;
 } HV_UINT128, *PHV_UINT128;
 
-typedef HV_UINT8 HV_BOOLEAN;
-typedef HV_BOOLEAN* PHV_BOOLEAN;
-typedef const HV_BOOLEAN* PCHV_BOOLEAN;
+/* Define a 256bit type. */
+typedef struct DECLSPEC_ALIGN(32) _HV_UINT256
+{
+    HV_UINT128 Low128;
+    HV_UINT128 High128;
+} HV_UINT256, *PHV_UINT256;
 
-/*
- * Hypercall Status Code
- */
+/* Define a 512bit type. */
+typedef struct DECLSPEC_ALIGN(32) _HV_UINT512
+{
+    HV_UINT256 Low128;
+    HV_UINT256 High128;
+} HV_UINT512, *PHV_UINT512;
 
-typedef HV_UINT16 HV_STATUS;
+/* Define an alignment for structures passed via hypercall. */
+#define HV_CALL_ALIGNMENT 8
+
+#define HV_CALL_ATTRIBUTES DECLSPEC_ALIGN(HV_CALL_ALIGNMENT)
+#define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) DECLSPEC_ALIGN(__alignment__)
+
+/* Memory Types */
+/**/
+/* System physical addresses (SPAs) define the physical address space of the */
+/* underlying hardware. There is only one system physical address space for */
+/* the entire machine. */
+/**/
+/* Guest physical addresses (GPAs) define the guest's view of physical */
+/* memory. GPAs can be mapped to underlying SPAs. There is one guest physical */
+/* address space per partition. */
+/**/
+/* Guest virtual addresses (GVAs) are used within the guest when it enables */
+/* address translation and provides a valid guest page table. */
+
+typedef HV_UINT64 HV_SPA, *PHV_SPA;
+typedef HV_UINT64 HV_GPA, *PHV_GPA;
+typedef HV_UINT64 HV_GVA, *PHV_GVA;
+
+/* Number of bytes in a page for X64. */
+#ifndef X64_PAGE_SIZE
+#define X64_PAGE_SIZE 0x1000
+#endif
+
+/* Number of bytes in a large page for X64. */
+#ifndef X64_LARGE_PAGE_SIZE
+#define X64_LARGE_PAGE_SIZE 0x200000
+#endif
+
+/* Number of bytes in a 1GB page for X64. */
+#ifndef X64_1GB_PAGE_SIZE
+#define X64_1GB_PAGE_SIZE 0x40000000
+#endif
+
+#define HV_X64_MAX_PAGE_NUMBER (UINT64_MAX/X64_PAGE_SIZE)
+#define HV_X64_MAX_LARGE_PAGE_NUMBER (UINT64_MAX/X64_LARGE_PAGE_SIZE)
+#define HV_X64_MAX_1GB_PAGE_NUMBER (UINT64_MAX/X64_1GB_PAGE_SIZE)
+#define HV_PAGE_SIZE X64_PAGE_SIZE
+#define HV_LARGE_PAGE_SIZE X64_LARGE_PAGE_SIZE
+#define HV_1GB_PAGE_SIZE X64_1GB_PAGE_SIZE
+#define HV_PAGE_MASK (HV_PAGE_SIZE - 1)
+#define HV_LARGE_PAGE_MASK (HV_LARGE_PAGE_SIZE - 1)
+#define HV_1GB_PAGE_MASK (HV_1GB_PAGE_SIZE - 1)
+
+typedef HV_UINT64 HV_SPA_PAGE_NUMBER, *PHV_SPA_PAGE_NUMBER;
+typedef HV_UINT64 HV_GPA_PAGE_NUMBER, *PHV_GPA_PAGE_NUMBER;
+typedef HV_UINT64 HV_GVA_PAGE_NUMBER, *PHV_GVA_PAGE_NUMBER;
+
+typedef const HV_SPA_PAGE_NUMBER *PCHV_SPA_PAGE_NUMBER;
+typedef const HV_GPA_PAGE_NUMBER *PCHV_GPA_PAGE_NUMBER;
+typedef const HV_GVA_PAGE_NUMBER *PCHV_GVA_PAGE_NUMBER;
+
+typedef HV_UINT16 HV_IO_PORT, *PHV_IO_PORT;
+
+/* Forward declare the loader block. */
+typedef struct _HV_LOADER_BLOCK *PHV_LOADER_BLOCK;
+
+/* Status codes for hypervisor operations. */
+typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
 
 #define HV_STATUS_SUCCESS ((HV_STATUS)0x0000)
 #define HV_STATUS_INVALID_HYPERCALL_CODE ((HV_STATUS)0x0002)
@@ -94,8 +161,30 @@ typedef HV_UINT16 HV_STATUS;
 #define HV_STATUS_FEATURE_UNAVAILABLE ((HV_STATUS)0x001E)
 #define HV_STATUS_PARTIAL_PACKET ((HV_STATUS)0x001F)
 #define HV_STATUS_PROCESSOR_FEATURE_NOT_SUPPORTED ((HV_STATUS)0x0020)
+#define HV_STATUS_PROCESSOR_FEATURE_SSE3_NOT_SUPPORTED ((HV_STATUS)0x0020)
+#define HV_STATUS_PROCESSOR_FEATURE_LAHFSAHF_NOT_SUPPORTED ((HV_STATUS)0x0021)
+#define HV_STATUS_PROCESSOR_FEATURE_SSSE3_NOT_SUPPORTED ((HV_STATUS)0x0022)
+#define HV_STATUS_PROCESSOR_FEATURE_SSE4_1_NOT_SUPPORTED ((HV_STATUS)0x0023)
+#define HV_STATUS_PROCESSOR_FEATURE_SSE4_2_NOT_SUPPORTED ((HV_STATUS)0x0024)
+#define HV_STATUS_PROCESSOR_FEATURE_SSE4A_NOT_SUPPORTED ((HV_STATUS)0x0025)
+#define HV_STATUS_PROCESSOR_FEATURE_SSE5_NOT_SUPPORTED ((HV_STATUS)0x0026)
+#define HV_STATUS_PROCESSOR_FEATURE_POPCNT_NOT_SUPPORTED ((HV_STATUS)0x0027)
+#define HV_STATUS_PROCESSOR_FEATURE_CMPXCHG16B_NOT_SUPPORTED ((HV_STATUS)0x0028)
+#define HV_STATUS_PROCESSOR_FEATURE_ALTMOVCR8_NOT_SUPPORTED ((HV_STATUS)0x0029)
+#define HV_STATUS_PROCESSOR_FEATURE_LZCNT_NOT_SUPPORTED ((HV_STATUS)0x002A)
+#define HV_STATUS_PROCESSOR_FEATURE_MISALIGNED_SSE_NOT_SUPPORTED ((HV_STATUS)0x002B)
+#define HV_STATUS_PROCESSOR_FEATURE_MMX_EXT_NOT_SUPPORTED ((HV_STATUS)0x002C)
+#define HV_STATUS_PROCESSOR_FEATURE_3DNOW_NOT_SUPPORTED ((HV_STATUS)0x002D)
+#define HV_STATUS_PROCESSOR_FEATURE_EXTENDED_3DNOW_NOT_SUPPORTED ((HV_STATUS)0x002E)
+#define HV_STATUS_PROCESSOR_FEATURE_PAGE_1GB_NOT_SUPPORTED ((HV_STATUS)0x002F)
 #define HV_STATUS_PROCESSOR_CACHE_LINE_FLUSH_SIZE_INCOMPATIBLE ((HV_STATUS)0x0030)
+#define HV_STATUS_PROCESSOR_FEATURE_XSAVE_NOT_SUPPORTED ((HV_STATUS)0x0031)
+#define HV_STATUS_PROCESSOR_FEATURE_XSAVEOPT_NOT_SUPPORTED ((HV_STATUS)0x0032)
 #define HV_STATUS_INSUFFICIENT_BUFFER ((HV_STATUS)0x0033)
+#define HV_STATUS_PROCESSOR_FEATURE_XSAVE_LEGACY_SSE_NOT_SUPPORTED ((HV_STATUS)0x0033)
+#define HV_STATUS_PROCESSOR_FEATURE_XSAVE_AVX_NOT_SUPPORTED ((HV_STATUS)0x0034)
+#define HV_STATUS_PROCESSOR_FEATURE_XSAVE_UNKNOWN_FEATURE_NOT_SUPPORTED ((HV_STATUS)0x0035)
+#define HV_STATUS_PROCESSOR_XSAVE_SAVE_AREA_INCOMPATIBLE ((HV_STATUS)0x0036)
 #define HV_STATUS_INCOMPATIBLE_PROCESSOR ((HV_STATUS)0x0037)
 #define HV_STATUS_INSUFFICIENT_DEVICE_DOMAINS ((HV_STATUS)0x0038)
 #define HV_STATUS_CPUID_FEATURE_VALIDATION_ERROR ((HV_STATUS)0x003C)
@@ -121,29 +210,24 @@ typedef HV_UINT16 HV_STATUS;
 #define HV_STATUS_CALL_PENDING ((HV_STATUS)0x0079)
 #define HV_STATUS_VTL_ALREADY_ENABLED ((HV_STATUS)0x0086)
 
+/* Time in the hypervisor is measured in 100 nanosecond units */
+
+typedef HV_UINT64 HV_NANO100_TIME, *PHV_NANO100_TIME;
+typedef HV_UINT64 HV_NANO100_DURATION, *PHV_NANO100_DURATION;
+
+/******************************************************************************/
+
+typedef HV_UINT8 HV_BOOLEAN;
+typedef HV_BOOLEAN* PHV_BOOLEAN;
+typedef const HV_BOOLEAN* PCHV_BOOLEAN;
+
 /*
  * Memory Address Space Types
  */
 
-typedef HV_UINT64 HV_SPA;
-typedef HV_UINT64 HV_GPA;
-typedef HV_UINT64 HV_GVA;
-typedef HV_SPA* PHV_SPA;
-typedef HV_GPA* PHV_GPA;
-typedef HV_GVA* PHV_GVA;
 typedef const HV_SPA* PCHV_SPA;
 typedef const HV_GPA* PCHV_GPA;
 typedef const HV_GVA* PCHV_GVA;
-
-typedef HV_UINT64 HV_SPA_PAGE_NUMBER;
-typedef HV_UINT64 HV_GPA_PAGE_NUMBER;
-typedef HV_UINT64 HV_GVA_PAGE_NUMBER;
-typedef HV_SPA_PAGE_NUMBER* PHV_SPA_PAGE_NUMBER;
-typedef HV_GPA_PAGE_NUMBER* PHV_GPA_PAGE_NUMBER;
-typedef HV_GVA_PAGE_NUMBER* PHV_GVA_PAGE_NUMBER;
-typedef const HV_SPA_PAGE_NUMBER* PCHV_SPA_PAGE_NUMBER;
-typedef const HV_GPA_PAGE_NUMBER* PCHV_GPA_PAGE_NUMBER;
-typedef const HV_GVA_PAGE_NUMBER* PCHV_GVA_PAGE_NUMBER;
 
 typedef HV_UINT32 HV_SPA_PAGE_OFFSET;
 
@@ -160,25 +244,6 @@ typedef HV_UINT32 HV_SPA_PAGE_OFFSET;
 
 #define X64_PAGE_SHIFT 12
 #define X64_PTE_BITS 9
-
-/* Number of bytes in a page for X64. */
-#define X64_PAGE_SIZE 0x1000
-/* Number of bytes in a large page for X64. */
-#define X64_LARGE_PAGE_SIZE 0x200000
-/* Number of bytes in a 1GB page for X64. */
-#define X64_1GB_PAGE_SIZE 0x40000000
-
-#define HV_X64_MAX_PAGE_NUMBER (UINT64_MAX/X64_PAGE_SIZE)
-#define HV_X64_MAX_LARGE_PAGE_NUMBER (UINT64_MAX/X64_LARGE_PAGE_SIZE)
-#define HV_X64_MAX_1GB_PAGE_NUMBER (UINT64_MAX/X64_1GB_PAGE_SIZE)
-
-#define HV_PAGE_SIZE X64_PAGE_SIZE
-#define HV_LARGE_PAGE_SIZE X64_LARGE_PAGE_SIZE
-#define HV_1GB_PAGE_SIZE X64_1GB_PAGE_SIZE
-
-#define HV_PAGE_MASK (HV_PAGE_SIZE - 1)
-#define HV_LARGE_PAGE_MASK (HV_LARGE_PAGE_SIZE - 1)
-#define HV_1GB_PAGE_MASK (HV_1GB_PAGE_SIZE - 1)
 
 /*
  * Partition Management Data Types
@@ -2282,8 +2347,6 @@ typedef struct _HV_X64_MEMORY_ACCESS_INFO
     HV_UINT8 Reserved : 7;
 } HV_X64_MEMORY_ACCESS_INFO, *PHV_X64_MEMORY_ACCESS_INFO;
 
-typedef HV_UINT64 HV_NANO100_TIME;
-typedef HV_NANO100_TIME* PHV_NANO100_TIME;
 typedef const HV_NANO100_TIME* PCHV_NANO100_TIME;
 
 typedef struct _HV_TIMER_MESSAGE_PAYLOAD {
@@ -3681,8 +3744,7 @@ typedef struct _HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
 #else
-/* nonstandard extension used : nameless struct/union */
-#pragma warning(default:4201)
+#pragma warning(default:4201) /* nameless struct/union */
 #endif
 #endif
 
