@@ -32,3 +32,4 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
 
 - [License](License.md)
 - [Mile.HyperV Definition References](References/ReadMe.md)
+- [Release Notes](ReleaseNotes.md)
