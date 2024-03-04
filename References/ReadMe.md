@@ -4,8 +4,8 @@ Mile.HyperV uses Microsoft Hypervisor Wrappers, Microsoft Independent Guest
 Virtual Machine, Hypervisor Top Level Functional Specification v6.0b, hvgdk.h
 from Windows Driver Kit version 7.1.0, MIT licensed Hyper-V headers from
 Microsoft, Archive of Hypervisor (Windows Drivers) documentations from Microsoft
-in 2013, Windows symbols, FreeBSD and Hyper-V integration support for macOS to
-create the definition headers.
+in 2013, Geoff Chappell's hvgdk_mini researches, Windows symbols, FreeBSD and
+Hyper-V integration support for macOS to create the definition headers.
 
 ## Microsoft Hypervisor Wrappers
 
@@ -52,6 +52,10 @@ Here is the extracted reference from the mentioned patch created by Microsoft.
 ## Archive of Hypervisor (Windows Drivers) documentations from Microsoft in 2013
 
 https://gerhart01.github.io/
+
+## Geoff Chappell's hvgdk_mini researches
+
+https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/shared/hvgdk_mini/hv_cpuid_function.htm
 
 ## Windows symbols
 
