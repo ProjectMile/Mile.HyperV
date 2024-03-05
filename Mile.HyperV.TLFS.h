@@ -345,10 +345,27 @@ typedef union _HV_X64_XSAVE_XFEM_REGISTER
     HV_UINT64 AsUINT64;
     struct
     {
+        HV_UINT32 LowUINT32;
+        HV_UINT32 HighUINT32;
+    };
+    struct
+    {
         HV_UINT64 LegacyX87 : 1;
         HV_UINT64 LegacySse : 1;
         HV_UINT64 Avx : 1;
-        HV_UINT64 Reserved : 61;
+        HV_UINT64 MpxBndreg : 1;
+        HV_UINT64 MpxBndcsr : 1;
+        HV_UINT64 Avx512OpMask : 1;
+        HV_UINT64 Avx512Zmmhi : 1;
+        HV_UINT64 Avx512Zmm16_31 : 1;
+        HV_UINT64 Reserved : 2;
+        HV_UINT64 Pasid : 1;
+        HV_UINT64 CetU : 1;
+        HV_UINT64 CetS : 1;
+        HV_UINT64 Reserved1 : 4;
+        HV_UINT64 XtileCfg : 1;
+        HV_UINT64 XtileData : 1;
+        HV_UINT64 Reserved2 : 45;
     };
 } HV_X64_XSAVE_XFEM_REGISTER, *PHV_X64_XSAVE_XFEM_REGISTER;
 
@@ -1802,10 +1819,15 @@ typedef union _HV_X64_MSR_NPIEP_CONFIG_CONTENTS
     HV_UINT64 AsUINT64;
     struct
     {
+        /* These bits enable instruction execution prevention for specific */
+        /* instructions. */
+
         HV_UINT64 PreventsGdt : 1;
         HV_UINT64 PreventsIdt : 1;
         HV_UINT64 PreventsLdt : 1;
         HV_UINT64 PreventsTr : 1;
+
+        /* The reserved bits must always be 0. */
         HV_UINT64 Reserved : 60;
     };
 } HV_X64_MSR_NPIEP_CONFIG_CONTENTS, *PHV_X64_MSR_NPIEP_CONFIG_CONTENTS;
@@ -1890,6 +1912,16 @@ typedef enum _HV_INTERCEPT_TYPE
     HvInterceptTypeX64Msr = 0x00000001,
     HvInterceptTypeX64Cpuid = 0x00000002,
     HvInterceptTypeX64Exception = 0x00000003,
+    HvInterceptTypeRegister = 0x00000004,
+    HvInterceptTypeMmio = 0x00000005,
+    HvInterceptTypeX64GlobalCpuid = 0x00000006,
+    HvInterceptTypeX64ApicSmi = 0x00000007,
+    HvInterceptTypeHypercall = 0x00000008,
+    HvInterceptTypeX64ApicInitSipi = 0x00000009,
+    HvInterceptTypeX64ApicWrite = 0x0000000B,
+    HvInterceptTypeX64MsrIndex = 0x0000000C,
+    HvInterceptTypeMax,
+    HvInterceptTypeInvalid = 0xFFFFFFFF
 } HV_INTERCEPT_TYPE, *PHV_INTERCEPT_TYPE;
 
 /* Define IO port type. */
@@ -1904,8 +1936,12 @@ typedef union _HV_INTERCEPT_PARAMETERS
     HV_X64_IO_PORT IoPort;
     /* HvInterceptTypeX64Cpuid. */
     HV_UINT32 CpuidIndex;
+    /* HvInterceptTypeX64ApicWrite */
+    HV_UINT32 ApicWriteMask;
     /* HvInterceptTypeX64Exception. */
     HV_UINT16 ExceptionVector;
+    /* HvInterceptTypeX64MsrIndex */
+    HV_UINT32 MsrIndex;
     /* N.B. Other intercept types do not have any paramaters. */
 } HV_INTERCEPT_PARAMETERS, *PHV_INTERCEPT_PARAMETERS;
 
@@ -2065,7 +2101,12 @@ typedef union _HV_GVA_RANGE
 
 /* Define index of synthetic interrupt source that receives intercept */
 /* messages. */
+
 #define HV_SYNIC_INTERCEPTION_SINT_INDEX ((HV_SYNIC_SINT_INDEX)0)
+#define HV_SYNIC_IOMMU_FAULT_SINT_INDEX ((HV_SYNIC_SINT_INDEX)1)
+#define HV_SYNIC_VMBUS_SINT_INDEX ((HV_SYNIC_SINT_INDEX)2)
+#define HV_SYNIC_FIRST_UNUSED_SINT_INDEX ((HV_SYNIC_SINT_INDEX)5)
+#define HV_SYNIC_DOORBELL_SINT_INDEX     HV_SYNIC_FIRST_UNUSED_SINT_INDEX
 
 /* Define version of the synthetic interrupt controller. */
 #define HV_SYNIC_VERSION (1)
