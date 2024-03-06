@@ -2851,7 +2851,11 @@ typedef struct _HV_X64_VP_EXECUTION_STATE
         HV_UINT16 EferLma : 1;
         HV_UINT16 DebugActive : 1;
         HV_UINT16 InterruptionPending : 1;
-        HV_UINT16 Reserved : 9;
+        HV_UINT16 Vtl : 4;
+        HV_UINT16 EnclaveMode : 1;
+        HV_UINT16 InterruptShadow : 1;
+        HV_UINT16 VirtualizationFaultActive : 1;
+        HV_UINT16 Reserved : 2;
     };
 } HV_X64_VP_EXECUTION_STATE, *PHV_X64_VP_EXECUTION_STATE;
 
@@ -2859,7 +2863,8 @@ typedef struct _HV_X64_VP_EXECUTION_STATE
 typedef struct _HV_X64_INTERCEPT_MESSAGE_HEADER
 {
     HV_VP_INDEX VpIndex;
-    HV_UINT8 InstructionLength;
+    HV_UINT8 InstructionLength : 4;
+    HV_UINT8 Cr8 : 4; /* Only set for exo partitions */
     HV_INTERCEPT_ACCESS_TYPE_MASK InterceptAccessType;
     HV_X64_VP_EXECUTION_STATE ExecutionState;
     HV_X64_SEGMENT_REGISTER CsSegment;
@@ -4272,12 +4277,6 @@ typedef enum _HV_UNIMPLEMENTED_MSR_ACTION
 #define HV_GENERIC_SET_SHIFT (6)
 #define HV_GENERIC_SET_MASK (63)
 
-typedef enum _HV_GENERIC_SET_FORMAT
-{
-    HvGenericSetSparse4k,
-    HvGenericSetAll
-} HV_GENERIC_SET_FORMAT, *PHV_GENERIC_SET_FORMAT;
-
 /* NOTE: following two #defines are not defined in Hyper-V code */
 /* The maximum number of sparse vCPU banks which can be encoded by HV_VP_SET */
 #define HV_MAX_SPARSE_VCPU_BANKS (64)
@@ -4329,6 +4328,319 @@ typedef union HV_GPA_PAGE_ACCESS_STATE
     };
     HV_UINT8 AsUINT8;
 } HV_GPA_PAGE_ACCESS_STATE, *PHV_GPA_PAGE_ACCESS_STATE;
+
+/* Bits for dirty mask of HV_VP_REGISTER_PAGE */
+
+#define HV_X64_REGISTER_CLASS_GENERAL 0
+#define HV_X64_REGISTER_CLASS_IP 1
+#define HV_X64_REGISTER_CLASS_XMM 2
+#define HV_X64_REGISTER_CLASS_SEGMENT 3
+#define HV_X64_REGISTER_CLASS_FLAGS 4
+
+#define HV_VP_REGISTER_PAGE_VERSION_1 1u
+
+typedef struct _HV_VP_REGISTER_PAGE
+{
+    HV_UINT16 Version;
+    HV_UINT8 IsValid;
+    HV_UINT8 Rsvdz;
+    HV_UINT32 Dirty;
+    union
+    {
+        struct
+        {
+            /* General purpose registers (HV_X64_REGISTER_CLASS_GENERAL) */
+            union
+            {
+                struct
+                {
+                    HV_UINT64 Rax;
+                    HV_UINT64 Rcx;
+                    HV_UINT64 Rdx;
+                    HV_UINT64 Rbx;
+                    HV_UINT64 Rsp;
+                    HV_UINT64 Rbp;
+                    HV_UINT64 Rsi;
+                    HV_UINT64 Rdi;
+                    HV_UINT64 R8;
+                    HV_UINT64 R9;
+                    HV_UINT64 R10;
+                    HV_UINT64 R11;
+                    HV_UINT64 R12;
+                    HV_UINT64 R13;
+                    HV_UINT64 R14;
+                    HV_UINT64 R15;
+                };
+                HV_UINT64 GpRegisters[16];
+            };
+            /* Instruction pointer (HV_X64_REGISTER_CLASS_IP) */
+            HV_UINT64 Rip;
+            /* Flags (HV_X64_REGISTER_CLASS_FLAGS) */
+            HV_UINT64 Rflags;
+        };
+        HV_UINT64 Registers[18];
+    };
+    /* Volatile XMM registers (HV_X64_REGISTER_CLASS_XMM) */
+    union
+    {
+        struct
+        {
+            HV_UINT128 Xmm0;
+            HV_UINT128 Xmm1;
+            HV_UINT128 Xmm2;
+            HV_UINT128 Xmm3;
+            HV_UINT128 Xmm4;
+            HV_UINT128 Xmm5;
+        };
+        HV_UINT128 XmmRegisters[6];
+    };
+    /* Segment registers (HV_X64_REGISTER_CLASS_SEGMENT) */
+    union
+    {
+        struct
+        {
+            HV_X64_SEGMENT_REGISTER Es;
+            HV_X64_SEGMENT_REGISTER Cs;
+            HV_X64_SEGMENT_REGISTER Ss;
+            HV_X64_SEGMENT_REGISTER Ds;
+            HV_X64_SEGMENT_REGISTER Fs;
+            HV_X64_SEGMENT_REGISTER Gs;
+        };
+        HV_X64_SEGMENT_REGISTER SegmentRegisters[6];
+    };
+    /* Misc. control registers (cannot be set via this interface) */
+    HV_UINT64 Cr0;
+    HV_UINT64 Cr3;
+    HV_UINT64 Cr4;
+    HV_UINT64 Cr8;
+    HV_UINT64 Efer;
+    HV_UINT64 Dr7;
+    HV_X64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
+    HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
+    HV_UINT64 InstructionEmulationHints;
+} HV_VP_REGISTER_PAGE, *PHV_VP_REGISTER_PAGE;
+
+typedef struct _HV_PARTITION_CREATION_PROPERTIES
+{
+    HV_PARTITION_PROCESSOR_FEATURES DisabledProcessorFeatures;
+    HV_PARTITION_PROCESSOR_XSAVE_FEATURES DisabledProcessorXsaveFeatures;
+} HV_PARTITION_CREATION_PROPERTIES, *PHV_PARTITION_CREATION_PROPERTIES;
+
+/* Definition of the partition isolation state. Used for */
+/* HV_PARTITION_PROPERTY_ISOLATION_STATE. */
+/* The isolation states (HV_PARTITION_ISOLATION_STATE) are sub-states of */
+/* ObPartitionActive that apply to VBS and hardware isolated partitions. */
+/* For VBS isolation, the trusted host VTL 1 component uses the isolation */
+/* state to establish a binding between a hypervisor partition and its own */
+/* partition context, and to enforce certain invariants. */
+/* Hardware-isolated partitions (including partitions that simulate hardware */
+/* isolation) also use isolation states to track the progression of the */
+/* partition security state through the architectural state machine. */
+/* Insecure states indicate that there is no architectural state associated */
+/* with the partition, and Secure indicates that the partition has secure */
+/* architectural state. */
+/* ObPartitionRestoring is treated differently for isolated partitions. */
+/* Only the trusted host component is allowed to restore partition state, and */
+/* ObPartitionRestoring can only transition directly to/from secure. */
+/* .................................................................. */
+/* .         UNINITIALIZED     FINALIZED                            . */
+/* .               |           ^       ^                            . */
+/* .    Initialize |          /         \                           . */
+/* .               |         /           \                          . */
+/* . --------------|--------/--- ACTIVE --\------------------------ . */
+/* . |             |       /               \                      | . */
+/* . |             |      / Finalize        \ Finalize            | . */
+/* . |             v     /                   \                    | . */
+/* . |       INSECURE-CLEAN <---------------- INSECURE-DIRTY      | . */
+/* . |                   \        Scrub      ^                    | . */
+/* . |                    \                 /                     | . */
+/* . |                     \               /                      | . */
+/* . |               Secure \             / Unsecure              | . */
+/* . |                       \           /                        | . */
+/* . |                        \         /                         | . */
+/* . |                         v       /                          | . */
+/* . |                           SECURE                           | . */
+/* . |                             ^                              | . */
+/* . |_____________________________|______________________________| . */
+/* .                               |                                . */
+/* .                               v                                . */
+/* .                           RESTORING                            . */
+/* .................................................................. */
+typedef enum _HV_PARTITION_ISOLATION_STATE
+{
+    /* Initial and final state for all non-isolated partitions. */
+    HvPartitionIsolationInvalid = 0,
+    /* An "Insecure" partition is not being used by the trusted host */
+    /* component. In this state, VPs can be created and deleted. VPs cannot */
+    /* be started, and VP registers cannot be modified. */
+    /* Initial state of an isolated partition as result of Initialize or */
+    /* Scrub hypercalls. Guest-visible partition and VP state is considered */
+    /* "clean", in the sense that a call to ObScrubPartition should not */
+    /* result in any changes. Also, there are no accepted or confidential */
+    /* pages assigned to the partition. InsecureRundown is enabled. */
+    HvPartitionIsolationInsecureClean = 1,
+    /* Guest-visible partition and VP state is not "clean". Hence it must be */
+    /* scrubbed first. One of 2 explicit states the trusted host component */
+    /* can request. It cannot transition the state to Secure. In this state, */
+    /* - IsolationControl is clear. */
+    /* - Secure rundowns are completely disabled. */
+    /* - No assigned pages exist. */
+    HvPartitionIsolationInsecureDirty = 2,
+    /* The partition is being used by the trusted host component (and is */
+    /* typically bound to a single partition context in that component). */
+    /* One of 2 explicit states the trusted host component can request. In */
+    /* this state, */
+    /* - VPs cannot be created or deleted. */
+    /* - Partition cannot be finalized, scrubbed. */
+    /* - Insecure rundowns are completely disabled. */
+    HvPartitionIsolationSecure = 3,
+    /* Represents a failed attempt to transition to Secure state. Partition */
+    /* in this state cannot be finalized, scrubbed since one or more pages */
+    /* may be assigned. */
+    HvPartitionIsolationSecureDirty = 4,
+    /* An internal state indicating that a partition is in the process of */
+    /* transitioning from Secure to InsecureDirty. */
+    HvPartitionIsolationSecureTerminating = 5,
+} HV_PARTITION_ISOLATION_STATE, *PHV_PARTITION_ISOLATION_STATE;
+
+#define HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS 1
+
+typedef union _HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES
+{
+    HV_UINT64 AsUINT64[HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS];
+    struct
+    {
+        /* Report a hypervisor is present. CPUID leaves 0x40000000 and */
+        /* 0x40000001 are supported.  */
+        HV_UINT64 HypervisorPresent : 1;
+
+        /* Features associated with HV#1: */
+
+        /* Report support for Hv1 (CPUID leaves 0x40000000 - 0x40000006). */
+        HV_UINT64 Hv1 : 1;
+        /* Access to HV_X64_MSR_VP_RUNTIME. */
+        /* Corresponds to AccessVpRunTimeReg privilege. */
+        HV_UINT64 AccessVpRunTimeReg : 1;
+        /* Access to HV_X64_MSR_TIME_REF_COUNT. */
+        /* Corresponds to AccessPartitionReferenceCounter privilege. */
+        HV_UINT64 AccessPartitionReferenceCounter : 1;
+        /* Access to SINT-related registers (HV_X64_MSR_SCONTROL through */
+        /* HV_X64_MSR_EOM and HV_X64_MSR_SINT0 through HV_X64_MSR_SINT15). */
+        /* Corresponds to AccessSynicRegs privilege. */
+        HV_UINT64 AccessSynicRegs : 1;
+        /* Access to synthetic timers and associated MSRs */
+        /* (HV_X64_MSR_STIMER0_CONFIG through HV_X64_MSR_STIMER3_COUNT). */
+        /* Corresponds to AccessSyntheticTimerRegs privilege. */
+        HV_UINT64 AccessSyntheticTimerRegs : 1;
+        /* Access to APIC MSRs (HV_X64_MSR_EOI, HV_X64_MSR_ICR and */
+        /* HV_X64_MSR_TPR) as well as the VP assist page. */
+        /* Corresponds to AccessIntrCtrlRegs privilege. */
+        HV_UINT64 AccessIntrCtrlRegs : 1;
+        /* Access to registers associated with hypercalls */
+        /* (HV_X64_MSR_GUEST_OS_ID and HV_X64_MSR_HYPERCALL). */
+        /* Corresponds to AccessHypercallMsrs privilege. */
+        HV_UINT64 AccessHypercallMsrs : 1;
+        /* VP index can be queried. corresponds to AccessVpIndex privilege. */
+        HV_UINT64 AccessVpIndex : 1;
+        /* Access to the reference TSC. Corresponds to */
+        /* AccessPartitionReferenceTsc privilege. */
+        HV_UINT64 AccessPartitionReferenceTsc : 1;
+        /* Partition has access to the guest idle reg. Corresponds to */
+        /* AccessGuestIdleReg privilege. */
+        HV_UINT64 AccessGuestIdleReg : 1;
+        /* Partition has access to frequency regs. corresponds to */
+        /* AccessFrequencyRegs privilege. */
+        HV_UINT64 AccessFrequencyRegs : 1;
+        /* Reserved for AccessReenlightenmentControls. */
+        HV_UINT64 ReservedZ12 : 1;
+        /* Reserved for AccessRootSchedulerReg. */
+        HV_UINT64 ReservedZ13 : 1;
+        /* Reserved for AccessTscInvariantControls. */
+        HV_UINT64 ReservedZ14 : 1; 
+        /* Extended GVA ranges for HvCallFlushVirtualAddressList hypercall. */
+        /* Corresponds to privilege. */
+        HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
+        /* Reserved for AccessVsm. */
+        HV_UINT64 ReservedZ16 : 1;
+        /* Reserved for AccessVpRegisters. */
+        HV_UINT64 ReservedZ17 : 1;
+        /* Use fast hypercall output. Corresponds to privilege. */
+        HV_UINT64 FastHypercallOutput : 1;
+        /* Reserved for EnableExtendedHypercalls. */
+        HV_UINT64 ReservedZ19 : 1;
+        /* HvStartVirtualProcessor can be used to start virtual processors. */
+        /* Corresponds to privilege. */
+        HV_UINT64 StartVirtualProcessor : 1;
+        /* Reserved for Isolation. */
+        HV_UINT64 ReservedZ21 : 1; 
+        /* Synthetic timers in direct mode. */
+        HV_UINT64 DirectSyntheticTimers : 1;
+        /* Reserved for synthetic time unhalted timer */
+        HV_UINT64 ReservedZ23 : 1; 
+        /* Use extended processor masks. */
+        HV_UINT64 ExtendedProcessorMasks : 1;
+        /* HvCallFlushVirtualAddressSpace / HvCallFlushVirtualAddressList are */
+        /* supported. */
+        HV_UINT64 TbFlushHypercalls : 1;
+        /* HvCallSendSyntheticClusterIpi is supported. */
+        HV_UINT64 SyntheticClusterIpi : 1;
+        /* HvCallNotifyLongSpinWait is supported. */
+        HV_UINT64 NotifyLongSpinWait : 1;
+        /* HvCallQueryNumaDistance is supported. */
+        HV_UINT64 QueryNumaDistance : 1;
+        /* HvCallSignalEvent is supported. Corresponds to privilege. */
+        HV_UINT64 SignalEvents : 1;
+        /* HvCallRetargetDeviceInterrupt is supported. */
+        HV_UINT64 RetargetDeviceInterrupt : 1;
+        /* HvCallRestorePartitionTime is supported. */
+        HV_UINT64 RestoreTime : 1;
+        /* EnlightenedVmcs nested enlightenment is supported. */
+        HV_UINT64 EnlightenedVmcs : 1;
+        HV_UINT64 Reserved : 31;
+    };
+} HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES, *PHV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES;
+
+#define HV_MAKE_COMPATIBILITY_VERSION(Major, Minor) \
+	((HV_UINT32)((Major) << 8 | (Minor)))
+
+#define HV_COMPATIBILITY_21_H2 HV_MAKE_COMPATIBILITY_VERSION(0x6, 0x9)
+
+typedef union _HV_PARTITION_ISOLATION_PROPERTIES
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 IsolationType : 5;
+        HV_UINT64 IsolationHostType : 2;
+        HV_UINT64 RsvdZ : 5;
+        HV_UINT64 SharedGpaBoundaryPageNumber : 52;
+    };
+} HV_PARTITION_ISOLATION_PROPERTIES, *PHV_PARTITION_ISOLATION_PROPERTIES;
+
+/* Various isolation types supported by MSHV. */
+
+#define HV_PARTITION_ISOLATION_TYPE_NONE 0
+#define HV_PARTITION_ISOLATION_TYPE_SNP 2
+#define HV_PARTITION_ISOLATION_TYPE_TDX 3
+
+/* Various host isolation types supported by MSHV. */
+
+#define HV_PARTITION_ISOLATION_HOST_TYPE_NONE 0x0
+#define HV_PARTITION_ISOLATION_HOST_TYPE_HARDWARE 0x1
+#define HV_PARTITION_ISOLATION_HOST_TYPE_RESERVED 0x2
+
+/* Note: Exo partition is enabled by default */
+#define HV_PARTITION_CREATION_FLAG_EXO_PARTITION (1 << 8)
+#define HV_PARTITION_CREATION_FLAG_LAPIC_ENABLED (1 << 13)
+#define HV_PARTITION_CREATION_FLAG_INTERCEPT_MESSAGE_PAGE_ENABLED (1 << 19)
+#define HV_PARTITION_CREATION_FLAG_X2APIC_CAPABLE (1 << 22)
+
+typedef enum _HV_VP_STATE_PAGE_TYPE
+{
+    HvVpStatePageRegisters = 0,
+    HvVpStatePageInterceptMessage = 1,
+    HvVpStatePageCount
+} HV_VP_STATE_PAGE_TYPE, *PHV_VP_STATE_PAGE_TYPE;
 
 /******************************************************************************/
 /* Hypervisor CPUID Definitions */
@@ -5747,6 +6059,10 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PARTITION
 {
     HV_UINT64 Flags;
     HV_PROXIMITY_DOMAIN_INFO ProximityDomainInfo;
+    HV_UINT32 CompatibilityVersion;
+    HV_UINT32 Padding;
+    HV_PARTITION_CREATION_PROPERTIES PartitionCreationProperties;
+    HV_PARTITION_ISOLATION_PROPERTIES IsolationProperties;
 } HV_INPUT_CREATE_PARTITION, *PHV_INPUT_CREATE_PARTITION;
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_CREATE_PARTITION
@@ -6381,11 +6697,13 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PORT_PROPERTY
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_SYSTEM_PROPERTY
 {
     HV_UINT32 PropertyId; /* HV_SYSTEM_PROPERTY */
+    HV_UINT32 Padding;
 } HV_INPUT_GET_SYSTEM_PROPERTY, *PHV_INPUT_GET_SYSTEM_PROPERTY;
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SYSTEM_PROPERTY
 {
     HV_UINT32 SchedulerType; /* HV_SCHEDULER_TYPE */
+    HV_UINT32 Padding;
 } HV_OUTPUT_GET_SYSTEM_PROPERTY, *PHV_OUTPUT_GET_SYSTEM_PROPERTY;
 
 /* HvCallMapDeviceInterrupt | 0x007C */
