@@ -1636,10 +1636,13 @@ typedef enum _HV_PROCESSOR_VENDOR
     HvProcessorVendorIntel = 0x0001
 } HV_PROCESSOR_VENDOR, *PHV_PROCESSOR_VENDOR;
 
+#define HV_PARTITION_PROCESSOR_FEATURES_BANKS 2
+
 /* Define the structure defining the processor related features that may be */
 /* de-featured. */
 typedef union _HV_PARTITION_PROCESSOR_FEATURES
 {
+    HV_UINT64 AsUINT64[HV_PARTITION_PROCESSOR_FEATURES_BANKS];
     struct
     {
         HV_UINT64 Sse3Support : 1;
@@ -1648,7 +1651,7 @@ typedef union _HV_PARTITION_PROCESSOR_FEATURES
         HV_UINT64 Sse4_1Support : 1;
         HV_UINT64 Sse4_2Support : 1;
         HV_UINT64 Sse4aSupport : 1;
-        HV_UINT64 Sse5Support : 1;
+        HV_UINT64 XopSupport : 1;
         HV_UINT64 PopCntSupport : 1;
         HV_UINT64 Cmpxchg16bSupport : 1;
         HV_UINT64 Altmovcr8Support : 1;
@@ -1658,9 +1661,82 @@ typedef union _HV_PARTITION_PROCESSOR_FEATURES
         HV_UINT64 Amd3DNowSupport : 1;
         HV_UINT64 ExtendedAmd3DNowSupport : 1;
         HV_UINT64 Page1GBSupport : 1;
-        HV_UINT64 Reserved1 : 48;
+        HV_UINT64 AesSupport : 1;
+        HV_UINT64 PclmulqdqSupport : 1;
+        HV_UINT64 PcidSupport : 1;
+        HV_UINT64 Fma4Support : 1;
+        HV_UINT64 F16cSupport : 1;
+        HV_UINT64 RdRandSupport : 1;
+        HV_UINT64 RdWrFsGsSupport : 1;
+        HV_UINT64 SmepSupport : 1;
+        HV_UINT64 EnhancedFastStringSupport : 1;
+        HV_UINT64 Bmi1Support : 1;
+        HV_UINT64 Bmi2Support : 1;
+        HV_UINT64 HleSupportDeprecated : 1;
+        HV_UINT64 RtmSupportDeprecated : 1;
+        HV_UINT64 MovbeSupport : 1;
+        HV_UINT64 Npiep1Support : 1;
+        HV_UINT64 DepX87FpuSaveSupport : 1;
+        HV_UINT64 RdSeedSupport : 1;
+        HV_UINT64 AdxSupport : 1;
+        HV_UINT64 IntelPrefetchSupport : 1;
+        HV_UINT64 SmapSupport : 1;
+        HV_UINT64 HleSupport : 1;
+        HV_UINT64 RtmSupport : 1;
+        HV_UINT64 RdtscpSupport : 1;
+        HV_UINT64 ClflushoptSupport : 1;
+        HV_UINT64 ClwbSupport : 1;
+        HV_UINT64 ShaSupport : 1;
+        HV_UINT64 X87PointersSavedSupport : 1;
+        HV_UINT64 InvpcidSupport : 1;
+        HV_UINT64 IbrsSupport : 1;
+        HV_UINT64 StibpSupport : 1;
+        HV_UINT64 IbpbSupport : 1;
+        HV_UINT64 UnrestrictedGuestSupport : 1;
+        HV_UINT64 MddSupport : 1;
+        HV_UINT64 FastShortRepMovSupport : 1;
+        HV_UINT64 L1dcacheFlushSupport : 1;
+        HV_UINT64 RdclNoSupport : 1;
+        HV_UINT64 IbrsAllSupport : 1;
+        HV_UINT64 SkipL1dfSupport : 1;
+        HV_UINT64 SsbNoSupport : 1;
+        HV_UINT64 RsbANoSupport : 1;
+        HV_UINT64 VirtSpecCtrlSupport : 1;
+        HV_UINT64 RdPidSupport : 1;
+        HV_UINT64 UmipSupport : 1;
+        HV_UINT64 MbsNoSupport : 1;
+        HV_UINT64 MbClearSupport : 1;
+        HV_UINT64 TaaNoSupport : 1;
+        HV_UINT64 TsxCtrlSupport : 1;
+        /* N.B. The final processor feature bit in bank 0 is reserved to */
+        /* simplify potential downlevel backports. */
+        HV_UINT64 ReservedBank0 : 1;
+
+        /* N.B. Begin bank 1 processor features. */
+        HV_UINT64 AcountMcountSupport : 1;
+        HV_UINT64 TscInvariantSupport : 1;
+        HV_UINT64 ClZeroSupport : 1;
+        HV_UINT64 RdpruSupport : 1;
+        HV_UINT64 La57Support : 1;
+        HV_UINT64 MbecSupport : 1;
+        HV_UINT64 NestedVirtSupport : 1;
+        HV_UINT64 PsfdSupport : 1;
+        HV_UINT64 CetSsSupport : 1;
+        HV_UINT64 CetIbtSupport : 1;
+        HV_UINT64 VmxExceptionInjectSupport : 1;
+        HV_UINT64 EnqcmdSupport : 1;
+        HV_UINT64 UmwaitTpauseSupport : 1;
+        HV_UINT64 MovdiriSupport : 1;
+        HV_UINT64 Movdir64bSupport : 1;
+        HV_UINT64 CldemoteSupport : 1;
+        HV_UINT64 SerializeSupport : 1;
+        HV_UINT64 TscDeadlineTmrSupport : 1;
+        HV_UINT64 TscAdjustSupport : 1;
+        HV_UINT64 FzlrepMovsb : 1;
+        HV_UINT64 FsrepStosb : 1;
+        HV_UINT64 FsrepCmpsb : 1;
+        HV_UINT64 ReservedBank1 : 42;
     };
-    HV_UINT64 AsUINT64;
 } HV_PARTITION_PROCESSOR_FEATURES, *PHV_PARTITION_PROCESSOR_FEATURES;
 
 /* Define the processor features avaialble in Intel and AMD compatibility */
@@ -2776,7 +2852,10 @@ typedef struct _HV_X64_MEMORY_ACCESS_INFO
     struct
     {
         HV_UINT8 GvaValid : 1;
-        HV_UINT8 Reserved : 7;
+        HV_UINT8 GvaGpaValid : 1;
+        HV_UINT8 HypercallOutputPending : 1;
+        HV_UINT8 TlbLockedNoOverlay : 1;
+        HV_UINT8 Reserved : 4;
     };
 } HV_X64_MEMORY_ACCESS_INFO, *PHV_X64_MEMORY_ACCESS_INFO;
 
@@ -2800,7 +2879,8 @@ typedef struct _HV_X64_EXCEPTION_INFO
     struct
     {
         HV_UINT8 ErrorCodeValid : 1;
-        HV_UINT8 Reserved : 7;
+        HV_UINT8 SoftwareException : 1;
+        HV_UINT8 Reserved : 6;
     };
 } HV_X64_EXCEPTION_INFO, *PHV_X64_EXCEPTION_INFO;
 
@@ -2813,10 +2893,14 @@ typedef struct _HV_X64_MEMORY_INTERCEPT_MESSAGE
     HV_CACHE_TYPE CacheType;
     HV_UINT8 InstructionByteCount;
     HV_X64_MEMORY_ACCESS_INFO MemoryAccessInfo;
-    HV_UINT16 Reserved1;
+    HV_UINT8 TprPriority;
+    HV_UINT8 Reserved1;
     HV_UINT64 GuestVirtualAddress;
     HV_UINT64 GuestPhysicalAddress;
     HV_UINT8 InstructionBytes[16];
+
+    /* Below definition are not found in mshv MIT-licensed hv headers. */
+
     HV_X64_SEGMENT_REGISTER DsSegment;
     HV_X64_SEGMENT_REGISTER SsSegment;
     HV_UINT64 Rax;
@@ -5566,7 +5650,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PARTITION
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_CREATE_PARTITION
 {
-    HV_PARTITION_ID NewPartitionId;
+    HV_PARTITION_ID PartitionId;
 } HV_OUTPUT_CREATE_PARTITION, *PHV_OUTPUT_CREATE_PARTITION;
 
 /* HvCallInitializePartition | 0x0041 */
@@ -5596,6 +5680,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_PARTITION_PROPERTY
 {
     HV_PARTITION_ID PartitionId;
     HV_PARTITION_PROPERTY_CODE PropertyCode;
+    HV_UINT32 Padding;
 } HV_INPUT_GET_PARTITION_PROPERTY, *PHV_INPUT_GET_PARTITION_PROPERTY;
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_PARTITION_PROPERTY
@@ -5609,6 +5694,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PARTITION_PROPERTY
 {
     HV_PARTITION_ID PartitionId;
     HV_PARTITION_PROPERTY_CODE PropertyCode;
+    HV_UINT32 Padding;
     HV_PARTITION_PROPERTY PropertyValue;
 } HV_INPUT_SET_PARTITION_PROPERTY, *PHV_INPUT_SET_PARTITION_PROPERTY;
 
@@ -5881,11 +5967,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PORT_DEPRECATED
 
 /* HvCallDeletePort | 0x0058 */
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_PORT
+typedef union HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_PORT
 {
-    HV_PARTITION_ID PortPartition;
-    HV_PORT_ID PortId;
-    HV_UINT32 Reserved;
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        HV_PARTITION_ID PortPartition;
+        HV_PORT_ID PortId;
+        HV_UINT32 Reserved;
+    };
 } HV_INPUT_DELETE_PORT, *PHV_INPUT_DELETE_PORT;
 
 /* HvCallConnectPortDeprecated | 0x0059 */
@@ -5918,11 +6008,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_PORT_PROPERTY
 
 /* HvCallDisconnectPort | 0x005B */
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISCONNECT_PORT
+typedef union HV_CALL_ATTRIBUTES _HV_INPUT_DISCONNECT_PORT
 {
-    HV_PARTITION_ID ConnectionPartition;
-    HV_CONNECTION_ID ConnectionId;
-    HV_UINT32 Reserved;
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        HV_PARTITION_ID ConnectionPartition;
+        HV_CONNECTION_ID ConnectionId;
+        HV_UINT32 Reserved;
+    };   
 } HV_INPUT_DISCONNECT_PORT, *PHV_INPUT_DISCONNECT_PORT;
 
 /* HvCallPostMessage | 0x005C */

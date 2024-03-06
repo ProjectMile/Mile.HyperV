@@ -104,117 +104,6 @@ struct hv_vp_register_page {
 	__u64 instruction_emulation_hints;
 } __packed;
 
-#define HV_PARTITION_PROCESSOR_FEATURES_BANKS 2
-
-union hv_partition_processor_features {
-	__u64 as_uint64[HV_PARTITION_PROCESSOR_FEATURES_BANKS];
-	struct {
-		__u64 sse3_support:1;
-		__u64 lahf_sahf_support:1;
-		__u64 ssse3_support:1;
-		__u64 sse4_1_support:1;
-		__u64 sse4_2_support:1;
-		__u64 sse4a_support:1;
-		__u64 xop_support:1;
-		__u64 pop_cnt_support:1;
-		__u64 cmpxchg16b_support:1;
-		__u64 altmovcr8_support:1;
-		__u64 lzcnt_support:1;
-		__u64 mis_align_sse_support:1;
-		__u64 mmx_ext_support:1;
-		__u64 amd3dnow_support:1;
-		__u64 extended_amd3dnow_support:1;
-		__u64 page_1gb_support:1;
-		__u64 aes_support:1;
-		__u64 pclmulqdq_support:1;
-		__u64 pcid_support:1;
-		__u64 fma4_support:1;
-		__u64 f16c_support:1;
-		__u64 rd_rand_support:1;
-		__u64 rd_wr_fs_gs_support:1;
-		__u64 smep_support:1;
-		__u64 enhanced_fast_string_support:1;
-		__u64 bmi1_support:1;
-		__u64 bmi2_support:1;
-		__u64 hle_support_deprecated:1;
-		__u64 rtm_support_deprecated:1;
-		__u64 movbe_support:1;
-		__u64 npiep1_support:1;
-		__u64 dep_x87_fpu_save_support:1;
-		__u64 rd_seed_support:1;
-		__u64 adx_support:1;
-		__u64 intel_prefetch_support:1;
-		__u64 smap_support:1;
-		__u64 hle_support:1;
-		__u64 rtm_support:1;
-		__u64 rdtscp_support:1;
-		__u64 clflushopt_support:1;
-		__u64 clwb_support:1;
-		__u64 sha_support:1;
-		__u64 x87_pointers_saved_support:1;
-		__u64 invpcid_support:1;
-		__u64 ibrs_support:1;
-		__u64 stibp_support:1;
-		__u64 ibpb_support: 1;
-		__u64 unrestricted_guest_support:1;
-		__u64 mdd_support:1;
-		__u64 fast_short_rep_mov_support:1;
-		__u64 l1dcache_flush_support:1;
-		__u64 rdcl_no_support:1;
-		__u64 ibrs_all_support:1;
-		__u64 skip_l1df_support:1;
-		__u64 ssb_no_support:1;
-		__u64 rsb_a_no_support:1;
-		__u64 virt_spec_ctrl_support:1;
-		__u64 rd_pid_support:1;
-		__u64 umip_support:1;
-		__u64 mbs_no_support:1;
-		__u64 mb_clear_support:1;
-		__u64 taa_no_support:1;
-		__u64 tsx_ctrl_support:1;
-		/*
-		 * N.B. The final processor feature bit in bank 0 is reserved to
-		 * simplify potential downlevel backports.
-		 */
-		__u64 reserved_bank0:1;
-
-		/* N.B. Begin bank 1 processor features. */
-		__u64 acount_mcount_support:1;
-		__u64 tsc_invariant_support:1;
-		__u64 cl_zero_support:1;
-		__u64 rdpru_support:1;
-		__u64 la57_support:1;
-		__u64 mbec_support:1;
-		__u64 nested_virt_support:1;
-		__u64 psfd_support:1;
-		__u64 cet_ss_support:1;
-		__u64 cet_ibt_support:1;
-		__u64 vmx_exception_inject_support:1;
-		__u64 enqcmd_support:1;
-		__u64 umwait_tpause_support:1;
-		__u64 movdiri_support:1;
-		__u64 movdir64b_support:1;
-		__u64 cldemote_support:1;
-		__u64 serialize_support:1;
-		__u64 tsc_deadline_tmr_support:1;
-		__u64 tsc_adjust_support:1;
-		__u64 fzlrep_movsb:1;
-		__u64 fsrep_stosb:1;
-		__u64 fsrep_cmpsb:1;
-		__u64 reserved_bank1:42;
-	} __packed;
-};
-
-union hv_partition_processor_xsave_features {
-	struct {
-		__u64 xsave_support : 1;
-		__u64 xsaveopt_support : 1;
-		__u64 avx_support : 1;
-		__u64 reserved1 : 61;
-	} __packed;
-	__u64 as_uint64;
-};
-
 struct hv_partition_creation_properties {
 	union hv_partition_processor_features disabled_processor_features;
 	union hv_partition_processor_xsave_features
@@ -499,39 +388,6 @@ struct hv_input_create_partition {
 	union hv_partition_isolation_properties isolation_properties;
 } __packed;
 
-struct hv_output_create_partition {
-	__u64 partition_id;
-} __packed;
-
-struct hv_input_initialize_partition {
-	__u64 partition_id;
-} __packed;
-
-struct hv_input_finalize_partition {
-	__u64 partition_id;
-} __packed;
-
-struct hv_input_delete_partition {
-	__u64 partition_id;
-} __packed;
-
-struct hv_input_get_partition_property {
-	__u64 partition_id;
-	__u32 property_code; /* enum hv_partition_property_code */
-	__u32 padding;
-} __packed;
-
-struct hv_output_get_partition_property {
-	__u64 property_value;
-} __packed;
-
-struct hv_input_set_partition_property {
-	__u64 partition_id;
-	__u32 property_code; /* enum hv_partition_property_code */
-	__u32 padding;
-	__u64 property_value;
-} __packed;
-
 enum hv_vp_state_page_type {
 	HV_VP_STATE_PAGE_REGISTERS = 0,
 	HV_VP_STATE_PAGE_INTERCEPT_MESSAGE = 1,
@@ -747,121 +603,6 @@ struct hv_x64_register_intercept_message {
 	union hv_x64_register_access_info access_info;
 } __packed;
 
-union hv_x64_memory_access_info {
-	__u8 as_uint8;
-	struct {
-		__u8 gva_valid:1;
-		__u8 gva_gpa_valid:1;
-		__u8 hypercall_output_pending:1;
-		__u8 tlb_locked_no_overlay:1;
-		__u8 reserved:4;
-	} __packed;
-};
-
-union hv_x64_io_port_access_info {
-	__u8 as_uint8;
-	struct {
-		__u8 access_size:3;
-		__u8 string_op:1;
-		__u8 rep_prefix:1;
-		__u8 reserved:3;
-	} __packed;
-};
-
-union hv_x64_exception_info {
-	__u8 as_uint8;
-	struct {
-		__u8 error_code_valid:1;
-		__u8 software_exception:1;
-		__u8 reserved:6;
-	} __packed;
-};
-
-struct hv_x64_memory_intercept_message {
-	struct hv_x64_intercept_message_header header;
-	__u32 cache_type; /* enum hv_cache_type */
-	__u8 instruction_byte_count;
-	union hv_x64_memory_access_info memory_access_info;
-	__u8 tpr_priority;
-	__u8 reserved1;
-	__u64 guest_virtual_address;
-	__u64 guest_physical_address;
-	__u8 instruction_bytes[16];
-} __packed;
-
-struct hv_x64_cpuid_intercept_message {
-	struct hv_x64_intercept_message_header header;
-	__u64 rax;
-	__u64 rcx;
-	__u64 rdx;
-	__u64 rbx;
-	__u64 default_result_rax;
-	__u64 default_result_rcx;
-	__u64 default_result_rdx;
-	__u64 default_result_rbx;
-} __packed;
-
-struct hv_x64_msr_intercept_message {
-	struct hv_x64_intercept_message_header header;
-	__u32 msr_number;
-	__u32 reserved;
-	__u64 rdx;
-	__u64 rax;
-} __packed;
-
-struct hv_x64_io_port_intercept_message {
-	struct hv_x64_intercept_message_header header;
-	__u16 port_number;
-	union hv_x64_io_port_access_info access_info;
-	__u8 instruction_byte_count;
-	__u32 reserved;
-	__u64 rax;
-	__u8 instruction_bytes[16];
-	struct hv_x64_segment_register ds_segment;
-	struct hv_x64_segment_register es_segment;
-	__u64 rcx;
-	__u64 rsi;
-	__u64 rdi;
-} __packed;
-
-struct hv_x64_exception_intercept_message {
-	struct hv_x64_intercept_message_header header;
-	__u16 exception_vector;
-	union hv_x64_exception_info exception_info;
-	__u8 instruction_byte_count;
-	__u32 error_code;
-	__u64 exception_parameter;
-	__u64 reserved;
-	__u8 instruction_bytes[16];
-	struct hv_x64_segment_register ds_segment;
-	struct hv_x64_segment_register ss_segment;
-	__u64 rax;
-	__u64 rcx;
-	__u64 rdx;
-	__u64 rbx;
-	__u64 rsp;
-	__u64 rbp;
-	__u64 rsi;
-	__u64 rdi;
-	__u64 r8;
-	__u64 r9;
-	__u64 r10;
-	__u64 r11;
-	__u64 r12;
-	__u64 r13;
-	__u64 r14;
-	__u64 r15;
-} __packed;
-
-struct hv_x64_invalid_vp_register_message {
-	__u32 vp_index;
-	__u32 reserved;
-} __packed;
-
-struct hv_x64_unrecoverable_exception_message {
-	struct hv_x64_intercept_message_header header;
-} __packed;
-
 struct hv_x64_halt_message {
 	struct hv_x64_intercept_message_header header;
 } __packed;
@@ -944,16 +685,6 @@ struct hv_input_register_intercept_result {
 	union hv_register_intercept_result_parameters parameters;
 } __packed;
 
-struct hv_input_assert_virtual_interrupt {
-	__u64 partition_id;
-	union hv_interrupt_control control;
-	__u64 dest_addr; /* cpu's apic id */
-	__u32 vector;
-	__u8 target_vtl;
-	__u8 rsvd_z0;
-	__u16 rsvd_z1;
-} __packed;
-
 struct hv_input_create_port {
 	__u64 port_partition_id;
 	union hv_port_id port_id;
@@ -963,15 +694,6 @@ struct hv_input_create_port {
 	__u64 connection_partition_id;
 	struct hv_port_info port_info;
 	struct hv_proximity_domain_info proximity_domain_info;
-} __packed;
-
-union hv_input_delete_port {
-	__u64 as_uint64[2];
-	struct {
-		__u64 port_partition_id;
-		union hv_port_id port_id;
-		__u32 reserved;
-	};
 } __packed;
 
 struct hv_input_connect_port {
@@ -985,16 +707,6 @@ struct hv_input_connect_port {
 	__u32 reserved2;
 	struct hv_connection_info connection_info;
 	struct hv_proximity_domain_info proximity_domain_info;
-} __packed;
-
-union hv_input_disconnect_port {
-	__u64 as_uint64[2];
-	struct {
-		__u64 connection_partition_id;
-		union hv_connection_id connection_id;
-		__u32 is_doorbell: 1;
-		__u32 reserved: 31;
-	} __packed;
 } __packed;
 
 union hv_input_notify_port_ring_empty {

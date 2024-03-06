@@ -64,29 +64,6 @@ struct hv_output_get_system_property {
 	};
 } __packed;
 
-struct hv_proximity_domain_flags {
-	__u32 proximity_preferred : 1;
-	__u32 reserved : 30;
-	__u32 proximity_info_valid : 1;
-} __packed;
-
-struct hv_proximity_domain_info {
-	__u32 domain_id;
-	struct hv_proximity_domain_flags flags;
-} __packed;
-
-struct hv_input_withdraw_memory {
-	__u64 partition_id;
-	struct hv_proximity_domain_info proximity_domain_info;
-} __packed;
-
-struct hv_output_withdraw_memory {
-	/* Hack - compiler doesn't like empty array size
-	 * in struct with no other members
-	 */
-	__u64 gpa_page_list[0];
-} __packed;
-
 union hv_gpa_page_access_state_flags {
 	struct {
 		__u64 clear_accessed : 1;
