@@ -4250,8 +4250,8 @@ typedef enum _HV_CPUID_FUNCTION
     HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
     HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
     HvCpuIdFunctionMsHvSvmFeatures = 0x40000008,
-    HvCpuIdFunctionMsHvNestedHvFeatures = 0x40000009,
-    HvCpuIdFunctionMsHvNestedVirtFeatures = 0x4000000A,
+    HvCpuIdFunctionMsHvSkipLevelFeatures = 0x40000009,
+    HvCpuidFunctionMsHvNestedVirtFeatures = 0x4000000A,
     HvCpuIdFunctionMaxReserved = 0x4000000A
 } HV_CPUID_FUNCTION, *PHV_CPUID_FUNCTION;
 
@@ -4433,8 +4433,7 @@ typedef struct _HV_HYPERVISOR_SVM_FEATURES
     HV_UINT32 ReservedEdx;
 } HV_HYPERVISOR_SVM_FEATURES, *PHV_HYPERVISOR_SVM_FEATURES;
 
-/* Structure name is guessed according to TLFS naming style */
-typedef struct _HV_HYPERVISOR_NESTED_HV_FEATURES
+typedef struct _HV_HYPERVISOR_SKIP_LEVEL_FEATURES
 {
     HV_UINT32 Reserved : 2;
     HV_UINT32 AccessSynicRegs : 1;
@@ -4454,14 +4453,13 @@ typedef struct _HV_HYPERVISOR_NESTED_HV_FEATURES
     HV_UINT32 Reserved6 : 1;
     HV_UINT32 SintPollingModeAvailable : 1;
     HV_UINT32 Reserved7 : 14;
-} HV_HYPERVISOR_NESTED_HV_FEATURES, *PHV_HYPERVISOR_NESTED_HV_FEATURES;
+} HV_HYPERVISOR_SKIP_LEVEL_FEATURES, *PHV_HYPERVISOR_SKIP_LEVEL_FEATURES;
 
-/* Structure name and member name is guessed according to TLFS naming style */
 typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
 {
     HV_UINT32 EnlightenedVmcsVersionLow : 8;
     HV_UINT32 EnlightenedVmcsVersionHigh : 8;
-    HV_UINT32 Reserved : 1;
+    HV_UINT32 FlushGuestPhysicalHypercall_Deprecated : 1;
     HV_UINT32 NestedFlushVirtualHypercall : 1;
     HV_UINT32 FlushGuestPhysicalHypercall : 1;
     HV_UINT32 MsrBitmap : 1;
@@ -4502,7 +4500,7 @@ typedef union _HV_CPUID_RESULT
     HV_X64_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
     HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
     HV_HYPERVISOR_SVM_FEATURES MsHvSvmFeatures;
-    HV_HYPERVISOR_NESTED_HV_FEATURES MsHvNestedHvFeatures;
+    HV_HYPERVISOR_SKIP_LEVEL_FEATURES MsHvNestedHvFeatures;
     HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
 } HV_CPUID_RESULT, *PHV_CPUID_RESULT;
 
@@ -6016,7 +6014,7 @@ typedef union HV_CALL_ATTRIBUTES _HV_INPUT_DISCONNECT_PORT
         HV_PARTITION_ID ConnectionPartition;
         HV_CONNECTION_ID ConnectionId;
         HV_UINT32 Reserved;
-    };   
+    };
 } HV_INPUT_DISCONNECT_PORT, *PHV_INPUT_DISCONNECT_PORT;
 
 /* HvCallPostMessage | 0x005C */
