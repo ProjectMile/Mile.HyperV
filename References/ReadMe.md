@@ -65,10 +65,10 @@ HV_CPUID_FUNCTION.
 
 - \Windows Kits\10\Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
   - Version: 10.0.26063.0
-  - Local Archive: [kdhv.lib](kdhv.lib)
+  - Local Archive: [Symbols/kdhv.lib](Symbols/kdhv.lib)
 - urlmon.dll
   - Version: 11.0.14393.0
-  - Local Archive: [urlmon.dll](urlmon.dll), [urlmon.pdb](urlmon.pdb)
+  - Local Archive: [Symbols/urlmon.dll](urlmon.dll), [Symbols/urlmon.pdb](urlmon.pdb)
 
 ## FreeBSD
 
