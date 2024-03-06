@@ -26,62 +26,71 @@
 
 #define HV_VP_REGISTER_PAGE_VERSION_1	1u
 
-struct hv_vp_register_page {
-	__u16 version;
-	__u8 isvalid;
-	__u8 rsvdz;
-	__u32 dirty;
-	union {
-		struct {
+struct hv_vp_register_page
+{
+	HV_UINT16 version;
+	HV_UINT8 isvalid;
+	HV_UINT8 rsvdz;
+	HV_UINT32 dirty;
+	union
+    {
+		struct
+        {
 			/* General purpose registers
 			 * (HV_X64_REGISTER_CLASS_GENERAL)
 			 */
-			union {
-				struct {
-					__u64 rax;
-					__u64 rcx;
-					__u64 rdx;
-					__u64 rbx;
-					__u64 rsp;
-					__u64 rbp;
-					__u64 rsi;
-					__u64 rdi;
-					__u64 r8;
-					__u64 r9;
-					__u64 r10;
-					__u64 r11;
-					__u64 r12;
-					__u64 r13;
-					__u64 r14;
-					__u64 r15;
+			union
+            {
+				struct
+                {
+					HV_UINT64 rax;
+					HV_UINT64 rcx;
+					HV_UINT64 rdx;
+					HV_UINT64 rbx;
+					HV_UINT64 rsp;
+					HV_UINT64 rbp;
+					HV_UINT64 rsi;
+					HV_UINT64 rdi;
+					HV_UINT64 r8;
+					HV_UINT64 r9;
+					HV_UINT64 r10;
+					HV_UINT64 r11;
+					HV_UINT64 r12;
+					HV_UINT64 r13;
+					HV_UINT64 r14;
+					HV_UINT64 r15;
 				} __packed;
 
-				__u64 gp_registers[16];
+				HV_UINT64 gp_registers[16];
 			};
 			/* Instruction pointer (HV_X64_REGISTER_CLASS_IP) */
-			__u64 rip;
+			HV_UINT64 rip;
 			/* Flags (HV_X64_REGISTER_CLASS_FLAGS) */
-			__u64 rflags;
+			HV_UINT64 rflags;
 		} __packed;
 
-		__u64 registers[18];
+		HV_UINT64 registers[18];
 	};
 	/* Volatile XMM registers (HV_X64_REGISTER_CLASS_XMM) */
-	union {
-		struct {
-			struct hv_u128 xmm0;
-			struct hv_u128 xmm1;
-			struct hv_u128 xmm2;
-			struct hv_u128 xmm3;
-			struct hv_u128 xmm4;
-			struct hv_u128 xmm5;
+	union
+    {
+		struct
+        {
+			HV_UINT128 xmm0;
+			HV_UINT128 xmm1;
+			HV_UINT128 xmm2;
+			HV_UINT128 xmm3;
+			HV_UINT128 xmm4;
+			HV_UINT128 xmm5;
 		} __packed;
 
-		struct hv_u128 xmm_registers[6];
+		HV_UINT128 xmm_registers[6];
 	};
 	/* Segment registers (HV_X64_REGISTER_CLASS_SEGMENT) */
-	union {
-		struct {
+	union
+    {
+		struct
+        {
 			struct hv_x64_segment_register es;
 			struct hv_x64_segment_register cs;
 			struct hv_x64_segment_register ss;
@@ -93,18 +102,19 @@ struct hv_vp_register_page {
 		struct hv_x64_segment_register segment_registers[6];
 	};
 	/* Misc. control registers (cannot be set via this interface) */
-	__u64 cr0;
-	__u64 cr3;
-	__u64 cr4;
-	__u64 cr8;
-	__u64 efer;
-	__u64 dr7;
+	HV_UINT64 cr0;
+	HV_UINT64 cr3;
+	HV_UINT64 cr4;
+	HV_UINT64 cr8;
+	HV_UINT64 efer;
+	HV_UINT64 dr7;
 	union hv_x64_pending_interruption_register pending_interruption;
 	union hv_x64_interrupt_state_register interrupt_state;
-	__u64 instruction_emulation_hints;
+	HV_UINT64 instruction_emulation_hints;
 } __packed;
 
-struct hv_partition_creation_properties {
+struct hv_partition_creation_properties
+{
 	union hv_partition_processor_features disabled_processor_features;
 	union hv_partition_processor_xsave_features
 		disabled_processor_xsave_features;
@@ -158,7 +168,8 @@ struct hv_partition_creation_properties {
  * .                           RESTORING                            .
  * ..................................................................
  */
-enum hv_partition_isolation_state {
+enum hv_partition_isolation_state
+{
 	/*
 	 * Initial and final state for all non-isolated partitions.
 	 */
@@ -215,147 +226,151 @@ enum hv_partition_isolation_state {
 
 #define HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS 1
 
-union hv_partition_synthetic_processor_features {
-	__u64 as_uint64[HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS];
+union hv_partition_synthetic_processor_features
+{
+	HV_UINT64 AsUINT64[HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS];
 
-	struct {
+	struct
+    {
 		/* Report a hypervisor is present. CPUID leaves
 		 * 0x40000000 and 0x40000001 are supported.
 		 */
-		__u64 hypervisor_present:1;
+		HV_UINT64 hypervisor_present:1;
 
 		/*
 		 * Features associated with HV#1:
 		 */
 
 		/* Report support for Hv1 (CPUID leaves 0x40000000 - 0x40000006). */
-		__u64 hv1:1;
+		HV_UINT64 hv1:1;
 
 		/* Access to HV_X64_MSR_VP_RUNTIME.
 		 * Corresponds to access_vp_run_time_reg privilege.
 		 */
-		__u64 access_vp_run_time_reg:1;
+		HV_UINT64 access_vp_run_time_reg:1;
 
 		/* Access to HV_X64_MSR_TIME_REF_COUNT.
 		 * Corresponds to access_partition_reference_counter privilege.
 		 */
-		__u64 access_partition_reference_counter:1;
+		HV_UINT64 access_partition_reference_counter:1;
 
 		/* Access to SINT-related registers (HV_X64_MSR_SCONTROL through
 		 * HV_X64_MSR_EOM and HV_X64_MSR_SINT0 through HV_X64_MSR_SINT15).
 		 * Corresponds to access_synic_regs privilege.
 		 */
-		__u64 access_synic_regs:1;
+		HV_UINT64 access_synic_regs:1;
 
 		/* Access to synthetic timers and associated MSRs
 		 * (HV_X64_MSR_STIMER0_CONFIG through HV_X64_MSR_STIMER3_COUNT).
 		 * Corresponds to access_synthetic_timer_regs privilege.
 		 */
-		__u64 access_synthetic_timer_regs:1;
+		HV_UINT64 access_synthetic_timer_regs:1;
 
 		/* Access to APIC MSRs (HV_X64_MSR_EOI, HV_X64_MSR_ICR and HV_X64_MSR_TPR)
 		 * as well as the VP assist page.
 		 * Corresponds to access_intr_ctrl_regs privilege.
 		 */
-		__u64 access_intr_ctrl_regs:1;
+		HV_UINT64 access_intr_ctrl_regs:1;
 
 		/* Access to registers associated with hypercalls (HV_X64_MSR_GUEST_OS_ID
 		 * and HV_X64_MSR_HYPERCALL).
 		 * Corresponds to access_hypercall_msrs privilege.
 		 */
-		__u64 access_hypercall_regs:1;
+		HV_UINT64 access_hypercall_regs:1;
 
 		/* VP index can be queried. corresponds to access_vp_index privilege. */
-		__u64 access_vp_index:1;
+		HV_UINT64 access_vp_index:1;
 
 		/* Access to the reference TSC. Corresponds to access_partition_reference_tsc
 		 * privilege.
 		 */
-		__u64 access_partition_reference_tsc:1;
+		HV_UINT64 access_partition_reference_tsc:1;
 
 		/* Partition has access to the guest idle reg. Corresponds to
 		 * access_guest_idle_reg privilege.
 		 */
-		__u64 access_guest_idle_reg:1;
+		HV_UINT64 access_guest_idle_reg:1;
 
 		/* Partition has access to frequency regs. corresponds to access_frequency_regs
 		 * privilege.
 		 */
-		__u64 access_frequency_regs:1;
+		HV_UINT64 access_frequency_regs:1;
 
-		__u64 reserved_z12:1; /* Reserved for access_reenlightenment_controls. */
-		__u64 reserved_z13:1; /* Reserved for access_root_scheduler_reg. */
-		__u64 reserved_z14:1; /* Reserved for access_tsc_invariant_controls. */
+		HV_UINT64 reserved_z12:1; /* Reserved for access_reenlightenment_controls. */
+		HV_UINT64 reserved_z13:1; /* Reserved for access_root_scheduler_reg. */
+		HV_UINT64 reserved_z14:1; /* Reserved for access_tsc_invariant_controls. */
 
 		/* Extended GVA ranges for HvCallFlushVirtualAddressList hypercall.
 		 * Corresponds to privilege.
 		 */
-		__u64 enable_extended_gva_ranges_for_flush_virtual_address_list:1;
+		HV_UINT64 enable_extended_gva_ranges_for_flush_virtual_address_list:1;
 
-		__u64 reserved_z16:1; /* Reserved for access_vsm. */
-		__u64 reserved_z17:1; /* Reserved for access_vp_registers. */
+		HV_UINT64 reserved_z16:1; /* Reserved for access_vsm. */
+		HV_UINT64 reserved_z17:1; /* Reserved for access_vp_registers. */
 
 		/* Use fast hypercall output. Corresponds to privilege. */
-		__u64 fast_hypercall_output:1;
+		HV_UINT64 fast_hypercall_output:1;
 
-		__u64 reserved_z19:1; /* Reserved for enable_extended_hypercalls. */
+		HV_UINT64 reserved_z19:1; /* Reserved for enable_extended_hypercalls. */
 
 		/*
 		 * HvStartVirtualProcessor can be used to start virtual processors.
 		 * Corresponds to privilege.
 		 */
-		__u64 start_virtual_processor:1;
+		HV_UINT64 start_virtual_processor:1;
 
-		__u64 reserved_z21:1; /* Reserved for Isolation. */
+		HV_UINT64 reserved_z21:1; /* Reserved for Isolation. */
 
 		/* Synthetic timers in direct mode. */
-		__u64 direct_synthetic_timers:1;
+		HV_UINT64 direct_synthetic_timers:1;
 
-		__u64 reserved_z23:1; /* Reserved for synthetic time unhalted timer */
+		HV_UINT64 reserved_z23:1; /* Reserved for synthetic time unhalted timer */
 
 		/* Use extended processor masks. */
-		__u64 extended_processor_masks:1;
+		HV_UINT64 extended_processor_masks:1;
 
 		/* HvCallFlushVirtualAddressSpace / HvCallFlushVirtualAddressList are supported. */
-		__u64 tb_flush_hypercalls:1;
+		HV_UINT64 tb_flush_hypercalls:1;
 
 		/* HvCallSendSyntheticClusterIpi is supported. */
-		__u64 synthetic_cluster_ipi:1;
+		HV_UINT64 synthetic_cluster_ipi:1;
 
 		/* HvCallNotifyLongSpinWait is supported. */
-		__u64 notify_long_spin_wait:1;
+		HV_UINT64 notify_long_spin_wait:1;
 
 		/* HvCallQueryNumaDistance is supported. */
-		__u64 query_numa_distance:1;
+		HV_UINT64 query_numa_distance:1;
 
 		/* HvCallSignalEvent is supported. Corresponds to privilege. */
-		__u64 signal_events:1;
+		HV_UINT64 signal_events:1;
 
 		/* HvCallRetargetDeviceInterrupt is supported. */
-		__u64 retarget_device_interrupt:1;
+		HV_UINT64 retarget_device_interrupt:1;
 
 		/* HvCallRestorePartitionTime is supported. */
-		__u64 restore_time:1;
+		HV_UINT64 restore_time:1;
 
 		/* EnlightenedVmcs nested enlightenment is supported. */
-		__u64 enlightened_vmcs:1;
+		HV_UINT64 enlightened_vmcs:1;
 
-		__u64 reserved:31;
+		HV_UINT64 reserved:31;
 	} __packed;
 };
 
 #define HV_MAKE_COMPATIBILITY_VERSION(major_, minor_)	\
-	((__u32)((major_) << 8 | (minor_)))
+	((HV_UINT32)((major_) << 8 | (minor_)))
 
 #define HV_COMPATIBILITY_21_H2		HV_MAKE_COMPATIBILITY_VERSION(0X6, 0X9)
 
-union hv_partition_isolation_properties {
-	__u64 as_uint64;
-	struct {
-		__u64 isolation_type: 5;
-		__u64 isolation_host_type : 2;
-		__u64 rsvd_z: 5;
-		__u64 shared_gpa_boundary_page_number: 52;
+union hv_partition_isolation_properties
+{
+	HV_UINT64 AsUINT64;
+	struct
+    {
+		HV_UINT64 isolation_type: 5;
+		HV_UINT64 isolation_host_type : 2;
+		HV_UINT64 rsvd_z: 5;
+		HV_UINT64 shared_gpa_boundary_page_number: 52;
 	} __packed;
 };
 
@@ -379,231 +394,261 @@ union hv_partition_isolation_properties {
 #define HV_PARTITION_CREATION_FLAG_INTERCEPT_MESSAGE_PAGE_ENABLED   (1 << 19)
 #define HV_PARTITION_CREATION_FLAG_X2APIC_CAPABLE                   (1 << 22)
 
-struct hv_input_create_partition {
-	__u64 flags;
+struct hv_input_create_partition
+{
+	HV_UINT64 flags;
 	struct hv_proximity_domain_info proximity_domain_info;
-	__u32 compatibility_version;
-	__u32 padding;
+	HV_UINT32 compatibility_version;
+	HV_UINT32 padding;
 	struct hv_partition_creation_properties partition_creation_properties;
 	union hv_partition_isolation_properties isolation_properties;
 } __packed;
 
-enum hv_vp_state_page_type {
+enum hv_vp_state_page_type
+{
 	HV_VP_STATE_PAGE_REGISTERS = 0,
 	HV_VP_STATE_PAGE_INTERCEPT_MESSAGE = 1,
 	HV_VP_STATE_PAGE_COUNT
 };
 
-struct hv_input_map_vp_state_page {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 type; /* enum hv_vp_state_page_type */
+struct hv_input_map_vp_state_page
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT32 type; /* enum hv_vp_state_page_type */
 } __packed;
 
-struct hv_output_map_vp_state_page {
-	__u64 map_location; /* GPA page number */
+struct hv_output_map_vp_state_page
+{
+	HV_UINT64 map_location; /* GPA page number */
 } __packed;
 
-struct hv_input_unmap_vp_state_page {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 type; /* enum hv_vp_state_page_type */
+struct hv_input_unmap_vp_state_page
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT32 type; /* enum hv_vp_state_page_type */
 } __packed;
 
-struct hv_cpuid_leaf_info {
-	__u32 eax;
-	__u32 ecx;
-	__u64 xfem;
-	__u64 xss;
+struct hv_cpuid_leaf_info
+{
+	HV_UINT32 eax;
+	HV_UINT32 ecx;
+	HV_UINT64 xfem;
+	HV_UINT64 xss;
 } __packed;
 
-union hv_get_vp_cpuid_values_flags {
-	__u32 as_uint32;
-	struct {
-		__u32 use_vp_xfem_xss: 1;
-		__u32 apply_registered_values: 1;
-		__u32 reserved: 30;
+union hv_get_vp_cpuid_values_flags
+{
+	HV_UINT32 AsUINT32;
+	struct
+    {
+		HV_UINT32 use_vp_xfem_xss: 1;
+		HV_UINT32 apply_registered_values: 1;
+		HV_UINT32 reserved: 30;
 	} __packed;
 } __packed;
 
-struct hv_input_get_vp_cpuid_values {
-	__u64 partition_id;
-	__u32 vp_index;
+struct hv_input_get_vp_cpuid_values
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
 	union hv_get_vp_cpuid_values_flags flags;
-	__u32 reserved;
-	__u32 padding;
+	HV_UINT32 reserved;
+	HV_UINT32 padding;
 	struct hv_cpuid_leaf_info cpuid_leaf_info[];
 } __packed;
 
 // NOTE: Not in hvhdk headers
-union hv_output_get_vp_cpuid_values {
-	__u32 as_uint32[4];
-	struct {
-		__u32 eax;
-		__u32 ebx;
-		__u32 ecx;
-		__u32 edx;
+union hv_output_get_vp_cpuid_values
+{
+	HV_UINT32 AsUINT32[4];
+	struct
+    {
+		HV_UINT32 eax;
+		HV_UINT32 ebx;
+		HV_UINT32 ecx;
+		HV_UINT32 edx;
 	} __packed;
 };
 
 /* Define synthetic interrupt controller flag constants. */
 #define HV_EVENT_FLAGS_COUNT		(256 * 8)
 #define HV_EVENT_FLAGS_BYTE_COUNT	(256)
-#define HV_EVENT_FLAGS_LONG_COUNT	(256 / sizeof(__u32))
+#define HV_EVENT_FLAGS_LONG_COUNT	(256 / sizeof(HV_UINT32))
 
-struct hv_x64_apic_eoi_message {
-	__u32 vp_index;
-	__u32 interrupt_vector;
+struct hv_x64_apic_eoi_message
+{
+	HV_UINT32 vp_index;
+	HV_UINT32 interrupt_vector;
 } __packed;
 
-struct hv_opaque_intercept_message {
-	__u32 vp_index;
+struct hv_opaque_intercept_message
+{
+	HV_UINT32 vp_index;
 } __packed;
 
 #define HV_SYNIC_EVENT_RING_MESSAGE_COUNT 63
 
-struct hv_synic_event_ring {
-	__u8  signal_masked;
-	__u8  ring_full;
-	__u16 reserved_z;
-	__u32 data[HV_SYNIC_EVENT_RING_MESSAGE_COUNT];
+struct hv_synic_event_ring
+{
+	HV_UINT8  signal_masked;
+	HV_UINT8  ring_full;
+	HV_UINT16 reserved_z;
+	HV_UINT32 data[HV_SYNIC_EVENT_RING_MESSAGE_COUNT];
 } __packed;
 
-struct hv_synic_event_ring_page {
+struct hv_synic_event_ring_page
+{
 	struct hv_synic_event_ring sint_event_ring[HV_SYNIC_SINT_COUNT];
 };
 
-union hv_synic_sirbp {
-	__u64 as_uint64;
-	struct {
-		__u64 sirbp_enabled:1;
-		__u64 preserved:11;
-		__u64 base_sirbp_gpa:52;
+union hv_synic_sirbp
+{
+	HV_UINT64 AsUINT64;
+	struct
+    {
+		HV_UINT64 sirbp_enabled:1;
+		HV_UINT64 preserved:11;
+		HV_UINT64 base_sirbp_gpa:52;
 	} __packed;
 };
 
-struct hv_local_interrupt_controller_state {
+struct hv_local_interrupt_controller_state
+{
 	/* HV_X64_INTERRUPT_CONTROLLER_STATE */
-	__u32 apic_id;
-	__u32 apic_version;
-	__u32 apic_ldr;
-	__u32 apic_dfr;
-	__u32 apic_spurious;
-	__u32 apic_isr[8];
-	__u32 apic_tmr[8];
-	__u32 apic_irr[8];
-	__u32 apic_esr;
-	__u32 apic_icr_high;
-	__u32 apic_icr_low;
-	__u32 apic_lvt_timer;
-	__u32 apic_lvt_thermal;
-	__u32 apic_lvt_perfmon;
-	__u32 apic_lvt_lint0;
-	__u32 apic_lvt_lint1;
-	__u32 apic_lvt_error;
-	__u32 apic_lvt_cmci;
-	__u32 apic_error_status;
-	__u32 apic_initial_count;
-	__u32 apic_counter_value;
-	__u32 apic_divide_configuration;
-	__u32 apic_remote_read;
+	HV_UINT32 apic_id;
+	HV_UINT32 apic_version;
+	HV_UINT32 apic_ldr;
+	HV_UINT32 apic_dfr;
+	HV_UINT32 apic_spurious;
+	HV_UINT32 apic_isr[8];
+	HV_UINT32 apic_tmr[8];
+	HV_UINT32 apic_irr[8];
+	HV_UINT32 apic_esr;
+	HV_UINT32 apic_icr_high;
+	HV_UINT32 apic_icr_low;
+	HV_UINT32 apic_lvt_timer;
+	HV_UINT32 apic_lvt_thermal;
+	HV_UINT32 apic_lvt_perfmon;
+	HV_UINT32 apic_lvt_lint0;
+	HV_UINT32 apic_lvt_lint1;
+	HV_UINT32 apic_lvt_error;
+	HV_UINT32 apic_lvt_cmci;
+	HV_UINT32 apic_error_status;
+	HV_UINT32 apic_initial_count;
+	HV_UINT32 apic_counter_value;
+	HV_UINT32 apic_divide_configuration;
+	HV_UINT32 apic_remote_read;
 } __packed;
 
-struct hv_stimer_state {
-	struct {
+struct hv_stimer_state
+{
+	struct
+    {
 		/*
 		 * Indicates if there is an undelivered timer expiry message.
 		 */
-		__u32 undelivered_msg_pending:1;
-		__u32 reserved:31;
+		HV_UINT32 undelivered_msg_pending:1;
+		HV_UINT32 reserved:31;
 	} __packed flags;
 
-	__u32 resvd;
+	HV_UINT32 resvd;
 
 	/* Timer configuration and count. */
-	__u64 config;
-	__u64 count;
+	HV_UINT64 config;
+	HV_UINT64 count;
 
 	/* Timer adjustment. */
-	__u64 adjustment;
+	HV_UINT64 adjustment;
 
 	/* Expiration time of the undelivered message. */
-	__u64 undelivered_exp_time;
+	HV_UINT64 undelivered_exp_time;
 } __packed;
 
-struct hv_synthetic_timers_state {
+struct hv_synthetic_timers_state
+{
 	struct hv_stimer_state timers[HV_SYNIC_STIMER_COUNT];
 
 	/* Reserved space for time unhalted timer. */
-	__u64 reserved[5];
+	HV_UINT64 reserved[5];
 } __packed;
 
-union hv_x64_vp_execution_state {
-	__u16 as_uint16;
-	struct {
-		__u16 cpl:2;
-		__u16 cr0_pe:1;
-		__u16 cr0_am:1;
-		__u16 efer_lma:1;
-		__u16 debug_active:1;
-		__u16 interruption_pending:1;
-		__u16 vtl:4;
-		__u16 enclave_mode:1;
-		__u16 interrupt_shadow:1;
-		__u16 virtualization_fault_active:1;
-		__u16 reserved:2;
+union hv_x64_vp_execution_state
+{
+	HV_UINT16 AsUINT16;
+	struct
+    {
+		HV_UINT16 cpl:2;
+		HV_UINT16 cr0_pe:1;
+		HV_UINT16 cr0_am:1;
+		HV_UINT16 efer_lma:1;
+		HV_UINT16 debug_active:1;
+		HV_UINT16 interruption_pending:1;
+		HV_UINT16 vtl:4;
+		HV_UINT16 enclave_mode:1;
+		HV_UINT16 interrupt_shadow:1;
+		HV_UINT16 virtualization_fault_active:1;
+		HV_UINT16 reserved:2;
 	} __packed;
 };
 
-struct hv_x64_intercept_message_header {
-	__u32 vp_index;
-	__u8 instruction_length:4;
-	__u8 cr8:4; /* Only set for exo partitions */
-	__u8 intercept_access_type;
+struct hv_x64_intercept_message_header
+{
+	HV_UINT32 vp_index;
+	HV_UINT8 instruction_length:4;
+	HV_UINT8 cr8:4; /* Only set for exo partitions */
+	HV_UINT8 intercept_access_type;
 	union hv_x64_vp_execution_state execution_state;
 	struct hv_x64_segment_register cs_segment;
-	__u64 rip;
-	__u64 rflags;
+	HV_UINT64 rip;
+	HV_UINT64 rflags;
 } __packed;
 
 #define HV_HYPERCALL_INTERCEPT_MAX_XMM_REGISTERS 6
 
-struct hv_x64_hypercall_intercept_message {
+struct hv_x64_hypercall_intercept_message
+{
 	struct hv_x64_intercept_message_header header;
-	__u64 rax;
-	__u64 rbx;
-	__u64 rcx;
-	__u64 rdx;
-	__u64 r8;
-	__u64 rsi;
-	__u64 rdi;
-	struct hv_u128 xmmregisters[HV_HYPERCALL_INTERCEPT_MAX_XMM_REGISTERS];
-	struct {
-		__u32 isolated:1;
-		__u32 reserved:31;
+	HV_UINT64 rax;
+	HV_UINT64 rbx;
+	HV_UINT64 rcx;
+	HV_UINT64 rdx;
+	HV_UINT64 r8;
+	HV_UINT64 rsi;
+	HV_UINT64 rdi;
+	HV_UINT128 xmmregisters[HV_HYPERCALL_INTERCEPT_MAX_XMM_REGISTERS];
+	struct
+    {
+		HV_UINT32 isolated:1;
+		HV_UINT32 reserved:31;
 	} __packed;
 } __packed;
 
-union hv_x64_register_access_info {
+union hv_x64_register_access_info
+{
 	union hv_register_value source_value;
-	__u32 destination_register;
-	__u64 source_address;
-	__u64 destination_address;
+	HV_UINT32 destination_register;
+	HV_UINT64 source_address;
+	HV_UINT64 destination_address;
 };
 
-struct hv_x64_register_intercept_message {
+struct hv_x64_register_intercept_message
+{
 	struct hv_x64_intercept_message_header header;
-	struct {
-		__u8 is_memory_op:1;
-		__u8 reserved:7;
+	struct
+    {
+		HV_UINT8 is_memory_op:1;
+		HV_UINT8 reserved:7;
 	} __packed;
-	__u8 reserved8;
-	__u16 reserved16;
-	__u32 register_name;
+	HV_UINT8 reserved8;
+	HV_UINT16 reserved16;
+	HV_UINT32 register_name;
 	union hv_x64_register_access_info access_info;
 } __packed;
 
-struct hv_x64_halt_message {
+struct hv_x64_halt_message
+{
 	struct hv_x64_intercept_message_header header;
 } __packed;
 
@@ -611,64 +656,74 @@ struct hv_x64_halt_message {
 #define HV_X64_PENDING_NMI		2
 #define HV_X64_PENDING_EXCEPTION	3
 
-struct hv_x64_interruption_deliverable_message {
+struct hv_x64_interruption_deliverable_message
+{
 	struct hv_x64_intercept_message_header header;
-	__u32 deliverable_type; /* pending interruption type */
-	__u32 rsvd;
+	HV_UINT32 deliverable_type; /* pending interruption type */
+	HV_UINT32 rsvd;
 } __packed;
 
-struct hv_x64_sint_deliverable_message {
+struct hv_x64_sint_deliverable_message
+{
 	struct hv_x64_intercept_message_header header;
-	__u16 deliverable_sints;
-	__u16 rsvd1;
-	__u32 rsvd2;
+	HV_UINT16 deliverable_sints;
+	HV_UINT16 rsvd1;
+	HV_UINT32 rsvd2;
 } __packed;
 
-struct hv_x64_sipi_intercept_message {
+struct hv_x64_sipi_intercept_message
+{
 	struct hv_x64_intercept_message_header header;
-	__u32 target_vp_index;
-	__u32 interrupt_vector;
+	HV_UINT32 target_vp_index;
+	HV_UINT32 interrupt_vector;
 } __packed;
 
-struct hv_register_x64_cpuid_result_parameters {
-	struct {
-		__u32 eax;
-		__u32 ecx;
-		__u8 subleaf_specific;
-		__u8 always_override;
-		__u16 padding;
+struct hv_register_x64_cpuid_result_parameters
+{
+	struct
+    {
+		HV_UINT32 eax;
+		HV_UINT32 ecx;
+		HV_UINT8 subleaf_specific;
+		HV_UINT8 always_override;
+		HV_UINT16 padding;
 	} __packed input;
-	struct {
-		__u32 eax;
-		__u32 eax_mask;
-		__u32 ebx;
-		__u32 ebx_mask;
-		__u32 ecx;
-		__u32 ecx_mask;
-		__u32 edx;
-		__u32 edx_mask;
+	struct
+    {
+		HV_UINT32 eax;
+		HV_UINT32 eax_mask;
+		HV_UINT32 ebx;
+		HV_UINT32 ebx_mask;
+		HV_UINT32 ecx;
+		HV_UINT32 ecx_mask;
+		HV_UINT32 edx;
+		HV_UINT32 edx_mask;
 	} __packed result;
 } __packed;
 
-struct hv_register_x64_msr_result_parameters {
-	__u32 msr_index;
-	__u32 access_type;
-	__u32 action; /* enum hv_unimplemented_msr_action */
+struct hv_register_x64_msr_result_parameters
+{
+	HV_UINT32 msr_index;
+	HV_UINT32 access_type;
+	HV_UINT32 action; /* enum hv_unimplemented_msr_action */
 } __packed;
 
-union hv_register_intercept_result_parameters {
+union hv_register_intercept_result_parameters
+{
 	struct hv_register_x64_cpuid_result_parameters cpuid;
 	struct hv_register_x64_msr_result_parameters msr;
 } __packed;
 
-struct hv_async_completion_message_payload {
-	__u64 partition_id;
-	__u32 status;
-	__u32 completion_count;
-	__u64 sub_status;
+struct hv_async_completion_message_payload
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 status;
+	HV_UINT32 completion_count;
+	HV_UINT64 sub_status;
 } __packed;
 
-enum hv_cache_type {
+enum hv_cache_type
+{
 	HV_CACHE_TYPE_UNCACHED		= 0,
 	HV_CACHE_TYPE_WRITE_COMBINING	= 1,
 	HV_CACHE_TYPE_WRITE_THROUGH	= 4,
@@ -678,69 +733,78 @@ enum hv_cache_type {
 
 #define HV_SUPPORTS_REGISTER_INTERCEPT
 
-struct hv_input_register_intercept_result {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 intercept_type; /* enum hv_intercept_type */
+struct hv_input_register_intercept_result
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT32 intercept_type; /* enum hv_intercept_type */
 	union hv_register_intercept_result_parameters parameters;
 } __packed;
 
-struct hv_input_create_port {
-	__u64 port_partition_id;
+struct hv_input_create_port
+{
+	HV_UINT64 port_partition_id;
 	union hv_port_id port_id;
-	__u8 port_vtl;
-	__u8 min_connection_vtl;
-	__u16 padding;
-	__u64 connection_partition_id;
+	HV_UINT8 port_vtl;
+	HV_UINT8 min_connection_vtl;
+	HV_UINT16 padding;
+	HV_UINT64 connection_partition_id;
 	struct hv_port_info port_info;
 	struct hv_proximity_domain_info proximity_domain_info;
 } __packed;
 
-struct hv_input_connect_port {
-	__u64 connection_partition_id;
+struct hv_input_connect_port
+{
+	HV_UINT64 connection_partition_id;
 	union hv_connection_id connection_id;
-	__u8 connection_vtl;
-	__u8 rsvdz0;
-	__u16 rsvdz1;
-	__u64 port_partition_id;
+	HV_UINT8 connection_vtl;
+	HV_UINT8 rsvdz0;
+	HV_UINT16 rsvdz1;
+	HV_UINT64 port_partition_id;
 	union hv_port_id port_id;
-	__u32 reserved2;
+	HV_UINT32 reserved2;
 	struct hv_connection_info connection_info;
 	struct hv_proximity_domain_info proximity_domain_info;
 } __packed;
 
-union hv_input_notify_port_ring_empty {
-	__u64 as_uint64;
-	struct {
-		__u32 sint_index;
-		__u32 reserved;
+union hv_input_notify_port_ring_empty
+{
+	HV_UINT64 AsUINT64;
+	struct
+{
+		HV_UINT32 sint_index;
+		HV_UINT32 reserved;
 	};
 } __packed;
 
-struct hv_input_signal_event_direct {
-	__u64 target_partition;
-	__u32 target_vp;
-	__u8  target_vtl;
-	__u8  target_sint;
-	__u16 flag_number;
+struct hv_input_signal_event_direct
+{
+	HV_UINT64 target_partition;
+	HV_UINT32 target_vp;
+	HV_UINT8  target_vtl;
+	HV_UINT8  target_sint;
+	HV_UINT16 flag_number;
 } __packed;
 
-struct hv_output_signal_event_direct {
-	__u8	newly_signaled;
-	__u8	reserved[7];
+struct hv_output_signal_event_direct
+{
+	HV_UINT8	newly_signaled;
+	HV_UINT8	reserved[7];
 } __packed;
 
-struct hv_input_post_message_direct {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u8  vtl;
-	__u8  padding[3];
-	__u32 sint_index;
-	__u8  message[HV_MESSAGE_SIZE];
-	__u32 padding2;
+struct hv_input_post_message_direct
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT8  vtl;
+	HV_UINT8  padding[3];
+	HV_UINT32 sint_index;
+	HV_UINT8  message[HV_MESSAGE_SIZE];
+	HV_UINT32 padding2;
 } __packed;
 
-struct hv_guest_mapping_flush_list { /* HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST */
+struct hv_guest_mapping_flush_list
+{ /* HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST */
 	u64 address_space;
 	u64 flags;
 	union hv_gpa_page_range gpa_list[];
@@ -748,8 +812,9 @@ struct hv_guest_mapping_flush_list { /* HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LI
 
 #define HV_SUPPORTS_VP_STATE
 
-struct hv_vp_state_data_xsave {
-	__u64 flags;
+struct hv_vp_state_data_xsave
+{
+	HV_UINT64 flags;
 	union hv_x64_xsave_xfem_register states;
 } __packed;
 
@@ -768,7 +833,8 @@ struct hv_vp_state_data_xsave {
 
 #define HV_GET_SET_VP_STATE_TYPE_PFN	(1 << 31)
 
-enum hv_get_set_vp_state_type {
+enum hv_get_set_vp_state_type
+{
 	HV_GET_SET_VP_STATE_LOCAL_INTERRUPT_CONTROLLER_STATE = 0 | HV_GET_SET_VP_STATE_TYPE_PFN,
 
 	HV_GET_SET_VP_STATE_XSAVE		= 1 | HV_GET_SET_VP_STATE_TYPE_PFN,
@@ -781,38 +847,43 @@ enum hv_get_set_vp_state_type {
 	HV_GET_SET_VP_STATE_SYNTHETIC_TIMERS	= 4,
 };
 
-struct hv_vp_state_data {
-	__u32 type;
-	__u32 rsvd;
+struct hv_vp_state_data
+{
+	HV_UINT32 type;
+	HV_UINT32 rsvd;
 	struct hv_vp_state_data_xsave xsave;
 } __packed;
 
-struct hv_input_get_vp_state {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u8 input_vtl;
-	__u8 rsvd0;
-	__u16 rsvd1;
+struct hv_input_get_vp_state
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT8 input_vtl;
+	HV_UINT8 rsvd0;
+	HV_UINT16 rsvd1;
 	struct hv_vp_state_data state_data;
-	__u64 output_data_pfns[];
+	HV_UINT64 output_data_pfns[];
 } __packed;
 
-union hv_output_get_vp_state {
+union hv_output_get_vp_state
+{
 	struct hv_local_interrupt_controller_state interrupt_controller_state;
 	struct hv_synthetic_timers_state synthetic_timers_state;
 } __packed;
 
-union hv_input_set_vp_state_data {
-	__u64 pfns;
-	__u8 bytes;
+union hv_input_set_vp_state_data
+{
+	HV_UINT64 pfns;
+	HV_UINT8 bytes;
 } __packed;
 
-struct hv_input_set_vp_state {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u8 input_vtl;
-	__u8 rsvd0;
-	__u16 rsvd1;
+struct hv_input_set_vp_state
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT8 input_vtl;
+	HV_UINT8 rsvd0;
+	HV_UINT16 rsvd1;
 	struct hv_vp_state_data state_data;
 	union hv_input_set_vp_state_data data[];
 } __packed;
@@ -821,7 +892,8 @@ struct hv_input_set_vp_state {
  * Dispatch state for the VP communicated by the hypervisor to the
  * VP-dispatching thread in the root on return from HVCALL_DISPATCH_VP.
  */
-enum hv_vp_dispatch_state {
+enum hv_vp_dispatch_state
+{
 	HV_VP_DISPATCH_STATE_INVALID = 0,
 	HV_VP_DISPATCH_STATE_BLOCKED = 1,
 	HV_VP_DISPATCH_STATE_READY = 2,
@@ -831,7 +903,8 @@ enum hv_vp_dispatch_state {
  * Dispatch event that caused the current dispatch state on return from
  * HVCALL_DISPATCH_VP.
  */
-enum hv_vp_dispatch_event {
+enum hv_vp_dispatch_event
+{
 	HV_VP_DISPATCH_EVENT_INVALID =	0x00000000,
 	HV_VP_DISPATCH_EVENT_SUSPEND = 0x00000001,
 	HV_VP_DISPATCH_EVENT_INTERCEPT = 0x00000002,
@@ -841,17 +914,19 @@ enum hv_vp_dispatch_event {
 /* The maximum array size of HV_GENERIC_SET (vp_set) buffer */
 #define HV_GENERIC_SET_QWORD_COUNT(max) (((((max) - 1) >> 6) + 1) + 2)
 
-struct hv_vp_signal_bitset_scheduler_message {
-	__u64 partition_id;
-	__u32 overflow_count;
-	__u16 vp_count;
-	__u16 reserved;
+struct hv_vp_signal_bitset_scheduler_message
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 overflow_count;
+	HV_UINT16 vp_count;
+	HV_UINT16 reserved;
 
 #define BITSET_BUFFER_SIZE \
 	HV_GENERIC_SET_QWORD_COUNT(HV_ROOT_SCHEDULER_MAX_VPS_PER_CHILD_PARTITION)
-	union {
+	union
+{
 		struct hv_vpset bitset;
-		__u64 bitset_buffer[BITSET_BUFFER_SIZE];
+		HV_UINT64 bitset_buffer[BITSET_BUFFER_SIZE];
 	} vp_bitset;
 #undef BITSET_BUFFER_SIZE
 } __packed;
@@ -863,17 +938,18 @@ static_assert(sizeof(struct hv_vp_signal_bitset_scheduler_message) <=
 
 #define HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT \
 	(((sizeof(struct hv_message) - sizeof(struct hv_message_header)) / \
-	 (sizeof(__u64 /* partition id */) + sizeof(__u32 /* vp index */))) - 1)
+	 (sizeof(HV_UINT64 /* partition id */) + sizeof(HV_UINT32 /* vp index */))) - 1)
 
-struct hv_vp_signal_pair_scheduler_message {
-	__u32 overflow_count;
-	__u8 vp_count;
-	__u8 reserved1[3];
+struct hv_vp_signal_pair_scheduler_message
+{
+	HV_UINT32 overflow_count;
+	HV_UINT8 vp_count;
+	HV_UINT8 reserved1[3];
 
-	__u64 partition_ids[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
-	__u32 vp_indexes[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
+	HV_UINT64 partition_ids[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
+	HV_UINT32 vp_indexes[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
 
-	__u8 reserved2[4];
+	HV_UINT8 reserved2[4];
 } __packed;
 
 #if defined(__KERNEL__)
@@ -889,17 +965,19 @@ static_assert(sizeof(struct hv_vp_signal_pair_scheduler_message) ==
 #define HV_DISPATCH_VP_FLAG_SKIP_CALLER_SPEC_FLUSH 0x10
 #define HV_DISPATCH_VP_FLAG_SKIP_CALLER_USER_SPEC_FLUSH 0x20
 
-struct hv_input_dispatch_vp {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 flags;
-	__u64 time_slice; /* in 100ns */
-	__u64 spec_ctrl;
+struct hv_input_dispatch_vp
+{
+	HV_UINT64 partition_id;
+	HV_UINT32 vp_index;
+	HV_UINT32 flags;
+	HV_UINT64 time_slice; /* in 100ns */
+	HV_UINT64 spec_ctrl;
 } __packed;
 
-struct hv_output_dispatch_vp {
-	__u32 dispatch_state; /* enum hv_vp_dispatch_state */
-	__u32 dispatch_event; /* enum hv_vp_dispatch_event */
+struct hv_output_dispatch_vp
+{
+	HV_UINT32 dispatch_state; /* enum hv_vp_dispatch_state */
+	HV_UINT32 dispatch_event; /* enum hv_vp_dispatch_event */
 } __packed;
 
 #endif /* _UAPI_HV_HVHDK_H */
