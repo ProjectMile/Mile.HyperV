@@ -4250,6 +4250,87 @@ typedef struct _HV_VMX_ENLIGHTENED_VMCS
 #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_ENLIGHTENMENTSCONTROL (1 << 15)
 
 /******************************************************************************/
+/* Hyper-V headers from Microsoft mshv Linux kernel module Definitions */
+/**/
+
+/* Message format for notifications delivered via intercept message */
+/* (as_intercept=1) */
+typedef struct _HV_NOTIFICATION_MESSAGE_PAYLOAD
+{
+    HV_UINT32 SintIndex;
+} HV_NOTIFICATION_MESSAGE_PAYLOAD, *PHV_NOTIFICATION_MESSAGE_PAYLOAD;
+
+typedef enum _HV_UNIMPLEMENTED_MSR_ACTION
+{
+    HvUnimplementedMsrActionFault = 0,
+    HvUnimplementedMsrActionIgnoreWriteReadZero = 1,
+    HvUnimplementedMsrActionCount = 2
+} HV_UNIMPLEMENTED_MSR_ACTION, *PHV_UNIMPLEMENTED_MSR_ACTION;
+
+/* Each generic set contains 64 elements */
+
+#define HV_GENERIC_SET_SHIFT (6)
+#define HV_GENERIC_SET_MASK (63)
+
+typedef enum _HV_GENERIC_SET_FORMAT
+{
+    HvGenericSetSparse4k,
+    HvGenericSetAll
+} HV_GENERIC_SET_FORMAT, *PHV_GENERIC_SET_FORMAT;
+
+/* NOTE: following two #defines are not defined in Hyper-V code */
+/* The maximum number of sparse vCPU banks which can be encoded by HV_VP_SET */
+#define HV_MAX_SPARSE_VCPU_BANKS (64)
+/* The number of vCPUs in one sparse bank */
+#define HV_VCPUS_PER_SPARSE_BANK (64)
+
+typedef enum _HV_SCHEDULER_TYPE
+{
+    HvSchedulerTypeLp = 1, /* Classic scheduler w/o SMT */
+    HvSchedulerTypeLpSmt = 2, /* Classic scheduler w/ SMT */
+    HvSchedulerTypeCoreSmt = 3, /* Core scheduler */
+    HvSchedulerTypeRoot = 4, /* Root / integrated scheduler */
+    HvSchedulerTypeMax
+} HV_SCHEDULER_TYPE, *PHV_SCHEDULER_TYPE;
+
+typedef enum _HV_SYSTEM_PROPERTY
+{
+    HvSetPerfCounterProperty = 1,
+    HvSystemPropertySchedulerType = 15
+} HV_SYSTEM_PROPERTY, *PHV_SYSTEM_PROPERTY;
+
+typedef union _HV_GPA_PAGE_ACCESS_STATE_FLAGS
+{
+    struct
+    {
+        HV_UINT64 ClearAccessed : 1;
+        HV_UINT64 SetAccess : 1;
+        HV_UINT64 ClearDirty : 1;
+        HV_UINT64 SetDirty : 1;
+        HV_UINT64 Reserved : 60;
+    };
+    HV_UINT64 AsUINT64;
+} HV_GPA_PAGE_ACCESS_STATE_FLAGS, *PHV_GPA_PAGE_ACCESS_STATE_FLAGS;
+
+typedef struct _HV_INPUT_GET_GPA_PAGES_ACCESS_STATE
+{
+    HV_UINT64 PartitionId;
+    HV_GPA_PAGE_ACCESS_STATE_FLAGS Flags;
+    HV_UINT64 HvGpaPageNumber;
+} HV_INPUT_GET_GPA_PAGES_ACCESS_STATE, *PHV_INPUT_GET_GPA_PAGES_ACCESS_STATE;
+
+typedef union HV_GPA_PAGE_ACCESS_STATE
+{
+    struct
+    {
+        HV_UINT8 Accessed : 1;
+        HV_UINT8 Dirty : 1;
+        HV_UINT8 Reserved : 6;
+    };
+    HV_UINT8 AsUINT8;
+} HV_GPA_PAGE_ACCESS_STATE, *PHV_GPA_PAGE_ACCESS_STATE;
+
+/******************************************************************************/
 /* Hypervisor CPUID Definitions */
 /**/
 
@@ -6249,15 +6330,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_SPARSE_GPA_PAGES
 
 /* HvCallSetSystemProperty | 0x006F */
 
-typedef enum _HV_SYSTEM_PROPERTY
-{
-    HvSetPerfCounterProperty = 1,
-    HvSystemPropertyMax = 2
-} HV_SYSTEM_PROPERTY, *PHV_SYSTEM_PROPERTY;
-
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_SYSTEM_PROPERTY
 {
-    HV_UINT32 PropertyId;
+    HV_UINT32 PropertyId; /* HV_SYSTEM_PROPERTY */
     union
     {
         struct
@@ -6303,13 +6378,23 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PORT_PROPERTY
 
 /* HvCallGetSystemProperty | 0x007B */
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_SYSTEM_PROPERTY
+{
+    HV_UINT32 PropertyId; /* HV_SYSTEM_PROPERTY */
+} HV_INPUT_GET_SYSTEM_PROPERTY, *PHV_INPUT_GET_SYSTEM_PROPERTY;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SYSTEM_PROPERTY
+{
+    HV_UINT32 SchedulerType; /* HV_SCHEDULER_TYPE */
+} HV_OUTPUT_GET_SYSTEM_PROPERTY, *PHV_OUTPUT_GET_SYSTEM_PROPERTY;
+
 /* HvCallMapDeviceInterrupt | 0x007C */
 
 /* HvCallUnmapDeviceInterrupt | 0x007D */
 
 /* HvCallRetargetDeviceInterrupt | 0x007E */
 
-typedef struct _HV_INPUT_RETARGET_DEVICE_INTERRUPT
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RETARGET_DEVICE_INTERRUPT
 {
     HV_PARTITION_ID PartitionId;
     HV_UINT64 DeviceId;
