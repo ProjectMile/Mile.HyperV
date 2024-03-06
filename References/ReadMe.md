@@ -57,6 +57,10 @@ https://gerhart01.github.io/
 
 https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/shared/hvgdk_mini/hv_cpuid_function.htm
 
+Note: This document only helps me to know hvgdk.h existance in Windows Driver
+Kit version 7.1.0 and symbols in urlmon.dll have the correct name for
+HV_CPUID_FUNCTION.
+
 ## Windows symbols
 
 - \Windows Kits\10\Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
