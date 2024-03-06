@@ -590,40 +590,6 @@ union hv_output_get_vp_cpuid_values {
 	} __packed;
 };
 
-enum hv_translate_gva_result_code {
-	HV_TRANSLATE_GVA_SUCCESS			= 0,
-
-	/* Translation failures. */
-	HV_TRANSLATE_GVA_PAGE_NOT_PRESENT		= 1,
-	HV_TRANSLATE_GVA_PRIVILEGE_VIOLATION		= 2,
-	HV_TRANSLATE_GVA_INVALID_PAGE_TABLE_FLAGS	= 3,
-
-	/* GPA access failures. */
-	HV_TRANSLATE_GVA_GPA_UNMAPPED			= 4,
-	HV_TRANSLATE_GVA_GPA_NO_READ_ACCESS		= 5,
-	HV_TRANSLATE_GVA_GPA_NO_WRITE_ACCESS		= 6,
-	HV_TRANSLATE_GVA_GPA_ILLEGAL_OVERLAY_ACCESS	= 7,
-
-	/*
-	 * Intercept for memory access by either
-	 *  - a higher VTL
-	 *  - a nested hypervisor (due to a violation of the nested page table)
-	 */
-	HV_TRANSLATE_GVA_INTERCEPT			= 8,
-
-	HV_TRANSLATE_GVA_GPA_UNACCEPTED			= 9,
-};
-
-union hv_translate_gva_result {
-	__u64 as_uint64;
-	struct {
-		__u32 result_code; /* enum hv_translate_hva_result_code */
-		__u32 cache_type : 8;
-		__u32 overlay_page : 1;
-		__u32 reserved : 23;
-	} __packed;
-};
-
 /* Define synthetic interrupt controller flag constants. */
 #define HV_EVENT_FLAGS_COUNT		(256 * 8)
 #define HV_EVENT_FLAGS_BYTE_COUNT	(256)
@@ -638,72 +604,6 @@ struct hv_opaque_intercept_message {
 	__u32 vp_index;
 } __packed;
 
-enum hv_port_type {
-	HV_PORT_TYPE_MESSAGE = 1,
-	HV_PORT_TYPE_EVENT   = 2,
-	HV_PORT_TYPE_MONITOR = 3,
-	HV_PORT_TYPE_DOORBELL = 4	/* Root Partition only */
-};
-
-struct hv_port_info {
-	__u32 port_type; /* enum hv_port_type */
-	__u32 padding;
-	union {
-		struct {
-			__u32 target_sint;
-			__u32 target_vp;
-			__u64 rsvdz;
-		} message_port_info;
-		struct {
-			__u32 target_sint;
-			__u32 target_vp;
-			__u16 base_flag_number;
-			__u16 flag_count;
-			__u32 rsvdz;
-		} event_port_info;
-		struct {
-			__u64 monitor_address;
-			__u64 rsvdz;
-		} monitor_port_info;
-		struct {
-			__u32 target_sint;
-			__u32 target_vp;
-			__u64 rsvdz;
-		} doorbell_port_info;
-	};
-} __packed;
-
-struct hv_connection_info {
-	__u32 port_type;
-	__u32 padding;
-	union {
-		struct {
-			__u64 rsvdz;
-		} message_connection_info;
-		struct {
-			__u64 rsvdz;
-		} event_connection_info;
-		struct {
-			__u64 monitor_address;
-		} monitor_connection_info;
-		struct {
-			__u64 gpa;
-			__u64 trigger_value;
-			__u64 flags;
-		} doorbell_connection_info;
-	};
-} __packed;
-
-/* Define the synthetic interrupt controller event flags format. */
-union hv_synic_event_flags {
-	unsigned char flags8[HV_EVENT_FLAGS_BYTE_COUNT];
-	unsigned long flags[HV_EVENT_FLAGS_LONG_COUNT];
-};
-
-struct hv_synic_event_flags_page {
-	union hv_synic_event_flags event_flags[HV_SYNIC_SINT_COUNT];
-};
-
 #define HV_SYNIC_EVENT_RING_MESSAGE_COUNT 63
 
 struct hv_synic_event_ring {
@@ -717,39 +617,12 @@ struct hv_synic_event_ring_page {
 	struct hv_synic_event_ring sint_event_ring[HV_SYNIC_SINT_COUNT];
 };
 
-union hv_synic_scontrol {
-	__u64 as_uint64;
-	struct {
-		__u64 enable:1;
-		__u64 reserved:63;
-	} __packed;
-};
-
-union hv_synic_siefp {
-	__u64 as_uint64;
-	struct {
-		__u64 siefp_enabled:1;
-		__u64 preserved:11;
-		__u64 base_siefp_gpa:52;
-	} __packed;
-};
-
 union hv_synic_sirbp {
 	__u64 as_uint64;
 	struct {
 		__u64 sirbp_enabled:1;
 		__u64 preserved:11;
 		__u64 base_sirbp_gpa:52;
-	} __packed;
-};
-
-union hv_interrupt_control {
-	__u64 as_uint64;
-	struct {
-		__u32 interrupt_type; /* enum hv_interrupt type */
-		__u32 level_triggered : 1;
-		__u32 logical_dest_mode : 1;
-		__u32 rsvd : 30;
 	} __packed;
 };
 
@@ -989,15 +862,6 @@ struct hv_x64_unrecoverable_exception_message {
 	struct hv_x64_intercept_message_header header;
 } __packed;
 
-#define HV_UNSUPPORTED_FEATURE_INTERCEPT	1
-#define HV_UNSUPPORTED_FEATURE_TASK_SWITCH_TSS	2
-
-struct hv_x64_unsupported_feature_message {
-	__u32 vp_index;
-	__u32 feature_code;
-	__u64 feature_parameter;
-} __packed;
-
 struct hv_x64_halt_message {
 	struct hv_x64_intercept_message_header header;
 } __packed;
@@ -1061,19 +925,6 @@ struct hv_async_completion_message_payload {
 	__u32 status;
 	__u32 completion_count;
 	__u64 sub_status;
-} __packed;
-
-struct hv_input_translate_virtual_address {
-	__u64 partition_id;
-	__u32 vp_index;
-	__u32 padding;
-	__u64 control_flags;
-	__u64 gva_page;
-} __packed;
-
-struct hv_output_translate_virtual_address {
-	union hv_translate_gva_result translation_result;
-	__u64 gpa_page;
 } __packed;
 
 enum hv_cache_type {

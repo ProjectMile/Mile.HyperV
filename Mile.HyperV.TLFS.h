@@ -2290,6 +2290,16 @@ typedef struct _HV_PORT_INFO
 } HV_PORT_INFO, *PHV_PORT_INFO;
 typedef const HV_PORT_INFO* PCHV_PORT_INFO;
 
+/* Doorbell connection_info flags. */
+
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_MASK  0x00000007
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_ANY   0x00000000
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_BYTE  0x00000001
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_WORD  0x00000002
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_DWORD 0x00000003
+#define HV_DOORBELL_FLAG_TRIGGER_SIZE_QWORD 0x00000004
+#define HV_DOORBELL_FLAG_TRIGGER_ANY_VALUE  0x80000000
+
 typedef struct _HV_CONNECTION_INFO
 {
     HV_PORT_TYPE PortType;
@@ -2979,6 +2989,7 @@ typedef enum
     /* Privilege properties */
 
     HvPartitionPropertyPrivilegeFlags = 0x00010000,
+    HvPartitionPropertySyntheticProcFeatures = 0x00010001,
 
     /* Scheduling properties */
 
@@ -2999,13 +3010,18 @@ typedef enum
     /* Resource properties */
 
     HvPartitionPropertyVirtualTlbPageCount = 0x00050000,
+    HvPartitionPropertyGpaPageAccessTracking = 0x00050005,
+    HvPartitionPropertyIsolationState = 0x0005000C,
+    HvPartitionPropertyUnimplementedMsrAction = 0x00050017,
 
     /* Compatibility properties */
 
     HvPartitionPropertyProcessorVendor = 0x00060000,
     HvPartitionPropertyProcessorFeatures = 0x00060001,
     HvPartitionPropertyProcessorXsaveFeatures = 0x00060002,
-    HvPartitionPropertyProcessorCLFlushSize = 0x00060003
+    HvPartitionPropertyProcessorCLFlushSize = 0x00060003,
+    HvPartitionPropertyMaxXsaveDataSize = 0x00060008,
+    HvPartitionPropertyProcessorClockFrequency = 0x00060009
 } HV_PARTITION_PROPERTY_CODE, *PHV_PARTITION_PROPERTY_CODE;
 
 /* Partition scheduling property ranges */
@@ -5676,6 +5692,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_GPA_PAGES
     HV_GPA_PAGE_NUMBER TargetGpaBase;
     /* Supplies the flags to use for the mapping. */
     HV_MAP_GPA_FLAGS MapFlags;
+    HV_UINT32 Padding;
     /* Supplies an array of guest physical page numbers in the calling */
     /* partition that the range of GPA will be mapped to. */
     HV_GPA_PAGE_NUMBER SourceGpaPageList[ANYSIZE_ARRAY];
@@ -5690,6 +5707,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_GPA_PAGES
     /* Supplies the base guest physical page number where the GPA space will */
     /* be removed. */
     HV_GPA_PAGE_NUMBER TargetGpaBase;
+    HV_UINT32 UnmapFlags;
+    HV_UINT32 Padding;
 } HV_INPUT_UNMAP_GPA_PAGES, *PHV_INPUT_UNMAP_GPA_PAGES;
 
 /* HvCallInstallIntercept | 0x004D */
