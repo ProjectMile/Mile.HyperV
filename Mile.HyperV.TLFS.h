@@ -8,6 +8,28 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+/* Thanks */
+/* - Geoff Chappell, https://www.geoffchappell.com/ for researches hints */
+/* - Gerhart, https://github.com/gerhart01 for documentation archive */
+/* - Liu Wei, https://github.com/liuw for mshv existance hints */
+/* - Mezone, https://github.com/Mez0ne for revise hints */
+/* - Nuno Das Neves, https://github.com/NunoDasNeves for mshv implementation */
+
+/* References */
+/* - Hypervisor Top Level Functional Specification 6.0b */
+/* - hvgdk.h from Windows Driver Kit version 7.1.0 */
+/* - MIT licensed Hyper-V headers from Microsoft mshv Linux kernel module */
+/* - gerhart01's archive of Hypervisor (Windows Drivers) documentations from */
+/*   Microsoft in 2013 */
+/* - https://github.com/rust-vmm/mshv */
+/* - https://github.com/microsoft/igvm */
+/* - Symbols in Windows Driver Kit version 10.0.26063.0's */
+/*   \Windows Kits\10\Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib */
+/* - Symbols in Windows version 10.0.14393.0's urlmon.dll */
+/* - Geoff Chappell's hvgdk_mini researches hints */
+/*   - hvgdk.h is existed from Windows Driver Kit version 7.1.0 */
+/*   - Symbols in Windows version 10.0.14393.0's urlmon.dll have HV symbols */
+
 #ifndef MILE_HYPERV_TLFS
 #define MILE_HYPERV_TLFS
 
