@@ -18,13 +18,13 @@
 /* References */
 /* - Hypervisor Top Level Functional Specification 6.0b */
 /* - hvgdk.h from Windows Driver Kit version 7.1.0 */
-/* - MIT licensed Hyper-V headers from Microsoft mshv Linux kernel module */
-/* - gerhart01's archive of Hypervisor (Windows Drivers) documentations from */
+/* - MIT-licensed Hyper-V headers from Microsoft mshv Linux kernel module */
+/* - gerhart01's archive of Hypervisor (Windows Drivers) documentation from */
 /*   Microsoft in 2013 */
 /* - https://github.com/rust-vmm/mshv */
 /* - https://github.com/microsoft/igvm */
 /* - Symbols in Windows Driver Kit version 10.0.26063.0's */
-/*   \Windows Kits\10\Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib */
+/*   Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib */
 /* - Symbols in Windows version 10.0.14393.0's urlmon.dll */
 /* - Geoff Chappell's hvgdk_mini researches hints */
 /*   - hvgdk.h is existed from Windows Driver Kit version 7.1.0 */
@@ -5495,7 +5495,7 @@ typedef struct _HV_NESTED_ENLIGHTENMENTS_CONTROL
 
 /* The virtualization fault information area contains the current fault code */
 /* and fault parameters for the VP. It is 16 byte aligned.*/
-/* It's 40 bytes according to MIT licensed Hyper-V headers from Microsoft. */
+/* It's 40 bytes according to MIT-licensed Hyper-V headers from Microsoft. */
 typedef struct _HV_VIRTUALIZATION_FAULT_INFORMATION
 {
     HV_UINT16 Parameter0;

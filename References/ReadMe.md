@@ -49,7 +49,7 @@ Here is the extracted reference from the mentioned patch created by Microsoft.
 - [MSHV/hvhdk.h](MSHV/hvhdk.h)
 - [MSHV/hvhdk_mini.h](MSHV/hvhdk_mini.h)
 
-## Archive of Hypervisor (Windows Drivers) documentations from Microsoft in 2013
+## Archive of Hypervisor (Windows Drivers) documentation from Microsoft in 2013
 
 https://gerhart01.github.io/
 
@@ -63,7 +63,7 @@ HV_CPUID_FUNCTION.
 
 ## Windows symbols
 
-- \Windows Kits\10\Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
+- Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
   - Version: 10.0.26063.0
   - Local Archive: [Symbols/kdhv.lib](Symbols/kdhv.lib)
 - urlmon.dll

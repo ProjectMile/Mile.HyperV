@@ -1,5 +1,14 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 0.2**
+
+- Revise the Mile.HyperV.TLFS definitions via hvgdk.h from Windows Driver Kit
+  version 7.1.0.
+- Revise the Mile.HyperV.TLFS definitions via MIT-licensed Hyper-V headers from
+  Microsoft.
+- Revise the Mile.HyperV.TLFS CPUID series definitions according to urlmon.dll's
+  symbols.
+
 **Mile.HyperV 0.1**
 
 - Initial release.
