@@ -2579,7 +2579,7 @@ typedef union _HV_PM_TIMER_INFO
 
 /* Definitions for the monitored notification facility */
 
-typedef struct _HV_MONITOR_TRIGGER_GROUP
+typedef union _HV_MONITOR_TRIGGER_GROUP
 {
     HV_UINT64 AsUINT64;
     struct
@@ -4549,7 +4549,7 @@ typedef union _HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES
         /* Reserved for AccessRootSchedulerReg. */
         HV_UINT64 ReservedZ13 : 1;
         /* Reserved for AccessTscInvariantControls. */
-        HV_UINT64 ReservedZ14 : 1; 
+        HV_UINT64 ReservedZ14 : 1;
         /* Extended GVA ranges for HvCallFlushVirtualAddressList hypercall. */
         /* Corresponds to privilege. */
         HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
@@ -4565,11 +4565,11 @@ typedef union _HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES
         /* Corresponds to privilege. */
         HV_UINT64 StartVirtualProcessor : 1;
         /* Reserved for Isolation. */
-        HV_UINT64 ReservedZ21 : 1; 
+        HV_UINT64 ReservedZ21 : 1;
         /* Synthetic timers in direct mode. */
         HV_UINT64 DirectSyntheticTimers : 1;
         /* Reserved for synthetic time unhalted timer */
-        HV_UINT64 ReservedZ23 : 1; 
+        HV_UINT64 ReservedZ23 : 1;
         /* Use extended processor masks. */
         HV_UINT64 ExtendedProcessorMasks : 1;
         /* HvCallFlushVirtualAddressSpace / HvCallFlushVirtualAddressList are */
