@@ -6102,17 +6102,17 @@ typedef enum _HV_CALL_CODE
     HvCallCount
 } HV_CALL_CODE, *PHV_CALL_CODE;
 
-// Type of Normal Hypercall calling convention
-typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_CALL_TYPE)(
+// Type of Normal Hypercall and Fast Hypercall calling convention.
+// - Normal Hypercall
+//   - HypercallParameter1: The guest physical addresses of input parameters.
+//   - HypercallParameter2: The guest physical addresses of output parameters.
+// - Fast Hypercall
+//   - HypercallParameter1: The content of input parameters 1.
+//   - HypercallParameter2: The content of input parameters 2.
+typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_HYPERCALL_TYPE)(
     HV_X64_HYPERCALL_INPUT HypercallInput,
-    HV_GPA InputParameters,
-    HV_GPA OutputParameters);
-
-// Type of Fast Hypercall calling convention
-typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_FAST_CALL_TYPE)(
-    HV_X64_HYPERCALL_INPUT HypercallInput,
-    HV_UINT64 InputParameter1,
-    HV_UINT64 InputParameter2);
+    HV_UINT64 HypercallParameter1,
+    HV_UINT64 HypercallParameter2);
 
 // Type of XMM Fast Hypercall (Extended Fast Hypercall) calling convention
 // typedef HV_X64_HYPERCALL_OUTPUT(*__vectorcall PHV_X64_XMM_FAST_CALL_TYPE)(
