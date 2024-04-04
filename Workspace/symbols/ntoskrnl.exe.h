@@ -162,340 +162,6 @@ struct _IO_LIVEDUMP_SECONDARY_DATA;
 struct _MEMORY_DUMP32;
 struct _LIVEDUMP_MAPPING_RESOURCES;
 
-/* 269 */
-enum _HV_GUEST_OS_MICROSOFT_IDS : __int32
-{
-  HvGuestOsMicrosoftUndefined = 0x0,
-  HvGuestOsMicrosoftMSDOS = 0x1,
-  HvGuestOsMicrosoftWindows3x = 0x2,
-  HvGuestOsMicrosoftWindows9x = 0x3,
-  HvGuestOsMicrosoftWindowsNT = 0x4,
-  HvGuestOsMicrosoftWindowsCE = 0x5,
-};
-
-/* 273 */
-enum _HV_NESTED_MSR_INTERCEPT_MODE : __int32
-{
-  HvNestedMsrInterceptModeSlow = 0x0,
-  HvNestedMsrInterceptModeFast = 0x1,
-  HvNestedMsrInterceptModeEnlightened = 0x2,
-  HvNestedMsrInterceptModeCount = 0x3,
-};
-
-/* 283 */
-enum _HV_GUEST_OS_VENDOR : __int32
-{
-  HvGuestOsVendorMicrosoft = 0x1,
-};
-
-/* 285 */
-enum _HV_X64_PENDING_EVENT_TYPE : __int32
-{
-  HvX64PendingEventException = 0x0,
-  HvX64PendingEventMemoryIntercept = 0x1,
-  HvX64PendingEventNestedMemoryIntercept = 0x2,
-};
-
-/* 328 */
-enum HV_EVENTLOG_TYPE : __int32
-{
-  HvEventLogTypeGlobalSystemEvents = 0x0,
-  HvEventLogTypeLocalDiagnostics = 0x1,
-  HvEventLogTypeMaximum = 0x1,
-};
-
-/* 332 */
-enum _HV_CPUID_FUNCTION : __int32
-{
-  HvCpuIdFunctionVersionAndFeatures = 0x1,
-  HvCpuIdFunctionHvVendorAndMaxFunction = 0x40000000,
-  HvCpuIdFunctionHvInterface = 0x40000001,
-  HvCpuIdFunctionMsHvVersion = 0x40000002,
-  HvCpuIdFunctionMsHvFeatures = 0x40000003,
-  HvCpuIdFunctionMsHvEnlightenmentInformation = 0x40000004,
-  HvCpuIdFunctionMsHvImplementationLimits = 0x40000005,
-  HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
-  HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
-  HvCpuIdFunctionMsHvSvmFeatures = 0x40000008,
-  HvCpuIdFunctionMsHvSkipLevelFeatures = 0x40000009,
-  HvCpuidFunctionMsHvNestedVirtFeatures = 0x4000000A,
-  HvCpuIdFunctionMaxReserved = 0x4000000A,
-};
-
-/* 339 */
-enum _HV_ARCHITECTURE : __int32
-{
-  HvArchitectureX64 = 0x0,
-  HvArchitectureX86 = 0x1,
-  HvArchitectureARM64 = 0x2,
-  HvArchitectureMaximum = 0x3,
-};
-
-/* 410 */
-enum _HV_INTERRUPT_SOURCE : __int32
-{
-  HvInterruptSourceMsi = 0x1,
-  HvInterruptSourceIoApic = 0x2,
-  HvInterruptSourceGicd = 0x3,
-};
-
-/* 413 */
-enum _HV_HYPERVISOR_INTERFACE : __int32
-{
-  HvMicrosoftHypervisorInterface = 0x31237648,
-  HvMicrosoftXboxNanovisor = 0x766E6258,
-};
-
-/* 455 */
-enum _HV_INTERRUPT_TYPE : __int32
-{
-  HvX64InterruptTypeFixed = 0x0,
-  HvX64InterruptTypeLowestPriority = 0x1,
-  HvX64InterruptTypeSmi = 0x2,
-  HvX64InterruptTypeNmi = 0x4,
-  HvX64InterruptTypeInit = 0x5,
-  HvX64InterruptTypeSipi = 0x6,
-  HvX64InterruptTypeExtInt = 0x7,
-  HvX64InterruptTypeLocalInt0 = 0x8,
-  HvX64InterruptTypeLocalInt1 = 0x9,
-  HvX64InterruptTypeMaximum = 0xA,
-};
-
-/* 509 */
-enum _HV_VTL_ENTRY_REASON : __int32
-{
-  HvVtlEntryReserved = 0x0,
-  HvVtlEntryVtlCall = 0x1,
-  HvVtlEntryInterrupt = 0x2,
-};
-
-/* 528 */
-enum _HV_SERVICE_BRANCH : __int32
-{
-  HvServiceBranchGdr = 0x0,
-  HvServiceBranchQfe = 0x1,
-};
-
-/* 549 */
-enum _HV_GUEST_OS_OPENSOURCE_IDS : __int32
-{
-  HvGuestOsOpenSourceLinux = 0x1,
-};
-
-/* 583 */
-enum _HV_STORE_DATA_RESULT : __int32
-{
-  StoreDataSuccess = 0x0,
-  StoreDataNoWritesRequired = 0x1,
-  StoreDataFailure = 0x2,
-  StoreDataResultMaximum = 0x3,
-};
-
-/* 587 */
-enum _HV_FILE_STATUS : __int32
-{
-  Shrunk = 0x0,
-  Grown = 0x1,
-  Unchanged = 0x2,
-};
-
-/* 599 */
-enum _HV_BACKING_STORAGE_TYPE : __int32
-{
-  HvStorageLoader = 0x0,
-  HvStoragePool = 0x1,
-  HvStorageSystemCache = 0x2,
-};
-
-/* 600 */
-enum _HV_LOG_SWAP_REASON : __int32
-{
-  HvLogSwapSpaceExhausted = 0x0,
-  HvLogSwapReconcile = 0x1,
-};
-
-/* 621 */
-enum _HV_LOGICAL_PROCESSOR_PROPERTY_TYPE : __int32
-{
-  HvLogicalProcessorPerfStateConfig = 0x0,
-  HvLogicalProcessorThrottleStateConfig = 0x1,
-  HvLogicalProcessorPccConfig = 0x2,
-  HvLogicalProcessorPerfStateCap = 0x3,
-  HvLogicalProcessorMachineCheckContextInfo = 0x4,
-  HvLogicalProcessorMcUpdateUpdateStatus = 0x5,
-};
-
-/* 622 */
-enum _HV_STATS_OBJECT_TYPE : __int32
-{
-  HvStatsObjectHypervisor = 0x1,
-  HvStatsObjectLogicalProcessor = 0x2,
-  HvStatsObjectPartition = 0x10001,
-  HvStatsObjectVp = 0x10002,
-};
-
-/* 623 */
-enum _HV_LOGICAL_PROCESSOR_REGISTER_TYPE : __int32
-{
-  HvX64LpRegisterTypeCpuid = 0x10000,
-  HvX64LpRegisterTypeMsr = 0x10001,
-  HvX64LpRegisterTypeWbinvd = 0x10002,
-};
-
-/* 624 */
-enum _HV_POWER_PROPERTY_TYPE : __int32
-{
-  HvPowerPropertyLpIdleStateConfig = 0x0,
-  HvPowerPropertyLpPerfFeedbackCounters = 0x1,
-  HvPowerPropertyLpPercentageFrequency = 0x2,
-  HvPowerPropertyLpNextPlatformStateIndex = 0x3,
-  HvPowerPropertyStatsOffsets = 0x4,
-  HvPowerPropertyPolicySetting = 0x5,
-};
-
-/* 625 */
-enum _HV_PARTITION_EVENT : __int32
-{
-  HvPartitionEventDebugDeviceAvailable = 0x1,
-  HvPartitionEventRootCrashdump = 0x2,
-  HvPartitionEventAcpiReenabled = 0x3,
-};
-
-/* 626 */
-enum _HV_SYSTEM_PROPERTY : __int32
-{
-  HvPerfCounterProperty = 0x1,
-  HvLegacyPowerPolicySettingProperty = 0x2,
-  HvSleepStateProperty = 0x3,
-  HvMachineCheckProperty = 0x4,
-  HvIommuInitStatusProperty = 0x5,
-  HvHpetConfigProperty = 0x6,
-  HvHpetInterruptProperty = 0x7,
-  HvHpetEnabledProperty = 0x8,
-  HvHypervisorLaunchStatsProperty = 0x9,
-  HvHypervisorDebugProperty = 0xA,
-  HvRootSvmCapabilitiesProperty = 0xB,
-  HvRootNumaCostPagesProperty = 0xC,
-  HvHostPageTableRootProperty = 0xD,
-  HvTscSyncStatusProperty = 0xE,
-  HvSchedulerTypeProperty = 0xF,
-  HvPlatformVirtualizationSupportProperty = 0x10,
-};
-
-/* 627 */
-enum _HV_PPM_POWER_POLICY_SETTING_ID : __int32
-{
-  HvPowerPolicyIdleDisable = 0x0,
-  HvPowerPolicyIdleTimeCheck = 0x1,
-  HvPowerPolicyIdlePromoteThreshold = 0x2,
-  HvPowerPolicyIdleDemoteThreshold = 0x3,
-  HvPowerPolicyIdleStateMaximum = 0x4,
-  HvPowerPolicyThrottleMaximum = 0x5,
-  HvPowerPolicyThrottleMinimum = 0x6,
-  HvPowerPolicyPerfIncreaseThreshold = 0x7,
-  HvPowerPolicyPerfDecreaseThreshold = 0x8,
-  HvPowerPolicyPerfIncreasePolicy = 0x9,
-  HvPowerPolicyPerfDecreasePolicy = 0xA,
-  HvPowerPolicyCoreParkingIncreasePolicy = 0xB,
-  HvPowerPolicyCoreParkingDecreasePolicy = 0xC,
-  HvPowerPolicyCoreParkingMaxCores = 0xD,
-  HvPowerPolicyCoreParkingMinCores = 0xE,
-  HvPowerPolicyPerfTimeCheck = 0xF,
-  HvPowerPolicyPerfIncreaseTime = 0x10,
-  HvPowerPolicyPerfDecreaseTime = 0x11,
-  HvPowerPolicyPerfBoostPolicy = 0x12,
-  HvPowerPolicyPerfBoostMode = 0x13,
-  HvPowerPolicyMax = 0x14,
-};
-
-/* 628 */
-enum HV_PARTITION_PROPERTY_CODE : __int32
-{
-  HvPartitionPropertyPrivilegeFlags = 0x10000,
-  HvPartitionPropertySuspend = 0x20000,
-  HvPartitionPropertyCpuReserve = 0x20001,
-  HvPartitionPropertyCpuCap = 0x20002,
-  HvPartitionPropertyCpuWeight = 0x20003,
-  HvPartitionPropertyCpuGroupId = 0x20004,
-  HvPartitionPropertyEmulatedTimerPeriod = 0x30000,
-  HvPartitionPropertyEmulatedTimerControl = 0x30001,
-  HvPartitionPropertyPmTimerAssist = 0x30002,
-  HvPartitionPropertyTimeFreeze = 0x30003,
-  HvPartitionPropertyDebugChannelId = 0x40000,
-  HvPartitionPropertyVirtualTlbPageCount = 0x50000,
-  HvPartitionPropertyVsmConfig = 0x50001,
-  HvPartitionPropertyZeroMemoryOnReset = 0x50002,
-  HvPartitionPropertyProcessorsPerSocket = 0x50003,
-  HvPartitionPropertyNestedTlbSize = 0x50004,
-  HvPartitionPropertyProcessorVendor = 0x60000,
-  HvPartitionPropertyProcessorFeatures = 0x60001,
-  HvPartitionPropertyProcessorXsaveFeatures = 0x60002,
-  HvPartitionPropertyProcessorCLFlushSize = 0x60003,
-  HvPartitionPropertyEnlightenmentModifications = 0x60004,
-  HvPartitionPropertyCompatibilityVersion = 0x60005,
-  HvPartitionPropertyPhysicalAddressWidth = 0x60006,
-  HvPartitionPropertyGuestOsId = 0x70000,
-  HvPartitionPropertyProcessorVirtualizationFeatures = 0x80000,
-};
-
-/* 629 */
-enum _HV_BOOT_DEBUG_PORT_TYPE : __int32
-{
-  HvBootDbgPortNone = 0x0,
-  HvBootDbgPortCom = 0x1,
-  HvBootDbgPortFirewire = 0x2,
-  HvBootDbgPortNet = 0x3,
-};
-
-/* 630 */
-enum _HV_CRASHDUMP_ACTION : __int32
-{
-  HvCrashdumpNone = 0x0,
-  HvCrashdumpSuspendAllVps = 0x1,
-  HvCrashdumpPrepareForStateSave = 0x2,
-  HvCrashdumpStateSaved = 0x3,
-};
-
-/* 631 */
-enum _HV_PHYSICAL_DEVICE_PROPERTY : __int32
-{
-  HvPhysicalDevicePropertyCapabilities = 0x0,
-  HvPhysicalDevicePropertyEnabled = 0x1,
-};
-
-/* 632 */
-enum _HV_X64_PPM_PERF_STATE_PORT_ACCESS_SIZE : __int32
-{
-  HvX64PerfStatePort8Bit = 0x0,
-  HvX64PerfStatePort16Bit = 0x1,
-  HvX64PerfStatePort32Bit = 0x2,
-};
-
-/* 634 */
-enum _HV_MACHINE_CHECK_RECOVERY_FLAG : __int32
-{
-  InvalidRecoveryFlag = 0x0,
-  NewDeferredRecoveryQueued = 0x1,
-  DeferredRecoveryCompleted = 0x2,
-};
-
-/* 635 */
-enum _HV_MACHINE_CHECK_SOURCE : __int32
-{
-  HV_MACHINE_CHECK_SOURCE_NONE = 0x0,
-  HV_MACHINE_CHECK_SOURCE_HV = 0x1,
-  HV_MACHINE_CHECK_SOURCE_ROOT_VP = 0x2,
-  HV_MACHINE_CHECK_SOURCE_NON_ROOT_VP = 0x3,
-};
-
-/* 636 */
-enum _HV_HYPERVISOR_COUNTER : __int32
-{
-  StHvCounterLogicalProcessors = 0x1,
-  StHvCounterPartitions = 0x2,
-  StHvCounterTotalPages = 0x3,
-};
-
 /* 637 */
 enum _HV_DEVICE_TYPE : __int32
 {
@@ -8943,35 +8609,11 @@ union _HV_REGISTER_VALUE
   _HV_X64_PENDING_EXCEPTION_EVENT PendingExceptionEvent;
 };
 
-/* 2885 */
-struct $B6A83534C883D2AE13A1E4ADF6092B96
-{
-  unsigned __int32 Vector : 8;
-  unsigned __int32 DeliveryMode : 3;
-  unsigned __int32 DestinationMode : 1;
-  unsigned __int32 DeliveryStatus : 1;
-  unsigned __int32 InterruptPolarity : 1;
-  unsigned __int32 RemoteIRR : 1;
-  unsigned __int32 TriggerMode : 1;
-  unsigned __int32 InterruptMask : 1;
-  unsigned __int32 Reserved1 : 15;
-  unsigned __int32 Reserved2 : 24;
-  unsigned __int32 DestinationId : 8;
-};
-
 /* 2886 */
 struct $36DB9F07A37CDAA7F3A4AF928B3F4525
 {
   unsigned int LowUINT32;
   unsigned int HighUINT32;
-};
-
-/* 2887 */
-union _HV_IOAPIC_RTE
-{
-  $B6A83534C883D2AE13A1E4ADF6092B96 __s0;
-  $36DB9F07A37CDAA7F3A4AF928B3F4525 __s1;
-  unsigned __int64 AsUINT64;
 };
 
 /* 2926 */
@@ -9404,24 +9046,6 @@ union _HV_VP_ASSIST_PAGE
   unsigned __int8 ReservedZBytePadding[4096];
 };
 
-/* 3530 */
-struct $478D8D51EE89E97DBC5A8920D786D4DD
-{
-  unsigned __int32 Vector : 8;
-  unsigned __int32 DeliveryMode : 3;
-  unsigned __int32 Reserved1 : 3;
-  unsigned __int32 LevelAssert : 1;
-  unsigned __int32 TriggerMode : 1;
-  unsigned __int32 Reserved2 : 16;
-};
-
-/* 3531 */
-union _HV_MSI_DATA_REGISTER
-{
-  unsigned int AsUINT32;
-  $478D8D51EE89E97DBC5A8920D786D4DD __s1;
-};
-
 /* 3534 */
 struct $F0DAE1FA2BC21B660CCF134D0C12A248
 {
@@ -9469,13 +9093,6 @@ union _HV_PARTITION_PRIVILEGE_MASK
 {
   unsigned __int64 AsUINT64;
   $F0DAE1FA2BC21B660CCF134D0C12A248 __s1;
-};
-
-/* 3665 */
-struct _HV_EVENTLOG_MESSAGE_PAYLOAD
-{
-  HV_EVENTLOG_TYPE EventLogType;
-  unsigned int BufferIndex;
 };
 
 /* 3667 */
@@ -9552,76 +9169,6 @@ union _HV_REGISTER_VSM_VP_VTL_CONTROL
 {
   unsigned __int64 AsUINT64;
   $92560E5375D4F6A085E11034DE5E6882 __s1;
-};
-
-/* 3767 */
-struct $28C48B95CF79B974EFF585D7A614C057
-{
-  unsigned __int32 Reserved1 : 2;
-  unsigned __int32 DestinationMode : 1;
-  unsigned __int32 RedirectionHint : 1;
-  unsigned __int32 Reserved2 : 8;
-  unsigned __int32 DestinationId : 8;
-  unsigned __int32 MsiBase : 12;
-};
-
-/* 3768 */
-union _HV_MSI_ADDRESS_REGISTER
-{
-  unsigned int AsUINT32;
-  $28C48B95CF79B974EFF585D7A614C057 __s1;
-};
-
-/* 3769 */
-struct $2958AADFDAB94EA473C1014C9AB3009D
-{
-  _HV_MSI_ADDRESS_REGISTER Address;
-  _HV_MSI_DATA_REGISTER Data;
-};
-
-/* 3770 */
-union _HV_MSI_ENTRY
-{
-  $2958AADFDAB94EA473C1014C9AB3009D __s0;
-  unsigned __int64 AsUINT64;
-};
-
-/* 3771 */
-struct $AC2EC41BBA1E8CCE1A1660D49EA60717
-{
-  unsigned __int32 Polarity : 1;
-  unsigned __int32 TriggerMode : 1;
-  unsigned __int32 Line : 10;
-  unsigned __int32 ProcessorTarget : 3;
-  unsigned __int32 Vector : 10;
-  unsigned __int32 Priority : 7;
-  unsigned __int32 UnitId : 24;
-  unsigned __int32 Flags : 8;
-};
-
-/* 3772 */
-union _HV_GICD_ENTRY
-{
-  $AC2EC41BBA1E8CCE1A1660D49EA60717 __s0;
-  $36DB9F07A37CDAA7F3A4AF928B3F4525 __s1;
-  unsigned __int64 AsUINT64;
-};
-
-/* 3773 */
-union $0C75A670DA946C82B6FC34D5B48F0F08
-{
-  _HV_MSI_ENTRY MsiEntry;
-  _HV_IOAPIC_RTE IoApicEntry;
-  _HV_GICD_ENTRY GicdEntry;
-  unsigned __int64 Data;
-};
-
-/* 3774 */
-struct _HV_INTERRUPT_ENTRY
-{
-  _HV_INTERRUPT_SOURCE InterruptSource;
-  unsigned int Reserved;
-  $0C75A670DA946C82B6FC34D5B48F0F08 ___u2;
 };
 
 /* 3775 */
@@ -9886,15 +9433,6 @@ struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
   unsigned int ReservedEbx;
   unsigned int ReservedEcx;
   unsigned int ReservedEdx;
-};
-
-/* 4237 */
-struct _HV_HYPERVISOR_INTERFACE_INFO
-{
-  unsigned int Interface;
-  unsigned int Reserved1;
-  unsigned int Reserved2;
-  unsigned int Reserved3;
 };
 
 /* 4238 */
@@ -12848,9 +12386,6 @@ typedef _HV_INPUT_PREPARE_FOR_SLEEP *PHV_INPUT_PREPARE_FOR_SLEEP;
 /* 12654 */
 typedef _HV_INPUT_NOTIFY_PARTITION_EVENT *PHV_INPUT_NOTIFY_PARTITION_EVENT;
 
-/* 12665 */
-typedef _HV_IOAPIC_RTE *PHV_IOAPIC_RTE;
-
 /* 12721 */
 typedef _HV_ATTACH_DEVICE_FLAGS *PHV_ATTACH_DEVICE_FLAGS;
 
@@ -12877,12 +12412,6 @@ typedef _HV_X64_PPM_PERF_STATE_REGISTER *PHV_X64_PPM_PERF_STATE_REGISTER;
 
 /* 13027 */
 typedef unsigned int *PHV_LOGICAL_DEVICE_ID;
-
-/* 13032 */
-typedef _HV_FILE_STATUS *PHV_FILE_STATUS;
-
-/* 13070 */
-typedef _HV_HYPERVISOR_INTERFACE *PHV_HYPERVISOR_INTERFACE;
 
 /* 13128 */
 typedef _HV_X64_PPM_IDLE_STATE *PHV_X64_PPM_IDLE_STATE;
@@ -12989,9 +12518,6 @@ typedef _HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA *PHV_INPUT_QUERY_ASSOCIATED_LP_FOR
 /* 14152 */
 typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY *PHV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY;
 
-/* 14161 */
-typedef unsigned int HV_EVENTLOG_BUFFER_INDEX;
-
 /* 14174 */
 typedef _HV_TIMER_MESSAGE_PAYLOAD *PHV_TIMER_MESSAGE_PAYLOAD;
 
@@ -13088,9 +12614,6 @@ typedef _HV_INPUT_MAP_DEVICE_INTERRUPT *PHV_INPUT_MAP_DEVICE_INTERRUPT;
 /* 14938 */
 typedef _HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS *PHV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS;
 
-/* 14959 */
-typedef const _HV_LOGICAL_PROCESSOR_REGISTER_TYPE *PCHV_LOGICAL_PROCESSOR_REGISTER_TYPE;
-
 /* 15218 */
 typedef _HV_INPUT_CREATE_DEVICE_DOMAIN *PHV_INPUT_CREATE_DEVICE_DOMAIN;
 
@@ -13102,9 +12625,6 @@ typedef _HV_REGISTER_VALUE *PHV_REGISTER_VALUE;
 
 /* 15302 */
 typedef _HV_VP_CONTEXT *PHV_VP_CONTEXT;
-
-/* 15335 */
-typedef _HV_LOGICAL_PROCESSOR_REGISTER_TYPE *PHV_LOGICAL_PROCESSOR_REGISTER_TYPE;
 
 /* 15403 */
 typedef unsigned __int64 HV_DEVICE_VA;
@@ -13139,9 +12659,6 @@ typedef _HV_X64_PENDING_INTERRUPTION_REGISTER *PHV_X64_PENDING_INTERRUPTION_REGI
 /* 15770 */
 typedef _HV_PPM_POWER_POLICY_SETTING *PHV_PPM_POWER_POLICY_SETTING;
 
-/* 15811 */
-typedef _HV_NESTED_MSR_INTERCEPT_MODE *PHV_NESTED_MSR_INTERCEPT_MODE;
-
 /* 15839 */
 typedef _HV_HYPERCALL_OUTPUT *PHV_HYPERCALL_OUTPUT;
 
@@ -13150,9 +12667,6 @@ typedef _HV_HYPERCALL_INPUT *PHV_HYPERCALL_INPUT;
 
 /* 15972 */
 typedef unsigned __int16 *PHV_PCI_RID;
-
-/* 16005 */
-typedef _HV_INTERRUPT_SOURCE *PHV_INTERRUPT_SOURCE;
 
 /* 16025 */
 typedef _HV_INPUT_ENTER_SLEEP_STATE *PHV_INPUT_ENTER_SLEEP_STATE;
@@ -13183,9 +12697,6 @@ typedef _HV_MESSAGE_FLAGS *PHV_MESSAGE_FLAGS;
 
 /* 16308 */
 typedef _HV_INPUT_RETARGET_DEVICE_INTERRUPT *PHV_INPUT_RETARGET_DEVICE_INTERRUPT;
-
-/* 16322 */
-typedef _HV_CPUID_FUNCTION *PHV_CPUID_FUNCTION;
 
 /* 16323 */
 typedef unsigned int HV_DEVICE_DOMAIN_ID;
@@ -13220,9 +12731,6 @@ typedef _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER *PHV_INPUT_SET_DEVICE_PRQ_PROPE
 /* 16525 */
 typedef _HV_HPET_CONFIG_INFO *PHV_HPET_CONFIG_INFO;
 
-/* 16526 */
-typedef unsigned int *PHV_EVENTLOG_BUFFER_INDEX;
-
 /* 16532 */
 typedef unsigned __int64 *PHV_NANO100_TIME;
 
@@ -13237,9 +12745,6 @@ typedef _HV_DEVICE_INTERRUPT_DESCRIPTOR *PHV_DEVICE_INTERRUPT_DESCRIPTOR;
 
 /* 16640 */
 typedef _HV_INPUT_REMOVE_LOGICAL_PROCESSOR *PHV_INPUT_REMOVE_LOGICAL_PROCESSOR;
-
-/* 16759 */
-typedef _HV_MSI_DATA_REGISTER *PHV_MSI_DATA_REGISTER;
 
 /* 16834 */
 typedef _HV_X64_X_REGISTERS *PHV_X64_X_REGISTERS;
@@ -13258,9 +12763,6 @@ typedef unsigned int *PHV_DEVICE_PR_QUEUE_ID;
 
 /* 16876 */
 typedef _HV_OUTPUT_GET_PARTITION_ID *PHV_OUTPUT_GET_PARTITION_ID;
-
-/* 16928 */
-typedef _HV_HYPERVISOR_INTERFACE_INFO *PHV_HYPERVISOR_INTERFACE_INFO;
 
 /* 16930 */
 typedef _HV_HYPERCALL_OUTPUT (__stdcall *PHVCALL_HYPERCALL_ROUTINE)(_HV_HYPERCALL_INPUT, unsigned __int64, unsigned __int64);
@@ -13289,14 +12791,8 @@ typedef _HV_MCA_FAULTING_LP_MSR *PHV_MCA_FAULTING_LP_MSR;
 /* 17210 */
 typedef unsigned __int64 *PHV_DEVICE_VA;
 
-/* 17223 */
-typedef _HV_MACHINE_CHECK_SOURCE *PHV_MACHINE_CHECK_SOURCE;
-
 /* 17259 */
 typedef _HV_X64_MSR_RESET_CONTENTS *PHV_X64_MSR_RESET_CONTENTS;
-
-/* 17271 */
-typedef _HV_MACHINE_CHECK_RECOVERY_FLAG *PHV_MACHINE_CHECK_RECOVERY_FLAG;
 
 /* 17288 */
 typedef _HV_GVA_RANGE_SIMPLE *PHV_GVA_RANGE_SIMPLE;
@@ -13345,9 +12841,6 @@ typedef unsigned __int64 *PHV_ADDRESS_SPACE_ID;
 
 /* 17584 */
 typedef _HV_SYNIC_SINT *PHV_SYNIC_SINT;
-
-/* 17644 */
-typedef _HV_SERVICE_BRANCH *PHV_SERVICE_BRANCH;
 
 /* 17661 */
 typedef _HV_LP_STARTUP_STATUS *PHV_LP_STARTUP_STATUS;
@@ -13412,9 +12905,6 @@ typedef _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER *PHV_INPUT_SET_PHYSICAL_DE
 /* 18088 */
 typedef _HV_TSC_EMULATION_STATUS *PHV_TSC_EMULATION_STATUS;
 
-/* 18095 */
-typedef _HV_BOOT_DEBUG_PORT_TYPE *PHV_BOOT_DEBUG_PORT_TYPE;
-
 /* 18131 */
 typedef _HV_PCI_BDF *PHV_PCI_BDF;
 
@@ -13430,9 +12920,6 @@ typedef _HV_REFERENCE_TSC_PAGE *PHV_REFERENCE_TSC_PAGE;
 /* 18212 */
 typedef _HV_MACHINE_CHECK_CONTEXT_INFO *PHV_MACHINE_CHECK_CONTEXT_INFO;
 
-/* 18273 */
-typedef _HV_INTERRUPT_TYPE *PHV_INTERRUPT_TYPE;
-
 /* 18310 */
 typedef unsigned int HV_INTERCEPT_ACCESS_TYPE_MASK;
 
@@ -13441,9 +12928,6 @@ typedef unsigned int HV_LOGICAL_PROCESSOR_INDEX;
 
 /* 18392 */
 typedef _HV_GUEST_OS_ID_CONTENTS *PHV_GUEST_OS_ID_CONTENTS;
-
-/* 18433 */
-typedef _HV_VTL_ENTRY_REASON *PHV_VTL_ENTRY_REASON;
 
 /* 18435 */
 typedef _HV_NESTED_ENLIGHTENMENTS_CONTROL *PHV_NESTED_ENLIGHTENMENTS_CONTROL;
@@ -13459,9 +12943,6 @@ typedef _HV_PROXIMITY_DOMAIN_FLAGS *PHV_PROXIMITY_DOMAIN_FLAGS;
 
 /* 18536 */
 typedef unsigned int *PHV_MAP_GPA_FLAGS;
-
-/* 18566 */
-typedef _HV_CRASHDUMP_ACTION *PHV_CRASHDUMP_ACTION;
 
 /* 18588 */
 typedef _HV_INPUT_MAP_GPA_PAGES *PHV_INPUT_MAP_GPA_PAGES;
@@ -13502,23 +12983,14 @@ typedef _HV_VP_VTL_CONTROL *PHV_VP_VTL_CONTROL;
 /* 18967 */
 typedef _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG *PHV_REGISTER_VSM_VP_SECURE_VTL_CONFIG;
 
-/* 19001 */
-typedef _HV_MSI_ENTRY *PHV_MSI_ENTRY;
-
 /* 19006 */
 typedef _HV_OUTPUT_GET_SYSTEM_PROPERTY *PHV_OUTPUT_GET_SYSTEM_PROPERTY;
 
 /* 19070 */
 typedef _HV_CRASH_CTL_REG_CONTENTS *PHV_CRASH_CTL_REG_CONTENTS;
 
-/* 19086 */
-typedef _HV_X64_PENDING_EVENT_TYPE *PHV_X64_PENDING_EVENT_TYPE;
-
 /* 19208 */
 typedef _HV_REGISTER_VSM_PARTITION_STATUS *PHV_REGISTER_VSM_PARTITION_STATUS;
-
-/* 19234 */
-typedef _HV_GUEST_OS_MICROSOFT_IDS *PHV_GUEST_OS_MICROSOFT_IDS;
 
 /* 19267 */
 typedef _HV_REGISTER_VSM_VP_STATUS *PHV_REGISTER_VSM_VP_STATUS;
@@ -13529,9 +13001,6 @@ typedef unsigned __int16 HV_STATS_OBJECT_FLAG;
 /* 19375 */
 typedef _HV_INPUT_GET_SPA_PAGE_LIST *PHV_INPUT_GET_SPA_PAGE_LIST;
 
-/* 19406 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY *PHV_PHYSICAL_DEVICE_PROPERTY;
-
 /* 19495 */
 typedef _HV_LOGICAL_PROCESSOR_PROPERTY *PHV_LOGICAL_PROCESSOR_PROPERTY;
 
@@ -13540,9 +13009,6 @@ typedef _HV_EXPLICIT_SUSPEND_REGISTER *PHV_EXPLICIT_SUSPEND_REGISTER;
 
 /* 19588 */
 typedef unsigned int *PHV_APIC_ID;
-
-/* 19659 */
-typedef _HV_PARTITION_EVENT *PHV_PARTITION_EVENT;
 
 /* 19678 */
 typedef _HV_OUTPUT_ADD_LOGICAL_PROCESSOR *PHV_OUTPUT_ADD_LOGICAL_PROCESSOR;
@@ -13555,9 +13021,6 @@ typedef _HV_INPUT_SET_SYSTEM_PROPERTY *PHV_INPUT_SET_SYSTEM_PROPERTY;
 
 /* 19800 */
 typedef _HV_DETAILS *PHV_DETAILS;
-
-/* 19814 */
-typedef _HV_INTERRUPT_ENTRY *PHV_INTERRUPT_ENTRY;
 
 /* 19822 */
 typedef _HV_CPU_MANAGEMENT_VERSION_REGISTER *PHV_CPU_MANAGEMENT_VERSION_REGISTER;
@@ -13628,9 +13091,6 @@ typedef unsigned __int64 HV_SPA_PAGE_NUMBER;
 /* 20534 */
 typedef _HV_X64_MSR_REFERENCE_TSC_CONTENTS *PHV_X64_MSR_REFERENCE_TSC_CONTENTS;
 
-/* 20563 */
-typedef _HV_SYSTEM_PROPERTY *PHV_SYSTEM_PROPERTY;
-
 /* 20698 */
 typedef _HV_INPUT_DELETE_DEVICE_PR_QUEUE *PHV_INPUT_DELETE_DEVICE_PR_QUEUE;
 
@@ -13646,9 +13106,6 @@ typedef _HV_X64_MSR_HYPERCALL_CONTENTS *PHV_X64_MSR_HYPERCALL_CONTENTS;
 /* 20985 */
 typedef _HV_X64_VOLATILE_GP_REGS *PHV_X64_VOLATILE_GP_REGS;
 
-/* 20987 */
-typedef HV_PARTITION_PROPERTY_CODE *PHV_PARTITION_PROPERTY_CODE;
-
 /* 21063 */
 typedef _HV_BOOT_DEBUG_COM_PORT_TYPE *PHV_BOOT_DEBUG_COM_PORT_TYPE;
 
@@ -13658,17 +13115,11 @@ typedef _HV_SLEEP_STATE *PHV_SLEEP_STATE;
 /* 21115 */
 typedef _HV_X64_FP_MMX_REGISTER *PHV_X64_FP_MMX_REGISTER;
 
-/* 21125 */
-typedef _HV_GICD_ENTRY *PHV_GICD_ENTRY;
-
 /* 21128 */
 typedef _HV_MCUPDATE_UPDATE_STATUS *PHV_MCUPDATE_UPDATE_STATUS;
 
 /* 21133 */
 typedef unsigned __int64 HV_ADDRESS_SPACE_ID;
-
-/* 21167 */
-typedef _HV_GUEST_OS_VENDOR *PHV_GUEST_OS_VENDOR;
 
 /* 21213 */
 typedef unsigned __int16 HV_PCI_RID;
@@ -13687,9 +13138,6 @@ typedef unsigned int *PHV_PROXIMITY_DOMAIN_ID;
 
 /* 21582 */
 typedef unsigned __int8 *PHV_VTL;
-
-/* 21590 */
-typedef _HV_GUEST_OS_OPENSOURCE_IDS *PHV_GUEST_OS_OPENSOURCE_IDS;
 
 /* 21668 */
 typedef _HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT *PHV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT;
@@ -13720,12 +13168,6 @@ typedef unsigned int *PHV_PASID_SPACE_ID;
 
 /* 21843 */
 typedef _HV_MACHINE_CHECK_CONTEXT *PHV_MACHINE_CHECK_CONTEXT;
-
-/* 21911 */
-typedef _HV_ARCHITECTURE *PHV_ARCHITECTURE;
-
-/* 21921 */
-typedef _HV_MSI_ADDRESS_REGISTER *PHV_MSI_ADDRESS_REGISTER;
 
 /* 22014 */
 typedef _HV_MESSAGE_HEADER *PHV_MESSAGE_HEADER;

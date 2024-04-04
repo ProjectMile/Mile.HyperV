@@ -29,6 +29,7 @@
 // - Geoff Chappell's hvgdk_mini researches hints
 //   - hvgdk.h is existed from Windows Driver Kit version 7.1.0
 //   - Symbols in Windows version 10.0.14393.0's urlmon.dll have HV symbols
+// - Symbols in Windows version 10.0.14347.0's ntoskrnl.exe
 
 #ifndef MILE_HYPERV_TLFS
 #define MILE_HYPERV_TLFS
@@ -329,6 +330,7 @@ typedef enum _HV_ARCHITECTURE
 {
     HvArchitectureX64,
     HvArchitectureX86,
+    HvArchitectureARM64,
     HvArchitectureMaximum
 } HV_ARCHITECTURE, *PHV_ARCHITECTURE;
 
@@ -654,7 +656,7 @@ typedef enum _HV_STATS_OBJECT_TYPE
 
     HvStatsObjectPartition = 0x00010001,
     HvStatsObjectVp = 0x00010002
-} HV_STATS_OBJECT_TYPE;
+} HV_STATS_OBJECT_TYPE, *PHV_STATS_OBJECT_TYPE;
 
 // Definition for the stats map/unmap MSR value.
 typedef union _HV_ST_MAP_LOCATION
@@ -677,7 +679,7 @@ typedef enum _HV_HYPERVISOR_COUNTER
     StHvCounterVirtualProcessors = 4,
     StHvCounterMonitoredNotifications = 5,
     StHvCounterMAXIMUM
-} HV_HYPERVISOR_COUNTER;
+} HV_HYPERVISOR_COUNTER, *PHV_HYPERVISOR_COUNTER;
 
 #define HV_STATISTICS_GROUP_HVA_LENGTH 40
 #define HV_STATISTICS_GROUP_HVV_LENGTH 0
@@ -1066,10 +1068,10 @@ typedef const HV_MEMORY_RANGE_INFO* PCHV_MEMORY_RANGE_INFO;
 // Define the trace buffer index type.
 typedef HV_UINT32 HV_EVENTLOG_BUFFER_INDEX, *PHV_EVENTLOG_BUFFER_INDEX;
 
-#define HV_EVENTLOG_BUFFER_INDEX_NONE 0xffffffff
+#define HV_EVENTLOG_BUFFER_INDEX_NONE 0xFFFFFFFF
 
 // Define all the trace buffer types.
-typedef enum
+typedef enum _HV_EVENTLOG_TYPE
 {
     HvEventLogTypeGlobalSystemEvents = 0x00000000,
     HvEventLogTypeLocalDiagnostics = 0x00000001,
@@ -3065,14 +3067,14 @@ typedef enum _HV_GUEST_OS_MICROSOFT_IDS
     HvGuestOsMicrosoftWindowsCE = 0x05
 } HV_GUEST_OS_MICROSOFT_IDS, *PHV_GUEST_OS_MICROSOFT_IDS;
 
-typedef enum _HV_GUEST_OS_OPENSOURCE_TYPES
+typedef enum _HV_GUEST_OS_OPENSOURCE_IDS
 {
     HvGuestOsOpenSourceUndefined = 0x0,
     HvGuestOsOpenSourceLinux = 0x1,
     HvGuestOsOpenSourceFreeBSD = 0x2,
     HvGuestOsOpenSourceXen = 0x3,
     HvGuestOsOpenSourceIllumos = 0x4,
-} HV_GUEST_OS_OPENSOURCE_TYPES, *PHV_GUEST_OS_OPENSOURCE_TYPES;
+} HV_GUEST_OS_OPENSOURCE_IDS, *PHV_GUEST_OS_OPENSOURCE_IDS;
 
 // Partition Properties
 
@@ -3087,15 +3089,18 @@ typedef enum
 
     // Scheduling properties
 
+    HvPartitionPropertySuspend = 0x00020000,
     HvPartitionPropertyCpuReserve = 0x00020001,
     HvPartitionPropertyCpuCap = 0x00020002,
     HvPartitionPropertyCpuWeight = 0x00020003,
+    HvPartitionPropertyCpuGroupId = 0x00020004,
 
     // Timer assist properties
 
     HvPartitionPropertyEmulatedTimerPeriod = 0x00030000,
     HvPartitionPropertyEmulatedTimerControl = 0x00030001,
     HvPartitionPropertyPmTimerAssist = 0x00030002,
+    HvPartitionPropertyTimeFreeze = 0x00030003,
 
     // Debugging properties
 
@@ -3104,6 +3109,10 @@ typedef enum
     // Resource properties
 
     HvPartitionPropertyVirtualTlbPageCount = 0x00050000,
+    HvPartitionPropertyVsmConfig = 0x00050001,
+    HvPartitionPropertyZeroMemoryOnReset = 0x00050002,
+    HvPartitionPropertyProcessorsPerSocket = 0x00050003,
+    HvPartitionPropertyNestedTlbSize = 0x00050004,
     HvPartitionPropertyGpaPageAccessTracking = 0x00050005,
     HvPartitionPropertyIsolationState = 0x0005000C,
     HvPartitionPropertyUnimplementedMsrAction = 0x00050017,
@@ -3114,8 +3123,15 @@ typedef enum
     HvPartitionPropertyProcessorFeatures = 0x00060001,
     HvPartitionPropertyProcessorXsaveFeatures = 0x00060002,
     HvPartitionPropertyProcessorCLFlushSize = 0x00060003,
+    HvPartitionPropertyEnlightenmentModifications = 0x00060004,
+    HvPartitionPropertyCompatibilityVersion = 0x00060005,
+    HvPartitionPropertyPhysicalAddressWidth = 0x00060006,
     HvPartitionPropertyMaxXsaveDataSize = 0x00060008,
-    HvPartitionPropertyProcessorClockFrequency = 0x00060009
+    HvPartitionPropertyProcessorClockFrequency = 0x00060009,
+
+    HvPartitionPropertyGuestOsId = 0x00070000,
+
+    HvPartitionPropertyProcessorVirtualizationFeatures = 0x00080000,
 } HV_PARTITION_PROPERTY_CODE, *PHV_PARTITION_PROPERTY_CODE;
 
 // Partition scheduling property ranges
@@ -3797,27 +3813,54 @@ typedef struct _HV_TRANSLATE_GVA_RESULT_EX
 
 typedef const HV_INTERRUPT_VECTOR* PCHV_INTERRUPT_VECTOR;
 
-typedef union _HV_MSI_ENTRY
-{
-    HV_UINT64 AsUINT64;
-
-    struct
-    {
-        HV_UINT32 Address;
-        HV_UINT32 Data;
-    };
-} HV_MSI_ENTRY, *PHV_MSI_ENTRY;
-
 typedef enum _HV_INTERRUPT_SOURCE
 {
     HvInterruptSourceMsi = 1, // MSI and MSI-X
-    HvInterruptSourceIoApic
+    HvInterruptSourceIoApic,
+    HvInterruptSourceGicd
 } HV_INTERRUPT_SOURCE, *PHV_INTERRUPT_SOURCE;
+
+typedef union _HV_MSI_ADDRESS_REGISTER
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        HV_UINT32 Reserved1 : 2;
+        HV_UINT32 DestinationMode : 1;
+        HV_UINT32 RedirectionHint : 1;
+        HV_UINT32 Reserved2 : 8;
+        HV_UINT32 DestinationId : 8;
+        HV_UINT32 MsiBase : 12;
+    };
+} HV_MSI_ADDRESS_REGISTER, *PHV_MSI_ADDRESS_REGISTER;
+
+typedef union _HV_MSI_DATA_REGISTER
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        HV_UINT32 Vector : 8;
+        HV_UINT32 DeliveryMode : 3;
+        HV_UINT32 Reserved1 : 3;
+        HV_UINT32 LevelAssert : 1;
+        HV_UINT32 TriggerMode : 1;
+        HV_UINT32 Reserved2 : 16;
+    };
+} HV_MSI_DATA_REGISTER, *PHV_MSI_DATA_REGISTER;
+
+typedef union _HV_MSI_ENTRY
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_MSI_ADDRESS_REGISTER Address;
+        HV_MSI_DATA_REGISTER Data;
+    };
+} HV_MSI_ENTRY, *PHV_MSI_ENTRY;
 
 typedef union _HV_IOAPIC_RTE
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT32 Vector : 8;
@@ -3825,7 +3868,7 @@ typedef union _HV_IOAPIC_RTE
         HV_UINT32 DestinationMode : 1;
         HV_UINT32 DeliveryStatus : 1;
         HV_UINT32 InterruptPolarity : 1;
-        HV_UINT32 RemoteIrr : 1;
+        HV_UINT32 RemoteIRR : 1;
         HV_UINT32 TriggerMode : 1;
         HV_UINT32 InterruptMask : 1;
         HV_UINT32 Reserved1 : 15;
@@ -3839,6 +3882,27 @@ typedef union _HV_IOAPIC_RTE
     };
 } HV_IOAPIC_RTE, *PHV_IOAPIC_RTE;
 
+typedef union _HV_GICD_ENTRY
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT32 Polarity : 1;
+        HV_UINT32 TriggerMode : 1;
+        HV_UINT32 Line : 10;
+        HV_UINT32 ProcessorTarget : 3;
+        HV_UINT32 Vector : 10;
+        HV_UINT32 Priority : 7;
+        HV_UINT32 UnitId : 24;
+        HV_UINT32 Flags : 8;
+    };
+    struct
+    {
+        HV_UINT32 LowUINT32;
+        HV_UINT32 HighUINT32;
+    };
+} HV_GICD_ENTRY, *PHV_GICD_ENTRY;
+
 typedef struct _HV_INTERRUPT_ENTRY
 {
     HV_INTERRUPT_SOURCE InterruptSource;
@@ -3847,6 +3911,8 @@ typedef struct _HV_INTERRUPT_ENTRY
     {
         HV_MSI_ENTRY MsiEntry;
         HV_IOAPIC_RTE IoApicRte;
+        HV_GICD_ENTRY GicdEntry;
+        HV_UINT64 Data;
     };
 } HV_INTERRUPT_ENTRY, *PHV_INTERRUPT_ENTRY;
 
@@ -4301,8 +4367,22 @@ typedef enum _HV_SCHEDULER_TYPE
 
 typedef enum _HV_SYSTEM_PROPERTY
 {
-    HvSetPerfCounterProperty = 1,
-    HvSystemPropertySchedulerType = 15
+    HvPerfCounterProperty = 1,
+    HvLegacyPowerPolicySettingProperty = 2,
+    HvSleepStateProperty = 3,
+    HvMachineCheckProperty = 4,
+    HvIommuInitStatusProperty = 5,
+    HvHpetConfigProperty = 6,
+    HvHpetInterruptProperty = 7,
+    HvHpetEnabledProperty = 8,
+    HvHypervisorLaunchStatsProperty = 9,
+    HvHypervisorDebugProperty = 10,
+    HvRootSvmCapabilitiesProperty = 11,
+    HvRootNumaCostPagesProperty = 12,
+    HvHostPageTableRootProperty = 13,
+    HvTscSyncStatusProperty = 14,
+    HvSchedulerTypeProperty = 15,
+    HvPlatformVirtualizationSupportProperty = 16,
 } HV_SYSTEM_PROPERTY, *PHV_SYSTEM_PROPERTY;
 
 typedef union _HV_GPA_PAGE_ACCESS_STATE_FLAGS
@@ -5002,6 +5082,153 @@ typedef union _HV_GPA_PAGE_ATTRIBUTES
     };
 } HV_GPA_PAGE_ATTRIBUTES, *PHV_GPA_PAGE_ATTRIBUTES;
 
+typedef enum _HV_NESTED_MSR_INTERCEPT_MODE
+{
+    HvNestedMsrInterceptModeSlow = 0x0,
+    HvNestedMsrInterceptModeFast = 0x1,
+    HvNestedMsrInterceptModeEnlightened = 0x2,
+    HvNestedMsrInterceptModeCount = 0x3,
+} HV_NESTED_MSR_INTERCEPT_MODE, *PHV_NESTED_MSR_INTERCEPT_MODE;
+
+typedef enum _HV_X64_PENDING_EVENT_TYPE
+{
+    HvX64PendingEventException = 0x0,
+    HvX64PendingEventMemoryIntercept = 0x1,
+    HvX64PendingEventNestedMemoryIntercept = 0x2,
+} HV_X64_PENDING_EVENT_TYPE, *PHV_X64_PENDING_EVENT_TYPE;
+
+typedef enum _HV_STORE_DATA_RESULT
+{
+    StoreDataSuccess = 0x0,
+    StoreDataNoWritesRequired = 0x1,
+    StoreDataFailure = 0x2,
+    StoreDataResultMaximum = 0x3,
+} HV_STORE_DATA_RESULT, *PHV_STORE_DATA_RESULT;
+
+typedef enum _HV_FILE_STATUS
+{
+    Shrunk = 0x0,
+    Grown = 0x1,
+    Unchanged = 0x2,
+} HV_FILE_STATUS, *PHV_FILE_STATUS;
+
+typedef enum _HV_BACKING_STORAGE_TYPE
+{
+    HvStorageLoader = 0x0,
+    HvStoragePool = 0x1,
+    HvStorageSystemCache = 0x2,
+} HV_BACKING_STORAGE_TYPE, *PHV_BACKING_STORAGE_TYPE;
+
+typedef enum _HV_LOG_SWAP_REASON
+{
+    HvLogSwapSpaceExhausted = 0x0,
+    HvLogSwapReconcile = 0x1,
+} HV_LOG_SWAP_REASON, *PHV_LOG_SWAP_REASON;
+
+typedef enum _HV_LOGICAL_PROCESSOR_PROPERTY_TYPE
+{
+    HvLogicalProcessorPerfStateConfig = 0x0,
+    HvLogicalProcessorThrottleStateConfig = 0x1,
+    HvLogicalProcessorPccConfig = 0x2,
+    HvLogicalProcessorPerfStateCap = 0x3,
+    HvLogicalProcessorMachineCheckContextInfo = 0x4,
+    HvLogicalProcessorMcUpdateUpdateStatus = 0x5,
+} HV_LOGICAL_PROCESSOR_PROPERTY_TYPE, *PHV_LOGICAL_PROCESSOR_PROPERTY_TYPE;
+
+typedef enum _HV_LOGICAL_PROCESSOR_REGISTER_TYPE
+{
+    HvX64LpRegisterTypeCpuid = 0x10000,
+    HvX64LpRegisterTypeMsr = 0x10001,
+    HvX64LpRegisterTypeWbinvd = 0x10002,
+} HV_LOGICAL_PROCESSOR_REGISTER_TYPE, *PHV_LOGICAL_PROCESSOR_REGISTER_TYPE;
+typedef const HV_LOGICAL_PROCESSOR_REGISTER_TYPE *PCHV_LOGICAL_PROCESSOR_REGISTER_TYPE;
+
+typedef enum _HV_POWER_PROPERTY_TYPE
+{
+    HvPowerPropertyLpIdleStateConfig = 0x0,
+    HvPowerPropertyLpPerfFeedbackCounters = 0x1,
+    HvPowerPropertyLpPercentageFrequency = 0x2,
+    HvPowerPropertyLpNextPlatformStateIndex = 0x3,
+    HvPowerPropertyStatsOffsets = 0x4,
+    HvPowerPropertyPolicySetting = 0x5,
+} HV_POWER_PROPERTY_TYPE, *PHV_POWER_PROPERTY_TYPE;
+
+typedef enum _HV_PARTITION_EVENT
+{
+    HvPartitionEventDebugDeviceAvailable = 0x1,
+    HvPartitionEventRootCrashdump = 0x2,
+    HvPartitionEventAcpiReenabled = 0x3,
+} HV_PARTITION_EVENT, *PHV_PARTITION_EVENT;
+
+typedef enum _HV_PPM_POWER_POLICY_SETTING_ID
+{
+    HvPowerPolicyIdleDisable = 0x0,
+    HvPowerPolicyIdleTimeCheck = 0x1,
+    HvPowerPolicyIdlePromoteThreshold = 0x2,
+    HvPowerPolicyIdleDemoteThreshold = 0x3,
+    HvPowerPolicyIdleStateMaximum = 0x4,
+    HvPowerPolicyThrottleMaximum = 0x5,
+    HvPowerPolicyThrottleMinimum = 0x6,
+    HvPowerPolicyPerfIncreaseThreshold = 0x7,
+    HvPowerPolicyPerfDecreaseThreshold = 0x8,
+    HvPowerPolicyPerfIncreasePolicy = 0x9,
+    HvPowerPolicyPerfDecreasePolicy = 0xA,
+    HvPowerPolicyCoreParkingIncreasePolicy = 0xB,
+    HvPowerPolicyCoreParkingDecreasePolicy = 0xC,
+    HvPowerPolicyCoreParkingMaxCores = 0xD,
+    HvPowerPolicyCoreParkingMinCores = 0xE,
+    HvPowerPolicyPerfTimeCheck = 0xF,
+    HvPowerPolicyPerfIncreaseTime = 0x10,
+    HvPowerPolicyPerfDecreaseTime = 0x11,
+    HvPowerPolicyPerfBoostPolicy = 0x12,
+    HvPowerPolicyPerfBoostMode = 0x13,
+    HvPowerPolicyMax = 0x14,
+} HV_PPM_POWER_POLICY_SETTING_ID, *PHV_PPM_POWER_POLICY_SETTING_ID;
+
+typedef enum _HV_BOOT_DEBUG_PORT_TYPE
+{
+    HvBootDbgPortNone = 0x0,
+    HvBootDbgPortCom = 0x1,
+    HvBootDbgPortFirewire = 0x2,
+    HvBootDbgPortNet = 0x3,
+} HV_BOOT_DEBUG_PORT_TYPE, *PHV_BOOT_DEBUG_PORT_TYPE;
+
+typedef enum _HV_CRASHDUMP_ACTION
+{
+    HvCrashdumpNone = 0x0,
+    HvCrashdumpSuspendAllVps = 0x1,
+    HvCrashdumpPrepareForStateSave = 0x2,
+    HvCrashdumpStateSaved = 0x3,
+} HV_CRASHDUMP_ACTION, *PHV_CRASHDUMP_ACTION;
+
+typedef enum _HV_PHYSICAL_DEVICE_PROPERTY
+{
+    HvPhysicalDevicePropertyCapabilities = 0x0,
+    HvPhysicalDevicePropertyEnabled = 0x1,
+} HV_PHYSICAL_DEVICE_PROPERTY, *PHV_PHYSICAL_DEVICE_PROPERTY;
+
+typedef enum _HV_X64_PPM_PERF_STATE_PORT_ACCESS_SIZE
+{
+    HvX64PerfStatePort8Bit = 0x0,
+    HvX64PerfStatePort16Bit = 0x1,
+    HvX64PerfStatePort32Bit = 0x2,
+} HV_X64_PPM_PERF_STATE_PORT_ACCESS_SIZE, *PHV_X64_PPM_PERF_STATE_PORT_ACCESS_SIZE;
+
+typedef enum _HV_MACHINE_CHECK_RECOVERY_FLAG
+{
+    InvalidRecoveryFlag = 0x0,
+    NewDeferredRecoveryQueued = 0x1,
+    DeferredRecoveryCompleted = 0x2,
+} HV_MACHINE_CHECK_RECOVERY_FLAG, *PHV_MACHINE_CHECK_RECOVERY_FLAG;
+
+typedef enum _HV_MACHINE_CHECK_SOURCE
+{
+    HV_MACHINE_CHECK_SOURCE_NONE = 0x0,
+    HV_MACHINE_CHECK_SOURCE_HV = 0x1,
+    HV_MACHINE_CHECK_SOURCE_ROOT_VP = 0x2,
+    HV_MACHINE_CHECK_SOURCE_NON_ROOT_VP = 0x3,
+} HV_MACHINE_CHECK_SOURCE, *PHV_MACHINE_CHECK_SOURCE;
+
 // *****************************************************************************
 // Hypervisor CPUID Definitions
 //
@@ -5043,15 +5270,15 @@ typedef struct _HV_VENDOR_AND_MAX_FUNCTION
 typedef enum _HV_HYPERVISOR_INTERFACE
 {
     HvMicrosoftHypervisorInterface = '1#vH',
-    HvMicrosoftXboxNanovisorInterface = 'vnbX'
+    HvMicrosoftXboxNanovisor = 'vnbX'
 } HV_HYPERVISOR_INTERFACE, *PHV_HYPERVISOR_INTERFACE;
 
 typedef struct _HV_HYPERVISOR_INTERFACE_INFO
 {
     HV_UINT32 Interface;
-    HV_UINT32 ReservedEbx;
-    HV_UINT32 ReservedEcx;
-    HV_UINT32 ReservedEdx;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+    HV_UINT32 Reserved3;
 } HV_HYPERVISOR_INTERFACE_INFO, *PHV_HYPERVISOR_INTERFACE_INFO;
 
 // Version info reported by both guest OS's and hypervisors

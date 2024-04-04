@@ -21,6 +21,8 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
     version 10.0.26063.0's Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14393.0's urlmon.dll
+  - Include Hyper-V related definitions from symbols in Windows version
+    10.0.14347.0's ntoskrnl.exe
 - Distributed under the MIT License
 
 ## Documents
