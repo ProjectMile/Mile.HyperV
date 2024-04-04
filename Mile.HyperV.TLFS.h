@@ -42,6 +42,7 @@
 #if (_MSC_VER >= 1200)
 #pragma warning(push)
 #endif
+#pragma warning(disable:4200) // zero length array
 #pragma warning(disable:4201) // nameless struct/union
 #endif
 
@@ -2048,7 +2049,7 @@ typedef HV_UINT32 HV_VP_INDEX;
 typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
 
 // Address space flush flags.
-typedef HV_UINT32 HV_FLUSH_FLAGS, *PHV_FLUSH_FLAGS;
+typedef HV_UINT64 HV_FLUSH_FLAGS, *PHV_FLUSH_FLAGS;
 
 #define HV_FLUSH_ALL_PROCESSORS (0x00000001)
 #define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES (0x00000002)
@@ -3152,6 +3153,14 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterImplementationLimitsInfo = 0x00000202,
     // 128-bit result same as CPUID 0x40000006
     HvRegisterHardwareFeaturesInfo = 0x00000203,
+    // 128-bit result same as CPUID 0x40000007
+    HvRegisterCpuManagementFeaturesInfo = 0x00000204,
+    // 128-bit result same as CPUID 0x40000008
+    HvRegisterSvmFeaturesInfo = 0x00000205,
+    // 128-bit result same as CPUID 0x40000009
+    HvRegisterSkipLevelFeaturesInfo = 0x00000206,
+    // 128-bit result same as CPUID 0x4000000A
+    HvRegisterNestedVirtFeaturesInfo = 0x00000207,
 
     // Guest Crash Registers
 
@@ -3170,6 +3179,10 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterPowerStateTriggerC2 = 0x00000223,
     HvRegisterPowerStateConfigC3 = 0x00000224,
     HvRegisterPowerStateTriggerC3 = 0x00000225,
+
+    // System Reset
+
+    HvRegisterSystemReset = 0x00000230,
 
     // Frequency Registers
 
@@ -3512,6 +3525,10 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterStatsVpRetail = 0x00090022,
     HvRegisterStatsVpInternal = 0x00090023,
 
+    // Nested Hypervisor-defined MSRs (Misc)
+
+    HvRegisterNestedVpIndex = 0x00091003,
+
     // Partition Timer Assist Registers
 
     HvX64RegisterEmulatedTimerPeriod = 0x00090030,
@@ -3542,6 +3559,31 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterSipp = 0x000A0013,
     HvRegisterEom = 0x000A0014,
     HvRegisterSirbp = 0x000A0015,
+
+    // Nested Hypervisor-defined MSRs (Synic)
+
+    HvRegisterNestedSint0 = 0x000A1000,
+    HvRegisterNestedSint1 = 0x000A1001,
+    HvRegisterNestedSint2 = 0x000A1002,
+    HvRegisterNestedSint3 = 0x000A1003,
+    HvRegisterNestedSint4 = 0x000A1004,
+    HvRegisterNestedSint5 = 0x000A1005,
+    HvRegisterNestedSint6 = 0x000A1006,
+    HvRegisterNestedSint7 = 0x000A1007,
+    HvRegisterNestedSint8 = 0x000A1008,
+    HvRegisterNestedSint9 = 0x000A1009,
+    HvRegisterNestedSint10 = 0x000A100A,
+    HvRegisterNestedSint11 = 0x000A100B,
+    HvRegisterNestedSint12 = 0x000A100C,
+    HvRegisterNestedSint13 = 0x000A100D,
+    HvRegisterNestedSint14 = 0x000A100E,
+    HvRegisterNestedSint15 = 0x000A100F,
+    HvRegisterNestedScontrol = 0x000A1010,
+    HvRegisterNestedSversion = 0x000A1011,
+    HvRegisterNestedSifp = 0x000A1012,
+    HvRegisterNestedSipp = 0x000A1013,
+    HvRegisterNestedEom = 0x000A1014,
+    HvRegisterNestedSirbp = 0x000A1015,
 
     // Hypervisor-defined MSRs (Synthetic Timers)
 
@@ -3596,6 +3638,7 @@ typedef enum _HV_REGISTER_NAME
 
     // Synthetic VSM registers
 
+    HvRegisterVsmVpVtlControl = 0x000D0000,
     HvRegisterVsmCodePageOffsets = 0x000D0002,
     HvRegisterVsmVpStatus = 0x000D0003,
     HvRegisterVsmPartitionStatus = 0x000D0004,
@@ -3718,15 +3761,16 @@ typedef const HV_PARTITION_ID* PCHV_PARTITION_ID;
 typedef enum _HV_GENERIC_SET_FORMAT
 {
     HvGenericSetSparse4k,
-    HvGenericSetAll
+    HvGenericSetAll,
+    HvGenericSetInvalid
 } HV_GENERIC_SET_FORMAT, *PHV_GENERIC_SET_FORMAT;
 
-typedef struct _HV_VP_SET
+typedef struct _HV_GENERIC_SET
 {
     HV_UINT64 Format;
     HV_UINT64 ValidBanksMask;
-    HV_UINT64 BankContents[ANYSIZE_ARRAY];
-} HV_VP_SET, *PHV_VP_SET;
+    HV_UINT64 BankContents[];
+} HV_GENERIC_SET, *PHV_GENERIC_SET, HV_VP_SET, *PHV_VP_SET;
 
 typedef HV_UINT32 HV_APIC_ID;
 typedef HV_APIC_ID* PHV_APIC_ID;
@@ -3965,7 +4009,6 @@ typedef union _HV_REGISTER_CR_INTERCEPT_CONTROL
 typedef union _HV_INPUT_VTL
 {
     HV_UINT8 AsUINT8;
-
     struct
     {
         HV_UINT8 TargetVtl : 4;
@@ -4741,7 +4784,7 @@ typedef struct _HV_X64_REGISTER_INTERCEPT_MESSAGE
     };
     HV_UINT8 Reserved1[3];
     HV_UINT32 RegisterName;
-    HV_X64_REGISTER_ACCESS_INFO access_info;
+    HV_X64_REGISTER_ACCESS_INFO AccessInfo;
 } HV_X64_REGISTER_INTERCEPT_MESSAGE, *PHV_X64_REGISTER_INTERCEPT_MESSAGE;
 
 typedef struct _HV_X64_HALT_MESSAGE
@@ -4930,6 +4973,34 @@ static_assert(sizeof(HV_VP_SIGNAL_PAIR_SCHEDULER_MESSAGE) ==
 #define HV_DISPATCH_VP_FLAG_SKIP_VP_SPEC_FLUSH 0x8
 #define HV_DISPATCH_VP_FLAG_SKIP_CALLER_SPEC_FLUSH 0x10
 #define HV_DISPATCH_VP_FLAG_SKIP_CALLER_USER_SPEC_FLUSH 0x20
+
+// *****************************************************************************
+// Extra Hyper-V definitions from Windows symbols
+//
+
+typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
+{
+    HV_ADDRESS_SPACE_ID AddressSpace;
+    HV_FLUSH_FLAGS Flags;
+    HV_UINT64 ProcessorMask;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
+
+typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX
+{
+    HV_ADDRESS_SPACE_ID AddressSpace;
+    HV_FLUSH_FLAGS Flags;
+    HV_GENERIC_SET ProcessorSet;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX;
+
+typedef union _HV_GPA_PAGE_ATTRIBUTES
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 Protectable : 1;
+        HV_UINT64 Reserved : 63;
+    };
+} HV_GPA_PAGE_ATTRIBUTES, *PHV_GPA_PAGE_ATTRIBUTES;
 
 // *****************************************************************************
 // Hypervisor CPUID Definitions
@@ -6139,21 +6210,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE
 {
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_UINT32 Padding;
-    HV_UINT64 ProcessorMask;
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE;
 
 // HvCallFlushVirtualAddressList | 0x0003
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST
 {
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_UINT32 Padding;
-    HV_UINT64 ProcessorMask;
-    HV_GVA GvaRangeList[ANYSIZE_ARRAY];
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
+    HV_GVA GvaList[];
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
 
 // HvCallGetLogicalProcessorRunTime | 0x0004
@@ -6203,7 +6268,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI
 {
     HV_UINT32 Vector;
     HV_INPUT_VTL TargetVtl;
-    HV_UINT8 Padding[3];
+    HV_UINT8 RsvdZ0;
+    HV_UINT16 RsvdZ1;
     HV_UINT64 ProcessorMask;
 } HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI;
 
@@ -6214,8 +6280,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_VTL_PROTECTION_MASK
     HV_PARTITION_ID TargetPartitionId;
     HV_MAP_GPA_FLAGS MapFlags;
     HV_INPUT_VTL TargetVtl;
-    HV_UINT8 ReservedZ[3];
-    HV_GPA_PAGE_NUMBER GpaPageList[ANYSIZE_ARRAY];
+    HV_UINT8 RsvdZ8;
+    HV_UINT16 RsvdZ16;
+    HV_GPA_PAGE_NUMBER GpaPageList[];
 } HV_INPUT_MODIFY_VTL_PROTECTION_MASK, *PHV_INPUT_MODIFY_VTL_PROTECTION_MASK;
 
 // HvCallEnablePartitionVtl | 0x000D
@@ -6235,7 +6302,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PARTITION_VTL
     HV_PARTITION_ID TargetPartitionId;
     HV_VTL TargetVtl;
     HV_ENABLE_PARTITION_VTL_FLAGS Flags;
-    HV_UINT8 ReservedZ[6];
+    HV_UINT16 ReservedZ0;
+    HV_UINT32 ReservedZ1;
 } HV_INPUT_ENABLE_PARTITION_VTL, *PHV_INPUT_ENABLE_PARTITION_VTL;
 
 // HvCallDisablePartitionVtl | 0x000E
@@ -6247,7 +6315,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
     HV_PARTITION_ID TargetPartitionId;
     HV_VP_INDEX VpIndex;
     HV_VTL TargetVtl;
-    HV_UINT8 ReservedZ[3];
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
     HV_INITIAL_VP_CONTEXT VpVtlContext;
 } HV_INPUT_ENABLE_VP_VTL, *PHV_INPUT_ENABLE_VP_VTL;
 
@@ -6265,21 +6334,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX
 {
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_UINT32 Padding;
-    HV_VP_SET ProcessorSet;
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
 
 // HvCallFlushVirtualAddressListEx | 0x0014
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX
 {
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_UINT32 Padding;
-    HV_VP_SET ProcessorSet;
-    HV_GVA GvaRangeList[ANYSIZE_ARRAY];
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
+    HV_GVA GvaList[];
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
 
 // HvCallSendSyntheticClusterIpiEx | 0x0015
@@ -6288,8 +6351,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX
 {
     HV_UINT32 Vector;
     HV_INPUT_VTL TargetVtl;
-    HV_UINT8 Padding[3];
-    HV_VP_SET ProcessorSet;
+    HV_UINT8 RsvdZ0;
+    HV_UINT16 RsvdZ1;
+    HV_GENERIC_SET ProcessorSet;
 } HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX;
 
 // HvCallQueryImageInfo | 0x0016
@@ -6531,8 +6595,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_REGISTERS
     HV_PARTITION_ID PartitionId;
     HV_VP_INDEX VpIndex;
     HV_INPUT_VTL InputVtl;
-    HV_UINT8 Padding[3];
-    HV_REGISTER_NAME Names[ANYSIZE_ARRAY];
+    HV_UINT8 RsvdZ8;
+    HV_UINT16 RsvdZ16;
+    HV_REGISTER_NAME Names[];
 } HV_INPUT_GET_VP_REGISTERS, *PHV_INPUT_GET_VP_REGISTERS;
 
 typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_OUTPUT_GET_VP_REGISTERS
@@ -6545,7 +6610,7 @@ typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_OUTPUT_GET_VP_REGISTERS
 typedef struct _HV_REGISTER_ASSOC
 {
     HV_REGISTER_NAME Name;
-    HV_UINT8 Padding[12];
+    HV_UINT8 Pad[12];
     HV_REGISTER_VALUE Value;
 } HV_REGISTER_ASSOC, *PHV_REGISTER_ASSOC;
 
@@ -6554,8 +6619,9 @@ typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_INPUT_SET_VP_REGISTERS
     HV_PARTITION_ID PartitionId;
     HV_VP_INDEX VpIndex;
     HV_INPUT_VTL InputVtl;
-    HV_UINT8 Padding[3];
-    HV_REGISTER_ASSOC Elements[ANYSIZE_ARRAY];
+    HV_UINT8 RsvdZ8;
+    HV_UINT16 RsvdZ16;
+    HV_REGISTER_ASSOC Elements[];
 } HV_INPUT_SET_VP_REGISTERS, *PHV_INPUT_SET_VP_REGISTERS;
 
 // HvCallTranslateVirtualAddress | 0x0052
@@ -6886,7 +6952,6 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_RETRIEVE_DEBUG_DATA
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RESET_DEBUG_SESSION
 {
     HV_DEBUG_OPTIONS Options;
-    HV_UINT32 Padding;
 } HV_INPUT_RESET_DEBUG_SESSION, *PHV_INPUT_RESET_DEBUG_SESSION;
 
 // HvCallMapStatsPage | 0x006C
@@ -7161,7 +7226,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID
 // HvCallSetPhysicalDeviceProperty | 0x00AB
 // HvCallTranslateVirtualAddressEx | 0x00AC
 // HvCallCheckForIoIntercept | 0x00AD
+
 // HvCallSetGpaPageAttributes | 0x00AE
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_GPA_PAGE_ATTRIBUTES
+{
+    HV_PARTITION_ID PartitionId;
+    HV_GPA_PAGE_ATTRIBUTES Attributes;
+    HV_UINT64 GpaPageList[];
+} HV_INPUT_SET_GPA_PAGE_ATTRIBUTES, *PHV_INPUT_SET_GPA_PAGE_ATTRIBUTES;
 
 // HvCallFlushGuestPhysicalAddressSpace | 0x00AF
 
@@ -7422,6 +7495,7 @@ typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_CPUID_VALUES
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
 #else
+#pragma warning(default:4200) // zero length array
 #pragma warning(default:4201) // nameless struct/union
 #endif
 #endif
