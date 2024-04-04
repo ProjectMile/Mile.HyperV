@@ -3080,7 +3080,7 @@ typedef enum _HV_GUEST_OS_OPENSOURCE_IDS
 
 typedef HV_UINT64 HV_PARTITION_PROPERTY, *PHV_PARTITION_PROPERTY;
 
-typedef enum
+typedef enum _HV_PARTITION_PROPERTY_CODE
 {
     // Privilege properties
 
@@ -5228,6 +5228,121 @@ typedef enum _HV_MACHINE_CHECK_SOURCE
     HV_MACHINE_CHECK_SOURCE_ROOT_VP = 0x2,
     HV_MACHINE_CHECK_SOURCE_NON_ROOT_VP = 0x3,
 } HV_MACHINE_CHECK_SOURCE, *PHV_MACHINE_CHECK_SOURCE;
+
+typedef enum _HV_DEVICE_TYPE
+{
+    HV_DEVICE_TYPE_PCI = 0x1,
+    HV_DEVICE_TYPE_IOAPIC = 0x2,
+} HV_DEVICE_TYPE, *PHV_DEVICE_TYPE;
+
+typedef enum _HV_COVERAGE_OPERATION
+{
+    HvCoverageFetchInfo = 0x0,
+    HvCoverageFetchCovHeader = 0x1,
+    HvCoverageFetchCovSection = 0x2,
+    HvCoverageResetCovVector = 0x3,
+} HV_COVERAGE_OPERATION, *PHV_COVERAGE_OPERATION;
+
+typedef enum _HV_X64_PPM_IDLE_STATE_CHANGE_METHOD
+{
+    HvX64PowerChangeIssueHlt = 0x0,
+    HvX64PowerChangeReadIoThenIssueHlt = 0x1,
+    HvX64PowerChangeReadIo = 0x2,
+    HvX64PowerChangeIssueMwait = 0x3,
+} HV_X64_PPM_IDLE_STATE_CHANGE_METHOD, *PHV_X64_PPM_IDLE_STATE_CHANGE_METHOD;
+
+typedef enum _HV_BOOT_DEBUG_COM_PORT_TYPE
+{
+    HvBootDbgPortComIoPort = 0x0,
+    HvBootDbgPortComMemoryMapped = 0x1,
+} HV_BOOT_DEBUG_COM_PORT_TYPE, *PHV_BOOT_DEBUG_COM_PORT_TYPE;
+
+typedef enum _HV_INTERRUPT_TRIGGER_MODE
+{
+    HvInterruptTriggerModeEdge = 0x0,
+    HvInterruptTriggerModeLevel = 0x1,
+} HV_INTERRUPT_TRIGGER_MODE, *PHV_INTERRUPT_TRIGGER_MODE;
+
+typedef enum _HV_SLEEP_STATE
+{
+    HvSleepStateS1 = 0x1,
+    HvSleepStateS2 = 0x2,
+    HvSleepStateS3 = 0x3,
+    HvSleepStateS4 = 0x4,
+    HvSleepStateS5 = 0x5,
+    HvSleepStateLock = 0x6,
+} HV_SLEEP_STATE, *PHV_SLEEP_STATE;
+
+typedef enum _HV_DEVICE_PRQ_PROPERTY
+{
+    HvDevicePrqPropertyStalled = 0x0,
+    HvDevicePrqPropertyInterruptMasked = 0x1,
+} HV_DEVICE_PRQ_PROPERTY, *PHV_DEVICE_PRQ_PROPERTY;
+
+typedef enum _HV_MACHINE_CHECK_PROPERTY_TYPE
+{
+    MachineCheckHandlerState = 0x1,
+    MachineCheckDeferredRecoveryState = 0x2,
+} HV_MACHINE_CHECK_PROPERTY_TYPE, *PHV_MACHINE_CHECK_PROPERTY_TYPE;
+
+typedef enum _HV_X64_PPM_PERF_STATE_REGISTER_TYPE
+{
+    HvX64PerfStateRegisterNone = 0x0,
+    HvX64PerfStateRegisterMsr = 0x1,
+    HvX64PerfStateRegisterIo = 0x2,
+    HvX64PerfStateRegisterMemory = 0x3,
+} HV_X64_PPM_PERF_STATE_REGISTER_TYPE, *PHV_X64_PPM_PERF_STATE_REGISTER_TYPE;
+
+typedef enum _HV_X64_PPM_PERF_DOMAIN_COORDINATION
+{
+    HvX64PerfDomainCoordinationSwAll = 0x0,
+    HvX64PerfDomainCoordinationSwAny = 0x1,
+    HvX64PerfDomainCoordinationHwAll = 0x2,
+} HV_X64_PPM_PERF_DOMAIN_COORDINATION, *PHV_X64_PPM_PERF_DOMAIN_COORDINATION;
+
+typedef enum _HV_ERROR_TYPES
+{
+    HV_MISCELLANEOUS_ERROR = 0x0,
+    HV_PERFORMANCE_COUNTER_DECREASED = 0x1,
+    HV_PERFORMANCE_COUNTER_SKIPPED = 0x2,
+    HV_FREED_TOO_MANY_COMMON_BUFFERS = 0x3,
+    HV_FREED_TOO_MANY_ADAPTER_CHANNELS = 0x4,
+    HV_FREED_TOO_MANY_MAP_REGISTERS = 0x5,
+    HV_FREED_TOO_MANY_SCATTER_GATHER_LISTS = 0x6,
+    HV_LEFTOVER_COMMON_BUFFERS = 0x7,
+    HV_LEFTOVER_ADAPTER_CHANNELS = 0x8,
+    HV_LEFTOVER_MAP_REGISTERS = 0x9,
+    HV_LEFTOVER_SCATTER_GATHER_LISTS = 0xA,
+    HV_TOO_MANY_ADAPTER_CHANNELS = 0xB,
+    HV_TOO_MANY_MAP_REGISTERS = 0xC,
+    HV_DID_NOT_FLUSH_ADAPTER_BUFFERS = 0xD,
+    HV_DMA_BUFFER_NOT_LOCKED = 0xE,
+    HV_BOUNDARY_OVERRUN = 0xF,
+    HV_CANNOT_FREE_MAP_REGISTERS = 0x10,
+    HV_DID_NOT_PUT_ADAPTER = 0x11,
+    HV_MDL_FLAGS_NOT_SET = 0x12,
+    HV_BAD_IRQL = 0x13,
+    HV_BAD_IRQL_JUST_WARN = 0x14,
+    HV_OUT_OF_MAP_REGISTERS = 0x15,
+    HV_FLUSH_EMPTY_BUFFERS = 0x16,
+    HV_MISMATCHED_MAP_FLUSH = 0x17,
+    HV_ADAPTER_ALREADY_RELEASED = 0x18,
+    HV_NULL_DMA_ADAPTER = 0x19,
+    HV_MAP_FLUSH_NO_TRANSFER = 0x1A,
+    HV_ADDRESS_NOT_IN_MDL = 0x1B,
+    HV_DATA_LOSS = 0x1C,
+    HV_DOUBLE_MAP_REGISTER = 0x1D,
+    HV_OBSOLETE_API = 0x1E,
+    HV_BAD_MDL = 0x1F,
+    HV_FLUSH_NOT_MAPPED = 0x20,
+    HV_MAP_ZERO_LENGTH_BUFFER = 0x21,
+    HV_BUFFER_NOT_MAPPED_IN_SYSTEM_VA = 0x22,
+    HV_INCOMPLETE_FLUSH = 0x23,
+    HV_INSUFFICIENT_BUFFER = 0x24,
+    HV_UNKNOWN_DEVICE_DESCRIPTION_VERSION = 0x25,
+    HV_MAX_ERROR_TYPES = 0x26,
+    HV_ERROR_HAS_SUBCODE = 0x10000000,
+} HV_ERROR_TYPES, *PHV_ERROR_TYPES;
 
 // *****************************************************************************
 // Hypervisor CPUID Definitions
