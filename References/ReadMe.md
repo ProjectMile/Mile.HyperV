@@ -67,6 +67,8 @@ HV_CPUID_FUNCTION.
   - [Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib](Symbols/26063/kdhv.lib)
 - Build 14393
   - [urlmon.dll](Symbols/14393/urlmon.dll), [urlmon.pdb](Symbols/14393/urlmon.pdb)
+- Build 14347
+  - [ntoskrnl.exe](Symbols/14347/ntoskrnl.exe), [ntkrpamp.pdb](Symbols/14347/ntkrpamp.pdb)
 
 ## FreeBSD
 
