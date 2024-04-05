@@ -8256,111 +8256,6 @@ union _HV_UINT128
   unsigned int Dword[4];
 };
 
-/* 2782 */
-struct $336ADB633B825FF5FBBC51C9C5A00F17
-{
-  unsigned __int64 Mantissa;
-  unsigned __int64 BiasedExponent : 15;
-  unsigned __int64 Sign : 1;
-  unsigned __int64 Reserved : 48;
-};
-
-/* 2783 */
-union _HV_X64_FP_REGISTER
-{
-  _HV_UINT128 AsUINT128;
-  $336ADB633B825FF5FBBC51C9C5A00F17 __s1;
-};
-
-/* 2784 */
-struct $84B3231EFFF5200577DF27523E6D5A78
-{
-  unsigned __int16 FpControl;
-  unsigned __int16 FpStatus;
-  unsigned __int8 FpTag;
-  unsigned __int8 IgnNe : 1;
-  unsigned __int8 Reserved : 7;
-  unsigned __int16 LastFpOp;
-  unsigned __int64 LastFpRip;
-};
-
-/* 2785 */
-struct __unaligned __declspec(align(2)) $02100ACD733A6B63292924D13E757A74
-{
-  _BYTE gap0[8];
-  unsigned int LastFpEip;
-  unsigned __int16 LastFpCs;
-};
-
-/* 2786 */
-union _HV_X64_FP_CONTROL_STATUS_REGISTER
-{
-  _HV_UINT128 AsUINT128;
-  $84B3231EFFF5200577DF27523E6D5A78 __s1;
-  $02100ACD733A6B63292924D13E757A74 __s2;
-};
-
-/* 2787 */
-struct $AB62A68A7EFEA7353ADEF6FD4F30B18D
-{
-  unsigned __int64 LastFpRdp;
-  unsigned int XmmStatusControl;
-  unsigned int XmmStatusControlMask;
-};
-
-/* 2788 */
-struct __unaligned __declspec(align(2)) $041F4BE252ED0D3C9E0AB682D47D2FB4
-{
-  unsigned int LastFpDp;
-  unsigned __int16 LastFpDs;
-};
-
-/* 2789 */
-union _HV_X64_XMM_CONTROL_STATUS_REGISTER
-{
-  _HV_UINT128 AsUINT128;
-  $AB62A68A7EFEA7353ADEF6FD4F30B18D __s1;
-  $041F4BE252ED0D3C9E0AB682D47D2FB4 __s2;
-};
-
-/* 2790 */
-struct $7B97D251A4824B7AB0CCB8762E8D282F
-{
-  unsigned __int16 SegmentType : 4;
-  unsigned __int16 NonSystemSegment : 1;
-  unsigned __int16 DescriptorPrivilegeLevel : 2;
-  unsigned __int16 Present : 1;
-  unsigned __int16 Reserved : 4;
-  unsigned __int16 Available : 1;
-  unsigned __int16 Long : 1;
-  unsigned __int16 Default : 1;
-  unsigned __int16 Granularity : 1;
-};
-
-/* 2791 */
-union $C4E3598890685A55FC58DADFD01909BE
-{
-  $7B97D251A4824B7AB0CCB8762E8D282F __s0;
-  unsigned __int16 Attributes;
-};
-
-/* 2792 */
-struct _HV_X64_SEGMENT_REGISTER
-{
-  unsigned __int64 Base;
-  unsigned int Limit;
-  unsigned __int16 Selector;
-  $C4E3598890685A55FC58DADFD01909BE ___u3;
-};
-
-/* 2793 */
-struct _HV_X64_TABLE_REGISTER
-{
-  unsigned __int16 Pad[3];
-  unsigned __int16 Limit;
-  unsigned __int64 Base;
-};
-
 /* 2794 */
 struct $3896566DFD6713B540D422B785C5E7E5
 {
@@ -8642,29 +8537,6 @@ union _HV_TSC_EMULATION_CONTROL
 {
   unsigned __int64 AsUINT64;
   $0266DD6D772D72DB8EC6FA01D2585088 __s1;
-};
-
-/* 3375 */
-struct _HV_INITIAL_VP_CONTEXT
-{
-  unsigned __int64 Rip;
-  unsigned __int64 Rsp;
-  unsigned __int64 Rflags;
-  _HV_X64_SEGMENT_REGISTER Cs;
-  _HV_X64_SEGMENT_REGISTER Ds;
-  _HV_X64_SEGMENT_REGISTER Es;
-  _HV_X64_SEGMENT_REGISTER Fs;
-  _HV_X64_SEGMENT_REGISTER Gs;
-  _HV_X64_SEGMENT_REGISTER Ss;
-  _HV_X64_SEGMENT_REGISTER Tr;
-  _HV_X64_SEGMENT_REGISTER Ldtr;
-  _HV_X64_TABLE_REGISTER Idtr;
-  _HV_X64_TABLE_REGISTER Gdtr;
-  unsigned __int64 Efer;
-  unsigned __int64 Cr0;
-  unsigned __int64 Cr3;
-  unsigned __int64 Cr4;
-  unsigned __int64 MsrCrPat;
 };
 
 /* 3441 */
@@ -9037,65 +8909,6 @@ union _HV_REGISTER_VSM_VP_VTL_CONTROL
   $92560E5375D4F6A085E11034DE5E6882 __s1;
 };
 
-/* 3775 */
-union $EBF4594745B8530952A8E75B867F4416
-{
-  unsigned __int64 ProcessorMask;
-  unsigned __int64 ProcessorSet[];
-};
-
-/* 3776 */
-struct _HV_DEVICE_INTERRUPT_TARGET
-{
-  unsigned int Vector;
-  unsigned int Flags;
-  $EBF4594745B8530952A8E75B867F4416 ___u2;
-};
-
-/* 3777 */
-struct _HV_INPUT_RETARGET_DEVICE_INTERRUPT
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 DeviceId;
-  _HV_INTERRUPT_ENTRY InterruptEntry;
-  unsigned __int64 Reserved;
-  _HV_DEVICE_INTERRUPT_TARGET InterruptTarget;
-};
-
-/* 3782 */
-union _HV_X64_FP_MMX_REGISTER
-{
-  _HV_UINT128 AsUINT128;
-  _HV_X64_FP_REGISTER Fp;
-  unsigned __int64 Mmx;
-};
-
-/* 3783 */
-struct $7493D26DC7779B3A5344C65EFD485B96
-{
-  _HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
-  _HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
-  _HV_X64_FP_MMX_REGISTER FpMmx[8];
-  _HV_UINT128 Xmm[16];
-};
-
-/* 3784 */
-union _HV_X64_FX_REGISTERS
-{
-  $7493D26DC7779B3A5344C65EFD485B96 __s0;
-  unsigned __int8 FxSaveArea[512];
-};
-
-/* 3829 */
-struct _HV_INPUT_DISABLE_PARTITION_VTL
-{
-  unsigned __int64 PartitionId;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 ReservedZ0;
-  unsigned __int16 ReservedZ1;
-  unsigned int ReservedZ2;
-};
-
 /* 3905 */
 struct $B70A472D9CC7CC52192E08F5AB511E1F
 {
@@ -9131,16 +8944,6 @@ struct _HV_X64_XSAVE_HEADER
   unsigned __int64 Reserved5;
   unsigned __int64 Reserved6;
   unsigned __int64 Reserved7;
-};
-
-/* 3921 */
-struct _HV_INPUT_DISABLE_VP_VTL
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 ReservedZ0;
-  unsigned __int16 ReservedZ1;
 };
 
 /* 4010 */
@@ -9325,220 +9128,6 @@ struct _HVL_SECONDARY_DUMP_HV_IDENTITY
   unsigned int HvlEnlightenments;
 };
 
-/* 4281 */
-struct $264558B4D569060315F1D4F9F12F8439
-{
-  _HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
-  _HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
-  _HV_X64_FP_MMX_REGISTER FpMmx[8];
-  _HV_UINT128 Xmm[16];
-  _HV_UINT128 Reserved[6];
-  _HV_X64_XSAVE_HEADER Header;
-  _HV_UINT128 YmmHigh[16];
-};
-
-/* 4282 */
-struct $AAA1DFC5DE7E4B1DF9A8425980A7C55A
-{
-  _BYTE gap0[160];
-  _HV_UINT128 YmmLow[16];
-};
-
-/* 4283 */
-union _HV_X64_X_REGISTERS
-{
-  $264558B4D569060315F1D4F9F12F8439 __s0;
-  unsigned __int8 XSaveArea[2688];
-  $AAA1DFC5DE7E4B1DF9A8425980A7C55A __s2;
-};
-
-/* 4284 */
-union $D139CE19128AB0D84C35ACEB3AD68723
-{
-  _HV_X64_FX_REGISTERS FxRegisters;
-  _HV_X64_X_REGISTERS XRegisters;
-};
-
-/* 4285 */
-struct _HV_X64_CONTEXT
-{
-  unsigned __int64 InitialApicId;
-  unsigned __int64 Rax;
-  unsigned __int64 Rbx;
-  unsigned __int64 Rcx;
-  unsigned __int64 Rdx;
-  unsigned __int64 Rsi;
-  unsigned __int64 Rdi;
-  unsigned __int64 Rbp;
-  unsigned __int64 Rsp;
-  unsigned __int64 R8;
-  unsigned __int64 R9;
-  unsigned __int64 R10;
-  unsigned __int64 R11;
-  unsigned __int64 R12;
-  unsigned __int64 R13;
-  unsigned __int64 R14;
-  unsigned __int64 R15;
-  unsigned __int64 Rip;
-  unsigned __int64 Rflags;
-  unsigned __int64 Cr0;
-  unsigned __int64 Cr2;
-  unsigned __int64 Cr3;
-  unsigned __int64 Cr4;
-  unsigned __int64 Cr8;
-  unsigned __int64 Efer;
-  unsigned __int64 Xfem;
-  unsigned __int64 Dr0;
-  unsigned __int64 Dr1;
-  unsigned __int64 Dr2;
-  unsigned __int64 Dr3;
-  unsigned __int64 Dr6;
-  unsigned __int64 Dr7;
-  _HV_X64_TABLE_REGISTER Idtr;
-  _HV_X64_TABLE_REGISTER Gdtr;
-  _HV_X64_SEGMENT_REGISTER Cs;
-  _HV_X64_SEGMENT_REGISTER Ds;
-  _HV_X64_SEGMENT_REGISTER Es;
-  _HV_X64_SEGMENT_REGISTER Fs;
-  _HV_X64_SEGMENT_REGISTER Gs;
-  _HV_X64_SEGMENT_REGISTER Ss;
-  _HV_X64_SEGMENT_REGISTER Tr;
-  _HV_X64_SEGMENT_REGISTER Ldtr;
-  unsigned __int64 KernelGsBase;
-  unsigned __int64 Star;
-  unsigned __int64 Lstar;
-  unsigned __int64 Cstar;
-  unsigned __int64 Sfmask;
-  unsigned __int64 SysenterCs;
-  unsigned __int64 SysenterEip;
-  unsigned __int64 SysenterEsp;
-  unsigned __int64 MsrCrPat;
-  unsigned int LocalApicId;
-  unsigned int LocalApicVersion;
-  unsigned int LocalApicLdr;
-  unsigned int LocalApicDfr;
-  unsigned int LocalApicSpurious;
-  unsigned int LocalApicIcrLow;
-  unsigned int LocalApicIcrHigh;
-  unsigned int LocalApicIsr[8];
-  unsigned int LocalApicTmr[8];
-  unsigned int LocalApicLvtTimer;
-  unsigned int LocalApicLvtPerfmon;
-  unsigned int LocalApicLvtLint0;
-  unsigned int LocalApicLvtLint1;
-  unsigned int LocalApicCurrentCount;
-  unsigned int LocalApicInitialCount;
-  unsigned int LocalApicDivider;
-  unsigned __int64 LocalApicBaseMsr;
-  __declspec(align(32)) $D139CE19128AB0D84C35ACEB3AD68723 ___u68;
-};
-
-/* 4286 */
-struct _HV_ARM64_CONTEXT
-{
-  unsigned __int64 X0;
-  unsigned __int64 X1;
-  unsigned __int64 X2;
-  unsigned __int64 X3;
-  unsigned __int64 X4;
-  unsigned __int64 X5;
-  unsigned __int64 X6;
-  unsigned __int64 X7;
-  unsigned __int64 X8;
-  unsigned __int64 X9;
-  unsigned __int64 X10;
-  unsigned __int64 X11;
-  unsigned __int64 X12;
-  unsigned __int64 X13;
-  unsigned __int64 X14;
-  unsigned __int64 X15;
-  _HV_UINT128 Q0;
-  _HV_UINT128 Q1;
-  _HV_UINT128 Q2;
-  _HV_UINT128 Q3;
-  _HV_UINT128 Q4;
-  _HV_UINT128 Q5;
-  _HV_UINT128 Q6;
-  _HV_UINT128 Q7;
-  _HV_UINT128 Q16;
-  _HV_UINT128 Q17;
-  _HV_UINT128 Q18;
-  _HV_UINT128 Q19;
-  _HV_UINT128 Q20;
-  _HV_UINT128 Q21;
-  _HV_UINT128 Q22;
-  _HV_UINT128 Q23;
-  _HV_UINT128 Q24;
-  _HV_UINT128 Q25;
-  _HV_UINT128 Q26;
-  _HV_UINT128 Q27;
-  _HV_UINT128 Q28;
-  _HV_UINT128 Q29;
-  _HV_UINT128 Q30;
-  _HV_UINT128 Q31;
-  unsigned __int64 X16;
-  unsigned __int64 X17;
-  unsigned __int64 X18;
-  unsigned __int64 X19;
-  unsigned __int64 X20;
-  unsigned __int64 X21;
-  unsigned __int64 X22;
-  unsigned __int64 X23;
-  unsigned __int64 X24;
-  unsigned __int64 X25;
-  unsigned __int64 X26;
-  unsigned __int64 X27;
-  unsigned __int64 X28;
-  unsigned __int64 XFp;
-  unsigned __int64 XLr;
-  __declspec(align(16)) _HV_UINT128 Q8;
-  _HV_UINT128 Q9;
-  _HV_UINT128 Q10;
-  _HV_UINT128 Q11;
-  _HV_UINT128 Q12;
-  _HV_UINT128 Q13;
-  _HV_UINT128 Q14;
-  _HV_UINT128 Q15;
-  unsigned int Cpsr;
-  unsigned __int64 Sp;
-  unsigned __int64 Pc;
-  unsigned __int64 SCTLR_EL1;
-  unsigned __int64 ACTLR_EL1;
-  unsigned __int64 CPACR_EL1;
-  unsigned __int64 TPIDRRO_EL0;
-  unsigned __int64 TPIDR_EL0;
-  unsigned __int64 TTBR0_EL1;
-  unsigned __int64 TTBR1_EL1;
-  unsigned __int64 TCR_EL1;
-  unsigned __int64 ESR_EL1;
-  unsigned __int64 FAR_EL1;
-  unsigned __int64 PAR_EL1;
-  unsigned __int64 MAIR_EL1;
-  unsigned __int64 VBAR_EL1;
-  unsigned __int64 CONTEXTIDR_EL1;
-  unsigned __int64 TPIDR_EL1;
-  unsigned __int64 SPSR_EL1;
-  unsigned __int64 ELR_EL1;
-  unsigned __int64 AFSR0_EL1;
-  unsigned __int64 AFSR1_EL1;
-  unsigned __int64 AMAIR_EL1;
-};
-
-/* 4287 */
-union $80315A5FC91A9E35EF98F9323E41B986
-{
-  _HV_X64_CONTEXT x64;
-  _HV_ARM64_CONTEXT aa64;
-};
-
-/* 4288 */
-struct _HV_VP_CONTEXT
-{
-  unsigned int Version;
-  _HV_ARCHITECTURE Architecture;
-  __declspec(align(64)) $80315A5FC91A9E35EF98F9323E41B986 ___u2;
-};
-
 /* 4335 */
 struct $811FDB4F6923FD2366AF1D10536D4891
 {
@@ -9590,14 +9179,6 @@ struct _HV_HYPERVISOR_SVM_FEATURES
   unsigned int Reserved1;
 };
 
-/* 4667 */
-struct _HV_INPUT_POST_DEBUG_DATA
-{
-  unsigned int Count;
-  unsigned int Options;
-  unsigned __int8 Data[4088];
-};
-
 /* 4696 */
 struct $345138E7AE76ED1FC824C1BE61BB6FD6
 {
@@ -9618,17 +9199,6 @@ union _HV_REGISTER_VSM_PARTITION_CONFIG
 struct __declspec(align(8)) _HV_OUTPUT_POST_DEBUG_DATA
 {
   unsigned int PendingCount;
-};
-
-/* 4930 */
-struct _HV_INPUT_START_VIRTUAL_PROCESSOR
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 ReservedZ0;
-  unsigned __int16 ReservedZ1;
-  _HV_INITIAL_VP_CONTEXT VpContext;
 };
 
 /* 4949 */
@@ -12177,14 +11747,8 @@ typedef _HV_MEMORY_DESCRIPTOR *PHV_MEMORY_DESCRIPTOR;
 /* 11823 */
 typedef _HV_X64_PPM_PERF_STATE *PHV_X64_PPM_PERF_STATE;
 
-/* 11829 */
-typedef _HV_INPUT_START_VIRTUAL_PROCESSOR *PHV_INPUT_START_VIRTUAL_PROCESSOR;
-
 /* 11832 */
 typedef const _HV_STATS_OBJECT_IDENTITY *PCHV_STATS_OBJECT_IDENTITY;
-
-/* 11909 */
-typedef _HV_INITIAL_VP_CONTEXT *PHV_INITIAL_VP_CONTEXT;
 
 /* 11910 */
 typedef _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME *PHV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
@@ -12297,9 +11861,6 @@ typedef _HV_INPUT_GET_COVERAGE_VECTOR *PHV_INPUT_GET_COVERAGE_VECTOR;
 /* 13314 */
 typedef _HV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS *PHV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS;
 
-/* 13355 */
-typedef _HV_X64_TABLE_REGISTER *PHV_X64_TABLE_REGISTER;
-
 /* 13365 */
 typedef _HV_PROXIMITY_DOMAIN_INFO *PHV_PROXIMITY_DOMAIN_INFO;
 
@@ -12320,9 +11881,6 @@ typedef _HV_INPUT_DETACH_DEVICE *PHV_INPUT_DETACH_DEVICE;
 
 /* 13606 */
 typedef _HV_X64_XSAVE_HEADER *PHV_X64_XSAVE_HEADER;
-
-/* 13617 */
-typedef _HV_X64_FX_REGISTERS *PHV_X64_FX_REGISTERS;
 
 /* 13667 */
 typedef unsigned __int16 *PHV_STATUS;
@@ -12366,9 +11924,6 @@ typedef _HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO *PHV_PLATFORM_VIRTUALIZATION_SU
 /* 14016 */
 typedef _HV_INPUT_ATTACH_DEVICE *PHV_INPUT_ATTACH_DEVICE;
 
-/* 14024 */
-typedef _HV_X64_SEGMENT_REGISTER *PHV_X64_SEGMENT_REGISTER;
-
 /* 14089 */
 typedef _HVL_SECONDARY_DUMP_HV_IDENTITY *PHVL_SECONDARY_DUMP_HV_IDENTITY;
 
@@ -12386,9 +11941,6 @@ typedef _HV_X64_OUTPUT_PREPARE_FOR_HIBERNATE *PHV_X64_OUTPUT_PREPARE_FOR_HIBERNA
 
 /* 14221 */
 typedef _HV_GPA_PAGE_RANGE *PHV_GPA_PAGE_RANGE;
-
-/* 14228 */
-typedef _HV_X64_FP_CONTROL_STATUS_REGISTER *PHV_X64_FP_CONTROL_STATUS_REGISTER;
 
 /* 14253 */
 typedef _HV_SPA_PAGE_RANGE *PHV_SPA_PAGE_RANGE;
@@ -12432,14 +11984,8 @@ typedef _HV_EVENTLOG_MESSAGE_PAYLOAD *PHV_EVENTLOG_MESSAGE_PAYLOAD;
 /* 14503 */
 typedef _HV_X64_PENDING_EVENT *PHV_X64_PENDING_EVENT;
 
-/* 14569 */
-typedef _HV_X64_FP_REGISTER *PHV_X64_FP_REGISTER;
-
 /* 14581 */
 typedef _HV_REGISTER_VSM_CODE_PAGE_OFFSETS *PHV_REGISTER_VSM_CODE_PAGE_OFFSETS;
-
-/* 14603 */
-typedef _HV_INPUT_DISABLE_PARTITION_VTL *PHV_INPUT_DISABLE_PARTITION_VTL;
 
 /* 14604 */
 typedef _HV_INPUT_UNMAP_DEVICE_INTERRUPT *PHV_INPUT_UNMAP_DEVICE_INTERRUPT;
@@ -12482,9 +12028,6 @@ typedef _HV_OUTPUT_COLLECT_LIVE_DUMP *PHV_OUTPUT_COLLECT_LIVE_DUMP;
 
 /* 15296 */
 typedef _HV_REGISTER_VALUE *PHV_REGISTER_VALUE;
-
-/* 15302 */
-typedef _HV_VP_CONTEXT *PHV_VP_CONTEXT;
 
 /* 15403 */
 typedef unsigned __int64 HV_DEVICE_VA;
@@ -12543,17 +12086,8 @@ typedef _HV_INPUT_SET_PARTITION_PROPERTY *PHV_INPUT_SET_PARTITION_PROPERTY;
 /* 16170 */
 typedef _HV_FULL_PASID *PHV_FULL_PASID;
 
-/* 16228 */
-typedef _HV_INPUT_DISABLE_VP_VTL *PHV_INPUT_DISABLE_VP_VTL;
-
-/* 16292 */
-typedef _HV_DEVICE_INTERRUPT_TARGET *PHV_DEVICE_INTERRUPT_TARGET;
-
 /* 16303 */
 typedef _HV_MESSAGE_FLAGS *PHV_MESSAGE_FLAGS;
-
-/* 16308 */
-typedef _HV_INPUT_RETARGET_DEVICE_INTERRUPT *PHV_INPUT_RETARGET_DEVICE_INTERRUPT;
 
 /* 16323 */
 typedef unsigned int HV_DEVICE_DOMAIN_ID;
@@ -12599,9 +12133,6 @@ typedef _HV_DEVICE_INTERRUPT_DESCRIPTOR *PHV_DEVICE_INTERRUPT_DESCRIPTOR;
 
 /* 16640 */
 typedef _HV_INPUT_REMOVE_LOGICAL_PROCESSOR *PHV_INPUT_REMOVE_LOGICAL_PROCESSOR;
-
-/* 16834 */
-typedef _HV_X64_X_REGISTERS *PHV_X64_X_REGISTERS;
 
 /* 16835 */
 typedef _HV_IOMMU_EXTENDED_STATUS *PHV_IOMMU_EXTENDED_STATUS;
@@ -12687,9 +12218,6 @@ typedef _HV_UINT256 *PHV_UINT256;
 /* 17522 */
 typedef _HV_X64_PPM_FEEDBACK_REGISTER_PAIR *PHV_X64_PPM_FEEDBACK_REGISTER_PAIR;
 
-/* 17523 */
-typedef _HV_X64_XMM_CONTROL_STATUS_REGISTER *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
-
 /* 17579 */
 typedef unsigned __int64 *PHV_ADDRESS_SPACE_ID;
 
@@ -12735,9 +12263,6 @@ typedef _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE *PHV_INPUT_FLUSH_PASID_ADDRESS_SPACE
 /* 17914 */
 typedef unsigned __int64 *PHV_GVA_PAGE_NUMBER;
 
-/* 17927 */
-typedef _HV_ARM64_CONTEXT *PHV_ARM64_CONTEXT;
-
 /* 17939 */
 typedef _HV_DEVICE_ID *PHV_DEVICE_ID;
 
@@ -12749,9 +12274,6 @@ typedef _HV_X64_MSR_STIMER_CONFIG_CONTENTS *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
 
 /* 18041 */
 typedef unsigned __int64 HV_PARTITION_PROPERTY;
-
-/* 18062 */
-typedef _HV_X64_CONTEXT *PHV_X64_CONTEXT;
 
 /* 18074 */
 typedef _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER *PHV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER;
@@ -12957,9 +12479,6 @@ typedef _HV_X64_MSR_HYPERCALL_CONTENTS *PHV_X64_MSR_HYPERCALL_CONTENTS;
 /* 20985 */
 typedef _HV_X64_VOLATILE_GP_REGS *PHV_X64_VOLATILE_GP_REGS;
 
-/* 21115 */
-typedef _HV_X64_FP_MMX_REGISTER *PHV_X64_FP_MMX_REGISTER;
-
 /* 21128 */
 typedef _HV_MCUPDATE_UPDATE_STATUS *PHV_MCUPDATE_UPDATE_STATUS;
 
@@ -13046,9 +12565,6 @@ typedef _HV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY *PHV_INPUT_SET_LOGICAL_PROCESSO
 
 /* 22326 */
 typedef void (__stdcall *PHAL_SVM_GET_SYSTEM_CAPABILITIES)(_HAL_HV_SVM_SYSTEM_CAPABILITIES *);
-
-/* 22356 */
-typedef _HV_INPUT_POST_DEBUG_DATA *PHV_INPUT_POST_DEBUG_DATA;
 
 /* 22445 */
 typedef _HV_UINT128 *PHV_UINT128;

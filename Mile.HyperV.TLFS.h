@@ -269,7 +269,6 @@ typedef union _HV_X64_FP_CONTROL_STATUS_REGISTER
             {
                 HV_UINT32 LastFpEip;
                 HV_UINT16 LastFpCs;
-                HV_UINT16 Padding;
             };
         };
     };
@@ -287,7 +286,6 @@ typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
             {
                 HV_UINT32 LastFpDp;
                 HV_UINT16 LastFpDs;
-                HV_UINT16 Padding;
             };
         };
         HV_UINT32 XmmStatusControl;
@@ -410,9 +408,29 @@ typedef struct DECLSPEC_ALIGN(64) _HV_X64_XSAVE_HEADER
 // This is the size of the legacy save area (512) plus the size of the XSAVE
 // header (64) plus the size of the AVX context (16 128-bit registers).
 
+// Extra notes from Mile.HyperV.TLFS:
+// For Windows 10 ntoskrnl.exe symbol types, the HV_X64_XSAVE_AREA_SIZE should
+// be 2688. So, I do some guess based on
+// https://www.moritz.systems/blog/how-debuggers-work-getting-and-setting-x86-registers-part-2/
+
 #define HV_X64_XSAVE_AREA_HEADER_SIZE 64
 #define HV_X64_XSAVE_AREA_AVX_SIZE 256
-#define HV_X64_XSAVE_AREA_SIZE (HV_X64_FXSAVE_AREA_SIZE + HV_X64_XSAVE_AREA_HEADER_SIZE + HV_X64_XSAVE_AREA_AVX_SIZE)
+#define HV_X64_XSAVE_AREA_MPX_SIZE 80
+#define HV_X64_XSAVE_AREA_AVX512_SIZE 1600
+#define HV_X64_XSAVE_AREA_PT_SIZE 72
+#define HV_X64_XSAVE_AREA_PKRU_SIZE 4
+#define HV_X64_XSAVE_AREA_HDC_SIZE 8
+#define HV_X64_XSAVE_AREA_UNKNOWN_SIZE 92
+#define HV_X64_XSAVE_AREA_SIZE ( \
+    HV_X64_FXSAVE_AREA_SIZE + \
+    HV_X64_XSAVE_AREA_HEADER_SIZE + \
+    HV_X64_XSAVE_AREA_AVX_SIZE + \
+    HV_X64_XSAVE_AREA_MPX_SIZE + \
+    HV_X64_XSAVE_AREA_AVX512_SIZE + \
+    HV_X64_XSAVE_AREA_PT_SIZE + \
+    HV_X64_XSAVE_AREA_PKRU_SIZE + \
+    HV_X64_XSAVE_AREA_HDC_SIZE + \
+    HV_X64_XSAVE_AREA_UNKNOWN_SIZE)
 
 // This structure defines the format of the XSAVE save area, the area used to
 // save and restore the context of processor extended state (including legacy
@@ -520,11 +538,11 @@ typedef struct _HV_X64_CONTEXT
     HV_UINT64 SysenterEip;
     HV_UINT64 SysenterEsp;
     HV_UINT64 MsrCrPat;
-    HV_UINT64 MsrMtrrCap;
-    HV_UINT64 MsrMtrrDefType;
-    HV_UINT64 MsrMtrrFixed[11];
-    HV_UINT64 MsrMtrrVariableBase[8];
-    HV_UINT64 MsrMtrrVariableMask[8];
+    // HV_UINT64 MsrMtrrCap; // Seems not available in Windows 10 symbols
+    // HV_UINT64 MsrMtrrDefType; // Seems not available in Windows 10 symbols
+    // HV_UINT64 MsrMtrrFixed[11]; // Seems not available in Windows 10 symbols
+    // HV_UINT64 MsrMtrrVariableBase[8]; // Seems not available in Windows 10 symbols
+    // HV_UINT64 MsrMtrrVariableMask[8]; // Seems not available in Windows 10 symbols
 
     // Local APIC state.
 
@@ -558,6 +576,96 @@ typedef struct _HV_X64_CONTEXT
     };
 } HV_X64_CONTEXT, *PHV_X64_CONTEXT;
 
+typedef struct _HV_ARM64_CONTEXT
+{
+    HV_UINT64 X0;
+    HV_UINT64 X1;
+    HV_UINT64 X2;
+    HV_UINT64 X3;
+    HV_UINT64 X4;
+    HV_UINT64 X5;
+    HV_UINT64 X6;
+    HV_UINT64 X7;
+    HV_UINT64 X8;
+    HV_UINT64 X9;
+    HV_UINT64 X10;
+    HV_UINT64 X11;
+    HV_UINT64 X12;
+    HV_UINT64 X13;
+    HV_UINT64 X14;
+    HV_UINT64 X15;
+    HV_UINT128 Q0;
+    HV_UINT128 Q1;
+    HV_UINT128 Q2;
+    HV_UINT128 Q3;
+    HV_UINT128 Q4;
+    HV_UINT128 Q5;
+    HV_UINT128 Q6;
+    HV_UINT128 Q7;
+    HV_UINT128 Q16;
+    HV_UINT128 Q17;
+    HV_UINT128 Q18;
+    HV_UINT128 Q19;
+    HV_UINT128 Q20;
+    HV_UINT128 Q21;
+    HV_UINT128 Q22;
+    HV_UINT128 Q23;
+    HV_UINT128 Q24;
+    HV_UINT128 Q25;
+    HV_UINT128 Q26;
+    HV_UINT128 Q27;
+    HV_UINT128 Q28;
+    HV_UINT128 Q29;
+    HV_UINT128 Q30;
+    HV_UINT128 Q31;
+    HV_UINT64 X16;
+    HV_UINT64 X17;
+    HV_UINT64 X18;
+    HV_UINT64 X19;
+    HV_UINT64 X20;
+    HV_UINT64 X21;
+    HV_UINT64 X22;
+    HV_UINT64 X23;
+    HV_UINT64 X24;
+    HV_UINT64 X25;
+    HV_UINT64 X26;
+    HV_UINT64 X27;
+    HV_UINT64 X28;
+    HV_UINT64 XFp;
+    HV_UINT64 XLr;
+    HV_UINT128 Q8;
+    HV_UINT128 Q9;
+    HV_UINT128 Q10;
+    HV_UINT128 Q11;
+    HV_UINT128 Q12;
+    HV_UINT128 Q13;
+    HV_UINT128 Q14;
+    HV_UINT128 Q15;
+    HV_UINT32 Cpsr;
+    HV_UINT64 Sp;
+    HV_UINT64 Pc;
+    HV_UINT64 SCTLR_EL1;
+    HV_UINT64 ACTLR_EL1;
+    HV_UINT64 CPACR_EL1;
+    HV_UINT64 TPIDRRO_EL0;
+    HV_UINT64 TPIDR_EL0;
+    HV_UINT64 TTBR0_EL1;
+    HV_UINT64 TTBR1_EL1;
+    HV_UINT64 TCR_EL1;
+    HV_UINT64 ESR_EL1;
+    HV_UINT64 FAR_EL1;
+    HV_UINT64 PAR_EL1;
+    HV_UINT64 MAIR_EL1;
+    HV_UINT64 VBAR_EL1;
+    HV_UINT64 CONTEXTIDR_EL1;
+    HV_UINT64 TPIDR_EL1;
+    HV_UINT64 SPSR_EL1;
+    HV_UINT64 ELR_EL1;
+    HV_UINT64 AFSR0_EL1;
+    HV_UINT64 AFSR1_EL1;
+    HV_UINT64 AMAIR_EL1;
+} HV_ARM64_CONTEXT, *PHV_ARM64_CONTEXT;
+
 #define HV_VIRTUAL_PROCESSOR_REGISTERS_VERSION 1
 
 typedef struct _HV_VP_CONTEXT
@@ -569,6 +677,7 @@ typedef struct _HV_VP_CONTEXT
     union
     {
         HV_X64_CONTEXT x64;
+        HV_ARM64_CONTEXT aa64;
     };
 } HV_VP_CONTEXT, *PHV_VP_CONTEXT;
 
@@ -3926,7 +4035,7 @@ typedef struct _HV_DEVICE_INTERRUPT_TARGET
     union
     {
         HV_UINT64 ProcessorMask;
-        HV_UINT64 ProcessorSet[ANYSIZE_ARRAY];
+        HV_UINT64 ProcessorSet[];
     };
 } HV_DEVICE_INTERRUPT_TARGET, *PHV_DEVICE_INTERRUPT_TARGET;
 
@@ -6650,6 +6759,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PARTITION_VTL
 
 // HvCallDisablePartitionVtl | 0x000E
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_PARTITION_VTL
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VTL TargetVtl;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+    HV_UINT32 ReservedZ2;
+} HV_INPUT_DISABLE_PARTITION_VTL, *PHV_INPUT_DISABLE_PARTITION_VTL;
+
 // HvCallEnableVpVtl | 0x000F
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
@@ -6663,6 +6781,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
 } HV_INPUT_ENABLE_VP_VTL, *PHV_INPUT_ENABLE_VP_VTL;
 
 // HvCallDisableVpVtl | 0x0010
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_VP_VTL
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL TargetVtl;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+} HV_INPUT_DISABLE_VP_VTL, *PHV_INPUT_DISABLE_VP_VTL;
 
 // HvCallVtlCall | 0x0011
 
@@ -7518,7 +7645,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
     HV_PARTITION_ID PartitionId;
     HV_VP_INDEX VpIndex;
     HV_VTL TargetVtl;
-    HV_UINT8 Padding[3];
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
     HV_INITIAL_VP_CONTEXT VpContext;
 } HV_INPUT_START_VIRTUAL_PROCESSOR, *PHV_INPUT_START_VIRTUAL_PROCESSOR;
 
