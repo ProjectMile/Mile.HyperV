@@ -5453,6 +5453,144 @@ typedef enum _HV_ERROR_TYPES
     HV_ERROR_HAS_SUBCODE = 0x10000000,
 } HV_ERROR_TYPES, *PHV_ERROR_TYPES;
 
+typedef struct _HV_PPM_POWER_POLICY_SETTING
+{
+    HV_PPM_POWER_POLICY_SETTING_ID SettingId;
+    HV_UINT32 Value;
+} HV_PPM_POWER_POLICY_SETTING, *PHV_PPM_POWER_POLICY_SETTING;
+
+typedef struct _HV_IOMMU_INIT_STATUS
+{
+    HV_UINT8 HardwarePresent;
+    HV_UINT8 Enabled;
+    HV_UINT64 Policy;
+    HV_UINT64 Features;
+    HV_UINT64 InitStatus;
+    HV_UINT64 Errors;
+    HV_UINT64 Errata;
+} HV_IOMMU_INIT_STATUS, *PHV_IOMMU_INIT_STATUS;
+
+typedef struct _HV_TSC_SYNC_STATUS
+{
+    HV_UINT8 SyncFailed;
+    HV_UINT8 SyncNeeded;
+    HV_INT64 MaxDelta;
+    HV_INT64 MinDelta;
+} HV_TSC_SYNC_STATUS, *PHV_TSC_SYNC_STATUS;
+
+typedef union _HV_PCI_BDF
+{
+    HV_UINT16 AsUINT16;
+    struct
+    {
+        HV_UINT8 Function : 3;
+        HV_UINT8 Device : 5;
+        HV_UINT8 Bus;
+    };
+} HV_PCI_BDF, *PHV_PCI_BDF;
+
+typedef union _HV_PCI_BUS_RANGE
+{
+    HV_UINT16 AsUINT16;
+    struct
+    {
+        HV_UINT8 SubordinateBus;
+        HV_UINT8 SecondaryBus;
+    };
+} HV_PCI_BUS_RANGE, *PHV_PCI_BUS_RANGE;
+
+typedef union _HV_DEVICE_ID
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT16 Rid;
+        HV_UINT16 Segment;
+        HV_UINT8 DeviceType : 2;
+        HV_UINT8 SourceShadow : 2;
+        HV_UINT8 PhantomFunctionBits : 2;
+        HV_UINT8 RsvdZ0 : 2;
+        HV_UINT8 IoApicId;
+        HV_PCI_BDF ShadowBdf;
+    };
+    struct
+    {
+        HV_PCI_BDF Bdf;
+        HV_UINT8 gap2[4];
+        HV_PCI_BUS_RANGE ShadowBusRange;
+    };
+} HV_DEVICE_ID, *PHV_DEVICE_ID;
+
+typedef struct DECLSPEC_ALIGN(8) _HV_HPET_CONFIG_INFO
+{
+    HV_UINT64 BaseAddress;
+    HV_UINT32 TimerIndex;
+    HV_DEVICE_ID DeviceId;
+    HV_UINT8 TimerInterruptPin;
+} HV_HPET_CONFIG_INFO, *PHV_HPET_CONFIG_INFO;
+
+typedef struct _HV_HPET_INTERRUPT_INFO
+{
+    HV_INTERRUPT_ENTRY InterruptEntry;
+} HV_HPET_INTERRUPT_INFO, *PHV_HPET_INTERRUPT_INFO;
+
+typedef struct _HV_HPET_ENABLED_INFO
+{
+    HV_UINT8 HpetEnabled : 1;
+    HV_UINT8 Reserved : 7;
+} HV_HPET_ENABLED_INFO, *PHV_HPET_ENABLED_INFO;
+
+typedef struct _HV_HYPERVISOR_LAUNCH_STATS
+{
+    HV_UINT64 RootBspTscAdjustment;
+} HV_HYPERVISOR_LAUNCH_STATS, *PHV_HYPERVISOR_LAUNCH_STATS;
+
+typedef struct _HV_ROOT_SVM_CAPABILITIES_PROPERTY
+{
+    HV_UINT32 IommuCount;
+    HV_UINT32 MinIommuPasidCount;
+} HV_ROOT_SVM_CAPABILITIES_PROPERTY, *PHV_ROOT_SVM_CAPABILITIES_PROPERTY;
+
+typedef struct DECLSPEC_ALIGN(8) _HV_NUMA_NODE_RESERVED_PAGE_INFO
+{
+    HV_UINT64 PhysicalAddress;
+    HV_UINT32 ProximityDomainId;
+} HV_NUMA_NODE_RESERVED_PAGE_INFO, *PHV_NUMA_NODE_RESERVED_PAGE_INFO;
+
+typedef struct _HV_ROOT_NUMA_COST_PAGES_PROPERTY
+{
+    HV_UINT32 NumaNodeCount;
+    HV_UINT32 ReservedP;
+    HV_NUMA_NODE_RESERVED_PAGE_INFO NumaNodePfn[64];
+} HV_ROOT_NUMA_COST_PAGES_PROPERTY, *PHV_ROOT_NUMA_COST_PAGES_PROPERTY;
+
+typedef struct DECLSPEC_ALIGN(4) _HV_SLEEP_STATE_INFO
+{
+    HV_SLEEP_STATE SleepState;
+    HV_UINT8 Pm1a_SLP_TYP;
+    HV_UINT8 Pm1b_SLP_TYP;
+} HV_SLEEP_STATE_INFO, *PHV_SLEEP_STATE_INFO;
+
+typedef struct _HV_MACHINE_CHECK_PROPERTY_INFO
+{
+    HV_MACHINE_CHECK_PROPERTY_TYPE PropertyType;
+    union
+    {
+        HV_UINT8 MachineCheckHandlerReady;
+        HV_MACHINE_CHECK_RECOVERY_FLAG MachineCheckRecoveryFlag;
+    };
+} HV_MACHINE_CHECK_PROPERTY_INFO, *PHV_MACHINE_CHECK_PROPERTY_INFO;
+
+typedef struct _HV_HYPERVISOR_DEBUG_PROPERTY
+{
+    HV_UINT8 PowerStateEnabled;
+} HV_HYPERVISOR_DEBUG_PROPERTY, *PHV_HYPERVISOR_DEBUG_PROPERTY;
+
+typedef struct _HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO
+{
+    HV_UINT8 NestedVirtualization;
+} HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO, *PHV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO;
+
 // *****************************************************************************
 // Hypervisor CPUID Definitions
 //
@@ -7429,7 +7567,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_STATS_PAGE
 {
     HV_STATS_OBJECT_TYPE StatsType;
     HV_STATS_OBJECT_IDENTITY ObjectIdentity;
-    HV_GPA_PAGE_NUMBER MapLocation;
+    HV_GPA_PAGE_NUMBER MapLocation; // Seems not available since Windows 10
 } HV_INPUT_MAP_STATS_PAGE, *PHV_INPUT_MAP_STATS_PAGE;
 
 // HvCallUnmapStatsPage | 0x006D
@@ -7438,7 +7576,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_STATS_PAGE
 {
     HV_STATS_OBJECT_TYPE StatsType;
     HV_STATS_OBJECT_IDENTITY ObjectIdentity;
-    HV_GPA_PAGE_NUMBER MapLocation;
+    HV_GPA_PAGE_NUMBER MapLocation; // Seems not available since Windows 10
 } HV_INPUT_UNMAP_STATS_PAGE, *PHV_INPUT_UNMAP_STATS_PAGE;
 
 // HvCallMapSparseGpaPages | 0x006E
@@ -7472,7 +7610,13 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_SYSTEM_PROPERTY
             HV_UINT16 ReservedZ1;
             HV_UINT32 ReservedZ2;
             HV_UINT64 Period;
-        } SetPerfCounter;
+        } PerfCounter;
+        HV_PPM_POWER_POLICY_SETTING PowerPolicySetting;
+        HV_SLEEP_STATE_INFO SetSleepStateInformation;
+        HV_MACHINE_CHECK_PROPERTY_INFO MachineCheckStateInformation;
+        HV_HPET_CONFIG_INFO HpetConfigInfo;
+        HV_HPET_ENABLED_INFO HpetEnabledInfo;
+        HV_HYPERVISOR_DEBUG_PROPERTY Debug;
     } Property;
 } HV_INPUT_SET_SYSTEM_PROPERTY, *PHV_INPUT_SET_SYSTEM_PROPERTY;
 
@@ -7512,13 +7656,33 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PORT_PROPERTY
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_SYSTEM_PROPERTY
 {
     HV_SYSTEM_PROPERTY PropertyId;
-    HV_UINT32 Padding;
+    union
+    {
+        HV_PPM_POWER_POLICY_SETTING_ID SettingId;
+    } Property;
 } HV_INPUT_GET_SYSTEM_PROPERTY, *PHV_INPUT_GET_SYSTEM_PROPERTY;
 
-typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SYSTEM_PROPERTY
+typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SYSTEM_PROPERTY
 {
+    struct
+    {
+        HV_UINT16 EventType;
+        HV_UINT16 ReservedZ1;
+        HV_UINT32 ReservedZ2;
+        HV_UINT64 Period;
+    } PerfCounter;
+    HV_PPM_POWER_POLICY_SETTING PowerPolicySetting;
+    HV_IOMMU_INIT_STATUS IommuInitStatus;
+    HV_TSC_SYNC_STATUS TscSyncStatus;
+    HV_HPET_CONFIG_INFO HpetConfigInfo;
+    HV_HPET_INTERRUPT_INFO HpetInterruptInfo;
+    HV_HPET_ENABLED_INFO HpetEnabledInfo;
+    HV_HYPERVISOR_LAUNCH_STATS HvLaunchStats;
+    HV_ROOT_SVM_CAPABILITIES_PROPERTY RootSvmCapabilities;
+    HV_ROOT_NUMA_COST_PAGES_PROPERTY RootNumaCostPages;
+    HV_UINT64 HvHostPageTableRoot;
     HV_SCHEDULER_TYPE SchedulerType;
-    HV_UINT32 Padding;
+    HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO VirtualizationInfo;
 } HV_OUTPUT_GET_SYSTEM_PROPERTY, *PHV_OUTPUT_GET_SYSTEM_PROPERTY;
 
 // HvCallMapDeviceInterrupt | 0x007C
@@ -7652,29 +7816,19 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
 
 // HvCallGetVpIndexFromApicId | 0x009A
 
-typedef struct _HV_APIC_ID_ASSOC
-{
-    HV_APIC_ID ApicId;
-    HV_UINT32 Padding;
-} HV_APIC_ID_ASSOC, *PHV_APIC_ID_ASSOC;
-
-typedef struct _HV_VP_INDEX_ASSOC
-{
-    HV_VP_INDEX VpIndex;
-    HV_UINT32 Padding;
-} HV_VP_INDEX_ASSOC, *PHV_VP_INDEX_ASSOC;
-
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID
 {
     HV_PARTITION_ID PartitionId;
     HV_VTL TargetVtl;
-    HV_UINT8 Padding[7];
-    HV_APIC_ID_ASSOC Elements[ANYSIZE_ARRAY];
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+    HV_UINT32 ReservedZ2;
+    HV_APIC_ID ApicIds[];
 } HV_INPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_INPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID
 {
-    HV_VP_INDEX_ASSOC Elements[ANYSIZE_ARRAY];
+    HV_VP_INDEX VpIndexs[];
 } HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 // HvCallGetPowerProperty | 0x009B
@@ -7687,7 +7841,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID
 // HvCallAttachPasidSpace | 0x00A2
 // HvCallDetachPasidSpace | 0x00A3
 // HvCallEnablePasid | 0x00A4
+
 // HvCallDisablePasid | 0x00A5
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_PASID
+{
+    HV_UINT32 LogicalDeviceId;
+    HV_UINT32 Pasid;
+} HV_INPUT_DISABLE_PASID, *PHV_INPUT_DISABLE_PASID;
+
 // HvCallAcknowledgeDevicePageRequest | 0x00A6
 // HvCallCreateDevicePrQueue | 0x00A7
 // HvCallDeleteDevicePrQueue | 0x00A8
