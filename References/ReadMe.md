@@ -69,6 +69,7 @@ HV_CPUID_FUNCTION.
   - [urlmon.dll](Symbols/14393/urlmon.dll), [urlmon.pdb](Symbols/14393/urlmon.pdb)
 - Build 14347
   - [ntoskrnl.exe](Symbols/14347/ntoskrnl.exe), [ntkrpamp.pdb](Symbols/14347/ntkrpamp.pdb)
+  - [vmbuspipe.dll](Symbols/14347/vmbuspipe.dll), [vmbuspipe.pdb](Symbols/14347/vmbuspipe.pdb)
 
 ## FreeBSD
 
