@@ -4,7 +4,8 @@ The lightweight library for Hyper-V guest interfaces.
 
 ## Usage
 
-Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
+Currently, include `Mile.HyperV.*.h` which you actually needed to your C/C++
+projects.
 
 ## Features
 
@@ -23,6 +24,9 @@ Currently, include `Mile.HyperV.TLFS.h` to your C/C++ projects.
     10.0.14393.0's urlmon.dll
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's ntoskrnl.exe
+ - Mile.HyperV.Windows.VMBusPipe.h
+  - Include Hyper-V related definitions from symbols in Windows version
+    10.0.14347.0's vmbuspipe.dll
 - Distributed under the MIT License
 
 ## Documents
