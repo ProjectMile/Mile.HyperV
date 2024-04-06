@@ -24,7 +24,7 @@ projects.
     10.0.14393.0's urlmon.dll
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's ntoskrnl.exe
- - Mile.HyperV.Windows.VMBusPipe.h
+ - Mile.HyperV.Windows.VMBusPipe.h and Mile.HyperV.Windows.VMBusPipe.cpp
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's vmbuspipe.dll
 - Distributed under the MIT License
