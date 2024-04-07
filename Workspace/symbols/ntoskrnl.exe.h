@@ -8256,120 +8256,6 @@ union _HV_UINT128
   unsigned int Dword[4];
 };
 
-/* 2794 */
-struct $3896566DFD6713B540D422B785C5E7E5
-{
-  unsigned __int64 Suspended : 1;
-  unsigned __int64 Reserved : 63;
-};
-
-/* 2795 */
-union _HV_EXPLICIT_SUSPEND_REGISTER
-{
-  unsigned __int64 AsUINT64;
-  $3896566DFD6713B540D422B785C5E7E5 __s1;
-};
-
-/* 2796 */
-union _HV_INTERCEPT_SUSPEND_REGISTER
-{
-  unsigned __int64 AsUINT64;
-  $3896566DFD6713B540D422B785C5E7E5 __s1;
-};
-
-/* 2797 */
-struct $6553FF7CC0C0D172B3D6EE33E51779C8
-{
-  unsigned __int64 InterruptShadow : 1;
-  unsigned __int64 NmiMasked : 1;
-  unsigned __int64 Reserved : 62;
-};
-
-/* 2798 */
-union _HV_X64_INTERRUPT_STATE_REGISTER
-{
-  unsigned __int64 AsUINT64;
-  $6553FF7CC0C0D172B3D6EE33E51779C8 __s1;
-};
-
-/* 2799 */
-struct $3E6BA28D050E5F816756C1B0AD8E9141
-{
-  unsigned __int32 InterruptionPending : 1;
-  unsigned __int32 InterruptionType : 3;
-  unsigned __int32 DeliverErrorCode : 1;
-  unsigned __int32 InstructionLength : 4;
-  unsigned __int32 NestedEvent : 1;
-  unsigned __int32 Reserved : 6;
-  unsigned __int32 InterruptionVector : 16;
-  unsigned int ErrorCode;
-};
-
-/* 2800 */
-union _HV_X64_PENDING_INTERRUPTION_REGISTER
-{
-  unsigned __int64 AsUINT64;
-  $3E6BA28D050E5F816756C1B0AD8E9141 __s1;
-};
-
-/* 2801 */
-struct $ED1FE53EAEBCADE113E9137100B6916F
-{
-  unsigned __int64 PreventSgdt : 1;
-  unsigned __int64 PreventSidt : 1;
-  unsigned __int64 PreventSldt : 1;
-  unsigned __int64 PreventStr : 1;
-  unsigned __int64 Reserved : 60;
-};
-
-/* 2802 */
-union _HV_X64_MSR_NPIEP_CONFIG_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $ED1FE53EAEBCADE113E9137100B6916F __s1;
-};
-
-/* 2803 */
-struct $D3CD7CC934EA5935AEAF13F23E4C212D
-{
-  unsigned __int32 EventPending : 1;
-  unsigned __int32 EventType : 3;
-  unsigned __int32 Reserved0 : 4;
-  unsigned __int32 DeliverErrorCode : 1;
-  unsigned __int32 Reserved1 : 7;
-  unsigned __int32 Vector : 16;
-  unsigned int ErrorCode;
-  unsigned __int64 ExceptionParameter;
-};
-
-/* 2804 */
-union _HV_X64_PENDING_EXCEPTION_EVENT
-{
-  unsigned __int64 AsUINT64[2];
-  $D3CD7CC934EA5935AEAF13F23E4C212D __s1;
-};
-
-/* 2805 */
-union _HV_REGISTER_VALUE
-{
-  _HV_UINT128 Reg128;
-  unsigned __int64 Reg64;
-  unsigned int Reg32;
-  unsigned __int16 Reg16;
-  unsigned __int8 Reg8;
-  _HV_X64_FP_REGISTER Fp;
-  _HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
-  _HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
-  _HV_X64_SEGMENT_REGISTER Segment;
-  _HV_X64_TABLE_REGISTER Table;
-  _HV_EXPLICIT_SUSPEND_REGISTER ExplicitSuspend;
-  _HV_INTERCEPT_SUSPEND_REGISTER InterceptSuspend;
-  _HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
-  _HV_X64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
-  _HV_X64_MSR_NPIEP_CONFIG_CONTENTS NpiepConfig;
-  _HV_X64_PENDING_EXCEPTION_EVENT PendingExceptionEvent;
-};
-
 /* 2886 */
 struct $36DB9F07A37CDAA7F3A4AF928B3F4525
 {
@@ -8485,46 +8371,6 @@ struct _HV_VIRTUAL_APIC_ASSIST
   $B0001D64052FD40254A2EDFA56F629F9 ___u0;
 };
 
-/* 3257 */
-struct _HV_OUTPUT_GET_PARTITION_ID
-{
-  unsigned __int64 PartitionId;
-};
-
-/* 3314 */
-struct $45E7F78FB309118D772134F40D939444
-{
-  unsigned __int64 Enable : 1;
-  unsigned __int64 Periodic : 1;
-  unsigned __int64 Lazy : 1;
-  unsigned __int64 AutoEnable : 1;
-  unsigned __int64 ApicVector : 8;
-  unsigned __int64 DirectMode : 1;
-  unsigned __int64 ReservedZ1 : 3;
-  unsigned __int64 SINTx : 4;
-  unsigned __int64 ReservedZ2 : 44;
-};
-
-/* 3315 */
-union $0B495C3F4AE242498E4D4D81A1F7205E
-{
-  unsigned __int64 AsUINT64;
-  $45E7F78FB309118D772134F40D939444 __s1;
-};
-
-/* 3316 */
-struct _HV_X64_MSR_STIMER_CONFIG_CONTENTS
-{
-  $0B495C3F4AE242498E4D4D81A1F7205E ___u0;
-};
-
-/* 3323 */
-struct _HV_VENDOR_AND_MAX_FUNCTION
-{
-  unsigned int MaxFunction;
-  unsigned __int8 VendorName[12];
-};
-
 /* 3337 */
 struct $0266DD6D772D72DB8EC6FA01D2585088
 {
@@ -8604,235 +8450,6 @@ struct _SYSTEM_HYPERVISOR_DETAIL_INFORMATION
   _HV_DETAILS ImplementationLimits;
 };
 
-/* 3496 */
-struct $D0AFF4A69D9DCEFED22B73853D1890D1
-{
-  unsigned __int8 EventPending : 1;
-  unsigned __int8 EventType : 3;
-  unsigned __int8 Reserved0 : 4;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 AccessType;
-  unsigned __int8 GuestLinearAddressValid : 1;
-  unsigned __int8 Reserved1 : 7;
-  unsigned int Reserved2;
-  unsigned __int64 GuestLinearAddress;
-  unsigned __int64 GuestPhysicalAddress;
-  unsigned __int64 Reserved3;
-};
-
-/* 3497 */
-union _HV_X64_PENDING_MEMORY_INTERCEPT_EVENT
-{
-  unsigned __int64 AsUINT64[4];
-  $D0AFF4A69D9DCEFED22B73853D1890D1 __s1;
-};
-
-/* 3498 */
-struct $6B856F8444A45AB65CACB54BA89500A4
-{
-  unsigned __int8 EventPending : 1;
-  unsigned __int8 EventType : 3;
-  unsigned __int8 Reserved0 : 4;
-  unsigned __int8 AccessType;
-  unsigned __int8 GuestAccessPermission;
-  unsigned __int8 GuestLinearAddressValid : 1;
-  unsigned __int8 CausedByGpaAccess : 1;
-  unsigned __int8 PageTableMisconfiguration : 1;
-  unsigned __int8 Reserved1 : 5;
-  unsigned int Reserved2;
-  unsigned __int64 GuestLinearAddress;
-  unsigned __int64 GuestNestedPhysicalAddress;
-  unsigned __int64 Reserved3;
-};
-
-/* 3499 */
-union _HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT
-{
-  unsigned __int64 AsUINT64[4];
-  $6B856F8444A45AB65CACB54BA89500A4 __s1;
-};
-
-/* 3500 */
-struct $F7ECFF0D59BFB6D80F4ECD4796B1758E
-{
-  _HV_UINT128 Reg0;
-  _HV_UINT128 Reg1;
-};
-
-/* 3501 */
-struct $3A7724D8CEA3FACD475BA7AA9EC0D9F7
-{
-  unsigned __int8 EventPending : 1;
-  unsigned __int8 EventType : 3;
-  unsigned __int8 Reserved : 4;
-  unsigned __int8 EventData[15];
-};
-
-/* 3502 */
-union _HV_X64_PENDING_EVENT
-{
-  $F7ECFF0D59BFB6D80F4ECD4796B1758E __s0;
-  $3A7724D8CEA3FACD475BA7AA9EC0D9F7 __s1;
-  _HV_X64_PENDING_EXCEPTION_EVENT Exception;
-  _HV_X64_PENDING_MEMORY_INTERCEPT_EVENT MemoryIntercept;
-  _HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT NestedMemoryIntercept;
-};
-
-/* 3506 */
-struct $475728EFAD75A5A6EA9A16B068FCF1B5
-{
-  unsigned __int8 VinaAsserted : 1;
-  unsigned __int8 VinaReservedZ : 7;
-};
-
-/* 3507 */
-union _HV_VP_VTL_CONTROL::<unnamed_type_VinaStatus>
-{
-  unsigned __int8 AsUINT8;
-  $475728EFAD75A5A6EA9A16B068FCF1B5 __s1;
-};
-
-/* 3508 */
-struct $A97E767CBB05BC5954941AB6D56ECEBF
-{
-  unsigned int VtlReturnX86Eax;
-  unsigned int VtlReturnX86Ecx;
-};
-
-/* 3509 */
-union $E6F5F17740A89A0E7A2730595BCF4779
-{
-  unsigned __int64 VtlReturnX64Rax;
-  $A97E767CBB05BC5954941AB6D56ECEBF __s1;
-};
-
-/* 3510 */
-struct $7D44DE647107190A427C80C089FA79AE
-{
-  unsigned int VtlReturnX86Edx;
-  unsigned int ReservedZ1;
-};
-
-/* 3511 */
-union $BAD2CE3137CBF4CC510D641C842911FC
-{
-  unsigned __int64 VtlReturnX64Rcx;
-  $7D44DE647107190A427C80C089FA79AE __s1;
-};
-
-/* 3512 */
-struct _HV_VP_VTL_CONTROL
-{
-  _HV_VTL_ENTRY_REASON EntryReason;
-  _HV_VP_VTL_CONTROL::<unnamed_type_VinaStatus> VinaStatus;
-  unsigned __int8 ReservedZ00;
-  unsigned __int16 ReservedZ01;
-  $E6F5F17740A89A0E7A2730595BCF4779 ___u4;
-  $BAD2CE3137CBF4CC510D641C842911FC ___u5;
-};
-
-/* 3513 */
-struct $5663A2C9A2E3B8EE00F4954CBF967A00
-{
-  unsigned __int32 DirectHypercall : 1;
-  unsigned __int32 Reserved : 31;
-};
-
-/* 3514 */
-union _HV_NESTED_ENLIGHTENMENTS_CONTROL::<unnamed_type_Features>
-{
-  unsigned int AsUINT32;
-  $5663A2C9A2E3B8EE00F4954CBF967A00 __s1;
-};
-
-/* 3515 */
-struct $CA561BD266D36C09EACB36DFC101C3AE
-{
-  unsigned __int32 InterPartitionCommunication : 1;
-  unsigned __int32 Reserved : 31;
-};
-
-/* 3516 */
-union _HV_NESTED_ENLIGHTENMENTS_CONTROL::<unnamed_type_HypercallControls>
-{
-  unsigned int AsUINT32;
-  $CA561BD266D36C09EACB36DFC101C3AE __s1;
-};
-
-/* 3517 */
-struct _HV_NESTED_ENLIGHTENMENTS_CONTROL
-{
-  _HV_NESTED_ENLIGHTENMENTS_CONTROL::<unnamed_type_Features> Features;
-  _HV_NESTED_ENLIGHTENMENTS_CONTROL::<unnamed_type_HypercallControls> HypercallControls;
-};
-
-/* 3518 */
-struct $59E8D1DBE18BCF6F3D2E0CB0CA9891F8
-{
-  _HV_VIRTUAL_APIC_ASSIST ApicAssist;
-  unsigned int ReservedZ;
-  _HV_VP_VTL_CONTROL VtlControl;
-  _HV_NESTED_ENLIGHTENMENTS_CONTROL NestedEnlightenmentsControl;
-  unsigned __int8 EnlightenVmEntry;
-  unsigned __int64 CurrentNestedVmcs;
-};
-
-/* 3519 */
-union _HV_VP_ASSIST_PAGE
-{
-  $59E8D1DBE18BCF6F3D2E0CB0CA9891F8 __s0;
-  unsigned __int8 ReservedZBytePadding[4096];
-};
-
-/* 3534 */
-struct $F0DAE1FA2BC21B660CCF134D0C12A248
-{
-  unsigned __int64 AccessVpRunTimeReg : 1;
-  unsigned __int64 AccessPartitionReferenceCounter : 1;
-  unsigned __int64 AccessSynicRegs : 1;
-  unsigned __int64 AccessSyntheticTimerRegs : 1;
-  unsigned __int64 AccessIntrCtrlRegs : 1;
-  unsigned __int64 AccessHypercallMsrs : 1;
-  unsigned __int64 AccessVpIndex : 1;
-  unsigned __int64 AccessResetReg : 1;
-  unsigned __int64 AccessStatsReg : 1;
-  unsigned __int64 AccessPartitionReferenceTsc : 1;
-  unsigned __int64 AccessGuestIdleReg : 1;
-  unsigned __int64 AccessFrequencyRegs : 1;
-  unsigned __int64 AccessDebugRegs : 1;
-  unsigned __int64 AccessReenlightenmentControls : 1;
-  unsigned __int64 Reserved1 : 18;
-  unsigned __int64 CreatePartitions : 1;
-  unsigned __int64 AccessPartitionId : 1;
-  unsigned __int64 AccessMemoryPool : 1;
-  unsigned __int64 AdjustMessageBuffers : 1;
-  unsigned __int64 PostMessages : 1;
-  unsigned __int64 SignalEvents : 1;
-  unsigned __int64 CreatePort : 1;
-  unsigned __int64 ConnectPort : 1;
-  unsigned __int64 AccessStats : 1;
-  unsigned __int64 Reserved2 : 2;
-  unsigned __int64 Debugging : 1;
-  unsigned __int64 CpuManagement : 1;
-  unsigned __int64 ConfigureProfiler : 1;
-  unsigned __int64 AccessVpExitTracing : 1;
-  unsigned __int64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
-  unsigned __int64 AccessVsm : 1;
-  unsigned __int64 AccessVpRegisters : 1;
-  unsigned __int64 UnusedBit : 1;
-  unsigned __int64 FastHypercallOutput : 1;
-  unsigned __int64 EnableExtendedHypercalls : 1;
-  unsigned __int64 StartVirtualProcessor : 1;
-  unsigned __int64 Reserved3 : 10;
-};
-
-/* 3535 */
-union _HV_PARTITION_PRIVILEGE_MASK
-{
-  unsigned __int64 AsUINT64;
-  $F0DAE1FA2BC21B660CCF134D0C12A248 __s1;
-};
-
 /* 3667 */
 struct $22F2B92E971F267BB4D786C0AE79BEE0
 {
@@ -8845,53 +8462,6 @@ union _HV_ENABLE_PARTITION_VTL_FLAGS
 {
   unsigned __int8 AsUINT8;
   $22F2B92E971F267BB4D786C0AE79BEE0 __s1;
-};
-
-/* 3675 */
-struct $25D440EDD0315888F0B51F4CF05601CA
-{
-  unsigned __int64 AdditionalPages : 12;
-  unsigned __int64 GvaPageNumber : 52;
-};
-
-/* 3676 */
-union _HV_GVA_RANGE_SIMPLE
-{
-  unsigned __int64 AsUINT64;
-  $25D440EDD0315888F0B51F4CF05601CA __s1;
-};
-
-/* 3677 */
-struct $5F1F719EEB124085CCB1937C2839FB20
-{
-  unsigned __int64 AdditionalPages : 11;
-  unsigned __int64 LargePage : 1;
-  unsigned __int64 GvaPageNumber : 52;
-};
-
-/* 3678 */
-struct $8A91A3576B766DF508C2B9BB14E94DF5
-{
-  unsigned __int64 : 12;
-  unsigned __int64 PageSize : 1;
-  unsigned __int64 Reserved : 8;
-  unsigned __int64 GvaLargePageNumber : 43;
-};
-
-/* 3679 */
-union _HV_GVA_RANGE_EXTENDED
-{
-  unsigned __int64 AsUINT64;
-  $5F1F719EEB124085CCB1937C2839FB20 __s1;
-  $8A91A3576B766DF508C2B9BB14E94DF5 __s2;
-};
-
-/* 3680 */
-union _HV_GVA_RANGE
-{
-  unsigned __int64 AsUINT64;
-  _HV_GVA_RANGE_SIMPLE Simple;
-  _HV_GVA_RANGE_EXTENDED Extended;
 };
 
 /* 3724 */
@@ -8946,22 +8516,6 @@ struct _HV_X64_XSAVE_HEADER
   unsigned __int64 Reserved7;
 };
 
-/* 4010 */
-struct $5C1F9265A2FB4D6C63FDE5278000A83C
-{
-  unsigned __int16 CallStatus;
-  unsigned __int16 Reserved1;
-  unsigned __int32 ElementsProcessed : 12;
-  unsigned __int32 Reserved2 : 20;
-};
-
-/* 4011 */
-union _HV_HYPERCALL_OUTPUT
-{
-  $5C1F9265A2FB4D6C63FDE5278000A83C __s0;
-  unsigned __int64 AsUINT64;
-};
-
 /* 4012 */
 struct _HV_TIMER_MESSAGE_PAYLOAD
 {
@@ -8990,129 +8544,6 @@ volatile struct _HV_MESSAGE
 struct _HV_MESSAGE_PAGE
 {
   volatile _HV_MESSAGE SintMessage[16];
-};
-
-/* 4035 */
-struct $DABC886BC82C70225C377CEB3FF2D527
-{
-  unsigned __int32 AllowRedSignedCode : 1;
-  unsigned __int32 AllowKernelModeDebugging : 1;
-  unsigned __int32 AllowUserModeDebugging : 1;
-  unsigned __int32 AllowTelnetServer : 1;
-  unsigned __int32 AllowIOPorts : 1;
-  unsigned __int32 AllowFullMsrSpace : 1;
-  unsigned __int32 AllowPerfCounters : 1;
-  unsigned __int32 AllowHost512MB : 1;
-  unsigned __int32 ReservedEax1 : 1;
-  unsigned __int32 AllowRemoteRecovery : 1;
-  unsigned __int32 AllowStreaming : 1;
-  unsigned __int32 AllowPushDeployment : 1;
-  unsigned __int32 AllowPullDeployment : 1;
-  unsigned __int32 AllowProfiling : 1;
-  unsigned __int32 AllowJsProfiling : 1;
-  unsigned __int32 AllowCrashDump : 1;
-  unsigned __int32 AllowVsCrashDump : 1;
-  unsigned __int32 AllowToolFileIO : 1;
-  unsigned __int32 AllowConsoleMgmt : 1;
-  unsigned __int32 AllowTracing : 1;
-  unsigned __int32 AllowXStudio : 1;
-  unsigned __int32 AllowGestureBuilder : 1;
-  unsigned __int32 AllowSpeechLab : 1;
-  unsigned __int32 AllowSmartglassStudio : 1;
-  unsigned __int32 AllowNetworkTools : 1;
-  unsigned __int32 AllowTcrTool : 1;
-  unsigned __int32 AllowHostNetworkStack : 1;
-  unsigned __int32 AllowSystemUpdateTest : 1;
-  unsigned __int32 AllowOffChipPerfCtrStreaming : 1;
-  unsigned __int32 AllowToolingMemory : 1;
-  unsigned __int32 AllowSystemDowngrade : 1;
-  unsigned __int32 AllowGreenDiskLicenses : 1;
-  unsigned __int32 IsLiveConnected : 1;
-  unsigned __int32 IsMteBoosted : 1;
-  unsigned __int32 IsQaSlt : 1;
-  unsigned __int32 IsStockImage : 1;
-  unsigned __int32 IsMsTestLab : 1;
-  unsigned __int32 IsRetailDebugger : 1;
-  unsigned __int32 IsXvdSrt : 1;
-  unsigned __int32 IsGreenDebug : 1;
-  unsigned __int32 IsHwDevTest : 1;
-  unsigned __int32 AllowDiskLicenses : 1;
-  unsigned __int32 AllowInstrumentation : 1;
-  unsigned __int32 AllowWifiTester : 1;
-  unsigned __int32 AllowWifiTesterDFS : 1;
-  unsigned __int32 IsHwTest : 1;
-  unsigned __int32 AllowHostOddTest : 1;
-  unsigned __int32 IsLiveUnrestricted : 1;
-  unsigned __int32 AllowDiscLicensesWithoutMediaAuth : 1;
-  unsigned __int32 ReservedEbx : 15;
-  unsigned int ReservedEcx;
-  unsigned __int32 ReservedEdx : 31;
-  unsigned __int32 UseAlternateXvd : 1;
-};
-
-/* 4036 */
-union _HV_X64_PLATFORM_CAPABILITIES
-{
-  unsigned __int64 AsUINT64[2];
-  $DABC886BC82C70225C377CEB3FF2D527 __s1;
-};
-
-/* 4079 */
-struct _HV_OUTPUT_RETRIEVE_DEBUG_DATA
-{
-  unsigned int RetrievedCount;
-  unsigned int RemainingCount;
-  unsigned __int8 Data[4088];
-};
-
-/* 4103 */
-struct _HV_X64_ENLIGHTENMENT_INFORMATION
-{
-  unsigned __int32 UseHypercallForAddressSpaceSwitch : 1;
-  unsigned __int32 UseHypercallForLocalFlush : 1;
-  unsigned __int32 UseHypercallForRemoteFlush : 1;
-  unsigned __int32 UseApicMsrs : 1;
-  unsigned __int32 UseHvRegisterForReset : 1;
-  unsigned __int32 UseRelaxedTiming : 1;
-  unsigned __int32 UseDmaRemapping_Deprecated : 1;
-  unsigned __int32 UseInterruptRemapping_Deprecated : 1;
-  unsigned __int32 UseX2ApicMsrs : 1;
-  unsigned __int32 DeprecateAutoEoi : 1;
-  unsigned __int32 UseSyntheticClusterIpi : 1;
-  unsigned __int32 UseExProcessorMasks : 1;
-  unsigned __int32 Nested : 1;
-  unsigned __int32 UseIntForMbecSystemCalls : 1;
-  unsigned __int32 UseVmcsEnlightenments : 1;
-  unsigned __int32 Reserved : 17;
-  unsigned int LongSpinWaitCount;
-  unsigned int ReservedEcx;
-  unsigned int ReservedEdx;
-};
-
-/* 4236 */
-struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
-{
-  unsigned __int32 EnlightenedVmcsVersionLow : 8;
-  unsigned __int32 EnlightenedVmcsVersionHigh : 8;
-  unsigned __int32 FlushGuestPhysicalHypercall_Deprecated : 1;
-  unsigned __int32 NestedFlushVirtualHypercall : 1;
-  unsigned __int32 FlushGuestPhysicalHypercall : 1;
-  unsigned __int32 MsrBitmap : 1;
-  unsigned __int32 Reserved0 : 12;
-  unsigned int ReservedEbx;
-  unsigned int ReservedEcx;
-  unsigned int ReservedEdx;
-};
-
-/* 4238 */
-struct _HV_HYPERVISOR_VERSION_INFO
-{
-  unsigned int BuildNumber;
-  unsigned __int32 MinorVersion : 16;
-  unsigned __int32 MajorVersion : 16;
-  unsigned int ServicePack;
-  unsigned __int32 ServiceNumber : 24;
-  unsigned __int32 ServiceBranch : 8;
 };
 
 /* 4239 */
@@ -9168,17 +8599,6 @@ union _HV_X64_XSAVE_AREA
   _HV_X64_X_REGISTERS XRegisters;
 };
 
-/* 4653 */
-struct _HV_HYPERVISOR_SVM_FEATURES
-{
-  unsigned __int32 SvmSupported : 1;
-  unsigned __int32 Reserved0 : 10;
-  unsigned __int32 MaxPasidSpacePasidCount : 21;
-  unsigned int MaxPasidSpaceCount;
-  unsigned int MaxDevicePrqSize;
-  unsigned int Reserved1;
-};
-
 /* 4696 */
 struct $345138E7AE76ED1FC824C1BE61BB6FD6
 {
@@ -9193,12 +8613,6 @@ union _HV_REGISTER_VSM_PARTITION_CONFIG
 {
   unsigned __int64 AsUINT64;
   $345138E7AE76ED1FC824C1BE61BB6FD6 __s1;
-};
-
-/* 4756 */
-struct __declspec(align(8)) _HV_OUTPUT_POST_DEBUG_DATA
-{
-  unsigned int PendingCount;
 };
 
 /* 4949 */
@@ -9216,35 +8630,6 @@ union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
   $E1F76BD6070F30024AD71EC1D3E97394 __s1;
 };
 
-/* 5001 */
-struct $478029150977E50BBCF4EB3DB0C863CC
-{
-  unsigned __int64 BuildNumber : 16;
-  unsigned __int64 ServiceVersion : 8;
-  unsigned __int64 MinorVersion : 8;
-  unsigned __int64 MajorVersion : 8;
-  unsigned __int64 OsId : 8;
-  unsigned __int64 VendorId : 16;
-};
-
-/* 5000 */
-struct $233F5C77A1F8A7968657794057B69338
-{
-  unsigned __int64 VendorSpecific1 : 16;
-  unsigned __int64 Version : 32;
-  unsigned __int64 VendorSpecific2 : 8;
-  unsigned __int64 OsId : 7;
-  unsigned __int64 IsOpenSource : 1;
-};
-
-/* 5002 */
-union _HV_GUEST_OS_ID_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $478029150977E50BBCF4EB3DB0C863CC __s1;
-  $233F5C77A1F8A7968657794057B69338 OpenSource;
-};
-
 /* 5033 */
 struct $E40A898125F12467A4105D9FBACA6083
 {
@@ -9260,31 +8645,6 @@ union _HV_REGISTER_VP_ASSIST_PAGE
   $E40A898125F12467A4105D9FBACA6083 __s1;
 };
 
-/* 5100 */
-struct _HV_IMPLEMENTATION_LIMITS
-{
-  unsigned int MaxVirtualProcessorCount;
-  unsigned int MaxLogicalProcessorCount;
-  unsigned int MaxInterruptMappingCount;
-  unsigned int Reserved;
-};
-
-/* 5114 */
-struct $933FE09BE71FF9FD2050F52B20DF17BD
-{
-  unsigned __int64 Enable : 1;
-  unsigned __int64 Locked : 1;
-  unsigned __int64 ReservedP : 10;
-  unsigned __int64 GpaPageNumber : 52;
-};
-
-/* 5115 */
-union _HV_X64_MSR_HYPERCALL_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $933FE09BE71FF9FD2050F52B20DF17BD __s1;
-};
-
 /* 5134 */
 struct $D832DE7733A49B13559E48FC17DEDC03
 {
@@ -9297,43 +8657,6 @@ union _HV_CRASH_CTL_REG_CONTENTS
 {
   unsigned __int64 AsUINT64;
   $D832DE7733A49B13559E48FC17DEDC03 __s1;
-};
-
-/* 5172 */
-struct _HV_DEBUG_NET_DATA
-{
-  unsigned int HostIp;
-  unsigned int TargetIp;
-  unsigned __int16 HostPort;
-  unsigned __int16 TargetPort;
-  unsigned __int8 HostMac[6];
-  unsigned __int8 TargetMac[6];
-};
-
-/* 5173 */
-struct _HV_OUTPUT_RESET_DEBUG_SESSION
-{
-  _HV_DEBUG_NET_DATA NetData;
-};
-
-/* 5235 */
-struct $E94CC24929C83E40C1B520F0BF2C96CA
-{
-  unsigned __int32 CallCode : 16;
-  unsigned __int32 IsFast : 1;
-  unsigned __int32 Reserved1 : 14;
-  unsigned __int32 IsNested : 1;
-  unsigned __int32 CountOfElements : 12;
-  unsigned __int32 Reserved2 : 4;
-  unsigned __int32 RepStartIndex : 12;
-  unsigned __int32 Reserved3 : 4;
-};
-
-/* 5236 */
-union _HV_HYPERCALL_INPUT
-{
-  $E94CC24929C83E40C1B520F0BF2C96CA __s0;
-  unsigned __int64 AsUINT64;
 };
 
 /* 5282 */
@@ -9351,26 +8674,6 @@ union _HV_REGISTER_VSM_VINA
 {
   unsigned __int64 AsUINT64;
   $C8C71A3554795C5A34C0B8E41DA6C5FE __s1;
-};
-
-/* 5301 */
-struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
-{
-  unsigned __int32 ApicOverlayAssistInUse : 1;
-  unsigned __int32 MsrBitmapsInUse : 1;
-  unsigned __int32 ArchitecturalPerformanceCountersInUse : 1;
-  unsigned __int32 SecondLevelAddressTranslationInUse : 1;
-  unsigned __int32 DmaRemappingInUse : 1;
-  unsigned __int32 InterruptRemappingInUse : 1;
-  unsigned __int32 MemoryPatrolScrubberPresent : 1;
-  unsigned __int32 DmaProtectionInUse : 1;
-  unsigned __int32 HpetRequested : 1;
-  unsigned __int32 SyntheticTimersVolatile : 1;
-  unsigned __int32 HypervisorLevel : 4;
-  unsigned __int32 Reserved : 18;
-  unsigned int ReservedEbx;
-  unsigned int ReservedEcx;
-  unsigned int ReservedEdx;
 };
 
 /* 5360 */
@@ -9422,36 +8725,6 @@ union _HV_REGISTER_VSM_VP_STATUS
   $AD16F5AD0D79B0B966E2A6967F68291E __s1;
 };
 
-/* 5514 */
-struct _HV_X64_HYPERVISOR_FEATURES
-{
-  _HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
-  unsigned __int32 MaxSupportedCState : 4;
-  unsigned __int32 HpetNeededForC3PowerState_Deprecated : 1;
-  unsigned __int32 Reserved : 27;
-  unsigned __int32 MwaitAvailable_Deprecated : 1;
-  unsigned __int32 GuestDebuggingAvailable : 1;
-  unsigned __int32 PerformanceMonitorsAvailable : 1;
-  unsigned __int32 CpuDynamicPartitioningAvailable : 1;
-  unsigned __int32 XmmRegistersForFastHypercallAvailable : 1;
-  unsigned __int32 GuestIdleAvailable : 1;
-  unsigned __int32 HypervisorSleepStateSupportAvailable : 1;
-  unsigned __int32 NumaDistanceQueryAvailable : 1;
-  unsigned __int32 FrequencyRegsAvailable : 1;
-  unsigned __int32 SyntheticMachineCheckAvailable : 1;
-  unsigned __int32 GuestCrashRegsAvailable : 1;
-  unsigned __int32 DebugRegsAvailable : 1;
-  unsigned __int32 Npiep1Available : 1;
-  unsigned __int32 DisableHypervisorAvailable : 1;
-  unsigned __int32 ExtendedGvaRangesForFlushVirtualAddressListAvailable : 1;
-  unsigned __int32 FastHypercallOutputAvailable : 1;
-  unsigned __int32 SvmFeaturesAvailable : 1;
-  unsigned __int32 SintPollingModeAvailable : 1;
-  unsigned __int32 HypercallMsrLockAvailable : 1;
-  unsigned __int32 DirectSyntheticTimers : 1;
-  unsigned __int32 Reserved1 : 12;
-};
-
 /* 5557 */
 struct $665D16390830E1750BE3CF386BE04F7B
 {
@@ -9464,60 +8737,6 @@ union _HV_TSC_EMULATION_STATUS
 {
   unsigned __int64 AsUINT64;
   $665D16390830E1750BE3CF386BE04F7B __s1;
-};
-
-/* 5582 */
-struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
-{
-  unsigned __int32 StartLogicalProcessor : 1;
-  unsigned __int32 CreateRootVirtualProcessor : 1;
-  unsigned __int32 Reserved0 : 29;
-  unsigned __int32 ReservedIdentityBit : 1;
-  unsigned __int32 ProcessorPowerManagement : 1;
-  unsigned __int32 MwaitIdleStates : 1;
-  unsigned __int32 LogicalProcessorIdling : 1;
-  unsigned __int32 Reserved1 : 29;
-  unsigned int ReservedEcx;
-  unsigned int ReservedEdx;
-};
-
-/* 1968 */
-struct $16E1E01FEC2AEE0364559B17133A53F6
-{
-  unsigned int Eax;
-  unsigned int Ebx;
-  unsigned int Ecx;
-  unsigned int Edx;
-};
-
-/* 5581 */
-struct $FADE6EBC30840E6138A387D9A6A4B4E8
-{
-  unsigned int ReservedEax;
-  unsigned __int32 ReservedEbx : 24;
-  unsigned __int32 InitialApicId : 8;
-  unsigned __int32 ReservedEcx : 31;
-  unsigned __int32 HypervisorPresent : 1;
-  unsigned int ReservedEdx;
-};
-
-/* 5583 */
-union _HV_CPUID_RESULT
-{
-  $16E1E01FEC2AEE0364559B17133A53F6 __s0;
-  unsigned int AsUINT32[4];
-  $FADE6EBC30840E6138A387D9A6A4B4E8 VersionAndFeatures;
-  _HV_VENDOR_AND_MAX_FUNCTION HvVendorAndMaxFunction;
-  _HV_HYPERVISOR_INTERFACE_INFO HvInterface;
-  _HV_HYPERVISOR_VERSION_INFO MsHvVersion;
-  _HV_X64_HYPERVISOR_FEATURES MsHvFeatures;
-  _HV_X64_ENLIGHTENMENT_INFORMATION MsHvEnlightenmentInformation;
-  _HV_IMPLEMENTATION_LIMITS MsHvImplementationLimits;
-  _HV_X64_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
-  _HV_X64_PLATFORM_CAPABILITIES MsHvPlatformCapabilities;
-  _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
-  _HV_HYPERVISOR_SVM_FEATURES MsHvSvmFeatures;
-  _HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
 };
 
 /* 5643 */
@@ -9547,27 +8766,6 @@ union _HV_VTL_RETURN_INPUT
 {
   unsigned __int64 AsUINT64;
   $F244B3B4672D2F4E33F1DF388E1ACD8F __s1;
-};
-
-/* 5673 */
-struct $1C089F3A5C26E55215FEE3452DE544EE
-{
-  unsigned __int64 Reset : 1;
-  unsigned __int64 ReservedZ : 63;
-};
-
-/* 5674 */
-union _HV_X64_MSR_RESET_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $1C089F3A5C26E55215FEE3452DE544EE __s1;
-};
-
-/* 5688 */
-union _HV_X64_MSR_REFERENCE_TSC_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $E40A898125F12467A4105D9FBACA6083 __s1;
 };
 
 /* 5808 */
@@ -9621,44 +8819,11 @@ struct _CM_VIRTUAL_REPLICATION_STACK
   HSTORAGE_TYPE StorageType;
 };
 
-/* 6172 */
-struct $4830772E2C22628E264B1A6B5630F19D
-{
-  unsigned int Reference;
-  unsigned int Actual;
-};
-
-/* 6173 */
-struct _HV_POWER_STATS_OFFSETS
-{
-  unsigned int GlobalTime;
-  unsigned int TotalRunTime;
-  unsigned int IdleSequenceNumber;
-  unsigned int GlobalTscCount;
-  unsigned int ActiveTscCount;
-  unsigned int IdleAccumulation;
-  $4830772E2C22628E264B1A6B5630F19D CycleCount[2];
-};
-
 /* 6174 */
 struct _HVLP_POWER_POLICY_MAPPING
 {
   const _GUID *SettingGuid;
   _HV_PPM_POWER_POLICY_SETTING_ID HvSetting;
-};
-
-/* 6175 */
-struct _HV_OUTPUT_GET_MEMORY_BALANCE
-{
-  unsigned __int64 PagesAvailable;
-  unsigned __int64 PagesInUse;
-};
-
-/* 6183 */
-struct __declspec(align(8)) _HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA
-{
-  unsigned int Count;
-  unsigned int AssociatedLpList[512];
 };
 
 /* 6184 */
@@ -9683,24 +8848,6 @@ union _HV_HYPERCALL_INPUT_PRIVATE
   unsigned __int64 AsUINT64;
 };
 
-/* 6186 */
-struct _HV_LP_STARTUP_STATUS
-{
-  unsigned __int16 Status;
-  unsigned __int64 SubStatus1;
-  unsigned __int64 SubStatus2;
-  unsigned __int64 SubStatus3;
-  unsigned __int64 SubStatus4;
-  unsigned __int64 SubStatus5;
-  unsigned __int64 SubStatus6;
-};
-
-/* 6187 */
-struct _HV_OUTPUT_ADD_LOGICAL_PROCESSOR
-{
-  _HV_LP_STARTUP_STATUS StartupStatus;
-};
-
 /* 6188 */
 struct $5F58830ACAD804269FA690CF2AD84A9F
 {
@@ -9715,209 +8862,10 @@ union _HV_SPA_PAGE_RANGE
   $5F58830ACAD804269FA690CF2AD84A9F __s1;
 };
 
-/* 6190 */
-struct $57B13CCAE687E9538050191B3E758FCA
-{
-  unsigned __int32 MaxPasidWidth : 5;
-  unsigned __int32 InvalidateQueueDepth : 5;
-  unsigned __int32 GlobalInvalidate : 1;
-  unsigned __int32 Reserved : 21;
-};
-
-/* 6191 */
-union _HV_DEVICE_PCI_CAPABILITIES
-{
-  $57B13CCAE687E9538050191B3E758FCA __s0;
-  unsigned int AsUINT32;
-};
-
-/* 6210 */
-struct _HV_X64_PPM_PERF_STATE
-{
-  unsigned __int64 Control;
-  unsigned __int64 Status;
-  unsigned __int64 ControlMask;
-  unsigned __int64 StatusMask;
-  unsigned int Frequency;
-  unsigned int TransitionLatency;
-  unsigned int BusMasterLatency;
-  unsigned int PowerConsumption;
-};
-
-/* 6214 */
-struct $89C11BFBE898980B7BDC95B937F792B2
-{
-  unsigned __int64 TypeSpecific : 52;
-  unsigned __int64 RegisterType : 12;
-};
-
-/* 6211 */
-struct $AA5F6A76809AB746F5CF4590DE353866
-{
-  unsigned int RegisterNumber;
-  unsigned __int8 BitWidth;
-  unsigned __int8 BitOffset;
-  unsigned __int16 ReservedZ : 4;
-};
-
-/* 6212 */
-struct $362C8F9679FF9E3E1558182A921A03D7
-{
-  unsigned __int16 Port;
-  unsigned __int16 AccessSize;
-  unsigned __int8 BitWidth;
-  unsigned __int8 BitOffset;
-  unsigned __int16 ReservedZ : 4;
-};
-
-/* 6213 */
-struct $1D9A5C36FDFCED9CB3B63EDA52006B1B
-{
-  unsigned __int64 Address : 52;
-};
-
-/* 6215 */
-union _HV_X64_PPM_PERF_STATE_REGISTER
-{
-  unsigned __int64 AsUINT64;
-  $89C11BFBE898980B7BDC95B937F792B2 __s1;
-  $AA5F6A76809AB746F5CF4590DE353866 Msr;
-  $362C8F9679FF9E3E1558182A921A03D7 Io;
-  $1D9A5C36FDFCED9CB3B63EDA52006B1B Memory;
-};
-
-/* 6216 */
-struct _HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY
-{
-  unsigned int StateCount;
-  _HV_X64_PPM_PERF_STATE States[64];
-  unsigned int DomainId;
-  unsigned int NumProcInDomain;
-  _HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
-  _HV_X64_PPM_PERF_STATE_REGISTER ControlRegister;
-  _HV_X64_PPM_PERF_STATE_REGISTER StatusRegister;
-};
-
-/* 6217 */
-struct _HV_X64_INPUT_DISABLE_HYPERVISOR
-{
-  unsigned __int64 TrampolineCr3;
-  unsigned __int64 KernelCr3;
-  unsigned __int64 Rip;
-};
-
-/* 6224 */
-struct $24CC1E224CBF0AA49293D8A745209D9D
-{
-  unsigned __int64 Deposited : 1;
-  unsigned __int64 RsvdZ : 63;
-};
-
-/* 6225 */
-union _HV_SPA_PAGE_LIST_FLAGS
-{
-  unsigned __int64 AsUINT64;
-  $24CC1E224CBF0AA49293D8A745209D9D __s1;
-};
-
-/* 6226 */
-struct _HV_INPUT_GET_SPA_PAGE_LIST
-{
-  unsigned __int64 StartPage;
-  unsigned __int64 EndPage;
-  _HV_SPA_PAGE_LIST_FLAGS Flags;
-};
-
-/* 6227 */
-struct _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER
-{
-  _HV_DEVICE_ID PhysicalDeviceId;
-  _HV_PHYSICAL_DEVICE_PROPERTY Property;
-  unsigned int Reserved;
-};
-
-/* 6228 */
-struct _HV_X64_PPM_PCC_CONFIG_PROPERTY
-{
-  unsigned int Flags;
-  unsigned int DomainId;
-  unsigned int NumProcInDomain;
-  _HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
-  unsigned __int64 SharedMemoryAddress;
-  unsigned int SharedMemoryLength;
-  _HV_X64_PPM_PERF_STATE_REGISTER Doorbell;
-  unsigned __int64 DoorbellPreserve;
-  unsigned __int64 DoorbellWrite;
-  unsigned __int64 DoorbellMask;
-  unsigned int InputBufferOffset;
-  unsigned int OutputBufferOffset;
-};
-
-/* 6229 */
-union $28DA5A2D81153E7E8D887D83370B2C6C
-{
-  _HV_PPM_POWER_POLICY_SETTING_ID PolicySettingId;
-};
-
-/* 6230 */
-struct $7175F5A3BB6D3CD366109F1FEEB8052F
-{
-  unsigned int LpIndex;
-};
-
-/* 6231 */
-union $BC0E56A67D528A5D55F86BBDC1E63111
-{
-  $28DA5A2D81153E7E8D887D83370B2C6C Global;
-  $7175F5A3BB6D3CD366109F1FEEB8052F Processor;
-};
-
-/* 6232 */
-struct _HV_INPUT_GET_POWER_PROPERTY
-{
-  _HV_POWER_PROPERTY_TYPE Type;
-  $BC0E56A67D528A5D55F86BBDC1E63111 ___u1;
-};
-
-/* 6243 */
-struct _HV_X64_PROC_STATE_GP_REGS
-{
-  unsigned __int64 Rip;
-  unsigned __int64 Rsp;
-  unsigned __int64 Rbp;
-  unsigned __int64 Rbx;
-  unsigned __int64 Rdi;
-  unsigned __int64 Rsi;
-  unsigned __int64 R12;
-  unsigned __int64 R13;
-  unsigned __int64 R14;
-  unsigned __int64 R15;
-};
-
-/* 6244 */
-struct __declspec(align(8)) _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
-{
-  unsigned int LpIndex;
-};
-
-/* 6245 */
-struct _HV_INPUT_DELETE_DEVICE_PR_QUEUE
-{
-  unsigned int QueueId;
-  unsigned int Reserved;
-};
-
 /* 6246 */
 struct _HV_OUTPUT_QUERY_NUMA_TOPOLOGY
 {
   unsigned __int64 Distance;
-};
-
-/* 6248 */
-struct _HV_INPUT_DELETE_PASID_SPACE
-{
-  unsigned int PasidSpaceId;
-  unsigned int Reserved;
 };
 
 /* 6249 */
@@ -9960,25 +8908,6 @@ struct _HV_LOGICAL_PROCESSOR_REGISTER_ASSOC
   _HV_LOGICAL_PROCESSOR_REGISTER_VALUE Value;
 };
 
-/* 6254 */
-struct _HV_X64_OUTPUT_PREPARE_FOR_HIBERNATE
-{
-  unsigned __int64 HvCr3;
-  unsigned __int64 HvEntryPoint;
-  unsigned __int64 HvReservedTransitionAddress;
-  unsigned __int64 HvReservedTransitionAddressSize;
-};
-
-/* 6255 */
-struct __declspec(align(8)) _HV_X64_PPM_THROTTLE_STATE
-{
-  unsigned __int64 Control;
-  unsigned __int64 Status;
-  unsigned int PercentFrequency;
-  unsigned int TransitionLatency;
-  unsigned int PowerConsumption;
-};
-
 /* 6256 */
 struct _HV_PHYSICAL_DEVICE_PROPERTY_ENABLED
 {
@@ -9988,219 +8917,11 @@ struct _HV_PHYSICAL_DEVICE_PROPERTY_ENABLED
   unsigned int Reserved2;
 };
 
-/* 6257 */
-struct _HV_PROXIMITY_DOMAIN_FLAGS
-{
-  unsigned __int32 ProximityPreferred : 1;
-  unsigned __int32 Reserved : 30;
-  unsigned __int32 ProximityInfoValid : 1;
-};
-
-/* 6258 */
-struct _HV_PROXIMITY_DOMAIN_INFO
-{
-  unsigned int Id;
-  _HV_PROXIMITY_DOMAIN_FLAGS Flags;
-};
-
-/* 6259 */
-struct _HV_INPUT_ADD_LOGICAL_PROCESSOR
-{
-  unsigned int LpIndex;
-  unsigned int ApicId;
-  _HV_PROXIMITY_DOMAIN_INFO ProximityDomainInfo;
-  unsigned __int64 Flags;
-};
-
-/* 6263 */
-struct $7F4CED1B7939382884282FA80C1C523B
-{
-  unsigned __int64 TypeSpecific : 52;
-  unsigned __int64 ChangeType : 4;
-  unsigned __int64 CheckBM_STS : 1;
-  unsigned __int64 SetBM_RST : 1;
-  unsigned __int64 ClearBM_RST : 1;
-  unsigned __int64 SetARB_DIS : 1;
-  unsigned __int64 ReservedZ : 4;
-};
-
-/* 6260 */
-struct $3BF51BF07D970A7AD3F227DC952BC96F
-{
-  unsigned __int64 ReservedZ : 52;
-};
-
-/* 6261 */
-struct $D8ED04AA15CA5EE4387A029BCB42E4BE
-{
-  unsigned __int16 Port;
-  unsigned __int16 ReservedZ1;
-  unsigned __int32 ReservedZ2 : 20;
-};
-
-/* 6262 */
-struct $CCBD12C915509F5FCC777673CF5E3E97
-{
-  unsigned int Hints;
-  unsigned __int32 BreakOnMaskedInterrupt : 1;
-  unsigned __int32 ReservedZ : 19;
-};
-
-/* 6264 */
-union _HV_X64_PPM_IDLE_STATE_CONFIG
-{
-  unsigned __int64 AsUINT64;
-  $7F4CED1B7939382884282FA80C1C523B __s1;
-  $3BF51BF07D970A7AD3F227DC952BC96F Hlt;
-  $D8ED04AA15CA5EE4387A029BCB42E4BE Io;
-  $CCBD12C915509F5FCC777673CF5E3E97 Mwait;
-};
-
-/* 6265 */
-struct __declspec(align(8)) _HV_X64_PPM_IDLE_STATE
-{
-  _HV_X64_PPM_IDLE_STATE_CONFIG Config;
-  unsigned int Type;
-  unsigned int HardwareLatency;
-  unsigned int PowerConsumption;
-};
-
-/* 6266 */
-struct _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY
-{
-  unsigned int StateCount;
-  _HV_X64_PPM_IDLE_STATE States[16];
-};
-
-/* 6267 */
-struct __declspec(align(8)) _HV_X64_PPM_FEEDBACK_REGISTER_PAIR
-{
-  _HV_X64_PPM_PERF_STATE_REGISTER ReferenceCount;
-  _HV_X64_PPM_PERF_STATE_REGISTER ActualCount;
-  unsigned __int8 ResetRegisters;
-};
-
-/* 6268 */
-struct _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG
-{
-  unsigned int Count;
-  _HV_X64_PPM_FEEDBACK_REGISTER_PAIR FeedbackCounters[4];
-};
-
-/* 6269 */
-struct $099DE00852DDDB25B9F3ADDB7201B967
-{
-  unsigned int Value;
-};
-
-/* 6270 */
-union _HV_OUTPUT_GET_POWER_PROPERTY
-{
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
-  unsigned int PercentFrequency;
-  unsigned int NextPlatformStateIndex;
-  _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
-  $099DE00852DDDB25B9F3ADDB7201B967 Policy;
-  _HV_POWER_STATS_OFFSETS StatsOffsets;
-};
-
 /* 6271 */
 struct _HV_MCUPDATE_DATA_HEADER
 {
   unsigned int DataSize;
   unsigned int TableOffset;
-};
-
-/* 6272 */
-struct _HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY
-{
-  unsigned int StateCount;
-  _HV_X64_PPM_THROTTLE_STATE States[100];
-  unsigned int DomainId;
-  unsigned int NumProcInDomain;
-  _HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
-  _HV_X64_PPM_PERF_STATE_REGISTER ControlRegister;
-  _HV_X64_PPM_PERF_STATE_REGISTER StatusRegister;
-  unsigned __int64 ControlMask;
-  unsigned __int64 StatusMask;
-};
-
-/* 6273 */
-struct _HV_X64_PPM_PERF_STATE_CAP_PROPERTY
-{
-  unsigned int PStateCap;
-  unsigned int TStateCap;
-  unsigned int ThermalCap;
-};
-
-/* 6274 */
-struct __unaligned __declspec(align(1)) $00E8C1E4E5281BE9FC1668976252C3C2
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  unsigned __int8 Vtl;
-};
-
-/* 6275 */
-union __declspec(align(4)) _HV_MACHINE_CHECK_CONTEXT
-{
-  $00E8C1E4E5281BE9FC1668976252C3C2 __s0;
-};
-
-/* 6276 */
-struct _HV_MACHINE_CHECK_CONTEXT_INFO
-{
-  _HV_MACHINE_CHECK_SOURCE MachineCheckSource;
-  __declspec(align(8)) _HV_MACHINE_CHECK_CONTEXT MachineCheckContext;
-};
-
-/* 6277 */
-struct _HV_MCUPDATE_UPDATE_STATUS
-{
-  unsigned __int8 Valid;
-  unsigned int UpdateLoadStatus;
-  unsigned int UpdateRevision;
-  unsigned int PreviousUpdateRevision;
-  unsigned int PlatformSpecificField1;
-  unsigned int PlatformSpecificField2;
-};
-
-/* 6278 */
-union _HV_LOGICAL_PROCESSOR_PROPERTY
-{
-  _HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY PerfStateConfig;
-  _HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY ThrottleStateConfig;
-  _HV_X64_PPM_PCC_CONFIG_PROPERTY PccConfig;
-  _HV_X64_PPM_PERF_STATE_CAP_PROPERTY PerfStateCap;
-  _HV_MACHINE_CHECK_CONTEXT_INFO MachineCheckContextInfo;
-  _HV_MCUPDATE_UPDATE_STATUS UpdateStatus;
-};
-
-/* 6279 */
-struct _HV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY
-{
-  unsigned int LpIndex;
-  _HV_LOGICAL_PROCESSOR_PROPERTY_TYPE Type;
-  _HV_LOGICAL_PROCESSOR_PROPERTY Property;
-};
-
-/* 6280 */
-struct __declspec(align(8)) _HV_INPUT_ENTER_SLEEP_STATE
-{
-  _HV_SLEEP_STATE SleepState;
-};
-
-/* 6281 */
-struct _HV_INPUT_DETACH_DEVICE
-{
-  unsigned __int64 PartitionId;
-  _HV_DEVICE_ID DeviceId;
-};
-
-/* 6282 */
-struct __declspec(align(8)) _HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA
-{
-  unsigned int VpIndex;
 };
 
 /* 6283 */
@@ -10224,39 +8945,10 @@ struct _HV_IMAGE_COVERAGE_INFO
   wchar_t ImageName[32];
 };
 
-/* 6288 */
-struct _HV_INPUT_DEPOSIT_MEMORY
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 GpaPageList[];
-};
-
 /* 6289 */
 struct _HV_OUTPUT_ADD_PHYSICAL_MEMORY
 {
   unsigned __int64 PagesProcessed;
-};
-
-/* 6290 */
-struct _HV_INPUT_UNMAP_DEVICE_INTERRUPT
-{
-  unsigned __int64 PartitionId;
-  _HV_DEVICE_ID DeviceId;
-  _HV_INTERRUPT_ENTRY InterruptEntry;
-};
-
-/* 6293 */
-struct _HV_INPUT_DEVICE_DOMAIN
-{
-  unsigned __int64 PartitionId;
-  _HV_INPUT_VTL OwnerVtl;
-  unsigned int DomainId;
-};
-
-/* 6294 */
-struct _HV_INPUT_CREATE_DEVICE_DOMAIN
-{
-  _HV_INPUT_DEVICE_DOMAIN DeviceDomain;
 };
 
 /* 6295 */
@@ -10345,33 +9037,6 @@ struct _HV_MINI_LOADER_BLOCK
   unsigned __int64 Below1MbPage;
 };
 
-/* 6305 */
-struct _HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT
-{
-  _HV_CRASHDUMP_ACTION CrashdumpAction;
-};
-
-/* 6306 */
-union _HV_PARTITION_EVENT_INPUT
-{
-  _HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT CrashdumpInput;
-};
-
-/* 6307 */
-struct _HV_INPUT_NOTIFY_PARTITION_EVENT
-{
-  _HV_PARTITION_EVENT Event;
-  _HV_PARTITION_EVENT_INPUT Input;
-};
-
-/* 6309 */
-struct _HV_INPUT_SET_PARTITION_PROPERTY
-{
-  unsigned __int64 PartitionId;
-  HV_PARTITION_PROPERTY_CODE PropertyCode;
-  unsigned __int64 PropertyValue;
-};
-
 /* 6310 */
 struct $DE8B26E4790C6258A28237437B23B98C
 {
@@ -10393,31 +9058,6 @@ union _HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY
 {
   _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES Capabilities;
   _HV_PHYSICAL_DEVICE_PROPERTY_ENABLED Enabled;
-};
-
-/* 6313 */
-struct _HV_MEMORY_DESCRIPTOR
-{
-  unsigned __int64 Pages;
-  unsigned int Levels;
-  unsigned __int64 PageTableRoot;
-};
-
-/* 6314 */
-struct _HV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY
-{
-  unsigned int LpIndex;
-  _HV_LOGICAL_PROCESSOR_PROPERTY_TYPE Type;
-};
-
-/* 6315 */
-struct _HV_INPUT_MAP_DEVICE_GPA_PAGES
-{
-  _HV_INPUT_DEVICE_DOMAIN DeviceDomain;
-  _HV_INPUT_VTL TargetVtl;
-  unsigned int MapFlags;
-  unsigned __int64 TargetDeviceVaBase;
-  unsigned __int64 GpaPageList[];
 };
 
 /* 6317 */
@@ -10445,15 +9085,6 @@ union _HV_GPA_PAGE_RANGE
   $8BCE1229B5E00C1C77B75EB8EDACB382 __s2;
 };
 
-/* 6320 */
-struct _HV_INPUT_MAP_GPA_PAGES
-{
-  unsigned __int64 TargetPartitionId;
-  unsigned __int64 TargetGpaBase;
-  unsigned int MapFlags;
-  unsigned __int64 SourceGpaPageList[];
-};
-
 /* 6321 */
 struct $CF6426CC8F5C0B5FC8C212F6D143BB63
 {
@@ -10469,170 +9100,16 @@ union _HV_PCI_ID
   _HV_PCI_BDF Bdf;
 };
 
-/* 6323 */
-struct _HV_INPUT_GET_MEMORY_BALANCE
-{
-  unsigned __int64 PartitionId;
-  _HV_PROXIMITY_DOMAIN_INFO ProximityDomainInfo;
-};
-
 /* 6324 */
 struct _HV_OUTPUT_MAP_STATS_PAGE
 {
   unsigned __int64 MapLocation;
 };
 
-/* 6325 */
-struct $AEB3573B2EA0D955F891761DE42245E2
-{
-  unsigned __int32 Valid : 1;
-  unsigned __int32 Reserved : 31;
-};
-
-/* 6326 */
-union $529BA51F610D711B6AE232E8BD837673
-{
-  unsigned int FlagsAsUINT32;
-  $AEB3573B2EA0D955F891761DE42245E2 __s1;
-};
-
-/* 6327 */
-struct __declspec(align(8)) _HV_CRASHDUMP_AREA
-{
-  unsigned int Version;
-  $529BA51F610D711B6AE232E8BD837673 ___u1;
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned int CheckSum;
-  unsigned __int64 CurrentPartition;
-  unsigned __int64 PartitionsCreated;
-  unsigned int PartitionsRunning;
-  unsigned __int64 CompartmentFreePfns;
-  unsigned __int16 ImageNameLength;
-  wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  unsigned __int64 BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 MaxPfn;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int CurrentProcessor;
-  unsigned __int64 CodeSpa;
-  unsigned __int8 CodeChunk[512];
-  unsigned int ContextCount;
-  unsigned int ContextOffset;
-  unsigned int ContextSize;
-  unsigned int PfnEntrySize;
-  unsigned __int16 AllocatedPfnEntryMask;
-  unsigned __int8 Partial;
-};
-
-/* 6328 */
-struct _HV_INPUT_GET_COVERAGE_VECTOR
-{
-  _HV_COVERAGE_OPERATION CoverageOp;
-  unsigned int PageCount;
-  unsigned __int64 GpaPageNumbers[128];
-};
-
 /* 6329 */
 struct _HV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY
 {
   _HV_LOGICAL_PROCESSOR_PROPERTY Property;
-};
-
-/* 6330 */
-struct _HV_INPUT_REMOVE_LOGICAL_PROCESSOR
-{
-  unsigned int LpIndex;
-  unsigned __int64 Flags;
-};
-
-/* 6331 */
-struct _HV_DEVICE_INTERRUPT_DESCRIPTOR
-{
-  _HV_INTERRUPT_TYPE InterruptType;
-  _HV_INTERRUPT_TRIGGER_MODE TriggerMode;
-  unsigned int VectorCount;
-  unsigned int Reserved;
-  _HV_DEVICE_INTERRUPT_TARGET Target;
-};
-
-/* 6332 */
-struct _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY
-{
-  _HV_DEVICE_ID PhysicalDeviceId;
-  _HV_PHYSICAL_DEVICE_PROPERTY Property;
-  unsigned int Reserved;
-};
-
-/* 6335 */
-struct $4F25DB81483CB6DA906F3348C99EC014
-{
-  unsigned int Pasid;
-  unsigned int PasidSpaceId;
-};
-
-/* 6336 */
-union _HV_FULL_PASID
-{
-  $4F25DB81483CB6DA906F3348C99EC014 __s0;
-  unsigned __int64 AsUINT64;
-};
-
-/* 6337 */
-struct $F2487DFD8A6AB1C26117F4EDB9664314
-{
-  unsigned __int64 Present : 1;
-  unsigned __int64 Reserved : 11;
-  unsigned __int64 PageTableRootPfn : 52;
-};
-
-/* 6338 */
-union _HV_DEVICE_ADDRESS_SPACE
-{
-  $F2487DFD8A6AB1C26117F4EDB9664314 __s0;
-  unsigned __int64 AsUINT64;
-};
-
-/* 6339 */
-struct _HV_INPUT_SET_PASID_ADDRESS_SPACE
-{
-  _HV_FULL_PASID FullPasid;
-  _HV_DEVICE_ADDRESS_SPACE AddressSpace;
-};
-
-/* 6340 */
-struct _HV_INPUT_CREATE_PASID_SPACE
-{
-  unsigned int PasidSpaceId;
-  unsigned int PasidCount;
-};
-
-/* 6343 */
-struct _HV_INPUT_MAP_DEVICE_INTERRUPT
-{
-  unsigned __int64 PartitionId;
-  _HV_DEVICE_ID DeviceId;
-  unsigned __int64 Flags;
-  _HV_DEVICE_INTERRUPT_DESCRIPTOR InterruptDescriptor;
-};
-
-/* 6344 */
-struct $6986B3F25752A150A857A41374594544
-{
-  unsigned __int64 ReservedZ0 : 12;
-  unsigned __int64 GpaPageNumber : 40;
-  unsigned __int64 ReservedZ1 : 11;
-  unsigned __int64 Disabled : 1;
-};
-
-/* 6345 */
-union _HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS
-{
-  unsigned __int64 AsUINT64;
-  $6986B3F25752A150A857A41374594544 __s1;
 };
 
 /* 6346 */
@@ -10691,54 +9168,6 @@ struct _HV_DEVICE_PAGE_REQUEST
   $66A00931D2028C4A0E1B26932CEE062F ___u13;
 };
 
-/* 6352 */
-struct _HV_INPUT_ENABLE_PASID
-{
-  unsigned int LogicalDeviceId;
-  unsigned int Pasid;
-};
-
-/* 6353 */
-struct _HV_INPUT_ATTACH_DEVICE_DOMAIN
-{
-  _HV_INPUT_DEVICE_DOMAIN DeviceDomain;
-  _HV_DEVICE_ID DeviceId;
-};
-
-/* 6355 */
-struct $5188A17E874841C1C17AFD6A7302775B
-{
-  unsigned __int32 LogicalId : 1;
-  unsigned __int32 PasidSupported : 1;
-  unsigned __int32 PasidEnabled : 1;
-  unsigned __int32 Reserved : 29;
-};
-
-/* 6356 */
-union _HV_ATTACH_DEVICE_FLAGS
-{
-  $5188A17E874841C1C17AFD6A7302775B __s0;
-  unsigned int AsUINT32;
-};
-
-/* 6357 */
-struct _HV_INPUT_ATTACH_DEVICE
-{
-  unsigned __int64 PartitionId;
-  _HV_DEVICE_ID DeviceId;
-  _HV_ATTACH_DEVICE_FLAGS Flags;
-  unsigned int LogicalDeviceId;
-  _HV_DEVICE_PCI_CAPABILITIES PciCapabilities;
-  unsigned int Reserved;
-};
-
-/* 6358 */
-struct _HV_INPUT_INVOKE_HYPERVISOR_DEBUGGER
-{
-  unsigned __int64 Reason;
-  unsigned __int64 SupplementalCode;
-};
-
 /* 6359 */
 struct _HV_OUTPUT_COLLECT_LIVE_DUMP
 {
@@ -10753,13 +9182,6 @@ struct _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
   unsigned __int64 LocalRunTime;
   unsigned __int64 RsvdZ;
   unsigned __int64 HypervisorTime;
-};
-
-/* 6361 */
-struct _HV_INPUT_QUERY_NUMA_DISTANCE
-{
-  unsigned int CpuProximityId;
-  unsigned int MemoryProximityId;
 };
 
 /* 6362 */
@@ -10777,32 +9199,6 @@ struct _HV_OUTPUT_MAP_DEVICE_INTERRUPT
   _HV_IOMMU_EXTENDED_STATUS ExtendedStatus;
 };
 
-/* 6364 */
-struct _HV_INPUT_CREATE_DEVICE_PR_QUEUE
-{
-  unsigned int QueueId;
-  unsigned int Size;
-  unsigned __int64 BaseGpaPage;
-  unsigned int InterruptVector;
-  unsigned int InterruptVpIndex;
-  unsigned int Flags;
-  unsigned int Reserved;
-};
-
-/* 6365 */
-struct _HV_INPUT_DETACH_PASID_SPACE
-{
-  unsigned int LogicalDeviceId;
-  unsigned int Reserved;
-};
-
-/* 6366 */
-struct _HV_INPUT_UNMAP_DEVICE_GPA_PAGES
-{
-  _HV_INPUT_DEVICE_DOMAIN DeviceDomain;
-  unsigned __int64 TargetDeviceVaBase;
-};
-
 /* 6368 */
 struct _HV_DEVICE_PRQ_PROPERTY_INTERRUPT_MASKED
 {
@@ -10812,34 +9208,10 @@ struct _HV_DEVICE_PRQ_PROPERTY_INTERRUPT_MASKED
   unsigned int Reserved2;
 };
 
-/* 6369 */
-struct _HV_INPUT_CREATE_VP
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  unsigned int Padding;
-  _HV_PROXIMITY_DOMAIN_INFO ProximityDomainInfo;
-  unsigned __int64 Flags;
-};
-
-/* 6370 */
-struct __declspec(align(8)) _HV_INPUT_PREPARE_FOR_SLEEP
-{
-  unsigned __int8 Entering;
-  unsigned __int8 ModernStandby;
-};
-
 /* 6371 */
 struct _HV_OUTPUT_GET_COVERAGE_VECTOR
 {
   _HV_IMAGE_COVERAGE_INFO CoverageInfo;
-};
-
-/* 6372 */
-struct _HV_INPUT_ADD_PHYSICAL_MEMORY
-{
-  unsigned __int64 StartPage;
-  unsigned __int64 PageCount;
 };
 
 /* 6373 */
@@ -10857,15 +9229,6 @@ struct _HV_OUTPUT_GET_SPA_PAGE_LIST
   _HV_SPA_PAGE_RANGE RangeList[510];
 };
 
-/* 6375 */
-struct _HV_INPUT_ATTACH_PASID_SPACE
-{
-  unsigned int LogicalDeviceId;
-  unsigned int PasidSpaceId;
-  unsigned int PrQueueId;
-  unsigned int Reserved;
-};
-
 /* 6376 */
 struct _HV_X64_VOLATILE_GP_REGS
 {
@@ -10876,14 +9239,6 @@ struct _HV_X64_VOLATILE_GP_REGS
   unsigned __int64 R9;
   unsigned __int64 R10;
   unsigned __int64 R11;
-};
-
-/* 6377 */
-struct _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE
-{
-  _HV_FULL_PASID FullPasid;
-  unsigned int Flags;
-  unsigned int Reserved;
 };
 
 /* 6378 */
@@ -10917,72 +9272,6 @@ struct __declspec(align(2)) _HV_DEVICE_PRQ_HEADER
   unsigned __int8 Pending;
   unsigned __int8 Stalled;
   unsigned __int8 Error;
-};
-
-/* 6382 */
-union $99406ED08B5330E15CE064C397CCED40
-{
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
-  unsigned int PercentFrequency;
-  unsigned int NextPlatformStateIndex;
-  _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
-};
-
-/* 6384 */
-union $A51A15A07293C747EA9D21054F7BA6BC
-{
-  _HV_PPM_POWER_POLICY_SETTING Policy;
-};
-
-/* 6383 */
-struct $E0544117EC6154A76B96DB5C88C5805B
-{
-  unsigned int LpIndex;
-  $99406ED08B5330E15CE064C397CCED40 ___u1;
-};
-
-/* 6385 */
-union $292ADBAE27D68C3B9B7782D9CE845CEE
-{
-  $E0544117EC6154A76B96DB5C88C5805B Processor;
-  $A51A15A07293C747EA9D21054F7BA6BC Global;
-};
-
-/* 6386 */
-struct _HV_INPUT_SET_POWER_PROPERTY
-{
-  _HV_POWER_PROPERTY_TYPE Type;
-  $292ADBAE27D68C3B9B7782D9CE845CEE ___u1;
-};
-
-/* 6387 */
-struct __declspec(align(8)) _HV_INPUT_PREPARE_FOR_HIBERNATE
-{
-  _HV_X64_PROC_STATE_GP_REGS ResumeGpRegs;
-  unsigned __int8 RestrictApVtl;
-};
-
-/* 6390 */
-struct _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER
-{
-  unsigned int QueueId;
-  _HV_DEVICE_PRQ_PROPERTY Property;
-};
-
-/* 6392 */
-struct _HV_INPUT_FLUSH_PASID_ADDRESS_LIST
-{
-  _HV_FULL_PASID FullPasid;
-  unsigned int Flags;
-  unsigned int VaCount;
-  _HV_GVA_RANGE_EXTENDED VaList[];
-};
-
-/* 6394 */
-struct _HV_INPUT_COLLECT_LIVE_DUMP
-{
-  unsigned __int64 Flags;
-  _HV_MEMORY_DESCRIPTOR Descriptor;
 };
 
 /* 6396 */
@@ -11386,27 +9675,6 @@ struct _PPM_HV_STATS
   unsigned __int64 ActiveCycleSnap;
 };
 
-/* 10833 */
-struct _HV_GUEST_OS_ID_CONTENTS::<unnamed_type_OpenSource>
-{
-  unsigned __int64 VendorSpecific1 : 16;
-  unsigned __int64 Version : 32;
-  unsigned __int64 VendorSpecific2 : 8;
-  unsigned __int64 OsId : 7;
-  unsigned __int64 IsOpenSource : 1;
-};
-
-/* 10863 */
-struct _HV_CPUID_RESULT::<unnamed_type_VersionAndFeatures>
-{
-  unsigned int ReservedEax;
-  unsigned __int32 ReservedEbx : 24;
-  unsigned __int32 InitialApicId : 8;
-  unsigned __int32 ReservedEcx : 31;
-  unsigned __int32 HypervisorPresent : 1;
-  unsigned int ReservedEdx;
-};
-
 /* 11287 */
 struct __declspec(align(4)) $B132ADBD9373BAC3E3171920E52FA102
 {
@@ -11424,62 +9692,26 @@ struct __declspec(align(4)) $B132ADBD9373BAC3E3171920E52FA102
   unsigned __int8 ValueAllocated;
 };
 
-/* 11794 */
-typedef _HV_MEMORY_DESCRIPTOR *PHV_MEMORY_DESCRIPTOR;
-
-/* 11823 */
-typedef _HV_X64_PPM_PERF_STATE *PHV_X64_PPM_PERF_STATE;
-
-/* 11910 */
-typedef _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME *PHV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
-
 /* 11915 */
 typedef _HV_OUTPUT_ADD_PHYSICAL_MEMORY *PHV_OUTPUT_ADD_PHYSICAL_MEMORY;
-
-/* 11925 */
-typedef _HV_PARTITION_PRIVILEGE_MASK *PHV_PARTITION_PRIVILEGE_MASK;
-
-/* 11936 */
-typedef _HV_X64_PENDING_MEMORY_INTERCEPT_EVENT *PHV_X64_PENDING_MEMORY_INTERCEPT_EVENT;
 
 /* 11941 */
 typedef unsigned __int64 *PHV_PARTITION_PROPERTY;
 
-/* 11963 */
-typedef _HV_INTERCEPT_SUSPEND_REGISTER *PHV_INTERCEPT_SUSPEND_REGISTER;
-
 /* 12068 */
 typedef _HAL_HV_SVM_DEVICE_CAPABILITIES *PHAL_HV_SVM_DEVICE_CAPABILITIES;
-
-/* 12089 */
-typedef _HV_INPUT_DETACH_PASID_SPACE *PHV_INPUT_DETACH_PASID_SPACE;
 
 /* 12103 */
 typedef _HV_OUTPUT_RETARGET_ROOT_DEVICE_INTERRUPT *PHV_OUTPUT_RETARGET_ROOT_DEVICE_INTERRUPT;
 
-/* 12145 */
-typedef _HV_INPUT_GET_MEMORY_BALANCE *PHV_INPUT_GET_MEMORY_BALANCE;
-
 /* 12153 */
 typedef _HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY *PHV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY;
-
-/* 12168 */
-typedef _HV_INPUT_ENABLE_PASID *PHV_INPUT_ENABLE_PASID;
 
 /* 12193 */
 typedef _HV_BOOT_DEBUG_PARAMETERS *PHV_BOOT_DEBUG_PARAMETERS;
 
-/* 12235 */
-typedef _HV_OUTPUT_POST_DEBUG_DATA *PHV_OUTPUT_POST_DEBUG_DATA;
-
 /* 12282 */
 typedef unsigned __int8 HV_IOAPIC_ID;
-
-/* 12388 */
-typedef _HV_POWER_STATS_OFFSETS *PHV_POWER_STATS_OFFSETS;
-
-/* 12587 */
-typedef _HV_INPUT_ATTACH_PASID_SPACE *PHV_INPUT_ATTACH_PASID_SPACE;
 
 /* 12595 */
 typedef _CELL_DATA *(__stdcall *PGET_CELL_ROUTINE)(_HHIVE *, unsigned int, _HV_GET_CELL_CONTEXT *);
@@ -11487,35 +9719,14 @@ typedef _CELL_DATA *(__stdcall *PGET_CELL_ROUTINE)(_HHIVE *, unsigned int, _HV_G
 /* 12598 */
 typedef _HV_ENABLE_PARTITION_VTL_FLAGS *PHV_ENABLE_PARTITION_VTL_FLAGS;
 
-/* 12650 */
-typedef _HV_INPUT_PREPARE_FOR_SLEEP *PHV_INPUT_PREPARE_FOR_SLEEP;
-
-/* 12654 */
-typedef _HV_INPUT_NOTIFY_PARTITION_EVENT *PHV_INPUT_NOTIFY_PARTITION_EVENT;
-
-/* 12721 */
-typedef _HV_ATTACH_DEVICE_FLAGS *PHV_ATTACH_DEVICE_FLAGS;
-
-/* 12753 */
-typedef _HV_X64_HYPERVISOR_HARDWARE_FEATURES *PHV_X64_HYPERVISOR_HARDWARE_FEATURES;
-
 /* 12820 */
 typedef const _HV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS *PCHV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS;
 
 /* 12882 */
 typedef _HV_PORT_ID *PHV_PORT_ID;
 
-/* 12953 */
-typedef _HV_INPUT_SET_PASID_ADDRESS_SPACE *PHV_INPUT_SET_PASID_ADDRESS_SPACE;
-
-/* 12999 */
-typedef _HV_X64_PPM_PERF_STATE_REGISTER *PHV_X64_PPM_PERF_STATE_REGISTER;
-
 /* 13027 */
 typedef unsigned int *PHV_LOGICAL_DEVICE_ID;
-
-/* 13128 */
-typedef _HV_X64_PPM_IDLE_STATE *PHV_X64_PPM_IDLE_STATE;
 
 /* 13175 */
 typedef _HV_X64_XSAVE_XFEM_REGISTER *PHV_X64_XSAVE_XFEM_REGISTER;
@@ -11532,29 +9743,11 @@ typedef unsigned __int16 *PHV_PCI_SEGMENT;
 /* 13258 */
 typedef _HV_DEVICE_PRQ_PROPERTY_INTERRUPT_MASKED *PHV_DEVICE_PRQ_PROPERTY_INTERRUPT_MASKED;
 
-/* 13296 */
-typedef _HV_INPUT_GET_COVERAGE_VECTOR *PHV_INPUT_GET_COVERAGE_VECTOR;
-
 /* 13314 */
 typedef _HV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS *PHV_X64_LOGICAL_PROCESSOR_REGISTER_ADDRESS;
 
-/* 13365 */
-typedef _HV_PROXIMITY_DOMAIN_INFO *PHV_PROXIMITY_DOMAIN_INFO;
-
 /* 13442 */
 typedef void (__stdcall *PRELEASE_CELL_ROUTINE)(_HHIVE *, _HV_GET_CELL_CONTEXT *);
-
-/* 13474 */
-typedef _HV_HYPERVISOR_SVM_FEATURES *PHV_HYPERVISOR_SVM_FEATURES;
-
-/* 13502 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY *PHV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY;
-
-/* 13537 */
-typedef _HV_IMPLEMENTATION_LIMITS *PHV_IMPLEMENTATION_LIMITS;
-
-/* 13569 */
-typedef _HV_INPUT_DETACH_DEVICE *PHV_INPUT_DETACH_DEVICE;
 
 /* 13606 */
 typedef _HV_X64_XSAVE_HEADER *PHV_X64_XSAVE_HEADER;
@@ -11565,20 +9758,8 @@ typedef unsigned __int16 *PHV_STATUS;
 /* 13683 */
 typedef _HV_BOOT_PARAMETERS *PHV_BOOT_PARAMETERS;
 
-/* 13689 */
-typedef _HV_OUTPUT_GET_POWER_PROPERTY *PHV_OUTPUT_GET_POWER_PROPERTY;
-
 /* 13699 */
 typedef _HV_MESSAGE *PHV_MESSAGE;
-
-/* 13719 */
-typedef _HV_INPUT_ADD_LOGICAL_PROCESSOR *PHV_INPUT_ADD_LOGICAL_PROCESSOR;
-
-/* 13722 */
-typedef _HV_CPUID_RESULT *PHV_CPUID_RESULT;
-
-/* 13738 */
-typedef _HV_X64_ENLIGHTENMENT_INFORMATION *PHV_X64_ENLIGHTENMENT_INFORMATION;
 
 /* 13752 */
 typedef unsigned int HV_APIC_ID;
@@ -11586,20 +9767,11 @@ typedef unsigned int HV_APIC_ID;
 /* 13809 */
 typedef unsigned int HV_VP_INDEX;
 
-/* 13813 */
-typedef _HV_OUTPUT_RETRIEVE_DEBUG_DATA *PHV_OUTPUT_RETRIEVE_DEBUG_DATA;
-
 /* 13945 */
 typedef unsigned int *PHV_LOGICAL_PROCESSOR_INDEX;
 
-/* 14016 */
-typedef _HV_INPUT_ATTACH_DEVICE *PHV_INPUT_ATTACH_DEVICE;
-
 /* 14089 */
 typedef _HVL_SECONDARY_DUMP_HV_IDENTITY *PHVL_SECONDARY_DUMP_HV_IDENTITY;
-
-/* 14128 */
-typedef _HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA *PHV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA;
 
 /* 14152 */
 typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY *PHV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY;
@@ -11607,23 +9779,14 @@ typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_PROPERTY *PHV_OUTPUT_GET_LOGICAL_PROCES
 /* 14174 */
 typedef _HV_TIMER_MESSAGE_PAYLOAD *PHV_TIMER_MESSAGE_PAYLOAD;
 
-/* 14182 */
-typedef _HV_X64_OUTPUT_PREPARE_FOR_HIBERNATE *PHV_X64_OUTPUT_PREPARE_FOR_HIBERNATE;
-
 /* 14221 */
 typedef _HV_GPA_PAGE_RANGE *PHV_GPA_PAGE_RANGE;
 
 /* 14253 */
 typedef _HV_SPA_PAGE_RANGE *PHV_SPA_PAGE_RANGE;
 
-/* 14302 */
-typedef _HV_INPUT_ADD_PHYSICAL_MEMORY *PHV_INPUT_ADD_PHYSICAL_MEMORY;
-
 /* 14334 */
 typedef _HV_VTL_RETURN_INPUT *PHV_VTL_RETURN_INPUT;
-
-/* 14364 */
-typedef _HV_VENDOR_AND_MAX_FUNCTION *PHV_VENDOR_AND_MAX_FUNCTION;
 
 /* 14380 */
 typedef _HV_REGISTER_VSM_VINA *PHV_REGISTER_VSM_VINA;
@@ -11637,29 +9800,14 @@ typedef unsigned __int8 HV_VTL;
 /* 14440 */
 typedef unsigned __int64 HV_NANO100_TIME;
 
-/* 14457 */
-typedef _HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY *PHV_X64_PPM_PERF_STATE_CONFIG_PROPERTY;
-
-/* 14472 */
-typedef _HV_X64_INTERRUPT_STATE_REGISTER *PHV_X64_INTERRUPT_STATE_REGISTER;
-
 /* 14498 */
 typedef _HV_EVENTLOG_MESSAGE_PAYLOAD *PHV_EVENTLOG_MESSAGE_PAYLOAD;
-
-/* 14503 */
-typedef _HV_X64_PENDING_EVENT *PHV_X64_PENDING_EVENT;
 
 /* 14581 */
 typedef _HV_REGISTER_VSM_CODE_PAGE_OFFSETS *PHV_REGISTER_VSM_CODE_PAGE_OFFSETS;
 
-/* 14604 */
-typedef _HV_INPUT_UNMAP_DEVICE_INTERRUPT *PHV_INPUT_UNMAP_DEVICE_INTERRUPT;
-
 /* 14695 */
 typedef unsigned int HAL_HV_VIRTUAL_PROCESSOR_INDEX;
-
-/* 14709 */
-typedef _HV_GVA_RANGE_EXTENDED *PHV_GVA_RANGE_EXTENDED;
 
 /* 14710 */
 typedef _HV_REENLIGHTENMENT_CONTROL *PHV_REENLIGHTENMENT_CONTROL;
@@ -11667,44 +9815,17 @@ typedef _HV_REENLIGHTENMENT_CONTROL *PHV_REENLIGHTENMENT_CONTROL;
 /* 14792 */
 typedef unsigned __int16 HV_STATUS;
 
-/* 14926 */
-typedef _HV_X64_MSR_NPIEP_CONFIG_CONTENTS *PHV_X64_MSR_NPIEP_CONFIG_CONTENTS;
-
 /* 14929 */
 typedef const _HV_LOGICAL_PROCESSOR_REGISTER_ASSOC *PCHV_LOGICAL_PROCESSOR_REGISTER_ASSOC;
-
-/* 14930 */
-typedef _HV_INPUT_MAP_DEVICE_INTERRUPT *PHV_INPUT_MAP_DEVICE_INTERRUPT;
-
-/* 14938 */
-typedef _HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS *PHV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS;
-
-/* 15218 */
-typedef _HV_INPUT_CREATE_DEVICE_DOMAIN *PHV_INPUT_CREATE_DEVICE_DOMAIN;
 
 /* 15237 */
 typedef _HV_OUTPUT_COLLECT_LIVE_DUMP *PHV_OUTPUT_COLLECT_LIVE_DUMP;
 
-/* 15296 */
-typedef _HV_REGISTER_VALUE *PHV_REGISTER_VALUE;
-
 /* 15403 */
 typedef unsigned __int64 HV_DEVICE_VA;
 
-/* 15451 */
-typedef unsigned int HV_PROXIMITY_DOMAIN_ID;
-
-/* 15497 */
-typedef _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY *PHV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY;
-
 /* 15502 */
 typedef unsigned int HV_LOGICAL_DEVICE_ID;
-
-/* 15524 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_LIST *PHV_INPUT_FLUSH_PASID_ADDRESS_LIST;
-
-/* 15548 */
-typedef _HV_INPUT_CREATE_VP *PHV_INPUT_CREATE_VP;
 
 /* 15601 */
 typedef _HV_LOGICAL_PROCESSOR_REGISTER_VALUE *PHV_LOGICAL_PROCESSOR_REGISTER_VALUE;
@@ -11712,44 +9833,17 @@ typedef _HV_LOGICAL_PROCESSOR_REGISTER_VALUE *PHV_LOGICAL_PROCESSOR_REGISTER_VAL
 /* 15682 */
 typedef _HV_OUTPUT_GET_COVERAGE_VECTOR *PHV_OUTPUT_GET_COVERAGE_VECTOR;
 
-/* 15741 */
-typedef _HV_DEBUG_NET_DATA *PHV_DEBUG_NET_DATA;
-
-/* 15744 */
-typedef _HV_X64_PENDING_INTERRUPTION_REGISTER *PHV_X64_PENDING_INTERRUPTION_REGISTER;
-
-/* 15839 */
-typedef _HV_HYPERCALL_OUTPUT *PHV_HYPERCALL_OUTPUT;
-
-/* 15890 */
-typedef _HV_HYPERCALL_INPUT *PHV_HYPERCALL_INPUT;
-
 /* 15972 */
 typedef unsigned __int16 *PHV_PCI_RID;
 
-/* 16025 */
-typedef _HV_INPUT_ENTER_SLEEP_STATE *PHV_INPUT_ENTER_SLEEP_STATE;
-
-/* 16123 */
-typedef _HV_HYPERVISOR_NESTED_VIRT_FEATURES *PHV_HYPERVISOR_NESTED_VIRT_FEATURES;
-
 /* 16131 */
 typedef const _HV_LOGICAL_PROCESSOR_REGISTER_ID *PCHV_LOGICAL_PROCESSOR_REGISTER_ID;
-
-/* 16152 */
-typedef _HV_INPUT_SET_PARTITION_PROPERTY *PHV_INPUT_SET_PARTITION_PROPERTY;
-
-/* 16170 */
-typedef _HV_FULL_PASID *PHV_FULL_PASID;
 
 /* 16303 */
 typedef _HV_MESSAGE_FLAGS *PHV_MESSAGE_FLAGS;
 
 /* 16323 */
 typedef unsigned int HV_DEVICE_DOMAIN_ID;
-
-/* 16333 */
-typedef _HV_X64_INPUT_DISABLE_HYPERVISOR *PHV_X64_INPUT_DISABLE_HYPERVISOR;
 
 /* 16379 */
 typedef unsigned int *PHAL_HV_VIRTUAL_PROCESSOR_INDEX;
@@ -11763,29 +9857,11 @@ typedef _HV_REGISTER_CR_INTERCEPT_CONTROL *PHV_REGISTER_CR_INTERCEPT_CONTROL;
 /* 16410 */
 typedef _HV_REGISTER_VSM_CAPABILITIES *PHV_REGISTER_VSM_CAPABILITIES;
 
-/* 16430 */
-typedef _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
-
 /* 16480 */
 typedef _PPM_HV_STATS *PPPM_HV_STATS;
 
-/* 16490 */
-typedef _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER *PHV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER;
-
 /* 16532 */
 typedef unsigned __int64 *PHV_NANO100_TIME;
-
-/* 16598 */
-typedef _HV_INPUT_QUERY_NUMA_DISTANCE *PHV_INPUT_QUERY_NUMA_DISTANCE;
-
-/* 16611 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG *PHV_X64_PPM_IDLE_STATE_CONFIG;
-
-/* 16634 */
-typedef _HV_DEVICE_INTERRUPT_DESCRIPTOR *PHV_DEVICE_INTERRUPT_DESCRIPTOR;
-
-/* 16640 */
-typedef _HV_INPUT_REMOVE_LOGICAL_PROCESSOR *PHV_INPUT_REMOVE_LOGICAL_PROCESSOR;
 
 /* 16835 */
 typedef _HV_IOMMU_EXTENDED_STATUS *PHV_IOMMU_EXTENDED_STATUS;
@@ -11793,35 +9869,11 @@ typedef _HV_IOMMU_EXTENDED_STATUS *PHV_IOMMU_EXTENDED_STATUS;
 /* 16837 */
 typedef _HV_GET_CELL_CONTEXT *PHV_GET_CELL_CONTEXT;
 
-/* 16844 */
-typedef _HV_CRASHDUMP_AREA *PHV_CRASHDUMP_AREA;
-
 /* 16860 */
 typedef unsigned int *PHV_DEVICE_PR_QUEUE_ID;
 
-/* 16876 */
-typedef _HV_OUTPUT_GET_PARTITION_ID *PHV_OUTPUT_GET_PARTITION_ID;
-
 /* 16930 */
 typedef _HV_HYPERCALL_OUTPUT (__stdcall *PHVCALL_HYPERCALL_ROUTINE)(_HV_HYPERCALL_INPUT, unsigned __int64, unsigned __int64);
-
-/* 17004 */
-typedef _HV_X64_PPM_PERF_STATE_CAP_PROPERTY *PHV_X64_PPM_PERF_STATE_CAP_PROPERTY;
-
-/* 17009 */
-typedef _HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA *PHV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA;
-
-/* 17075 */
-typedef _HV_OUTPUT_GET_MEMORY_BALANCE *PHV_OUTPUT_GET_MEMORY_BALANCE;
-
-/* 17078 */
-typedef _HV_INPUT_PREPARE_FOR_HIBERNATE *PHV_INPUT_PREPARE_FOR_HIBERNATE;
-
-/* 17080 */
-typedef _HV_GVA_RANGE *PHV_GVA_RANGE;
-
-/* 17165 */
-typedef _HV_HYPERVISOR_VERSION_INFO *PHV_HYPERVISOR_VERSION_INFO;
 
 /* 17174 */
 typedef _HV_MCA_FAULTING_LP_MSR *PHV_MCA_FAULTING_LP_MSR;
@@ -11829,17 +9881,8 @@ typedef _HV_MCA_FAULTING_LP_MSR *PHV_MCA_FAULTING_LP_MSR;
 /* 17210 */
 typedef unsigned __int64 *PHV_DEVICE_VA;
 
-/* 17259 */
-typedef _HV_X64_MSR_RESET_CONTENTS *PHV_X64_MSR_RESET_CONTENTS;
-
-/* 17288 */
-typedef _HV_GVA_RANGE_SIMPLE *PHV_GVA_RANGE_SIMPLE;
-
 /* 17290 */
 typedef _HV_PHYSICAL_DEVICE_PROPERTY_ENABLED *PHV_PHYSICAL_DEVICE_PROPERTY_ENABLED;
-
-/* 17304 */
-typedef _HV_INPUT_DEVICE_DOMAIN *PHV_INPUT_DEVICE_DOMAIN;
 
 /* 17334 */
 typedef unsigned int HV_SYNIC_SINT_INDEX;
@@ -11862,17 +9905,11 @@ typedef _HV_LOGICAL_PROCESSOR_REGISTER_ASSOC *PHV_LOGICAL_PROCESSOR_REGISTER_ASS
 /* 17520 */
 typedef _HV_UINT256 *PHV_UINT256;
 
-/* 17522 */
-typedef _HV_X64_PPM_FEEDBACK_REGISTER_PAIR *PHV_X64_PPM_FEEDBACK_REGISTER_PAIR;
-
 /* 17579 */
 typedef unsigned __int64 *PHV_ADDRESS_SPACE_ID;
 
 /* 17584 */
 typedef _HV_SYNIC_SINT *PHV_SYNIC_SINT;
-
-/* 17661 */
-typedef _HV_LP_STARTUP_STATUS *PHV_LP_STARTUP_STATUS;
 
 /* 17670 */
 typedef _HV_VIRTUAL_APIC_ASSIST *PHV_VIRTUAL_APIC_ASSIST;
@@ -11892,47 +9929,20 @@ typedef _HV_DEVICE_PAGE_REQUEST *PHV_DEVICE_PAGE_REQUEST;
 /* 17797 */
 typedef int (__stdcall *PHAL_SVM_GET_DEVICE_CAPABILITIES)(unsigned int, _HAL_HV_SVM_DEVICE_CAPABILITIES *);
 
-/* 17812 */
-typedef _HV_INPUT_CREATE_PASID_SPACE *PHV_INPUT_CREATE_PASID_SPACE;
-
-/* 17856 */
-typedef _HV_X64_PROC_STATE_GP_REGS *PHV_X64_PROC_STATE_GP_REGS;
-
-/* 17869 */
-typedef _HV_INPUT_SET_POWER_PROPERTY *PHV_INPUT_SET_POWER_PROPERTY;
-
-/* 17884 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE *PHV_INPUT_FLUSH_PASID_ADDRESS_SPACE;
-
 /* 17914 */
 typedef unsigned __int64 *PHV_GVA_PAGE_NUMBER;
 
 /* 17998 */
 typedef _HV_PCI_ID *PHV_PCI_ID;
 
-/* 18023 */
-typedef _HV_X64_MSR_STIMER_CONFIG_CONTENTS *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
-
 /* 18041 */
 typedef unsigned __int64 HV_PARTITION_PROPERTY;
-
-/* 18074 */
-typedef _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER *PHV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER;
 
 /* 18088 */
 typedef _HV_TSC_EMULATION_STATUS *PHV_TSC_EMULATION_STATUS;
 
-/* 18143 */
-typedef _HV_X64_PPM_PCC_CONFIG_PROPERTY *PHV_X64_PPM_PCC_CONFIG_PROPERTY;
-
-/* 18169 */
-typedef _HV_SPA_PAGE_LIST_FLAGS *PHV_SPA_PAGE_LIST_FLAGS;
-
 /* 18177 */
 typedef _HV_REFERENCE_TSC_PAGE *PHV_REFERENCE_TSC_PAGE;
-
-/* 18212 */
-typedef _HV_MACHINE_CHECK_CONTEXT_INFO *PHV_MACHINE_CHECK_CONTEXT_INFO;
 
 /* 18310 */
 typedef unsigned int HV_INTERCEPT_ACCESS_TYPE_MASK;
@@ -11940,35 +9950,20 @@ typedef unsigned int HV_INTERCEPT_ACCESS_TYPE_MASK;
 /* 18327 */
 typedef unsigned int HV_LOGICAL_PROCESSOR_INDEX;
 
-/* 18392 */
-typedef _HV_GUEST_OS_ID_CONTENTS *PHV_GUEST_OS_ID_CONTENTS;
-
-/* 18435 */
-typedef _HV_NESTED_ENLIGHTENMENTS_CONTROL *PHV_NESTED_ENLIGHTENMENTS_CONTROL;
-
 /* 18478 */
 typedef _HV_REGISTER_NESTED_CONTROL *PHV_REGISTER_NESTED_CONTROL;
 
 /* 18487 */
 typedef _HV_HYPERCALL_INPUT_PRIVATE *PHV_HYPERCALL_INPUT_PRIVATE;
 
-/* 18502 */
-typedef _HV_PROXIMITY_DOMAIN_FLAGS *PHV_PROXIMITY_DOMAIN_FLAGS;
-
 /* 18536 */
 typedef unsigned int *PHV_MAP_GPA_FLAGS;
-
-/* 18588 */
-typedef _HV_INPUT_MAP_GPA_PAGES *PHV_INPUT_MAP_GPA_PAGES;
 
 /* 18603 */
 typedef _HV_LOGICAL_PROCESSOR_REGISTER_ID *PHV_LOGICAL_PROCESSOR_REGISTER_ID;
 
 /* 18727 */
 typedef unsigned __int64 *PHV_GPA;
-
-/* 18729 */
-typedef _HV_INPUT_DEPOSIT_MEMORY *PHV_INPUT_DEPOSIT_MEMORY;
 
 /* 18741 */
 typedef _HAL_HV_SVM_SYSTEM_CAPABILITIES *PHAL_HV_SVM_SYSTEM_CAPABILITIES;
@@ -11978,15 +9973,6 @@ typedef unsigned __int64 *PHV_SPA;
 
 /* 18815 */
 typedef _HV_MESSAGE_PAGE *PHV_MESSAGE_PAGE;
-
-/* 18872 */
-typedef _HV_INPUT_MAP_DEVICE_GPA_PAGES *PHV_INPUT_MAP_DEVICE_GPA_PAGES;
-
-/* 18886 */
-typedef _HV_INPUT_GET_POWER_PROPERTY *PHV_INPUT_GET_POWER_PROPERTY;
-
-/* 18950 */
-typedef _HV_VP_VTL_CONTROL *PHV_VP_VTL_CONTROL;
 
 /* 18967 */
 typedef _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG *PHV_REGISTER_VSM_VP_SECURE_VTL_CONFIG;
@@ -12003,20 +9989,8 @@ typedef _HV_REGISTER_VSM_VP_STATUS *PHV_REGISTER_VSM_VP_STATUS;
 /* 19315 */
 typedef unsigned __int16 HV_STATS_OBJECT_FLAG;
 
-/* 19375 */
-typedef _HV_INPUT_GET_SPA_PAGE_LIST *PHV_INPUT_GET_SPA_PAGE_LIST;
-
-/* 19495 */
-typedef _HV_LOGICAL_PROCESSOR_PROPERTY *PHV_LOGICAL_PROCESSOR_PROPERTY;
-
-/* 19556 */
-typedef _HV_EXPLICIT_SUSPEND_REGISTER *PHV_EXPLICIT_SUSPEND_REGISTER;
-
 /* 19588 */
 typedef unsigned int *PHV_APIC_ID;
-
-/* 19678 */
-typedef _HV_OUTPUT_ADD_LOGICAL_PROCESSOR *PHV_OUTPUT_ADD_LOGICAL_PROCESSOR;
 
 /* 19720 */
 typedef _HV_REGISTER_VSM_PARTITION_CONFIG *PHV_REGISTER_VSM_PARTITION_CONFIG;
@@ -12030,15 +10004,6 @@ typedef _HV_CPU_MANAGEMENT_VERSION_REGISTER *PHV_CPU_MANAGEMENT_VERSION_REGISTER
 /* 19830 */
 typedef _HV_X64_XSAVE_AREA *PHV_X64_XSAVE_AREA;
 
-/* 19873 */
-typedef _HV_VP_ASSIST_PAGE *PHV_VP_ASSIST_PAGE;
-
-/* 19918 */
-typedef _HV_INPUT_DELETE_PASID_SPACE *PHV_INPUT_DELETE_PASID_SPACE;
-
-/* 19957 */
-typedef _HV_OUTPUT_RESET_DEBUG_SESSION *PHV_OUTPUT_RESET_DEBUG_SESSION;
-
 /* 19979 */
 typedef _HV_MCUPDATE_DATA_HEADER *PHV_MCUPDATE_DATA_HEADER;
 
@@ -12051,9 +10016,6 @@ typedef _HV_OUTPUT_MAP_STATS_PAGE *PHV_OUTPUT_MAP_STATS_PAGE;
 /* 20169 */
 typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME *PHV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
 
-/* 20244 */
-typedef _HV_X64_PENDING_EXCEPTION_EVENT *PHV_X64_PENDING_EXCEPTION_EVENT;
-
 /* 20252 */
 typedef unsigned int *PHV_DEVICE_DOMAIN_ID;
 
@@ -12063,23 +10025,11 @@ typedef unsigned int *PHV_PASID;
 /* 20393 */
 typedef _HV_UINT512 *PHV_UINT512;
 
-/* 20418 */
-typedef _HV_DEVICE_ADDRESS_SPACE *PHV_DEVICE_ADDRESS_SPACE;
-
 /* 20442 */
 typedef _HV_SYNIC_SIMP *PHV_SYNIC_SIMP;
 
 /* 20482 */
 typedef _HV_IMAGE_COVERAGE_INFO *PHV_IMAGE_COVERAGE_INFO;
-
-/* 20496 */
-typedef _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG *PHV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG;
-
-/* 20506 */
-typedef _HV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY *PHV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY;
-
-/* 20509 */
-typedef _HV_X64_HYPERVISOR_FEATURES *PHV_X64_HYPERVISOR_FEATURES;
 
 /* 20522 */
 typedef _HV_GET_BIN_CONTEXT *PHV_GET_BIN_CONTEXT;
@@ -12087,23 +10037,8 @@ typedef _HV_GET_BIN_CONTEXT *PHV_GET_BIN_CONTEXT;
 /* 20531 */
 typedef unsigned __int64 HV_SPA_PAGE_NUMBER;
 
-/* 20534 */
-typedef _HV_X64_MSR_REFERENCE_TSC_CONTENTS *PHV_X64_MSR_REFERENCE_TSC_CONTENTS;
-
-/* 20698 */
-typedef _HV_INPUT_DELETE_DEVICE_PR_QUEUE *PHV_INPUT_DELETE_DEVICE_PR_QUEUE;
-
-/* 20807 */
-typedef _HV_X64_PPM_THROTTLE_STATE *PHV_X64_PPM_THROTTLE_STATE;
-
-/* 20959 */
-typedef _HV_X64_MSR_HYPERCALL_CONTENTS *PHV_X64_MSR_HYPERCALL_CONTENTS;
-
 /* 20985 */
 typedef _HV_X64_VOLATILE_GP_REGS *PHV_X64_VOLATILE_GP_REGS;
-
-/* 21128 */
-typedef _HV_MCUPDATE_UPDATE_STATUS *PHV_MCUPDATE_UPDATE_STATUS;
 
 /* 21133 */
 typedef unsigned __int64 HV_ADDRESS_SPACE_ID;
@@ -12111,32 +10046,11 @@ typedef unsigned __int64 HV_ADDRESS_SPACE_ID;
 /* 21213 */
 typedef unsigned __int16 HV_PCI_RID;
 
-/* 21227 */
-typedef _HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT *PHV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT;
-
 /* 21243 */
 typedef _HV_TSC_EMULATION_CONTROL *PHV_TSC_EMULATION_CONTROL;
 
-/* 21282 */
-typedef _HV_INPUT_ATTACH_DEVICE_DOMAIN *PHV_INPUT_ATTACH_DEVICE_DOMAIN;
-
-/* 21479 */
-typedef unsigned int *PHV_PROXIMITY_DOMAIN_ID;
-
 /* 21582 */
 typedef unsigned __int8 *PHV_VTL;
-
-/* 21668 */
-typedef _HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT *PHV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT;
-
-/* 21718 */
-typedef _HV_X64_PLATFORM_CAPABILITIES *PHV_X64_PLATFORM_CAPABILITIES;
-
-/* 21733 */
-typedef _HV_DEVICE_PCI_CAPABILITIES *PHV_DEVICE_PCI_CAPABILITIES;
-
-/* 21734 */
-typedef _HV_INPUT_UNMAP_DEVICE_GPA_PAGES *PHV_INPUT_UNMAP_DEVICE_GPA_PAGES;
 
 /* 21752 */
 typedef unsigned int HV_MAP_GPA_FLAGS;
@@ -12146,9 +10060,6 @@ typedef unsigned int *PHV_SYNIC_SINT_INDEX;
 
 /* 21841 */
 typedef unsigned int *PHV_PASID_SPACE_ID;
-
-/* 21843 */
-typedef _HV_MACHINE_CHECK_CONTEXT *PHV_MACHINE_CHECK_CONTEXT;
 
 /* 22014 */
 typedef _HV_MESSAGE_HEADER *PHV_MESSAGE_HEADER;
@@ -12168,23 +10079,14 @@ typedef unsigned __int64 *PHV_SPA_PAGE_NUMBER;
 /* 22186 */
 typedef unsigned int HAL_HV_LOGICAL_PROCESSOR_INDEX;
 
-/* 22238 */
-typedef _HV_INPUT_INVOKE_HYPERVISOR_DEBUGGER *PHV_INPUT_INVOKE_HYPERVISOR_DEBUGGER;
-
 /* 22278 */
 typedef _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES *PHV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES;
-
-/* 22282 */
-typedef _HV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY *PHV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY;
 
 /* 22326 */
 typedef void (__stdcall *PHAL_SVM_GET_SYSTEM_CAPABILITIES)(_HAL_HV_SVM_SYSTEM_CAPABILITIES *);
 
 /* 22445 */
 typedef _HV_UINT128 *PHV_UINT128;
-
-/* 22499 */
-typedef _HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY *PHV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY;
 
 /* 22532 */
 typedef unsigned int *PHAL_HV_LOGICAL_PROCESSOR_INDEX;
@@ -12195,17 +10097,11 @@ typedef unsigned __int8 HV_INTERCEPT_ACCESS_TYPE;
 /* 22627 */
 typedef unsigned __int8 *PHV_IOAPIC_ID;
 
-/* 22648 */
-typedef _HV_INPUT_CREATE_DEVICE_PR_QUEUE *PHV_INPUT_CREATE_DEVICE_PR_QUEUE;
-
 /* 22722 */
 typedef _HV_PCI_PATH *PHV_PCI_PATH;
 
 /* 22724 */
 typedef _HV_OUTPUT_GET_SPA_PAGE_LIST *PHV_OUTPUT_GET_SPA_PAGE_LIST;
-
-/* 22730 */
-typedef _HV_INPUT_COLLECT_LIVE_DUMP *PHV_INPUT_COLLECT_LIVE_DUMP;
 
 /* 22762 */
 typedef unsigned int *PHV_VP_INDEX;
@@ -12230,9 +10126,6 @@ typedef unsigned __int64 *PHV_GVA;
 
 /* 22955 */
 typedef unsigned int HV_DEVICE_PR_QUEUE_ID;
-
-/* 22972 */
-typedef _HV_PARTITION_EVENT_INPUT *PHV_PARTITION_EVENT_INPUT;
 
 /* 22978 */
 typedef unsigned int *PHV_INTERRUPT_VECTOR;

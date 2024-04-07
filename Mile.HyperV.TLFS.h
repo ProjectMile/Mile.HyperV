@@ -45,6 +45,7 @@
 #endif
 #pragma warning(disable:4200) // zero length array
 #pragma warning(disable:4201) // nameless struct/union
+#pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
 #ifndef DECLSPEC_ALIGN
@@ -922,13 +923,13 @@ typedef HV_UINT64 HV_TIME_STAMP, *PHV_TIME_STAMP;
 typedef HV_UINT32 HV_LOGICAL_PROCESSOR_INDEX, *PHV_LOGICAL_PROCESSOR_INDEX;
 
 // This described the various methods for changing power state
-typedef enum _HV_X64_POWER_CHANGE_METHOD
+typedef enum _HV_X64_PPM_IDLE_STATE_CHANGE_METHOD
 {
     HvX64PowerChangeIssueHlt,
     HvX64PowerChangeReadIoThenIssueHlt,
     HvX64PowerChangeReadIo,
     HvX64PowerChangeIssueMwait
-} HV_X64_POWER_CHANGE_METHOD, *PHV_X64_POWER_CHANGE_METHOD;
+} HV_X64_PPM_IDLE_STATE_CHANGE_METHOD, * PHV_X64_PPM_IDLE_STATE_CHANGE_METHOD;
 
 // Define interrupt types.
 typedef enum _HV_INTERRUPT_TYPE
@@ -1708,8 +1709,8 @@ typedef HV_UINT32 HV_SAVE_RESTORE_STATE_FLAGS, *PHV_SAVE_RESTORE_STATE_FLAGS;
 typedef union _HV_PARTITION_PRIVILEGE_MASK
 {
     HV_UINT64 AsUINT64;
-
-    struct {
+    struct
+    {
         HV_UINT64 AccessVpRunTimeReg : 1;
         HV_UINT64 AccessPartitionReferenceCounter : 1;
         HV_UINT64 AccessSynicRegs : 1;
@@ -2280,9 +2281,7 @@ typedef HV_UINT32 HV_MAP_GPA_FLAGS;
 #define HV_MAP_GPA_EXECUTABLE 0x0000000C
 #define HV_MAP_GPA_PERMISSIONS_MASK 0x0000000F
 
-// Gva Range
-// The GVA range is a compressed range of GVA used by the TLB flush routines.
-typedef union _HV_GVA_RANGE
+typedef union _HV_GVA_RANGE_SIMPLE
 {
     HV_UINT64 AsUINT64;
     struct
@@ -2293,6 +2292,35 @@ typedef union _HV_GVA_RANGE
         // virtual address space.
         HV_UINT64 GvaPageNumber : 52;
     };
+} HV_GVA_RANGE_SIMPLE, *PHV_GVA_RANGE_SIMPLE;
+
+typedef union _HV_GVA_RANGE_EXTENDED
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 AdditionalPages : 11;
+        HV_UINT64 LargePage : 1;
+        union
+        {
+            HV_UINT64 GvaPageNumber : 52;
+            struct
+            {
+                HV_UINT64 PageSize : 1;
+                HV_UINT64 Reserved : 8;
+                HV_UINT64 GvaLargePageNumber : 43;
+            };
+        };
+    };
+} HV_GVA_RANGE_EXTENDED, *PHV_GVA_RANGE_EXTENDED;
+
+// Gva Range
+// The GVA range is a compressed range of GVA used by the TLB flush routines.
+typedef union _HV_GVA_RANGE
+{
+    HV_UINT64 AsUINT64;
+    HV_GVA_RANGE_SIMPLE Simple;
+    HV_GVA_RANGE_EXTENDED Extended;
 } HV_GVA_RANGE, *PHV_GVA_RANGE;
 
 // Define index of synthetic interrupt source that receives intercept messages.
@@ -2396,7 +2424,7 @@ typedef enum _HV_MESSAGE_TYPE
 // Define APIC EOI message.
 typedef struct _HV_X64_APIC_EOI_MESSAGE
 {
-    HV_UINT32 VpIndex;
+    HV_VP_INDEX VpIndex;
     HV_UINT32 InterruptVector;
 } HV_X64_APIC_EOI_MESSAGE, *PHV_X64_APIC_EOI_MESSAGE;
 
@@ -2842,7 +2870,6 @@ typedef struct _HV_CRASHDUMP_AREA_V1
     HV_UINT64 CrashStackAddress;
 } HV_CRASHDUMP_AREA_V1, *PHV_CRASHDUMP_AREA_V1;
 
-
 typedef struct _HV_CRASHDUMP_PROCESSOR_STATE
 {
     // Context of the crashing thread.
@@ -2865,7 +2892,7 @@ typedef struct _HV_CRASHDUMP_PROCESSOR_STATE
 // Size of code page to save during a crash.
 #define CODE_CHUNK_SIZE 0x200
 
-typedef struct _HV_CRASHDUMP_AREA
+typedef struct _HV_CRASHDUMP_AREA_V2
 {
     // Version of the Crashdump Area structure
 
@@ -2880,8 +2907,8 @@ typedef struct _HV_CRASHDUMP_AREA
         struct
         {
             // Indicates the contents of the Crashdump Area are valid
-            HV_UINT32  Valid : 1;
-            HV_UINT32  Reserved : 31;
+            HV_UINT32 Valid : 1;
+            HV_UINT32 Reserved : 31;
         };
     };
 
@@ -2930,6 +2957,79 @@ typedef struct _HV_CRASHDUMP_AREA
     HV_UINT32 ContextCount;
     HV_UINT32 ContextOffset;
     HV_UINT32 ContextSize;
+
+} HV_CRASHDUMP_AREA_V2, *PHV_CRASHDUMP_AREA_V2;
+
+typedef struct _HV_CRASHDUMP_AREA
+{
+    // Version of the Crashdump Area structure
+
+    HV_UINT32 Version;
+
+    // Flags indicating content validity and other attributes of the Crashdump
+    // Area
+
+    union
+    {
+        HV_UINT32 FlagsAsUINT32;
+        struct
+        {
+            // Indicates the contents of the Crashdump Area are valid
+            HV_UINT32 Valid : 1;
+            HV_UINT32 Reserved : 31;
+        };
+    };
+
+    // Loaded Module Information.
+
+    HV_UINT64 HypervisorBase;
+    HV_UINT32 SizeOfImage;
+    HV_UINT32 CheckSum;
+
+    // Partition State.
+
+    HV_UINT64 CurrentPartition;
+    HV_UINT64 PartitionsCreated;
+    HV_UINT32 PartitionsRunning;
+    HV_UINT64 CompartmentFreePfns;
+
+    HV_UINT16 ImageNameLength;
+    HV_UINT16 ImageName[HV_IMAGE_NAME_MAX_LENGTH]; // 2-bytes wchar_t
+
+    // Bugcheck error code fields.
+
+    HV_UINT64 BugCheckData[5];
+    HV_UINT64 BugCheckErrorReturnAddress;
+
+    // The root of the page table needed to lookup virtual addresses and the
+    // debugger data block. The debugger data block contains all the information
+    // necc. for the debugger to interpret the dump file. Of particular interest
+    // within it is the prcb address that contain the processor state.
+
+    HV_UINT64 PageTableBase;
+    HV_UINT64 PfnDataBase;
+    HV_UINT64 MaxPfn;
+    HV_UINT64 DebuggerDataBlock;
+    HV_UINT32 NumberProcessors;
+    HV_UINT32 CurrentProcessor;
+
+    // Code page data. If we know the source of the fault this will have the in
+    // memory copy of the code and its spa.
+
+    HV_UINT64 CodeSpa;
+    HV_UINT8 CodeChunk[CODE_CHUNK_SIZE];
+
+    // Processor contexts. This is the offset to a set of
+    // HV_CRASHDUMP_PROCESSOR_STATE structs. The crashing processor should
+    // always be included.
+
+    HV_UINT32 ContextCount;
+    HV_UINT32 ContextOffset;
+    HV_UINT32 ContextSize;
+
+    HV_UINT32 PfnEntrySize;
+    HV_UINT16 AllocatedPfnEntryMask;
+    HV_UINT8 Partial;
 
 } HV_CRASHDUMP_AREA, *PHV_CRASHDUMP_AREA;
 
@@ -3117,14 +3217,14 @@ typedef struct _HV_X64_EXCEPTION_INTERCEPT_MESSAGE
 // Define legacy floating point error message.
 typedef struct _HV_X64_LEGACY_FP_ERROR_MESSAGE
 {
-    HV_UINT32 VpIndex;
+    HV_VP_INDEX VpIndex;
     HV_UINT32 Reserved;
 } HV_X64_LEGACY_FP_ERROR_MESSAGE, *PHV_X64_LEGACY_FP_ERROR_MESSAGE;
 
 // Define invalid virtual processor register message.
 typedef struct _HV_X64_INVALID_VP_REGISTER_MESSAGE
 {
-    HV_UINT32 VpIndex;
+    HV_VP_INDEX VpIndex;
     HV_UINT32 Reserved;
 } HV_X64_INVALID_VP_REGISTER_MESSAGE, *PHV_X64_INVALID_VP_REGISTER_MESSAGE;
 
@@ -3144,7 +3244,7 @@ typedef enum _HV_X64_UNSUPPORTED_FEATURE_CODE
 // Define unsupported feature message.
 typedef struct _HV_X64_UNSUPPORTED_FEATURE_MESSAGE
 {
-    HV_UINT32 VpIndex;
+    HV_VP_INDEX VpIndex;
     HV_X64_UNSUPPORTED_FEATURE_CODE FeatureCode;
     HV_UINT64 FeatureParameter;
 } HV_X64_UNSUPPORTED_FEATURE_MESSAGE, *PHV_X64_UNSUPPORTED_FEATURE_MESSAGE;
@@ -3909,13 +4009,80 @@ typedef const HV_FLUSH_FLAGS* PCHV_FLUSH_FLAGS;
 
 typedef const HV_TRANSLATE_GVA_CONTROL_FLAGS* PCHV_TRANSLATE_GVA_CONTROL_FLAGS;
 
+typedef HV_UINT8 HV_VTL;
+typedef HV_VTL* PHV_VTL;
+typedef const HV_VTL* PCHV_VTL;
+
+#define HV_NUM_VTLS 2
+#define HV_INVALID_VTL ((HV_VTL)-1)
+#define HV_VTL_ALL 0xF
+
+typedef union _HV_X64_PENDING_MEMORY_INTERCEPT_EVENT
+{
+    HV_UINT64 AsUINT64[4];
+    struct
+    {
+        HV_UINT8 EventPending : 1;
+        HV_UINT8 EventType : 3;
+        HV_UINT8 Reserved0 : 4;
+        HV_VTL TargetVtl;
+        HV_UINT8 AccessType;
+        HV_UINT8 GuestLinearAddressValid : 1;
+        HV_UINT8 Reserved1 : 7;
+        HV_UINT32 Reserved2;
+        HV_UINT64 GuestLinearAddress;
+        HV_UINT64 GuestPhysicalAddress;
+        HV_UINT64 Reserved3;
+    };
+} HV_X64_PENDING_MEMORY_INTERCEPT_EVENT, *PHV_X64_PENDING_MEMORY_INTERCEPT_EVENT;
+
+typedef union _HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT
+{
+    HV_UINT64 AsUINT64[4];
+    struct
+    {
+        HV_UINT8 EventPending : 1;
+        HV_UINT8 EventType : 3;
+        HV_UINT8 Reserved0 : 4;
+        HV_UINT8 AccessType;
+        HV_UINT8 GuestAccessPermission;
+        HV_UINT8 GuestLinearAddressValid : 1;
+        HV_UINT8 CausedByGpaAccess : 1;
+        HV_UINT8 PageTableMisconfiguration : 1;
+        HV_UINT8 Reserved1 : 5;
+        HV_UINT32 Reserved2;
+        HV_UINT64 GuestLinearAddress;
+        HV_UINT64 GuestNestedPhysicalAddress;
+        HV_UINT64 Reserved3;
+    };
+} HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT, *PHV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT;
+
+typedef union _HV_X64_PENDING_EVENT
+{
+    struct
+    {
+        HV_UINT128 Reg0;
+        HV_UINT128 Reg1;
+    };
+    struct
+    {
+        HV_UINT8 EventPending : 1;
+        HV_UINT8 EventType : 3;
+        HV_UINT8 Reserved : 4;
+        HV_UINT8 EventData[15];
+    };
+    HV_X64_PENDING_EXCEPTION_EVENT Exception;
+    HV_X64_PENDING_MEMORY_INTERCEPT_EVENT MemoryIntercept;
+    HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT NestedMemoryIntercept;
+} HV_X64_PENDING_EVENT, *PHV_X64_PENDING_EVENT;
+
 typedef struct _HV_TRANSLATE_GVA_RESULT_EX
 {
     HV_TRANSLATE_GVA_RESULT_CODE ResultCode;
     HV_UINT32 CacheType : 8;
     HV_UINT32 OverlayPage : 1;
     HV_UINT32 Reserved : 23;
-    // HV_X64_PENDING_EVENT EventInfo; // Not in TLFS
+    HV_X64_PENDING_EVENT EventInfo; // Not in TLFS
 } HV_TRANSLATE_GVA_RESULT_EX, *PHV_TRANSLATE_GVA_RESULT_EX;
 
 /* Virtual Interrupt */
@@ -4051,14 +4218,6 @@ typedef const HV_INTERCEPT_ACCESS_TYPE_MASK* PCHV_INTERCEPT_ACCESS_TYPE_MASK;
 typedef const HV_NANO100_TIME* PCHV_NANO100_TIME;
 
 /* Virtual Secure Mode */
-
-typedef HV_UINT8 HV_VTL;
-typedef HV_VTL* PHV_VTL;
-typedef const HV_VTL* PCHV_VTL;
-
-#define HV_NUM_VTLS 2
-#define HV_INVALID_VTL ((HV_VTL)-1)
-#define HV_VTL_ALL 0xF
 
 typedef union _HV_REGISTER_VSM_PARTITION_STATUS
 {
@@ -4852,7 +5011,7 @@ typedef union _HV_GET_VP_CPUID_VALUES_FLAGS
 
 typedef struct _HV_OPAQUE_INTERCEPT_MESSAGE
 {
-    HV_UINT32 VpIndex;
+    HV_VP_INDEX VpIndex;
 } HV_OPAQUE_INTERCEPT_MESSAGE, *PHV_OPAQUE_INTERCEPT_MESSAGE;
 
 #define HV_SYNIC_EVENT_RING_MESSAGE_COUNT 63
@@ -5044,7 +5203,7 @@ typedef union _HV_REGISTER_INTERCEPT_RESULT_PARAMETERS
 
 typedef struct _HV_ASYNC_COMPLETION_MESSAGE_PAYLOAD
 {
-    HV_UINT64 PartitionId;
+    HV_PARTITION_ID PartitionId;
     HV_UINT32 Status;
     HV_UINT32 CompletionCount;
     HV_UINT64 SubStatus;
@@ -5120,7 +5279,7 @@ typedef enum _HV_VP_DISPATCH_EVENT
 
 typedef struct _HV_VP_SIGNAL_BITSET_SCHEDULER_MESSAGE
 {
-    HV_UINT64 PartitionId;
+    HV_PARTITION_ID PartitionId;
     HV_UINT32 OverflowCount;
     HV_UINT16 VpCount;
     HV_UINT16 Reserved;
@@ -5147,7 +5306,7 @@ typedef struct _HV_VP_SIGNAL_PAIR_SCHEDULER_MESSAGE
     HV_UINT8 VpCount;
     HV_UINT8 Reserved1[3];
     HV_UINT64 PartitionIds[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
-    HV_UINT32 VpIndexes[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
+    HV_VP_INDEX VpIndexes[HV_MESSAGE_MAX_PARTITION_VP_PAIR_COUNT];
     HV_UINT8 Reserved2[4];
 } HV_VP_SIGNAL_PAIR_SCHEDULER_MESSAGE, *PHV_VP_SIGNAL_PAIR_SCHEDULER_MESSAGE;
 
@@ -5351,14 +5510,6 @@ typedef enum _HV_COVERAGE_OPERATION
     HvCoverageFetchCovSection = 0x2,
     HvCoverageResetCovVector = 0x3,
 } HV_COVERAGE_OPERATION, *PHV_COVERAGE_OPERATION;
-
-typedef enum _HV_X64_PPM_IDLE_STATE_CHANGE_METHOD
-{
-    HvX64PowerChangeIssueHlt = 0x0,
-    HvX64PowerChangeReadIoThenIssueHlt = 0x1,
-    HvX64PowerChangeReadIo = 0x2,
-    HvX64PowerChangeIssueMwait = 0x3,
-} HV_X64_PPM_IDLE_STATE_CHANGE_METHOD, *PHV_X64_PPM_IDLE_STATE_CHANGE_METHOD;
 
 typedef enum _HV_BOOT_DEBUG_COM_PORT_TYPE
 {
@@ -5591,6 +5742,372 @@ typedef struct _HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO
     HV_UINT8 NestedVirtualization;
 } HV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO, *PHV_PLATFORM_VIRTUALIZATION_SUPPORT_INFO;
 
+typedef union _HV_SPA_PAGE_LIST_FLAGS
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 Deposited : 1;
+        HV_UINT64 RsvdZ : 63;
+    };
+} HV_SPA_PAGE_LIST_FLAGS, *PHV_SPA_PAGE_LIST_FLAGS;
+
+typedef struct _HV_X64_PPM_PERF_STATE
+{
+    HV_UINT64 Control;
+    HV_UINT64 Status;
+    HV_UINT64 ControlMask;
+    HV_UINT64 StatusMask;
+    HV_UINT32 Frequency;
+    HV_UINT32 TransitionLatency;
+    HV_UINT32 BusMasterLatency;
+    HV_UINT32 PowerConsumption;
+} HV_X64_PPM_PERF_STATE, *PHV_X64_PPM_PERF_STATE;
+
+typedef union _HV_X64_PPM_PERF_STATE_REGISTER
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 TypeSpecific : 52;
+        HV_UINT64 RegisterType : 12;
+    };
+    struct
+    {
+        HV_UINT32 RegisterNumber;
+        HV_UINT8 BitWidth;
+        HV_UINT8 BitOffset;
+        HV_UINT16 ReservedZ : 4;
+    } Msr;
+    struct
+    {
+        HV_UINT16 Port;
+        HV_UINT16 AccessSize;
+        HV_UINT8 BitWidth;
+        HV_UINT8 BitOffset;
+        HV_UINT16 ReservedZ : 4;
+    } Io;
+    struct
+    {
+        HV_UINT64 Address : 52;
+    } Memory;
+} HV_X64_PPM_PERF_STATE_REGISTER, *PHV_X64_PPM_PERF_STATE_REGISTER;
+
+typedef struct _HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY
+{
+    HV_UINT32 StateCount;
+    HV_X64_PPM_PERF_STATE States[64];
+    HV_UINT32 DomainId;
+    HV_UINT32 NumProcInDomain;
+    HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
+    HV_X64_PPM_PERF_STATE_REGISTER ControlRegister;
+    HV_X64_PPM_PERF_STATE_REGISTER StatusRegister;
+} HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY, *PHV_X64_PPM_PERF_STATE_CONFIG_PROPERTY;
+
+typedef struct DECLSPEC_ALIGN(8) _HV_X64_PPM_THROTTLE_STATE
+{
+    HV_UINT64 Control;
+    HV_UINT64 Status;
+    HV_UINT32 PercentFrequency;
+    HV_UINT32 TransitionLatency;
+    HV_UINT32 PowerConsumption;
+} HV_X64_PPM_THROTTLE_STATE, *PHV_X64_PPM_THROTTLE_STATE;
+
+typedef struct _HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY
+{
+    HV_UINT32 StateCount;
+    HV_X64_PPM_THROTTLE_STATE States[100];
+    HV_UINT32 DomainId;
+    HV_UINT32 NumProcInDomain;
+    HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
+    HV_X64_PPM_PERF_STATE_REGISTER ControlRegister;
+    HV_X64_PPM_PERF_STATE_REGISTER StatusRegister;
+    HV_UINT64 ControlMask;
+    HV_UINT64 StatusMask;
+} HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY, *PHV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY;
+
+typedef struct _HV_X64_PPM_PCC_CONFIG_PROPERTY
+{
+    HV_UINT32 Flags;
+    HV_UINT32 DomainId;
+    HV_UINT32 NumProcInDomain;
+    HV_X64_PPM_PERF_DOMAIN_COORDINATION Coordination;
+    HV_UINT64 SharedMemoryAddress;
+    HV_UINT32 SharedMemoryLength;
+    HV_X64_PPM_PERF_STATE_REGISTER Doorbell;
+    HV_UINT64 DoorbellPreserve;
+    HV_UINT64 DoorbellWrite;
+    HV_UINT64 DoorbellMask;
+    HV_UINT32 InputBufferOffset;
+    HV_UINT32 OutputBufferOffset;
+} HV_X64_PPM_PCC_CONFIG_PROPERTY, *PHV_X64_PPM_PCC_CONFIG_PROPERTY;
+
+typedef struct _HV_X64_PPM_PERF_STATE_CAP_PROPERTY
+{
+    HV_UINT32 PStateCap;
+    HV_UINT32 TStateCap;
+    HV_UINT32 ThermalCap;
+} HV_X64_PPM_PERF_STATE_CAP_PROPERTY, *PHV_X64_PPM_PERF_STATE_CAP_PROPERTY;
+
+typedef struct _HV_MACHINE_CHECK_CONTEXT
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_UINT8 Vtl;
+} HV_MACHINE_CHECK_CONTEXT, *PHV_MACHINE_CHECK_CONTEXT;
+
+typedef struct _HV_MACHINE_CHECK_CONTEXT_INFO
+{
+    HV_MACHINE_CHECK_SOURCE MachineCheckSource;
+    DECLSPEC_ALIGN(8) HV_MACHINE_CHECK_CONTEXT MachineCheckContext;
+} HV_MACHINE_CHECK_CONTEXT_INFO, *PHV_MACHINE_CHECK_CONTEXT_INFO;
+
+typedef struct _HV_MCUPDATE_UPDATE_STATUS
+{
+    HV_BOOLEAN Valid;
+    HV_UINT32 UpdateLoadStatus;
+    HV_UINT32 UpdateRevision;
+    HV_UINT32 PreviousUpdateRevision;
+    HV_UINT32 PlatformSpecificField1;
+    HV_UINT32 PlatformSpecificField2;
+} HV_MCUPDATE_UPDATE_STATUS, *PHV_MCUPDATE_UPDATE_STATUS;
+
+typedef union _HV_LOGICAL_PROCESSOR_PROPERTY
+{
+    HV_X64_PPM_PERF_STATE_CONFIG_PROPERTY PerfStateConfig;
+    HV_X64_PPM_THROTTLE_STATE_CONFIG_PROPERTY ThrottleStateConfig;
+    HV_X64_PPM_PCC_CONFIG_PROPERTY PccConfig;
+    HV_X64_PPM_PERF_STATE_CAP_PROPERTY PerfStateCap;
+    HV_MACHINE_CHECK_CONTEXT_INFO MachineCheckContextInfo;
+    HV_MCUPDATE_UPDATE_STATUS UpdateStatus;
+} HV_LOGICAL_PROCESSOR_PROPERTY, *PHV_LOGICAL_PROCESSOR_PROPERTY;
+
+typedef struct _HV_INPUT_DEVICE_DOMAIN
+{
+    HV_PARTITION_ID PartitionId;
+    HV_INPUT_VTL OwnerVtl;
+    HV_UINT32 DomainId;
+} HV_INPUT_DEVICE_DOMAIN, *PHV_INPUT_DEVICE_DOMAIN;
+
+typedef union _HV_FULL_PASID
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT32 Pasid;
+        HV_UINT32 PasidSpaceId;
+    }; 
+} HV_FULL_PASID, *PHV_FULL_PASID;
+
+typedef union _HV_DEVICE_ADDRESS_SPACE
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 Present : 1;
+        HV_UINT64 Reserved : 11;
+        HV_UINT64 PageTableRootPfn : 52;
+    };
+} HV_DEVICE_ADDRESS_SPACE, *PHV_DEVICE_ADDRESS_SPACE;
+
+typedef struct _HV_DEVICE_INTERRUPT_DESCRIPTOR
+{
+    HV_INTERRUPT_TYPE InterruptType;
+    HV_INTERRUPT_TRIGGER_MODE TriggerMode;
+    HV_UINT32 VectorCount;
+    HV_UINT32 Reserved;
+    HV_DEVICE_INTERRUPT_TARGET Target;
+} HV_DEVICE_INTERRUPT_DESCRIPTOR, *PHV_DEVICE_INTERRUPT_DESCRIPTOR;
+
+typedef union _HV_ATTACH_DEVICE_FLAGS
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        HV_UINT32 LogicalId : 1;
+        HV_UINT32 PasidSupported : 1;
+        HV_UINT32 PasidEnabled : 1;
+        HV_UINT32 Reserved : 29;
+    };
+} HV_ATTACH_DEVICE_FLAGS, *PHV_ATTACH_DEVICE_FLAGS;
+
+typedef union _HV_DEVICE_PCI_CAPABILITIES
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        HV_UINT32 MaxPasidWidth : 5;
+        HV_UINT32 InvalidateQueueDepth : 5;
+        HV_UINT32 GlobalInvalidate : 1;
+        HV_UINT32 Reserved : 21;
+    };
+} HV_DEVICE_PCI_CAPABILITIES, *PHV_DEVICE_PCI_CAPABILITIES;
+
+typedef struct _HV_X64_PROC_STATE_GP_REGS
+{
+    HV_UINT64 Rip;
+    HV_UINT64 Rsp;
+    HV_UINT64 Rbp;
+    HV_UINT64 Rbx;
+    HV_UINT64 Rdi;
+    HV_UINT64 Rsi;
+    HV_UINT64 R12;
+    HV_UINT64 R13;
+    HV_UINT64 R14;
+    HV_UINT64 R15;
+} HV_X64_PROC_STATE_GP_REGS, *PHV_X64_PROC_STATE_GP_REGS;
+
+typedef struct _HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT
+{
+    HV_CRASHDUMP_ACTION CrashdumpAction;
+} HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT, *PHV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT;
+
+typedef union _HV_PARTITION_EVENT_INPUT
+{
+    HV_PARTITION_EVENT_ROOT_CRASHDUMP_INPUT CrashdumpInput;
+} HV_PARTITION_EVENT_INPUT, *PHV_PARTITION_EVENT_INPUT;
+
+typedef union _HV_X64_PPM_IDLE_STATE_CONFIG
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 TypeSpecific : 52;
+        HV_UINT64 ChangeType : 4;
+        HV_UINT64 CheckBM_STS : 1;
+        HV_UINT64 SetBM_RST : 1;
+        HV_UINT64 ClearBM_RST : 1;
+        HV_UINT64 SetARB_DIS : 1;
+        HV_UINT64 ReservedZ : 4;
+    };
+    struct
+    {
+        HV_UINT64 ReservedZ : 52;
+    } Hlt;
+    struct
+    {
+        HV_UINT16 Port;
+        HV_UINT16 ReservedZ1;
+        HV_UINT32 ReservedZ2 : 20;
+    } Io;
+    struct $CCBD12C915509F5FCC777673CF5E3E97
+    {
+        HV_UINT32 Hints;
+        HV_UINT32 BreakOnMaskedInterrupt : 1;
+        HV_UINT32 ReservedZ : 19;
+    } Mwait;
+} HV_X64_PPM_IDLE_STATE_CONFIG, *PHV_X64_PPM_IDLE_STATE_CONFIG;
+
+typedef struct DECLSPEC_ALIGN(8) _HV_X64_PPM_IDLE_STATE
+{
+    HV_X64_PPM_IDLE_STATE_CONFIG Config;
+    HV_UINT32 Type;
+    HV_UINT32 HardwareLatency;
+    HV_UINT32 PowerConsumption;
+} HV_X64_PPM_IDLE_STATE, *PHV_X64_PPM_IDLE_STATE;
+
+typedef struct _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY
+{
+    HV_UINT32 StateCount;
+    HV_X64_PPM_IDLE_STATE States[16];
+} HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY, *PHV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY;
+
+typedef struct DECLSPEC_ALIGN(8) _HV_X64_PPM_FEEDBACK_REGISTER_PAIR
+{
+    HV_X64_PPM_PERF_STATE_REGISTER ReferenceCount;
+    HV_X64_PPM_PERF_STATE_REGISTER ActualCount;
+    HV_UINT8 ResetRegisters;
+} HV_X64_PPM_FEEDBACK_REGISTER_PAIR, *PHV_X64_PPM_FEEDBACK_REGISTER_PAIR;
+
+typedef struct _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG
+{
+    HV_UINT32 Count;
+    HV_X64_PPM_FEEDBACK_REGISTER_PAIR FeedbackCounters[4];
+} HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG, *PHV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG;
+
+typedef struct _HV_POWER_STATS_OFFSETS
+{
+    HV_UINT32 GlobalTime;
+    HV_UINT32 TotalRunTime;
+    HV_UINT32 IdleSequenceNumber;
+    HV_UINT32 GlobalTscCount;
+    HV_UINT32 ActiveTscCount;
+    HV_UINT32 IdleAccumulation;
+    struct
+    {
+        HV_UINT32 Reference;
+        HV_UINT32 Actual;
+    } CycleCount[2];
+} HV_POWER_STATS_OFFSETS, *PHV_POWER_STATS_OFFSETS;
+
+// Note: Add HV_ prefix to avoid conflict
+typedef union _HV_IPV6_ADDRESS
+{
+    struct
+    {
+        HV_UINT64 QW0;
+        HV_UINT64 QW1;
+    };
+    struct
+    {
+        HV_UINT32 DW0;
+        HV_UINT32 DW1;
+        HV_UINT32 DW2;
+        HV_UINT32 DW3;
+    };
+    struct
+    {
+        HV_UINT16 W0;
+        HV_UINT16 W1;
+        HV_UINT16 W2;
+        HV_UINT16 W3;
+        HV_UINT16 W4;
+        HV_UINT16 W5;
+        HV_UINT16 W6;
+        HV_UINT16 W7;
+    };
+} HV_IPV6_ADDRESS, *PHV_IPV6_ADDRESS;
+
+typedef struct _HV_DEBUG_NET_DATA
+{
+    struct
+    {
+        HV_UINT32 HostIp;
+        HV_UINT32 TargetIp;
+        HV_UINT16 HostPort;
+        HV_UINT16 TargetPort;
+        HV_UINT8 HostMac[6];
+        HV_UINT8 TargetMac[6];
+    } Ipv4;
+    struct
+    {
+        HV_IPV6_ADDRESS HostIp;
+        HV_IPV6_ADDRESS TargetIp;
+        HV_UINT16 HostPort;
+        HV_UINT16 TargetPort;
+        HV_UINT8 HostMac[6];
+        HV_UINT8 TargetMac[6];
+    } Ipv6;
+} HV_DEBUG_NET_DATA, *PHV_DEBUG_NET_DATA;
+
+typedef struct _HV_LP_STARTUP_STATUS
+{
+    HV_UINT16 Status;
+    HV_UINT64 SubStatus1;
+    HV_UINT64 SubStatus2;
+    HV_UINT64 SubStatus3;
+    HV_UINT64 SubStatus4;
+    HV_UINT64 SubStatus5;
+    HV_UINT64 SubStatus6;
+} HV_LP_STARTUP_STATUS, *PHV_LP_STARTUP_STATUS;
+
+typedef struct _HV_MEMORY_DESCRIPTOR
+{
+    HV_UINT64 Pages;
+    HV_UINT32 Levels;
+    HV_UINT64 PageTableRoot;
+} HV_MEMORY_DESCRIPTOR, *PHV_MEMORY_DESCRIPTOR;
+
 // *****************************************************************************
 // Hypervisor CPUID Definitions
 //
@@ -5612,10 +6129,11 @@ typedef enum _HV_CPUID_FUNCTION
     HvCpuIdFunctionMsHvImplementationLimits = 0x40000005,
     HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
     HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
-    HvCpuIdFunctionMsHvSvmFeatures = 0x40000008,
-    HvCpuIdFunctionMsHvSkipLevelFeatures = 0x40000009,
+    HvCpuIdFunctionMsHvPasidFeatures = 0x40000008,
+    HvCpuIdFunctionMsHvIsolationConfiguration = 0x40000009,
     HvCpuidFunctionMsHvNestedVirtFeatures = 0x4000000A,
-    HvCpuIdFunctionMaxReserved = 0x4000000A
+    HvCpuidFunctionMsHvIptFeatures = 0x4000000B,
+    HvCpuIdFunctionMaxReserved = 0x4000000B
 } HV_CPUID_FUNCTION, *PHV_CPUID_FUNCTION;
 
 #define HV_CPUID_HV_VENDOR_MICROSOFT "Microsoft Hv"
@@ -5722,8 +6240,8 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
     HV_UINT32 UseApicMsrs : 1;
     HV_UINT32 UseHvRegisterForReset : 1;
     HV_UINT32 UseRelaxedTiming : 1;
-    HV_UINT32 UseDmaRemappingDeprecated : 1;
-    HV_UINT32 UseInterruptRemappingDeprecated : 1;
+    HV_UINT32 UseDmaRemapping_Deprecated : 1;
+    HV_UINT32 UseInterruptRemapping_Deprecated : 1;
     HV_UINT32 UseX2ApicMsrs : 1;
     HV_UINT32 DeprecateAutoEoi : 1;
     HV_UINT32 UseSyntheticClusterIpi : 1;
@@ -5735,10 +6253,15 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
     HV_UINT32 CoreSchedulerRequested : 1;
     HV_UINT32 UseDirectLocalFlushEntire : 1;
     HV_UINT32 NoNonArchitecturalCoreSharing : 1;
-    HV_UINT32 Reserved : 13;
+    HV_UINT32 UseX2Apic : 1;
+    HV_UINT32 RestoreTimeOnResume : 1;
+    HV_UINT32 UseHypercallForMmioAccess : 1;
+    HV_UINT32 UseGpaPinningHypercall : 1;
+    HV_UINT32 WakeVps : 1;
+    HV_UINT32 Reserved : 8;
     HV_UINT32 LongSpinWaitCount;
     HV_UINT32 ImplementedPhysicalAddressBits : 7;
-    HV_UINT32 Reserved1 : 25;
+    HV_UINT32 ReservedEcx : 25;
     HV_UINT32 ReservedEdx;
 } HV_X64_ENLIGHTENMENT_INFORMATION, *PHV_X64_ENLIGHTENMENT_INFORMATION;
 
@@ -5747,7 +6270,7 @@ typedef struct _HV_IMPLEMENTATION_LIMITS
     HV_UINT32 MaxVirtualProcessorCount;
     HV_UINT32 MaxLogicalProcessorCount;
     HV_UINT32 MaxInterruptMappingCount;
-    HV_UINT32 ReservedEdx;
+    HV_UINT32 Reserved;
 } HV_IMPLEMENTATION_LIMITS, *PHV_IMPLEMENTATION_LIMITS;
 
 typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
@@ -5762,8 +6285,24 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
     HV_UINT32 DmaProtectionInUse : 1;
     HV_UINT32 HpetRequested : 1;
     HV_UINT32 SyntheticTimersVolatile : 1;
-    HV_UINT32 Reserved : 22;
-    HV_UINT32 ReservedEbx;
+    HV_UINT32 HypervisorLevel : 4;
+    HV_UINT32 PhysicalDestinationModeRequired : 1;
+    HV_UINT32 UseVmfuncForAliasMapSwitch : 1;
+    HV_UINT32 HvRegisterForMemoryZeroingSupported : 1;
+    HV_UINT32 UnrestrictedGuestSupported : 1;
+    HV_UINT32 RdtAFeaturesSupported : 1;
+    HV_UINT32 RdtMFeaturesSupported : 1;
+    HV_UINT32 ChildPerfmonPmuSupported : 1;
+    HV_UINT32 ChildPerfmonLbrSupported : 1;
+    HV_UINT32 ChildPerfmonIptSupported : 1;
+    HV_UINT32 ApicEmulationSupported : 1;
+    HV_UINT32 ChildX2ApicRecommended : 1;
+    HV_UINT32 HardwareWatchdogReserved : 1;
+    HV_UINT32 DeviceAccessTrackingSupported : 1;
+    HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
+    HV_UINT32 Reserved : 4;
+    HV_UINT32 DeviceDomainInputWidth : 8;
+    HV_UINT32 ReservedEbx : 24;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_HARDWARE_FEATURES, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES;
@@ -5773,48 +6312,57 @@ typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
     HV_UINT32 StartLogicalProcessor : 1;
     HV_UINT32 CreateRootVirtualProcessor : 1;
     HV_UINT32 PerformanceCounterSync : 1;
-    HV_UINT32 Reserved : 28;
+    HV_UINT32 Reserved0 : 28;
     HV_UINT32 ReservedIdentityBit : 1;
     HV_UINT32 ProcessorPowerManagement : 1;
     HV_UINT32 MwaitIdleStates : 1;
     HV_UINT32 LogicalProcessorIdling : 1;
-    HV_UINT32 Reserved1 : 29;
+    HV_UINT32 DriveIdleTransitions : 1;
+    HV_UINT32 Reserved1 : 28;
     HV_UINT32 RemapGuestUncached : 1;
-    HV_UINT32 Reserved2 : 31;
+    HV_UINT32 ReservedZ2 : 31;
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
 
-typedef struct _HV_HYPERVISOR_SVM_FEATURES
+typedef struct _HV_HYPERVISOR_PASID_FEATURES
 {
     HV_UINT32 SvmSupported : 1;
-    HV_UINT32 Reserved : 10;
+    HV_UINT32 PasidSupported : 1;
+    HV_UINT32 Reserved0 : 9;
     HV_UINT32 MaxPasidSpacePasidCount : 21;
-    HV_UINT32 ReservedEbx;
-    HV_UINT32 ReservedEcx;
-    HV_UINT32 ReservedEdx;
-} HV_HYPERVISOR_SVM_FEATURES, *PHV_HYPERVISOR_SVM_FEATURES;
+    HV_UINT32 MaxDevicePrqSize;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+} HV_HYPERVISOR_PASID_FEATURES, *PHV_HYPERVISOR_PASID_FEATURES;
 
-typedef struct _HV_HYPERVISOR_SKIP_LEVEL_FEATURES
+// Merged definitions from Hypervisor Top Level Functional Specification 6.0b
+// and Build 26063 kdhv.lib debug symbol from Microsoft
+typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION
 {
-    HV_UINT32 Reserved : 2;
-    HV_UINT32 AccessSynicRegs : 1;
-    HV_UINT32 Reserved1 : 1;
-    HV_UINT32 AccessIntrCtrlRegs : 1;
-    HV_UINT32 AccessHypercallMsrs : 1;
-    HV_UINT32 AccessVpIndex : 1;
-    HV_UINT32 Reserved2 : 5;
-    HV_UINT32 AccessReenlightenmentControls : 1;
-    HV_UINT32 Reserved3 : 19;
-    HV_UINT32 ReservedEbx;
-    HV_UINT32 ReservedEcx;
-    HV_UINT32 Reserved4 : 4;
-    HV_UINT32 XmmRegistersForFastHypercallAvailable : 1;
-    HV_UINT32 Reserved5 : 10;
-    HV_UINT32 FastHypercallOutputAvailable : 1;
-    HV_UINT32 Reserved6 : 1;
-    HV_UINT32 SintPollingModeAvailable : 1;
-    HV_UINT32 Reserved7 : 14;
-} HV_HYPERVISOR_SKIP_LEVEL_FEATURES, *PHV_HYPERVISOR_SKIP_LEVEL_FEATURES;
+    HV_UINT32 ParavisorPresent : 1; // Symbol
+    HV_UINT32 Reserved0 : 1; // Merged Result
+    HV_UINT32 AccessSynicRegs : 1; // TLFS
+    HV_UINT32 Reserved1 : 1; // TLFS
+    HV_UINT32 AccessIntrCtrlRegs : 1; // TLFS
+    HV_UINT32 AccessHypercallMsrs : 1; // TLFS
+    HV_UINT32 AccessVpIndex : 1; // TLFS
+    HV_UINT32 Reserved2 : 5; // TLFS
+    HV_UINT32 AccessReenlightenmentControls : 1; // TLFS
+    HV_UINT32 Reserved3 : 19; // TLFS
+    HV_UINT32 IsolationType : 4; // Symbol
+    HV_UINT32 Reserved4 : 1; // Symbol (Renamed)
+    HV_UINT32 SharedGpaBoundaryActive : 1; // Symbol
+    HV_UINT32 SharedGpaBoundaryBits : 6; // Symbol
+    HV_UINT32 Reserved5 : 20; // Symbol (Renamed)
+    HV_UINT32 Reserved6; // Symbol (Renamed)
+    HV_UINT32 Reserved7 : 4; // TLFS
+    HV_UINT32 XmmRegistersForFastHypercallAvailable : 1; // TLFS
+    HV_UINT32 Reserved8 : 10; // TLFS
+    HV_UINT32 FastHypercallOutputAvailable : 1; // TLFS
+    HV_UINT32 Reserved9 : 1; // TLFS
+    HV_UINT32 SintPollingModeAvailable : 1; // TLFS
+    HV_UINT32 Reserved10 : 14; // TLFS
+} HV_HYPERVISOR_ISOLATION_CONFIGURATION, *PHV_HYPERVISOR_ISOLATION_CONFIGURATION;
 
 typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
 {
@@ -5825,11 +6373,28 @@ typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
     HV_UINT32 FlushGuestPhysicalHypercall : 1;
     HV_UINT32 MsrBitmap : 1;
     HV_UINT32 VirtualizationException : 1;
-    HV_UINT32 Reserved1 : 11;
-    HV_UINT32 ReservedEbx;
+    HV_UINT32 DebugCtl : 1;
+    HV_UINT32 EnlightenedNptTlb : 1;
+    HV_UINT32 NoRmpTableRequired : 1;
+    HV_UINT32 EnlightenedSevSwap : 1;
+    HV_UINT32 Reserved0 : 7;
+    HV_UINT32 PerfGlobalCtrl : 1;
+    HV_UINT32 Reserved1 : 31;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
 } HV_HYPERVISOR_NESTED_VIRT_FEATURES, *PHV_HYPERVISOR_NESTED_VIRT_FEATURES;
+
+typedef struct _HV_HYPERVISOR_IPT_FEATURES
+{
+    HV_UINT32 ChainedToPA : 1;
+    HV_UINT32 Enlightened : 1;
+    HV_UINT32 Reserved0 : 10;
+    HV_UINT32 MaxTraceBufferSizePerVtl : 20;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+    HV_UINT32 HypervisorIpt : 1;
+    HV_UINT32 Reserved3 : 31;
+} HV_HYPERVISOR_IPT_FEATURES, *PHV_HYPERVISOR_IPT_FEATURES;
 
 typedef union _HV_CPUID_RESULT
 {
@@ -5840,9 +6405,7 @@ typedef union _HV_CPUID_RESULT
         HV_UINT32 Ecx;
         HV_UINT32 Edx;
     };
-
     HV_UINT32 AsUINT32[4];
-
     struct {
         HV_UINT32 ReservedEax;
         HV_UINT32 ReservedEbx : 24;
@@ -5851,7 +6414,6 @@ typedef union _HV_CPUID_RESULT
         HV_UINT32 HypervisorPresent : 1;
         HV_UINT32 ReservedEdx;
     } VersionAndFeatures;
-
     HV_VENDOR_AND_MAX_FUNCTION HvVendorAndMaxFunction;
     HV_HYPERVISOR_INTERFACE_INFO HvInterface;
     HV_HYPERVISOR_VERSION_INFO MsHvVersion;
@@ -5860,23 +6422,145 @@ typedef union _HV_CPUID_RESULT
     HV_IMPLEMENTATION_LIMITS MsHvImplementationLimits;
     HV_X64_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
     HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
-    HV_HYPERVISOR_SVM_FEATURES MsHvSvmFeatures;
-    HV_HYPERVISOR_SKIP_LEVEL_FEATURES MsHvNestedHvFeatures;
+    HV_HYPERVISOR_PASID_FEATURES MsHvPasidFeatures;
+    HV_HYPERVISOR_ISOLATION_CONFIGURATION MsHvIsolationConfiguration;
     HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
+    HV_HYPERVISOR_IPT_FEATURES MsHvIptFeatures;
 } HV_CPUID_RESULT, *PHV_CPUID_RESULT;
 
 // *****************************************************************************
 // Hypervisor MSRs Definitions
 //
 
+typedef enum _HV_X64_SYNTHETIC_MSR
+{
+    HvSyntheticMsrGuestOsId = 0x40000000,
+    HvSyntheticMsrHypercall = 0x40000001,
+    HvSyntheticMsrVpIndex = 0x40000002,
+    HvSyntheticMsrReset = 0x40000003,
+    HvSyntheticMsrCpuMgmtVersion = 0x40000004,
+    XbSyntheticMsrTbFlushHost = 0x40000006,
+    XbSyntheticMsrTbFlush = 0x40000007,
+    XbSyntheticMsrCrash = 0x40000008,
+    XbSyntheticMsrGuestOsType = 0x40000009,
+    XbSyntheticMsrDebugOutput = 0x4000000A,
+    XbSyntheticMsrFlushTbThreshold = 0x4000000B,
+    XbSyntheticMsrOsFlavor = 0x4000000C,
+    XbSyntheticMsrOsFrameOffset = 0x4000000E,
+    HvSyntheticMsrVpRuntime = 0x40000010,
+    XbSyntheticMsrRefTimeOffset = 0x40000011,
+    XbSyntheticMsrRefTscScale = 0x40000012,
+    XbSyntheticMsrVpCount = 0x40000013,
+    XbSyntheticMsrWbinvd = 0x40000014,
+    XbSyntheticMsrFlushWb = 0x40000015,
+    XbSyntheticMsrFlushTbCurrent = 0x40000016,
+    XbSyntheticMsrKcfgDone = 0x40000017,
+    XbSyntheticMsrClearSignaturePage = 0x40000018,
+    XbSyntheticMsrPauseElementsCount = 0x40000019,
+    XbSyntheticMsrTbFlushAll = 0x4000001A,
+    HvSyntheticMsrTimeRefCount = 0x40000020,
+    HvSyntheticMsrReferenceTsc = 0x40000021,
+    HvSyntheticMsrTscFrequency = 0x40000022,
+    HvSyntheticMsrApicFrequency = 0x40000023,
+    HvSyntheticMsrNpiepConfig = 0x40000040,
+    XbSyntheticMsrUtcFields = 0x40000045,
+    HvSyntheticMsrEoi = 0x40000070,
+    HvSyntheticMsrIcr = 0x40000071,
+    HvSyntheticMsrTpr = 0x40000072,
+    HvSyntheticMsrVpAssistPage = 0x40000073,
+    HvSyntheticMsrSControl = 0x40000080,
+    HvSyntheticMsrSVersion = 0x40000081,
+    HvSyntheticMsrSiefp = 0x40000082,
+    HvSyntheticMsrSimp = 0x40000083,
+    HvSyntheticMsrEom = 0x40000084,
+    HvSyntheticMsrSirb = 0x40000085,
+    HvSyntheticMsrSint0 = 0x40000090,
+    HvSyntheticMsrSint1 = 0x40000091,
+    HvSyntheticMsrSint2 = 0x40000092,
+    HvSyntheticMsrSint3 = 0x40000093,
+    HvSyntheticMsrSint4 = 0x40000094,
+    HvSyntheticMsrSint5 = 0x40000095,
+    HvSyntheticMsrSint6 = 0x40000096,
+    HvSyntheticMsrSint7 = 0x40000097,
+    HvSyntheticMsrSint8 = 0x40000098,
+    HvSyntheticMsrSint9 = 0x40000099,
+    HvSyntheticMsrSint10 = 0x4000009A,
+    HvSyntheticMsrSint11 = 0x4000009B,
+    HvSyntheticMsrSint12 = 0x4000009C,
+    HvSyntheticMsrSint13 = 0x4000009D,
+    HvSyntheticMsrSint14 = 0x4000009E,
+    HvSyntheticMsrSint15 = 0x4000009F,
+    HvSyntheticMsrSTimer0Config = 0x400000B0,
+    HvSyntheticMsrSTimer0Count = 0x400000B1,
+    HvSyntheticMsrSTimer1Config = 0x400000B2,
+    HvSyntheticMsrSTimer1Count = 0x400000B3,
+    HvSyntheticMsrSTimer2Config = 0x400000B4,
+    HvSyntheticMsrSTimer2Count = 0x400000B5,
+    HvSyntheticMsrSTimer3Config = 0x400000B6,
+    HvSyntheticMsrSTimer3Count = 0x400000B7,
+    HvSyntheticMsrReserved400000C1 = 0x400000C1,
+    HvSyntheticMsrGuestSchedulerEvent = 0x400000C2,
+    HvSyntheticMsrGuestIdle = 0x400000F0,
+    HvSyntheticMsrSynthDebugControl = 0x400000F1,
+    HvSyntheticMsrSynthDebugStatus = 0x400000F2,
+    HvSyntheticMsrSynthDebugSendBuffer = 0x400000F3,
+    HvSyntheticMsrSynthDebugReceiveBuffer = 0x400000F4,
+    HvSyntheticMsrSynthDebugPendingBuffer = 0x400000F5,
+    XbSyntheticMsrSynthDebugTransition = 0x400000F6,
+    HvSyntheticMsrDebugDeviceOptions = 0x400000FF,
+    HvSyntheticMsrCrashP0 = 0x40000100,
+    HvSyntheticMsrCrashP1 = 0x40000101,
+    HvSyntheticMsrCrashP2 = 0x40000102,
+    HvSyntheticMsrCrashP3 = 0x40000103,
+    HvSyntheticMsrCrashP4 = 0x40000104,
+    HvSyntheticMsrCrashCtl = 0x40000105,
+    HvSyntheticMsrReenlightenmentControl = 0x40000106,
+    HvSyntheticMsrTscEmulationControl = 0x40000107,
+    HvSyntheticMsrTscEmulationStatus = 0x40000108,
+    HvSyntheticMsrSWatchdogConfig = 0x40000110,
+    HvSyntheticMsrSWatchdogCount = 0x40000111,
+    HvSyntheticMsrSWatchdogStatus = 0x40000112,
+    HvSyntheticMsrSTimeUnhaltedTimerConfig = 0x40000114,
+    HvSyntheticMsrSTimeUnhaltedTimerCount = 0x40000115,
+    HvSyntheticMsrMemoryZeroingControl = 0x40000116,
+    HvSyntheticMsrVpConfig = 0x40000117,
+    HvSyntheticMsrTscInvariantControl = 0x40000118,
+    XbSyntheticMsrFsBase = 0x40000122,
+    XbSyntheticMsrXOnly = 0x40000123,
+    XbSyntheticMsrBootInfo = 0x40000130,
+    HvSyntheticMsrBelow1MbPage = 0x40000200,
+    HvSyntheticMsrNestedVpIndex = 0x40001002,
+    HvSyntheticMsrNestedSControl = 0x40001080,
+    HvSyntheticMsrNestedSVersion = 0x40001081,
+    HvSyntheticMsrNestedSiefp = 0x40001082,
+    HvSyntheticMsrNestedSimp = 0x40001083,
+    HvSyntheticMsrNestedEom = 0x40001084,
+    HvSyntheticMsrNestedSirb = 0x40001085,
+    HvSyntheticMsrNestedSint0 = 0x40001090,
+    HvSyntheticMsrNestedSint1 = 0x40001091,
+    HvSyntheticMsrNestedSint2 = 0x40001092,
+    HvSyntheticMsrNestedSint3 = 0x40001093,
+    HvSyntheticMsrNestedSint4 = 0x40001094,
+    HvSyntheticMsrNestedSint5 = 0x40001095,
+    HvSyntheticMsrNestedSint6 = 0x40001096,
+    HvSyntheticMsrNestedSint7 = 0x40001097,
+    HvSyntheticMsrNestedSint8 = 0x40001098,
+    HvSyntheticMsrNestedSint9 = 0x40001099,
+    HvSyntheticMsrNestedSint10 = 0x4000109A,
+    HvSyntheticMsrNestedSint11 = 0x4000109B,
+    HvSyntheticMsrNestedSint12 = 0x4000109C,
+    HvSyntheticMsrNestedSint13 = 0x4000109D,
+    HvSyntheticMsrNestedSint14 = 0x4000109E,
+    HvSyntheticMsrNestedSint15 = 0x4000109F,
+} HV_X64_SYNTHETIC_MSR, *PHV_X64_SYNTHETIC_MSR;
+
 // MSR used to identify the guest OS.
 
-#define HV_X64_MSR_GUEST_OS_ID 0x40000000
+#define HV_X64_MSR_GUEST_OS_ID HvSyntheticMsrGuestOsId
 
-typedef union _HV_X64_MSR_GUEST_OS_ID_CONTENTS
+typedef union _HV_GUEST_OS_ID_CONTENTS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 BuildNumber : 16;
@@ -5884,28 +6568,25 @@ typedef union _HV_X64_MSR_GUEST_OS_ID_CONTENTS
         HV_UINT64 MinorVersion : 8;
         HV_UINT64 MajorVersion : 8;
         HV_UINT64 OsId : 8; // HV_GUEST_OS_MICROSOFT_IDS (If Vendor=MS)
-        HV_UINT64 VendorId : 15; // HV_GUEST_OS_VENDOR
-        HV_UINT64 OpenSource : 1;
+        HV_UINT64 VendorId : 16; // HV_GUEST_OS_VENDOR
     };
-
     struct
     {
-        HV_UINT64 BuildNumber : 16;
+        HV_UINT64 VendorSpecific1 : 16;
         HV_UINT64 Version : 32;
-        HV_UINT64 OsId : 8;
-        HV_UINT64 OsType : 7;
-        HV_UINT64 OpenSource : 1;
-    };
-} HV_X64_MSR_GUEST_OS_ID_CONTENTS, *PHV_X64_MSR_GUEST_OS_ID_CONTENTS;
+        HV_UINT64 VendorSpecific2 : 8;
+        HV_UINT64 OsId : 7;
+        HV_UINT64 IsOpenSource : 1;
+    } OpenSource;
+} HV_GUEST_OS_ID_CONTENTS, *PHV_GUEST_OS_ID_CONTENTS;
 
 // MSR used to setup pages used to communicate with the hypervisor.
 
-#define HV_X64_MSR_HYPERCALL 0x40000001
+#define HV_X64_MSR_HYPERCALL HvSyntheticMsrHypercall
 
 typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Enable : 1;
@@ -5917,7 +6598,7 @@ typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
 
 // MSR used to provide vcpu index
 
-#define HV_X64_MSR_VP_INDEX 0x40000002
+#define HV_X64_MSR_VP_INDEX HvSyntheticMsrVpIndex
 
 typedef HV_VP_INDEX* PHV_VP_INDEX;
 typedef const HV_VP_INDEX* PCHV_VP_INDEX;
@@ -5978,7 +6659,7 @@ typedef struct _HV_SYNMC_X64_EVENT
 
 // MSR used to reset the guest OS.
 
-#define HV_X64_MSR_RESET 0x40000003
+#define HV_X64_MSR_RESET HvSyntheticMsrReset
 
 typedef union _HV_X64_MSR_RESET_CONTENTS
 {
@@ -5990,17 +6671,38 @@ typedef union _HV_X64_MSR_RESET_CONTENTS
     };
 } HV_X64_MSR_RESET_CONTENTS, *PHV_X64_MSR_RESET_CONTENTS;
 
+/* HvSyntheticMsrCpuMgmtVersion | 0x40000004 */
+/* XbSyntheticMsrTbFlushHost | 0x40000006 */
+/* XbSyntheticMsrTbFlush | 0x40000007 */
+/* XbSyntheticMsrCrash | 0x40000008 */
+/* XbSyntheticMsrGuestOsType | 0x40000009 */
+/* XbSyntheticMsrDebugOutput | 0x4000000A */
+/* XbSyntheticMsrFlushTbThreshold | 0x4000000B */
+/* XbSyntheticMsrOsFlavor | 0x4000000C */
+/* XbSyntheticMsrOsFrameOffset | 0x4000000E */
+
 // MSR used to provide vcpu runtime in 100ns units
 
-#define HV_X64_MSR_VP_RUNTIME 0x40000010
+#define HV_X64_MSR_VP_RUNTIME HvSyntheticMsrVpRuntime
+
+/* XbSyntheticMsrRefTimeOffset | 0x40000011 */
+/* XbSyntheticMsrRefTscScale | 0x40000012 */
+/* XbSyntheticMsrVpCount | 0x40000013 */
+/* XbSyntheticMsrWbinvd | 0x40000014 */
+/* XbSyntheticMsrFlushWb | 0x40000015 */
+/* XbSyntheticMsrFlushTbCurrent | 0x40000016 */
+/* XbSyntheticMsrKcfgDone | 0x40000017 */
+/* XbSyntheticMsrClearSignaturePage | 0x40000018 */
+/* XbSyntheticMsrPauseElementsCount | 0x40000019 */
+/* XbSyntheticMsrTbFlushAll | 0x4000001A */
 
 // MSR used to read the per-partition time reference counter
 
-#define HV_X64_MSR_TIME_REF_COUNT 0x40000020
+#define HV_X64_MSR_TIME_REF_COUNT HvSyntheticMsrTimeRefCount
 
 // A partition's reference time stamp counter (TSC) page
 
-#define HV_X64_MSR_REFERENCE_TSC 0x40000021
+#define HV_X64_MSR_REFERENCE_TSC HvSyntheticMsrReferenceTsc
 
 typedef union _HV_X64_MSR_REFERENCE_TSC_CONTENTS
 {
@@ -6027,22 +6729,24 @@ typedef struct _HV_REFERENCE_TSC_PAGE
 
 // MSR used to retrieve the TSC frequency
 
-#define HV_X64_MSR_TSC_FREQUENCY 0x40000022
+#define HV_X64_MSR_TSC_FREQUENCY HvSyntheticMsrTscFrequency
 
 // MSR used to retrieve the local APIC timer frequency
 
-#define HV_X64_MSR_APIC_FREQUENCY 0x40000023
+#define HV_X64_MSR_APIC_FREQUENCY HvSyntheticMsrApicFrequency
 
 // Non-Privileged Instruction Execution Prevention
 
-#define HV_X64_MSR_NPIEP_CONFIG 0x40000040
+#define HV_X64_MSR_NPIEP_CONFIG HvSyntheticMsrNpiepConfig
+
+/* XbSyntheticMsrUtcFields | 0x40000045 */
 
 // Define the virtual APIC registers
 
-#define HV_X64_MSR_EOI 0x40000070
-#define HV_X64_MSR_ICR 0x40000071
-#define HV_X64_MSR_TPR 0x40000072
-#define HV_X64_MSR_VP_ASSIST_PAGE 0x40000073
+#define HV_X64_MSR_EOI HvSyntheticMsrEoi
+#define HV_X64_MSR_ICR HvSyntheticMsrIcr
+#define HV_X64_MSR_TPR HvSyntheticMsrTpr
+#define HV_X64_MSR_VP_ASSIST_PAGE HvSyntheticMsrVpAssistPage
 
 typedef enum _HV_VTL_ENTRY_REASON
 {
@@ -6063,7 +6767,6 @@ typedef struct _HV_VP_VTL_CONTROL
     union
     {
         HV_UINT8 AsUINT8;
-
         struct
         {
             HV_UINT8 VinaAsserted : 1;
@@ -6097,17 +6800,24 @@ typedef struct _HV_VP_VTL_CONTROL
 // current nested guest context.
 typedef struct _HV_NESTED_ENLIGHTENMENTS_CONTROL
 {
-    struct
+    union
     {
-        HV_UINT32 DirectHypercall : 1;
-        HV_UINT32 VirtualizationException : 1;
-        HV_UINT32 Reserved : 30;
+        HV_UINT32 AsUINT32;
+        struct
+        {
+            HV_UINT32 DirectHypercall : 1;
+            HV_UINT32 VirtualizationException : 1;
+            HV_UINT32 Reserved : 30;
+        };
     } Features;
-
-    struct
+    union
     {
-        HV_UINT32 InterPartitionCommunication : 1;
-        HV_UINT32 Reserved : 31;
+        HV_UINT32 AsUINT32;
+        struct
+        {
+            HV_UINT32 InterPartitionCommunication : 1;
+            HV_UINT32 Reserved : 31;
+        };
     } HypercallControls;
 } HV_NESTED_ENLIGHTENMENTS_CONTROL, *PHV_NESTED_ENLIGHTENMENTS_CONTROL;
 
@@ -6151,28 +6861,28 @@ typedef union _HV_VP_ASSIST_PAGE
 
 // Define synthetic interrupt controller model specific registers.
 
-#define HV_X64_MSR_SCONTROL 0x40000080
-#define HV_X64_MSR_SVERSION 0x40000081
-#define HV_X64_MSR_SIEFP 0x40000082
-#define HV_X64_MSR_SIMP 0x40000083
-#define HV_X64_MSR_EOM 0x40000084
-#define HV_X64_MSR_SIRBP 0x40000085
-#define HV_X64_MSR_SINT0 0x40000090
-#define HV_X64_MSR_SINT1 0x40000091
-#define HV_X64_MSR_SINT2 0x40000092
-#define HV_X64_MSR_SINT3 0x40000093
-#define HV_X64_MSR_SINT4 0x40000094
-#define HV_X64_MSR_SINT5 0x40000095
-#define HV_X64_MSR_SINT6 0x40000096
-#define HV_X64_MSR_SINT7 0x40000097
-#define HV_X64_MSR_SINT8 0x40000098
-#define HV_X64_MSR_SINT9 0x40000099
-#define HV_X64_MSR_SINT10 0x4000009A
-#define HV_X64_MSR_SINT11 0x4000009B
-#define HV_X64_MSR_SINT12 0x4000009C
-#define HV_X64_MSR_SINT13 0x4000009D
-#define HV_X64_MSR_SINT14 0x4000009E
-#define HV_X64_MSR_SINT15 0x4000009F
+#define HV_X64_MSR_SCONTROL HvSyntheticMsrSControl
+#define HV_X64_MSR_SVERSION HvSyntheticMsrSVersion
+#define HV_X64_MSR_SIEFP HvSyntheticMsrSiefp
+#define HV_X64_MSR_SIMP HvSyntheticMsrSimp
+#define HV_X64_MSR_EOM HvSyntheticMsrEom
+#define HV_X64_MSR_SIRBP HvSyntheticMsrSirb
+#define HV_X64_MSR_SINT0 HvSyntheticMsrSint0
+#define HV_X64_MSR_SINT1 HvSyntheticMsrSint1
+#define HV_X64_MSR_SINT2 HvSyntheticMsrSint2
+#define HV_X64_MSR_SINT3 HvSyntheticMsrSint3
+#define HV_X64_MSR_SINT4 HvSyntheticMsrSint4
+#define HV_X64_MSR_SINT5 HvSyntheticMsrSint5
+#define HV_X64_MSR_SINT6 HvSyntheticMsrSint6
+#define HV_X64_MSR_SINT7 HvSyntheticMsrSint7
+#define HV_X64_MSR_SINT8 HvSyntheticMsrSint8
+#define HV_X64_MSR_SINT9 HvSyntheticMsrSint9
+#define HV_X64_MSR_SINT10 HvSyntheticMsrSint10
+#define HV_X64_MSR_SINT11 HvSyntheticMsrSint11
+#define HV_X64_MSR_SINT12 HvSyntheticMsrSint12
+#define HV_X64_MSR_SINT13 HvSyntheticMsrSint13
+#define HV_X64_MSR_SINT14 HvSyntheticMsrSint14
+#define HV_X64_MSR_SINT15 HvSyntheticMsrSint15
 
 // Define SynIC control register.
 typedef union _HV_SYNIC_SCONTROL
@@ -6228,19 +6938,18 @@ typedef union _HV_SYNIC_SINT
 
 // Synthetic Timer MSRs. Four timers per vcpu.
 
-#define HV_X64_MSR_STIMER0_CONFIG 0x400000B0
-#define HV_X64_MSR_STIMER0_COUNT 0x400000B1
-#define HV_X64_MSR_STIMER1_CONFIG 0x400000B2
-#define HV_X64_MSR_STIMER1_COUNT 0x400000B3
-#define HV_X64_MSR_STIMER2_CONFIG 0x400000B4
-#define HV_X64_MSR_STIMER2_COUNT 0x400000B5
-#define HV_X64_MSR_STIMER3_CONFIG 0x400000B6
-#define HV_X64_MSR_STIMER3_COUNT 0x400000B7
+#define HV_X64_MSR_STIMER0_CONFIG HvSyntheticMsrSTimer0Config
+#define HV_X64_MSR_STIMER0_COUNT HvSyntheticMsrSTimer0Count
+#define HV_X64_MSR_STIMER1_CONFIG HvSyntheticMsrSTimer1Config
+#define HV_X64_MSR_STIMER1_COUNT HvSyntheticMsrSTimer1Count
+#define HV_X64_MSR_STIMER2_CONFIG HvSyntheticMsrSTimer2Config
+#define HV_X64_MSR_STIMER2_COUNT HvSyntheticMsrSTimer2Count
+#define HV_X64_MSR_STIMER3_CONFIG HvSyntheticMsrSTimer3Config
+#define HV_X64_MSR_STIMER3_COUNT HvSyntheticMsrSTimer3Count
 
 typedef union _HV_X64_MSR_STIMER_CONFIG_CONTENTS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Enable : 1;
@@ -6254,6 +6963,9 @@ typedef union _HV_X64_MSR_STIMER_CONFIG_CONTENTS
         HV_UINT64 ReservedZ2 : 44;
     };
 } HV_X64_MSR_STIMER_CONFIG_CONTENTS, *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
+
+/* HvSyntheticMsrReserved400000C1 | 0x400000C1 */
+/* HvSyntheticMsrGuestSchedulerEvent | 0x400000C2 */
 
 // The following virtual MSRs are used to configure and trigger the C1-C3 power
 // states.  Space is reserved for power states C4-C15 should they ever be
@@ -6331,16 +7043,36 @@ typedef union _HV_X64_MSR_POWER_STATE_CONFIG
 // N.B. The guest idle MSR is only used by guests to enter idle state. Root uses
 //      the power trigger MSRs defined above to enter idle states.
 
-#define HV_X64_MSR_GUEST_IDLE 0x400000F0
+#define HV_X64_MSR_GUEST_IDLE HvSyntheticMsrGuestIdle
+
+/* HvSyntheticMsrSynthDebugControl | 0x400000F1 */
+/* HvSyntheticMsrSynthDebugStatus | 0x400000F2 */
+/* HvSyntheticMsrSynthDebugSendBuffer | 0x400000F3 */
+/* HvSyntheticMsrSynthDebugReceiveBuffer | 0x400000F4 */
+/* HvSyntheticMsrSynthDebugPendingBuffer | 0x400000F5 */
+/* XbSyntheticMsrSynthDebugTransition | 0x400000F6 */
+/* HvSyntheticMsrDebugDeviceOptions | 0x400000FF */
+
+typedef union _HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 ReservedZ0 : 12;
+        HV_UINT64 GpaPageNumber : 40;
+        HV_UINT64 ReservedZ1 : 11;
+        HV_UINT64 Disabled : 1;
+    };
+} HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS, *PHV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS;
 
 // Hyper-V guest crash notification MSR's
 
-#define HV_X64_MSR_CRASH_P0 0x40000100
-#define HV_X64_MSR_CRASH_P1 0x40000101
-#define HV_X64_MSR_CRASH_P2 0x40000102
-#define HV_X64_MSR_CRASH_P3 0x40000103
-#define HV_X64_MSR_CRASH_P4 0x40000104
-#define HV_X64_MSR_CRASH_CTL 0x40000105
+#define HV_X64_MSR_CRASH_P0 HvSyntheticMsrCrashP0
+#define HV_X64_MSR_CRASH_P1 HvSyntheticMsrCrashP1
+#define HV_X64_MSR_CRASH_P2 HvSyntheticMsrCrashP2
+#define HV_X64_MSR_CRASH_P3 HvSyntheticMsrCrashP3
+#define HV_X64_MSR_CRASH_P4 HvSyntheticMsrCrashP4
+#define HV_X64_MSR_CRASH_CTL HvSyntheticMsrCrashCtl
 
 typedef union _HV_CRASH_CTL_REG_CONTENTS
 {
@@ -6359,9 +7091,9 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
 
 // TSC emulation after migration
 
-#define HV_X64_MSR_REENLIGHTENMENT_CONTROL 0x40000106
-#define HV_X64_MSR_TSC_EMULATION_CONTROL 0x40000107
-#define HV_X64_MSR_TSC_EMULATION_STATUS 0x40000108
+#define HV_X64_MSR_REENLIGHTENMENT_CONTROL HvSyntheticMsrReenlightenmentControl
+#define HV_X64_MSR_TSC_EMULATION_CONTROL HvSyntheticMsrTscEmulationControl
+#define HV_X64_MSR_TSC_EMULATION_STATUS HvSyntheticMsrTscEmulationStatus
 
 typedef union _HV_REENLIGHTENMENT_CONTROL
 {
@@ -6399,39 +7131,53 @@ typedef union _HV_TSC_EMULATION_STATUS
     };
 } HV_TSC_EMULATION_STATUS, *PHV_TSC_EMULATION_STATUS;
 
+/* HvSyntheticMsrSWatchdogConfig | 0x40000110 */
+/* HvSyntheticMsrSWatchdogCount | 0x40000111 */
+/* HvSyntheticMsrSWatchdogStatus | 0x40000112 */
+
 // Synthetic Time-Unhalted Timer MSRs
 
-#define HV_X64_MSR_STIME_UNHALTED_TIMER_CONFIG 0x40000114
-#define HV_X64_MSR_STIME_UNHALTED_TIMER_COUNT 0x40000115
+#define HV_X64_MSR_STIME_UNHALTED_TIMER_CONFIG HvSyntheticMsrSTimeUnhaltedTimerConfig
+#define HV_X64_MSR_STIME_UNHALTED_TIMER_COUNT HvSyntheticMsrSTimeUnhaltedTimerCount
+
+/* HvSyntheticMsrMemoryZeroingControl | 0x40000116 */
+/* HvSyntheticMsrVpConfig | 0x40000117 */
 
 // TSC invariant control
 
-#define HV_X64_MSR_TSC_INVARIANT_CONTROL 0x40000118
+#define HV_X64_MSR_TSC_INVARIANT_CONTROL HvSyntheticMsrTscInvariantControl
+
+/* XbSyntheticMsrFsBase | 0x40000122 */
+/* XbSyntheticMsrXOnly | 0x40000123 */
+/* XbSyntheticMsrBootInfo | 0x40000130 */
+/* HvSyntheticMsrBelow1MbPage | 0x40000200 */
 
 // Define synthetic interrupt controller model specific registers for nested
 // hypervisor
 
-#define HV_X64_MSR_NESTED_SCONTROL 0x40001080
-#define HV_X64_MSR_NESTED_SVERSION 0x40001081
-#define HV_X64_MSR_NESTED_SIEFP 0x40001082
-#define HV_X64_MSR_NESTED_SIMP 0x40001083
-#define HV_X64_MSR_NESTED_EOM 0x40001084
-#define HV_X64_MSR_NESTED_SINT0 0x40001090
-#define HV_X64_MSR_NESTED_SINT1 0x40001091
-#define HV_X64_MSR_NESTED_SINT2 0x40001092
-#define HV_X64_MSR_NESTED_SINT3 0x40001093
-#define HV_X64_MSR_NESTED_SINT4 0x40001094
-#define HV_X64_MSR_NESTED_SINT5 0x40001095
-#define HV_X64_MSR_NESTED_SINT6 0x40001096
-#define HV_X64_MSR_NESTED_SINT7 0x40001097
-#define HV_X64_MSR_NESTED_SINT8 0x40001098
-#define HV_X64_MSR_NESTED_SINT9 0x40001099
-#define HV_X64_MSR_NESTED_SINT10 0x4000109A
-#define HV_X64_MSR_NESTED_SINT11 0x4000109B
-#define HV_X64_MSR_NESTED_SINT12 0x4000109C
-#define HV_X64_MSR_NESTED_SINT13 0x4000109D
-#define HV_X64_MSR_NESTED_SINT14 0x4000109E
-#define HV_X64_MSR_NESTED_SINT15 0x4000109F
+/* HvSyntheticMsrNestedVpIndex | 0x40001002 */
+#define HV_X64_MSR_NESTED_SCONTROL HvSyntheticMsrNestedSControl
+#define HV_X64_MSR_NESTED_SVERSION HvSyntheticMsrNestedSVersion
+#define HV_X64_MSR_NESTED_SIEFP HvSyntheticMsrNestedSiefp
+#define HV_X64_MSR_NESTED_SIMP HvSyntheticMsrNestedSimp
+#define HV_X64_MSR_NESTED_EOM HvSyntheticMsrNestedEom
+/* HvSyntheticMsrNestedSirb | 0x40001085 */
+#define HV_X64_MSR_NESTED_SINT0 HvSyntheticMsrNestedSint0
+#define HV_X64_MSR_NESTED_SINT1 HvSyntheticMsrNestedSint1
+#define HV_X64_MSR_NESTED_SINT2 HvSyntheticMsrNestedSint2
+#define HV_X64_MSR_NESTED_SINT3 HvSyntheticMsrNestedSint3
+#define HV_X64_MSR_NESTED_SINT4 HvSyntheticMsrNestedSint4
+#define HV_X64_MSR_NESTED_SINT5 HvSyntheticMsrNestedSint5
+#define HV_X64_MSR_NESTED_SINT6 HvSyntheticMsrNestedSint6
+#define HV_X64_MSR_NESTED_SINT7 HvSyntheticMsrNestedSint7
+#define HV_X64_MSR_NESTED_SINT8 HvSyntheticMsrNestedSint8
+#define HV_X64_MSR_NESTED_SINT9 HvSyntheticMsrNestedSint9
+#define HV_X64_MSR_NESTED_SINT10 HvSyntheticMsrNestedSint10
+#define HV_X64_MSR_NESTED_SINT11 HvSyntheticMsrNestedSint11
+#define HV_X64_MSR_NESTED_SINT12 HvSyntheticMsrNestedSint12
+#define HV_X64_MSR_NESTED_SINT13 HvSyntheticMsrNestedSint13
+#define HV_X64_MSR_NESTED_SINT14 HvSyntheticMsrNestedSint14
+#define HV_X64_MSR_NESTED_SINT15 HvSyntheticMsrNestedSint15
 
 // *****************************************************************************
 // Hypervisor Hypercall Definitions
@@ -6441,7 +7187,7 @@ typedef union _HV_TSC_EMULATION_STATUS
 #define HV_X64_MAX_HYPERCALL_ELEMENTS ((1 << 12) - 1)
 
 // Input: The call code, argument sizes and calling convention
-typedef union _HV_X64_HYPERCALL_INPUT
+typedef union _HV_HYPERCALL_INPUT
 {
     HV_UINT64 AsUINT64;
     struct
@@ -6456,10 +7202,10 @@ typedef union _HV_X64_HYPERCALL_INPUT
         HV_UINT32 RepStartIndex : 12;
         HV_UINT32 Reserved3 : 4; // Most significant bits
     };
-} HV_X64_HYPERCALL_INPUT, *PHV_X64_HYPERCALL_INPUT;
+} HV_HYPERCALL_INPUT, *PHV_HYPERCALL_INPUT;
 
 // Output: The result and returned data size
-typedef union _HV_X64_HYPERCALL_OUTPUT
+typedef union _HV_HYPERCALL_OUTPUT
 {
     HV_UINT64 AsUINT64;
     struct
@@ -6469,7 +7215,7 @@ typedef union _HV_X64_HYPERCALL_OUTPUT
         HV_UINT32 ElementsProcessed : 12;
         HV_UINT32 Reserved2 : 20; // Most significant bits
     };
-} HV_X64_HYPERCALL_OUTPUT, *PHV_X64_HYPERCALL_OUTPUT;
+} HV_HYPERCALL_OUTPUT, *PHV_HYPERCALL_OUTPUT;
 
 // Declare the various hypercall operations
 // Public: Have prototype definition in TLFS document
@@ -6769,14 +7515,14 @@ typedef enum _HV_CALL_CODE
 // - Fast Hypercall
 //   - HypercallParameter1: The content of input parameters 1.
 //   - HypercallParameter2: The content of input parameters 2.
-typedef HV_X64_HYPERCALL_OUTPUT(*PHV_X64_HYPERCALL_TYPE)(
-    HV_X64_HYPERCALL_INPUT HypercallInput,
+typedef HV_HYPERCALL_OUTPUT(*PHV_X64_HYPERCALL_TYPE)(
+    HV_HYPERCALL_INPUT HypercallInput,
     HV_UINT64 HypercallParameter1,
     HV_UINT64 HypercallParameter2);
 
 // Type of XMM Fast Hypercall (Extended Fast Hypercall) calling convention
-// typedef HV_X64_HYPERCALL_OUTPUT(*__vectorcall PHV_X64_XMM_FAST_CALL_TYPE)(
-//     HV_X64_HYPERCALL_INPUT HypercallInput,
+// typedef HV_HYPERCALL_OUTPUT(*__vectorcall PHV_X64_XMM_FAST_CALL_TYPE)(
+//     HV_HYPERCALL_INPUT HypercallInput,
 //     HV_UINT64 Parameter1,
 //     HV_UINT64 Parameter2,
 //     __m128 Parameter3,
@@ -6811,6 +7557,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
 
 // HvCallGetLogicalProcessorRunTime | 0x0004
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
+{
+    HV_UINT32 LpIndex;
+} HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME, *PHV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
 
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
 {
@@ -6949,7 +7700,6 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX
 {
     HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
-    HV_GVA GvaList[];
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
 
 // HvCallSendSyntheticClusterIpiEx | 0x0015
@@ -7064,7 +7814,6 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PARTITION_PROPERTY
 {
     HV_PARTITION_ID PartitionId;
     HV_PARTITION_PROPERTY_CODE PropertyCode;
-    HV_UINT32 Padding;
     HV_PARTITION_PROPERTY PropertyValue;
 } HV_INPUT_SET_PARTITION_PROPERTY, *PHV_INPUT_SET_PARTITION_PROPERTY;
 
@@ -7096,7 +7845,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DEPOSIT_MEMORY
     // into.
     HV_PARTITION_ID PartitionId;
     // Supplies the GPAs of the pages to be deposited.
-    HV_GPA_PAGE_NUMBER GpaPageList[ANYSIZE_ARRAY];
+    HV_GPA_PAGE_NUMBER GpaPageList[];
 } HV_INPUT_DEPOSIT_MEMORY, *PHV_INPUT_DEPOSIT_MEMORY;
 
 // HvCallWithdrawMemory | 0x0049
@@ -7113,7 +7862,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_WITHDRAW_MEMORY
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_WITHDRAW_MEMORY
 {
     // Returns the GPA of the memory withdrawn.
-    HV_GPA_PAGE_NUMBER GpaPageList[ANYSIZE_ARRAY];
+    HV_GPA_PAGE_NUMBER GpaPageList[];
 } HV_OUTPUT_WITHDRAW_MEMORY, *PHV_OUTPUT_WITHDRAW_MEMORY;
 
 // HvCallGetMemoryBalance | 0x004A
@@ -7147,10 +7896,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_GPA_PAGES
     HV_GPA_PAGE_NUMBER TargetGpaBase;
     // Supplies the flags to use for the mapping.
     HV_MAP_GPA_FLAGS MapFlags;
-    HV_UINT32 Padding;
     // Supplies an array of guest physical page numbers in the calling
     // partition that the range of GPA will be mapped to.
-    HV_GPA_PAGE_NUMBER SourceGpaPageList[ANYSIZE_ARRAY];
+    HV_GPA_PAGE_NUMBER SourceGpaPageList[];
 } HV_INPUT_MAP_GPA_PAGES, *PHV_INPUT_MAP_GPA_PAGES;
 
 // HvCallUnmapGpaPages | 0x004C
@@ -7535,7 +8283,6 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_DEBUG_DATA
 typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_POST_DEBUG_DATA
 {
     HV_UINT32 PendingCount;
-    HV_UINT32 Padding;
 } HV_OUTPUT_POST_DEBUG_DATA, *PHV_OUTPUT_POST_DEBUG_DATA;
 
 // HvCallRetrieveDebugData | 0x006A
@@ -7560,6 +8307,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RESET_DEBUG_SESSION
 {
     HV_DEBUG_OPTIONS Options;
 } HV_INPUT_RESET_DEBUG_SESSION, *PHV_INPUT_RESET_DEBUG_SESSION;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_RESET_DEBUG_SESSION
+{
+    HV_DEBUG_NET_DATA NetData;
+} HV_OUTPUT_RESET_DEBUG_SESSION, *PHV_OUTPUT_RESET_DEBUG_SESSION;
 
 // HvCallMapStatsPage | 0x006C
 
@@ -7643,13 +8395,52 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PORT_PROPERTY
 
 // HvCallAddLogicalProcessor | 0x0076
 
+/* 6259 */
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ADD_LOGICAL_PROCESSOR
+{
+    HV_UINT32 LpIndex;
+    HV_UINT32 ApicId;
+    HV_PROXIMITY_DOMAIN_INFO ProximityDomainInfo;
+    HV_UINT64 Flags;
+} HV_INPUT_ADD_LOGICAL_PROCESSOR, *PHV_INPUT_ADD_LOGICAL_PROCESSOR;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_ADD_LOGICAL_PROCESSOR
+{
+    HV_LP_STARTUP_STATUS StartupStatus;
+} HV_OUTPUT_ADD_LOGICAL_PROCESSOR, *PHV_OUTPUT_ADD_LOGICAL_PROCESSOR;
+
 // HvCallRemoveLogicalProcessor | 0x0077
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REMOVE_LOGICAL_PROCESSOR
+{
+    HV_UINT32 LpIndex;
+    HV_UINT64 Flags;
+} HV_INPUT_REMOVE_LOGICAL_PROCESSOR, *PHV_INPUT_REMOVE_LOGICAL_PROCESSOR;
 
 // HvCallQueryNumaDistance | 0x0078
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_QUERY_NUMA_DISTANCE
+{
+    HV_UINT32 CpuProximityId;
+    HV_UINT32 MemoryProximityId;
+} HV_INPUT_QUERY_NUMA_DISTANCE, *PHV_INPUT_QUERY_NUMA_DISTANCE;
+
 // HvCallSetLogicalProcessorProperty | 0x0079
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY
+{
+    HV_UINT32 LpIndex;
+    HV_LOGICAL_PROCESSOR_PROPERTY_TYPE Type;
+    HV_LOGICAL_PROCESSOR_PROPERTY Property;
+} HV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY, *PHV_INPUT_SET_LOGICAL_PROCESSOR_PROPERTY;
+
 // HvCallGetLogicalProcessorProperty | 0x007A
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY
+{
+    HV_UINT32 LpIndex;
+    HV_LOGICAL_PROCESSOR_PROPERTY_TYPE Type;
+} HV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY, *PHV_INPUT_GET_LOGICAL_PROCESSOR_PROPERTY;
 
 // HvCallGetSystemProperty | 0x007B
 
@@ -7687,7 +8478,22 @@ typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SYSTEM_PROPERTY
 
 // HvCallMapDeviceInterrupt | 0x007C
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_DEVICE_INTERRUPT
+{
+    HV_PARTITION_ID PartitionId;
+    HV_DEVICE_ID DeviceId;
+    HV_UINT64 Flags;
+    HV_DEVICE_INTERRUPT_DESCRIPTOR InterruptDescriptor;
+} HV_INPUT_MAP_DEVICE_INTERRUPT, *PHV_INPUT_MAP_DEVICE_INTERRUPT;
+
 // HvCallUnmapDeviceInterrupt | 0x007D
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_DEVICE_INTERRUPT
+{
+    HV_PARTITION_ID PartitionId;
+    HV_DEVICE_ID DeviceId;
+    HV_INTERRUPT_ENTRY InterruptEntry;
+} HV_INPUT_UNMAP_DEVICE_INTERRUPT, *PHV_INPUT_UNMAP_DEVICE_INTERRUPT;
 
 // HvCallRetargetDeviceInterrupt | 0x007E
 
@@ -7706,20 +8512,80 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RETARGET_DEVICE_INTERRUPT
 
 // HvCallAttachDevice | 0x0082
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_DEVICE
+{
+    HV_PARTITION_ID PartitionId;
+    HV_DEVICE_ID DeviceId;
+    HV_ATTACH_DEVICE_FLAGS Flags;
+    HV_UINT32 LogicalDeviceId;
+    HV_DEVICE_PCI_CAPABILITIES PciCapabilities;
+    HV_UINT32 Reserved;
+} HV_INPUT_ATTACH_DEVICE, *PHV_INPUT_ATTACH_DEVICE;
+
 // HvCallDetachDevice | 0x0083
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DETACH_DEVICE
+{
+    HV_PARTITION_ID PartitionId;
+    HV_DEVICE_ID DeviceId;
+} HV_INPUT_DETACH_DEVICE, *PHV_INPUT_DETACH_DEVICE;
+
 // HvCallEnterSleepState | 0x0084
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENTER_SLEEP_STATE
+{
+    HV_SLEEP_STATE SleepState;
+} HV_INPUT_ENTER_SLEEP_STATE, *PHV_INPUT_ENTER_SLEEP_STATE;
+
 // HvCallNotifyStandbyTransition | 0x0085
+
+// HV_INPUT_PREPARE_FOR_SLEEP
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_NOTIFY_STANDBY_TRANSITION
+{
+    HV_BOOLEAN Entering;
+    HV_BOOLEAN ModernStandby;
+} HV_INPUT_NOTIFY_STANDBY_TRANSITION, *PHV_INPUT_NOTIFY_STANDBY_TRANSITION;
 
 // HvCallPrepareForHibernate | 0x0086
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_PREPARE_FOR_HIBERNATE
+{
+    HV_X64_PROC_STATE_GP_REGS ResumeGpRegs;
+    HV_VTL RestrictApVtl;
+} HV_INPUT_PREPARE_FOR_HIBERNATE, *PHV_INPUT_PREPARE_FOR_HIBERNATE;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_X64_OUTPUT_PREPARE_FOR_HIBERNATE
+{
+    HV_UINT64 HvCr3;
+    HV_UINT64 HvEntryPoint;
+    HV_UINT64 HvReservedTransitionAddress;
+    HV_UINT64 HvReservedTransitionAddressSize;
+} HV_X64_OUTPUT_PREPARE_FOR_HIBERNATE, *PHV_X64_OUTPUT_PREPARE_FOR_HIBERNATE;
+
 // HvCallNotifyPartitionEvent | 0x0087
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_NOTIFY_PARTITION_EVENT
+{
+    HV_PARTITION_EVENT Event;
+    HV_PARTITION_EVENT_INPUT Input;
+} HV_INPUT_NOTIFY_PARTITION_EVENT, *PHV_INPUT_NOTIFY_PARTITION_EVENT;
 
 // HvCallGetLogicalProcessorRegisters | 0x0088
 
 // HvCallSetLogicalProcessorRegisters | 0x0089
 
 // HvCallQueryAssociatedLpsforMca | 0x008A
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_QUERY_ASSOCIATED_LPS_FOR_MCA
+{
+    HV_VP_INDEX VpIndex;
+} HV_INPUT_QUERY_ASSOCIATED_LPS_FOR_MCA, *PHV_INPUT_QUERY_ASSOCIATED_LPS_FOR_MCA;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA
+{
+    HV_UINT32 Count;
+    HV_UINT32 AssociatedLpList[512];
+} HV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA, *PHV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA;
 
 // HvCallNotifyRingEmpty | 0x008B
 
@@ -7739,7 +8605,20 @@ typedef union HV_CALL_ATTRIBUTES _HV_INPUT_NOTIFY_PORT_RING_EMPTY
 
 // HvCallCollectLivedump | 0x008E
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_COLLECT_LIVE_DUMP
+{
+    HV_UINT64 Flags;
+    HV_MEMORY_DESCRIPTOR Descriptor;
+} HV_INPUT_COLLECT_LIVE_DUMP, *PHV_INPUT_COLLECT_LIVE_DUMP;
+
 // HvCallDisableHypervisor | 0x008F
+
+typedef union HV_CALL_ATTRIBUTES _HV_X64_INPUT_DISABLE_HYPERVISOR
+{
+    HV_UINT64 TrampolineCr3;
+    HV_UINT64 KernelCr3;
+    HV_UINT64 Rip;
+} HV_X64_INPUT_DISABLE_HYPERVISOR, *PHV_X64_INPUT_DISABLE_HYPERVISOR;
 
 // HvCallModifySparseGpaPages | 0x0090
 
@@ -7747,8 +8626,8 @@ typedef union HV_CALL_ATTRIBUTES _HV_INPUT_NOTIFY_PORT_RING_EMPTY
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
     HV_INTERCEPT_TYPE InterceptType;
     HV_REGISTER_INTERCEPT_RESULT_PARAMETERS Parameters;
 } HV_INPUT_REGISTER_INTERCEPT_RESULT, *PHV_INPUT_REGISTER_INTERCEPT_RESULT;
@@ -7756,6 +8635,13 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT
 // HvCallUnregisterInterceptResult | 0x0092
 
 // HvCallGetCoverageData | 0x0093
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_COVERAGE_VECTOR
+{
+    HV_COVERAGE_OPERATION CoverageOp;
+    HV_UINT32 PageCount;
+    HV_GPA_PAGE_NUMBER GpaPageNumbers[128];
+} HV_INPUT_GET_COVERAGE_VECTOR, *PHV_INPUT_GET_COVERAGE_VECTOR;
 
 // HvCallAssertVirtualInterrupt | 0x0094
 
@@ -7775,8 +8661,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PORT
 {
     HV_UINT64 PortPartitionId;
     HV_PORT_ID PortId;
-    HV_UINT8 PortVtl;
-    HV_UINT8 MinConnectionVtl;
+    HV_VTL PortVtl;
+    HV_VTL MinConnectionVtl;
     HV_UINT16 Padding;
     HV_UINT64 ConnectionPartitionId;
     HV_PORT_INFO PortInfo;
@@ -7789,7 +8675,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CONNECT_PORT
 {
     HV_UINT64 Connection_partitionId;
     HV_CONNECTION_ID ConnectionId;
-    HV_UINT8 ConnectionVtl;
+    HV_VTL ConnectionVtl;
     HV_UINT8 Rsvdz[3];
     HV_UINT64 PortPartitionId;
     HV_PORT_ID PortId;
@@ -7799,6 +8685,13 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CONNECT_PORT
 } HV_INPUT_CONNECT_PORT, *PHV_INPUT_CONNECT_PORT;
 
 // HvCallGetSpaPageList | 0x0097
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_SPA_PAGE_LIST
+{
+    HV_UINT64 StartPage;
+    HV_UINT64 EndPage;
+    HV_SPA_PAGE_LIST_FLAGS Flags;
+} HV_INPUT_GET_SPA_PAGE_LIST, *PHV_INPUT_GET_SPA_PAGE_LIST;
 
 // HvCallReserved0098 | 0x0098
 
@@ -7832,15 +8725,129 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID
 } HV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_OUTPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 // HvCallGetPowerProperty | 0x009B
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_POWER_PROPERTY
+{
+    HV_POWER_PROPERTY_TYPE Type;
+    union
+    {
+        union
+        {
+            HV_PPM_POWER_POLICY_SETTING_ID PolicySettingId;
+        } Global;
+        struct
+        {
+            HV_UINT32 LpIndex;
+        } Processor;
+    };
+} HV_INPUT_GET_POWER_PROPERTY, *PHV_INPUT_GET_POWER_PROPERTY;
+
+typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_POWER_PROPERTY
+{
+    HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
+    HV_UINT32 PercentFrequency;
+    HV_UINT32 NextPlatformStateIndex;
+    HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
+    struct
+    {
+        HV_UINT32 Value;
+    } Policy;
+    HV_POWER_STATS_OFFSETS StatsOffsets;
+} HV_OUTPUT_GET_POWER_PROPERTY, *PHV_OUTPUT_GET_POWER_PROPERTY;
+
 // HvCallSetPowerProperty | 0x009C
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_POWER_PROPERTY
+{
+    HV_POWER_PROPERTY_TYPE Type;
+    union
+    {
+        struct
+        {
+            HV_UINT32 LpIndex;
+            union
+            {
+                HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
+                HV_UINT32 PercentFrequency;
+                HV_UINT32 NextPlatformStateIndex;
+                HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
+            };
+        } Processor;
+        union
+        {
+            HV_PPM_POWER_POLICY_SETTING Policy;
+        } Global;
+    };
+} HV_INPUT_SET_POWER_PROPERTY, *PHV_INPUT_SET_POWER_PROPERTY;
+
 // HvCallCreatePasidSpace | 0x009D
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PASID_SPACE
+{
+    HV_UINT32 PasidSpaceId;
+    HV_UINT32 PasidCount;
+} HV_INPUT_CREATE_PASID_SPACE, *PHV_INPUT_CREATE_PASID_SPACE;
+
 // HvCallDeletePasidSpace | 0x009E
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_PASID_SPACE
+{
+    HV_UINT32 PasidSpaceId;
+    HV_UINT32 Reserved;
+} HV_INPUT_DELETE_PASID_SPACE, *PHV_INPUT_DELETE_PASID_SPACE;
+
 // HvCallSetPasidAddressSpace | 0x009F
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PASID_ADDRESS_SPACE
+{
+    HV_FULL_PASID FullPasid;
+    HV_DEVICE_ADDRESS_SPACE AddressSpace;
+} HV_INPUT_SET_PASID_ADDRESS_SPACE, *PHV_INPUT_SET_PASID_ADDRESS_SPACE;
+
 // HvCallFlushPasidAddressSpace | 0x00A0
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE
+{
+    HV_FULL_PASID FullPasid;
+    HV_UINT32 Flags;
+    HV_UINT32 Reserved;
+} HV_INPUT_FLUSH_PASID_ADDRESS_SPACE, *PHV_INPUT_FLUSH_PASID_ADDRESS_SPACE;
+
 // HvCallFlushPasidAddressList | 0x00A1
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_PASID_ADDRESS_LIST
+{
+    HV_FULL_PASID FullPasid;
+    HV_UINT32 Flags;
+    HV_UINT32 VaCount;
+    HV_GVA_RANGE_EXTENDED VaList[];
+} HV_INPUT_FLUSH_PASID_ADDRESS_LIST, *PHV_INPUT_FLUSH_PASID_ADDRESS_LIST;
+
 // HvCallAttachPasidSpace | 0x00A2
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_PASID_SPACE
+{
+    HV_UINT32 LogicalDeviceId;
+    HV_UINT32 PasidSpaceId;
+    HV_UINT32 PrQueueId;
+    HV_UINT32 Reserved;
+} HV_INPUT_ATTACH_PASID_SPACE, *PHV_INPUT_ATTACH_PASID_SPACE;
+
 // HvCallDetachPasidSpace | 0x00A3
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DETACH_PASID_SPACE
+{
+    HV_UINT32 LogicalDeviceId;
+    HV_UINT32 Reserved;
+} HV_INPUT_DETACH_PASID_SPACE, *PHV_INPUT_DETACH_PASID_SPACE;
+
 // HvCallEnablePasid | 0x00A4
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PASID
+{
+    HV_UINT32 LogicalDeviceId;
+    HV_UINT32 Pasid;
+} HV_INPUT_ENABLE_PASID, *PHV_INPUT_ENABLE_PASID;
 
 // HvCallDisablePasid | 0x00A5
 
@@ -7851,11 +8858,57 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_PASID
 } HV_INPUT_DISABLE_PASID, *PHV_INPUT_DISABLE_PASID;
 
 // HvCallAcknowledgeDevicePageRequest | 0x00A6
+
 // HvCallCreateDevicePrQueue | 0x00A7
+
+/* 6364 */
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_DEVICE_PR_QUEUE
+{
+    HV_UINT32 QueueId;
+    HV_UINT32 Size;
+    HV_GPA_PAGE_NUMBER BaseGpaPage;
+    HV_UINT32 InterruptVector;
+    HV_UINT32 InterruptVpIndex;
+    HV_UINT32 Flags;
+    HV_UINT32 Reserved;
+} HV_INPUT_CREATE_DEVICE_PR_QUEUE, *PHV_INPUT_CREATE_DEVICE_PR_QUEUE;
+
 // HvCallDeleteDevicePrQueue | 0x00A8
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_DEVICE_PR_QUEUE
+{
+    HV_UINT32 QueueId;
+    HV_UINT32 Reserved;
+} HV_INPUT_DELETE_DEVICE_PR_QUEUE, *PHV_INPUT_DELETE_DEVICE_PR_QUEUE;
+
 // HvCallSetDevicePrqProperty | 0x00A9
+
+// HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_DEVICE_PRQ_PROPERTY
+{
+    HV_UINT32 QueueId;
+    HV_DEVICE_PRQ_PROPERTY Property;
+} HV_INPUT_SET_DEVICE_PRQ_PROPERTY, *PHV_INPUT_SET_DEVICE_PRQ_PROPERTY;
+
 // HvCallGetPhysicalDeviceProperty | 0x00AA
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY
+{
+    HV_DEVICE_ID PhysicalDeviceId;
+    HV_PHYSICAL_DEVICE_PROPERTY Property;
+    HV_UINT32 Reserved;
+} HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY, *PHV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY;
+
 // HvCallSetPhysicalDeviceProperty | 0x00AB
+
+// HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY
+{
+    HV_DEVICE_ID PhysicalDeviceId;
+    HV_PHYSICAL_DEVICE_PROPERTY Property;
+    HV_UINT32 Reserved;
+} HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY, *PHV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY;
+
 // HvCallTranslateVirtualAddressEx | 0x00AC
 // HvCallCheckForIoIntercept | 0x00AD
 
@@ -7865,7 +8918,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_GPA_PAGE_ATTRIBUTES
 {
     HV_PARTITION_ID PartitionId;
     HV_GPA_PAGE_ATTRIBUTES Attributes;
-    HV_UINT64 GpaPageList[];
+    HV_GPA_PAGE_NUMBER GpaPageList[];
 } HV_INPUT_SET_GPA_PAGE_ATTRIBUTES, *PHV_INPUT_SET_GPA_PAGE_ATTRIBUTES;
 
 // HvCallFlushGuestPhysicalAddressSpace | 0x00AF
@@ -7886,9 +8939,39 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST
 } HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST, *PHV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST;
 
 // HvCallCreateDeviceDomain | 0x00B1
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_DEVICE_DOMAIN
+{
+    HV_INPUT_DEVICE_DOMAIN DeviceDomain;
+} HV_INPUT_CREATE_DEVICE_DOMAIN, *PHV_INPUT_CREATE_DEVICE_DOMAIN;
+
 // HvCallAttachDeviceDomain | 0x00B2
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_DEVICE_DOMAIN
+{
+    HV_INPUT_DEVICE_DOMAIN DeviceDomain;
+    HV_DEVICE_ID DeviceId;
+} HV_INPUT_ATTACH_DEVICE_DOMAIN, *PHV_INPUT_ATTACH_DEVICE_DOMAIN;
+
 // HvCallMapDeviceGpaPages | 0x00B3
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_DEVICE_GPA_PAGES
+{
+    HV_INPUT_DEVICE_DOMAIN DeviceDomain;
+    HV_INPUT_VTL TargetVtl;
+    HV_UINT32 MapFlags;
+    HV_UINT64 TargetDeviceVaBase;
+    HV_GPA_PAGE_NUMBER GpaPageList[];
+} HV_INPUT_MAP_DEVICE_GPA_PAGES, *PHV_INPUT_MAP_DEVICE_GPA_PAGES;
+
 // HvCallUnmapDeviceGpaPages | 0x00B4
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_DEVICE_GPA_PAGES
+{
+    HV_INPUT_DEVICE_DOMAIN DeviceDomain;
+    HV_UINT64 TargetDeviceVaBase;
+} HV_INPUT_UNMAP_DEVICE_GPA_PAGES, *PHV_INPUT_UNMAP_DEVICE_GPA_PAGES;
+
 // HvCallCreateCpuGroup | 0x00B5
 // HvCallDeleteCpuGroup | 0x00B6
 // HvCallGetCpuGroupProperty | 0x00B7
@@ -7896,7 +8979,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST
 // HvCallGetCpuGroupAffinity | 0x00B9
 // HvCallGetNextCpuGroup | 0x00BA
 // HvCallGetNextCpuGroupPartition | 0x00BB
+
 // HvCallAddPhysicalMemory | 0x00BC
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ADD_PHYSICAL_MEMORY
+{
+    HV_GPA_PAGE_NUMBER StartPage;
+    HV_UINT64 PageCount;
+} HV_INPUT_ADD_PHYSICAL_MEMORY, *PHV_INPUT_ADD_PHYSICAL_MEMORY;
+
 // HvCallCompleteIntercept | 0x00BD
 // HvCallPrecommitGpaPages | 0x00BE
 // HvCallUncommitGpaPages | 0x00BF
@@ -7907,7 +8998,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT_DIRECT
 {
     HV_UINT64 TargetPartition;
     HV_UINT32 TargetVp;
-    HV_UINT8 TargetVtl;
+    HV_VTL TargetVtl;
     HV_UINT8 TargetSint;
     HV_UINT16 FlagNumber;
 } HV_INPUT_SIGNAL_EVENT_DIRECT, *PHV_INPUT_SIGNAL_EVENT_DIRECT;
@@ -7922,9 +9013,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_SIGNAL_EVENT_DIRECT
 
 typedef struct HV_CALL_ATTRIBUTES HV_INPUT_POST_MESSAGE_DIRECT
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
-    HV_UINT8 Vtl;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL Vtl;
     HV_UINT8 Padding[3];
     HV_UINT32 SintIndex;
     HV_UINT8 Message[HV_MESSAGE_SIZE];
@@ -7935,8 +9026,8 @@ typedef struct HV_CALL_ATTRIBUTES HV_INPUT_POST_MESSAGE_DIRECT
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISPATCH_VP
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
     HV_UINT32 Flags;
     HV_UINT64 TimeSlice; // in 100ns
     HV_UINT64 SpecCtrl;
@@ -7959,7 +9050,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_DISPATCH_VP
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_GPA_PAGES_ACCESS_STATE
 {
-    HV_UINT64 PartitionId;
+    HV_PARTITION_ID PartitionId;
     HV_GPA_PAGE_ACCESS_STATE_FLAGS Flags;
     HV_UINT64 HvGpaPageNumber;
 } HV_INPUT_GET_GPA_PAGES_ACCESS_STATE, *PHV_INPUT_GET_GPA_PAGES_ACCESS_STATE;
@@ -7992,8 +9083,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_GPA_PAGES_ACCESS_STATE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_VP_STATE_PAGE
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
     HV_VP_STATE_PAGE_TYPE Type;
 } HV_INPUT_MAP_VP_STATE_PAGE, *PHV_INPUT_MAP_VP_STATE_PAGE;
 
@@ -8006,8 +9097,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_MAP_VP_STATE_PAGE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_VP_STATE_PAGE
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
     HV_VP_STATE_PAGE_TYPE Type;
 } HV_INPUT_UNMAP_VP_STATE_PAGE, *PHV_INPUT_UNMAP_VP_STATE_PAGE;
 
@@ -8015,9 +9106,9 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_VP_STATE_PAGE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_STATE
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
-    HV_UINT8 InputVtl;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL InputVtl;
     HV_UINT8 Rsvd[3];
     HV_VP_STATE_DATA StateData;
     HV_UINT64 OutputDataPfns[ANYSIZE_ARRAY];
@@ -8039,9 +9130,9 @@ typedef union HV_INPUT_SET_VP_STATE_DATA
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_VP_STATE
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
-    HV_UINT8 InputVtl;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL InputVtl;
     HV_UINT8 Rsvd[3];
     HV_VP_STATE_DATA StateData;
     HV_INPUT_SET_VP_STATE_DATA Data[ANYSIZE_ARRAY];
@@ -8067,8 +9158,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_VP_STATE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_CPUID_VALUES
 {
-    HV_UINT64 PartitionId;
-    HV_UINT32 VpIndex;
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
     HV_GET_VP_CPUID_VALUES_FLAGS Flags;
     HV_UINT32 Reserved;
     HV_UINT32 Padding;
@@ -8129,6 +9220,7 @@ typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_CPUID_VALUES
 #else
 #pragma warning(default:4200) // zero length array
 #pragma warning(default:4201) // nameless struct/union
+#pragma warning(default:4324) // structure was padded due to __declspec(align())
 #endif
 #endif
 
