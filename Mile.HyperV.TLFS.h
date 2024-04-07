@@ -2568,7 +2568,6 @@ typedef enum _HV_PORT_PROPERTY_CODE
 typedef union _HV_MESSAGE_FLAGS
 {
     HV_UINT8 AsUINT8;
-
     struct
     {
         HV_UINT8 MessagePending : 1;
@@ -2582,7 +2581,7 @@ typedef struct _HV_MESSAGE_HEADER
     HV_MESSAGE_TYPE MessageType;
     HV_UINT8 PayloadSize;
     HV_MESSAGE_FLAGS MessageFlags;
-    HV_UINT16 Reserved;
+    HV_UINT8 Reserved[2];
     union
     {
         HV_UINT64 OriginationId;
@@ -2590,13 +2589,6 @@ typedef struct _HV_MESSAGE_HEADER
         HV_PORT_ID Port;
     };
 } HV_MESSAGE_HEADER, *PHV_MESSAGE_HEADER;
-
-// Define synthetic interrupt controller message format.
-typedef struct _HV_MESSAGE
-{
-    HV_MESSAGE_HEADER Header;
-    HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
-} HV_MESSAGE, *PHV_MESSAGE;
 
 // Define timer message payload structure.
 typedef struct _HV_TIMER_MESSAGE_PAYLOAD
@@ -2606,6 +2598,18 @@ typedef struct _HV_TIMER_MESSAGE_PAYLOAD
     HV_NANO100_TIME ExpirationTime; // When the timer expired
     HV_NANO100_TIME DeliveryTime; // When the message was delivered
 } HV_TIMER_MESSAGE_PAYLOAD, *PHV_TIMER_MESSAGE_PAYLOAD;
+
+// Define synthetic interrupt controller message format.
+typedef struct _HV_MESSAGE
+{
+    HV_MESSAGE_HEADER Header;
+    union
+    {
+        HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
+        HV_TIMER_MESSAGE_PAYLOAD TimerPayload;
+        HV_EVENTLOG_MESSAGE_PAYLOAD TracePayload;
+    };
+} HV_MESSAGE, *PHV_MESSAGE;
 
 // Define the number of message buffers associated with each port.
 #define HV_PORT_MESSAGE_BUFFER_COUNT (16)
@@ -2646,12 +2650,10 @@ typedef union _HV_X64_MSR_APIC_ASSIST_CONTENTS
 // Format of the APIC assist page.
 typedef union _HV_VIRTUAL_APIC_ASSIST
 {
-    HV_UINT32 ApicFlags;
-
+    HV_INT32 ApicFlags;
     struct
     {
         HV_UINT32 NoEOIRequired : 1;
-        HV_UINT32 ReservedZ : 31;
     };
 } HV_VIRTUAL_APIC_ASSIST, *PHV_VIRTUAL_APIC_ASSIST;
 
@@ -4226,7 +4228,6 @@ typedef const HV_NANO100_TIME* PCHV_NANO100_TIME;
 typedef union _HV_REGISTER_VSM_PARTITION_STATUS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 EnabledVtlSet : 16;
@@ -4239,7 +4240,6 @@ typedef union _HV_REGISTER_VSM_PARTITION_STATUS
 typedef union _HV_REGISTER_VSM_VP_STATUS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 ActiveVtl : 4;
@@ -4253,7 +4253,6 @@ typedef union _HV_REGISTER_VSM_VP_STATUS
 typedef union _HV_REGISTER_VSM_PARTITION_CONFIG
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 EnableVtlProtection : 1;
@@ -4273,7 +4272,6 @@ typedef union _HV_REGISTER_VSM_PARTITION_CONFIG
 typedef union _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 MbecEnabled : 1;
@@ -4285,7 +4283,6 @@ typedef union _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG
 typedef union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 VtlCallOffset : 12;
@@ -4297,7 +4294,6 @@ typedef union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
 typedef union _HV_REGISTER_VSM_VINA
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Vector : 8;
@@ -4311,7 +4307,6 @@ typedef union _HV_REGISTER_VSM_VINA
 typedef union _HV_REGISTER_CR_INTERCEPT_CONTROL
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Cr0Write : 1; // 0x0000000000000001
@@ -4401,19 +4396,20 @@ typedef struct _VM_PARTITION_ASSIST_PAGE
 typedef union _HV_GPA_PAGE_RANGE
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 AdditionalPages : 11;
         HV_UINT64 LargePage : 1;
-        HV_UINT64 BasePfn : 52;
-    };
-    struct
-    {
-        HV_UINT64 Reserved0 : 12;
-        HV_UINT64 PageSize : 1;
-        HV_UINT64 Reserved1 : 8;
-        HV_UINT64 BaseLargePfn : 43;
+        union
+        {
+            HV_UINT64 BasePfn : 52;
+            struct
+            {
+                HV_UINT64 PageSize : 1;
+                HV_UINT64 Reserved1 : 8;
+                HV_UINT64 BaseLargePfn : 43;
+            };
+        };
     };
 } HV_GPA_PAGE_RANGE, *PHV_GPA_PAGE_RANGE;
 
@@ -6974,13 +6970,13 @@ typedef union _HV_SYNIC_SINT
     struct
     {
         HV_UINT64 Vector : 8;
-        HV_UINT64 Preserved : 8;
+        HV_UINT64 ReservedP1 : 8;
         HV_UINT64 Masked : 1;
         HV_UINT64 AutoEoi : 1;
         HV_UINT64 Polling : 1;
         HV_UINT64 AsIntercept : 1;
         HV_UINT64 Proxy : 1;
-        HV_UINT64 Preserved1 : 43;
+        HV_UINT64 ReservedP2 : 43;
     };
 } HV_SYNIC_SINT, *PHV_SYNIC_SINT;
 
@@ -7125,7 +7121,6 @@ typedef union _HV_X64_MSR_SYNTH_DEBUG_BUFFER_CONTENTS
 typedef union _HV_CRASH_CTL_REG_CONTENTS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         // Reserved bits
@@ -7146,7 +7141,6 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
 typedef union _HV_REENLIGHTENMENT_CONTROL
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Vector : 8;
@@ -7160,7 +7154,6 @@ typedef union _HV_REENLIGHTENMENT_CONTROL
 typedef union _HV_TSC_EMULATION_CONTROL
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 Enabled : 1;
@@ -7171,7 +7164,6 @@ typedef union _HV_TSC_EMULATION_CONTROL
 typedef union _HV_TSC_EMULATION_STATUS
 {
     HV_UINT64 AsUINT64;
-
     struct
     {
         HV_UINT64 InProgress : 1;
