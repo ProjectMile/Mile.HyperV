@@ -5326,6 +5326,34 @@ static_assert(sizeof(HV_VP_SIGNAL_PAIR_SCHEDULER_MESSAGE) ==
 // Extra Hyper-V definitions from Windows symbols
 //
 
+typedef HV_UINT32 HV_LOGICAL_DEVICE_ID, *PHV_LOGICAL_DEVICE_ID;
+
+typedef HV_UINT32 HV_PASID, *PHV_PASID;
+
+typedef HV_UINT32 HV_PASID_SPACE_ID, *PHV_PASID_SPACE_ID;
+
+typedef HV_UINT8 HV_IOAPIC_ID, *PHV_IOAPIC_ID;
+
+typedef HV_UINT16 HV_PCI_SEGMENT, *PHV_PCI_SEGMENT;
+
+typedef HV_UINT64 HV_DEVICE_VA, *PHV_DEVICE_VA;
+
+typedef HV_UINT16 HV_PCI_RID, *PHV_PCI_RID;
+
+typedef HV_UINT32 HV_DEVICE_DOMAIN_ID, *PHV_DEVICE_DOMAIN_ID;
+
+typedef HV_UINT32 HV_DEVICE_PR_QUEUE_ID, *PHV_DEVICE_PR_QUEUE_ID;
+
+typedef enum _HV_SUBNODE_TYPE
+{
+    HvSubnodeAny = 0x0,
+    HvSubnodeSocket = 0x1,
+    HvSubnodeCluster = 0x2,
+    HvSubnodeL3 = 0x3,
+    HvSubnodeCount = 0x4,
+    HvSubnodeInvalid = 0xFFFFFFFF,
+} HV_SUBNODE_TYPE, *PHV_SUBNODE_TYPE;
+
 typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
 {
     HV_ADDRESS_SPACE_ID AddressSpace;
@@ -5853,7 +5881,7 @@ typedef struct _HV_MACHINE_CHECK_CONTEXT
 {
     HV_PARTITION_ID PartitionId;
     HV_VP_INDEX VpIndex;
-    HV_UINT8 Vtl;
+    HV_VTL Vtl;
 } HV_MACHINE_CHECK_CONTEXT, *PHV_MACHINE_CHECK_CONTEXT;
 
 typedef struct _HV_MACHINE_CHECK_CONTEXT_INFO
@@ -5886,7 +5914,7 @@ typedef struct _HV_INPUT_DEVICE_DOMAIN
 {
     HV_PARTITION_ID PartitionId;
     HV_INPUT_VTL OwnerVtl;
-    HV_UINT32 DomainId;
+    HV_DEVICE_DOMAIN_ID DomainId;
 } HV_INPUT_DEVICE_DOMAIN, *PHV_INPUT_DEVICE_DOMAIN;
 
 typedef union _HV_FULL_PASID
@@ -5894,8 +5922,8 @@ typedef union _HV_FULL_PASID
     HV_UINT64 AsUINT64;
     struct
     {
-        HV_UINT32 Pasid;
-        HV_UINT32 PasidSpaceId;
+        HV_PASID Pasid;
+        HV_PASID_SPACE_ID PasidSpaceId;
     }; 
 } HV_FULL_PASID, *PHV_FULL_PASID;
 
@@ -7859,7 +7887,7 @@ typedef HV_HYPERCALL_OUTPUT(*PHVCALL_HYPERCALL_ROUTINE)(
     HV_UINT64 HypercallParameter2);
 
 // Type of XMM Fast Hypercall (Extended Fast Hypercall) calling convention
-// typedef HV_HYPERCALL_OUTPUT(*__vectorcall PHV_X64_XMM_FAST_CALL_TYPE)(
+// typedef HV_HYPERCALL_OUTPUT(*__vectorcall PHVCALL_XMM_HYPERCALL_ROUTINE)(
 //     HV_HYPERCALL_INPUT HypercallInput,
 //     HV_UINT64 Parameter1,
 //     HV_UINT64 Parameter2,
@@ -8882,7 +8910,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_DEVICE
     HV_PARTITION_ID PartitionId;
     HV_DEVICE_ID DeviceId;
     HV_ATTACH_DEVICE_FLAGS Flags;
-    HV_UINT32 LogicalDeviceId;
+    HV_LOGICAL_DEVICE_ID LogicalDeviceId;
     HV_DEVICE_PCI_CAPABILITIES PciCapabilities;
     HV_UINT32 Reserved;
 } HV_INPUT_ATTACH_DEVICE, *PHV_INPUT_ATTACH_DEVICE;
@@ -9168,7 +9196,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_POWER_PROPERTY
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PASID_SPACE
 {
-    HV_UINT32 PasidSpaceId;
+    HV_PASID_SPACE_ID PasidSpaceId;
     HV_UINT32 PasidCount;
 } HV_INPUT_CREATE_PASID_SPACE, *PHV_INPUT_CREATE_PASID_SPACE;
 
@@ -9176,7 +9204,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_PASID_SPACE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_PASID_SPACE
 {
-    HV_UINT32 PasidSpaceId;
+    HV_PASID_SPACE_ID PasidSpaceId;
     HV_UINT32 Reserved;
 } HV_INPUT_DELETE_PASID_SPACE, *PHV_INPUT_DELETE_PASID_SPACE;
 
@@ -9211,8 +9239,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_PASID_ADDRESS_LIST
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_PASID_SPACE
 {
-    HV_UINT32 LogicalDeviceId;
-    HV_UINT32 PasidSpaceId;
+    HV_LOGICAL_DEVICE_ID LogicalDeviceId;
+    HV_PASID_SPACE_ID PasidSpaceId;
     HV_UINT32 PrQueueId;
     HV_UINT32 Reserved;
 } HV_INPUT_ATTACH_PASID_SPACE, *PHV_INPUT_ATTACH_PASID_SPACE;
@@ -9221,7 +9249,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ATTACH_PASID_SPACE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DETACH_PASID_SPACE
 {
-    HV_UINT32 LogicalDeviceId;
+    HV_LOGICAL_DEVICE_ID LogicalDeviceId;
     HV_UINT32 Reserved;
 } HV_INPUT_DETACH_PASID_SPACE, *PHV_INPUT_DETACH_PASID_SPACE;
 
@@ -9229,16 +9257,16 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DETACH_PASID_SPACE
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PASID
 {
-    HV_UINT32 LogicalDeviceId;
-    HV_UINT32 Pasid;
+    HV_LOGICAL_DEVICE_ID LogicalDeviceId;
+    HV_PASID Pasid;
 } HV_INPUT_ENABLE_PASID, *PHV_INPUT_ENABLE_PASID;
 
 // HvCallDisablePasid | 0x00A5
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_PASID
 {
-    HV_UINT32 LogicalDeviceId;
-    HV_UINT32 Pasid;
+    HV_LOGICAL_DEVICE_ID LogicalDeviceId;
+    HV_PASID Pasid;
 } HV_INPUT_DISABLE_PASID, *PHV_INPUT_DISABLE_PASID;
 
 // HvCallAcknowledgeDevicePageRequest | 0x00A6
@@ -9350,7 +9378,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_DEVICE_GPA_PAGES
     HV_INPUT_DEVICE_DOMAIN DeviceDomain;
     HV_INPUT_VTL TargetVtl;
     HV_UINT32 MapFlags;
-    HV_UINT64 TargetDeviceVaBase;
+    HV_DEVICE_VA TargetDeviceVaBase;
     HV_GPA_PAGE_NUMBER GpaPageList[];
 } HV_INPUT_MAP_DEVICE_GPA_PAGES, *PHV_INPUT_MAP_DEVICE_GPA_PAGES;
 
@@ -9359,7 +9387,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_DEVICE_GPA_PAGES
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_DEVICE_GPA_PAGES
 {
     HV_INPUT_DEVICE_DOMAIN DeviceDomain;
-    HV_UINT64 TargetDeviceVaBase;
+    HV_DEVICE_VA TargetDeviceVaBase;
 } HV_INPUT_UNMAP_DEVICE_GPA_PAGES, *PHV_INPUT_UNMAP_DEVICE_GPA_PAGES;
 
 // HvCallCreateCpuGroup | 0x00B5
