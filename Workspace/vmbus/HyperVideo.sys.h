@@ -80,65 +80,6 @@ struct _DXGKARGCB_UPDATECONTEXTALLOCATION;
 struct _DXGKARGCB_RESERVEGPUVIRTUALADDRESSRANGE;
 struct _VMBUS_CRASH_INTERFACE;
 
-/* 27 */
-enum SYNTHVID_FEATURE : __int32
-{
-  SynthVidFeatureWin7Rtm = 0x30000,
-  SynthVidFeatureBasic = 0x30000,
-  SynthVidFeatureWin8Rtm = 0x30002,
-  SynthVidFeatureHighResolutions = 0x30002,
-  SynthVidFeatureSupportsReinit = 0x30002,
-  SynthVidFeatureWinBlue = 0x30003,
-  SynthVidFeatureQueryBiosInfo = 0x30003,
-  SynthVidFeatureWinThresholdM1 = 0x30004,
-  SynthVidFeatureResolutionSetByHost = 0x30004,
-  SynthVidFeatureWinThresholdM2 = 0x30005,
-  SynthVidFeatureLockOnDisconnect = 0x30005,
-};
-
-/* 61 */
-enum SYNTHVID_MESSAGE_TYPE : __int32
-{
-  SynthvidError = 0x0,
-  SynthvidVersionRequest = 0x1,
-  SynthvidVersionResponse = 0x2,
-  SynthvidVramLocation = 0x3,
-  SynthvidVramLocationAck = 0x4,
-  SynthvidSituationUpdate = 0x5,
-  SynthvidSituationUpdateAck = 0x6,
-  SynthvidPointerPosition = 0x7,
-  SynthvidPointerShape = 0x8,
-  SynthvidFeatureChange = 0x9,
-  SynthvidDirt = 0xA,
-  SynthvidBiosInfoRequest = 0xB,
-  SynthvidBiosInfoResponse = 0xC,
-  SynthvidSupportedResolutionsRequest = 0xD,
-  SynthvidSupportedResolutionsResponse = 0xE,
-  SynthvidCapabilityRequest = 0xF,
-  SynthvidCapabilityResponse = 0x10,
-  SynthvidMax = 0x11,
-};
-
-/* 583 */
-struct SYNTHVID_MESSAGE_HEADER
-{
-  SYNTHVID_MESSAGE_TYPE Type;
-  unsigned int Size;
-};
-
-/* 584 */
-struct __unaligned __declspec(align(1)) SYNTHVID_POINTER_SHAPE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 PartialIndex;
-  unsigned __int8 CursorFlags;
-  unsigned int WidthPixels;
-  unsigned int HeightPixels;
-  unsigned int HotspotX;
-  unsigned int HotspotY;
-  unsigned __int8 PixelData[1];
-};
-
 /* 634 */
 struct REPORT_CURSOR_SHAPE_CHANGE
 {
@@ -3595,45 +3536,6 @@ struct _ACCESS_STATE
   _UNICODE_STRING ObjectTypeName;
 };
 
-/* 677 */
-struct $8AB60FC5E17AA030F0890052F66E5962
-{
-  unsigned __int16 MajorVersion;
-  unsigned __int16 MinorVersion;
-};
-
-/* 678 */
-union SYNTHVID_VERSION
-{
-  $8AB60FC5E17AA030F0890052F66E5962 __s0;
-  unsigned int AsDWORD;
-};
-
-/* 679 */
-struct SYNTHVID_VERSION_REQUEST_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  SYNTHVID_VERSION Version;
-};
-
-/* 680 */
-struct __unaligned __declspec(align(2)) SYNTHVID_VERSION_RESPONSE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  SYNTHVID_VERSION Version;
-  unsigned __int8 IsAccepted;
-  unsigned __int8 MaxVideoOutputs;
-};
-
-/* 681 */
-struct __unaligned __declspec(align(2)) SYNTHVID_DIRT_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 VideoOutput;
-  unsigned __int8 DirtCount;
-  tagRECT Dirt[1];
-};
-
 /* 692 */
 struct _SYNTHVID_RESPONSE
 {
@@ -3696,27 +3598,6 @@ struct __declspec(align(2)) _SYNTHVID_LIB_CONTEXT
   unsigned __int8 SupportDynamicEdid;
   unsigned __int8 IsVmconnectWindowOpened;
   unsigned __int8 LockOnDisconnect;
-};
-
-/* 694 */
-struct __unaligned __declspec(align(2)) SYNTHVID_POINTER_POSITION_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 IsVisible;
-  unsigned __int8 VideoOutput;
-  int ImageX;
-  int ImageY;
-};
-
-/* 695 */
-struct SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 IsDirtNeeded;
-  unsigned __int8 IsPointerPositionUpdatesNeeded;
-  unsigned __int8 IsPointerShapeUpdatesNeeded;
-  unsigned __int8 IsVideoSituationUpdatesNeeded;
-  unsigned __int8 EdidBlock[128];
 };
 
 /* 696 */
@@ -3819,18 +3700,6 @@ typedef SYNTHVID_BIOS_INFO_REQUEST_MESSAGE *PSYNTHVID_BIOS_INFO_REQUEST_MESSAGE;
 /* 1059 */
 typedef SYNTHVID_SITUATION_UPDATE_MESSAGE *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
 
-/* 1155 */
-typedef SYNTHVID_POINTER_SHAPE_MESSAGE *PSYNTHVID_POINTER_SHAPE_MESSAGE;
-
-/* 1356 */
-typedef SYNTHVID_FEATURE_CHANGE_MESSAGE_V2 *PSYNTHVID_FEATURE_CHANGE_MESSAGE_V2;
-
-/* 1361 */
-typedef SYNTHVID_POINTER_POSITION_MESSAGE *PSYNTHVID_POINTER_POSITION_MESSAGE;
-
-/* 1435 */
-typedef SYNTHVID_DIRT_MESSAGE *PSYNTHVID_DIRT_MESSAGE;
-
 /* 1455 */
 typedef SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
 
@@ -3848,12 +3717,6 @@ typedef _SYNTHVID_LIB_CONTEXT *PSYNTHVID_LIB_CONTEXT;
 
 /* 1558 */
 typedef _SYNTHVID_RESPONSE *PSYNTHVID_RESPONSE;
-
-/* 1596 */
-typedef SYNTHVID_MESSAGE_HEADER *PSYNTHVID_MESSAGE_HEADER;
-
-/* 1667 */
-typedef SYNTHVID_VERSION_REQUEST_MESSAGE *PSYNTHVID_VERSION_REQUEST_MESSAGE;
 
 /* 1831 */
 typedef SYNTHVID_CAPABILITY_REQUEST_MESSAGE *PSYNTHVID_CAPABILITY_REQUEST_MESSAGE;

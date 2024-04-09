@@ -85,4 +85,161 @@ typedef struct _HK_MESSAGE_LED_INDICATORS_STATE
     HV_UINT16 LedFlags;
 } HK_MESSAGE_LED_INDICATORS_STATE, *PHK_MESSAGE_LED_INDICATORS_STATE;
 
+// *****************************************************************************
+// Microsoft Hyper-V Video
+//
+
+// {DA0A7802-E377-4AAC-8E77-0558EB1073F8}
+const HV_GUID SYNTHVID_CONTROL_CLASS_ID =
+{
+    0xDA0A7802,
+    0xE377,
+    0x4AAC,
+    { 0x8E, 0x77, 0x05, 0x58, 0xEB, 0x10, 0x73, 0xF8 }
+};
+
+typedef enum _SYNTHVID_MESSAGE_TYPE
+{
+    SynthvidError = 0,
+    SynthvidVersionRequest = 1,
+    SynthvidVersionResponse = 2,
+    SynthvidVramLocation = 3,
+    SynthvidVramLocationAck = 4,
+    SynthvidSituationUpdate = 5,
+    SynthvidSituationUpdateAck = 6,
+    SynthvidPointerPosition = 7,
+    SynthvidPointerShape = 8,
+    SynthvidFeatureChange = 9,
+    SynthvidDirt = 10,
+    SynthvidBiosInfoRequest = 11,
+    SynthvidBiosInfoResponse = 12,
+    SynthvidSupportedResolutionsRequest = 13,
+    SynthvidSupportedResolutionsResponse = 14,
+    SynthvidCapabilityRequest = 15,
+    SynthvidCapabilityResponse = 16,
+    SynthvidMax = 17,
+} SYNTHVID_MESSAGE_TYPE, *PSYNTHVID_MESSAGE_TYPE;
+
+typedef struct _SYNTHVID_MESSAGE_HEADER
+{
+    SYNTHVID_MESSAGE_TYPE Type;
+    HV_UINT32 Size;
+} SYNTHVID_MESSAGE_HEADER, *PSYNTHVID_MESSAGE_HEADER;
+
+typedef enum _SYNTHVID_FEATURE
+{
+    SynthVidFeatureWin7Rtm = 0x00030000,
+    SynthVidFeatureBasic = 0x00030000,
+    SynthVidFeatureWin8Rtm = 0x00030002,
+    SynthVidFeatureHighResolutions = 0x00030002,
+    SynthVidFeatureSupportsReinit = 0x00030002,
+    SynthVidFeatureWinBlue = 0x00030003,
+    SynthVidFeatureQueryBiosInfo = 0x00030003,
+    SynthVidFeatureWinThresholdM1 = 0x00030004,
+    SynthVidFeatureResolutionSetByHost = 0x00030004,
+    SynthVidFeatureWinThresholdM2 = 0x00030005,
+    SynthVidFeatureLockOnDisconnect = 0x00030005,
+} SYNTHVID_FEATURE, *PSYNTHVID_FEATURE;
+
+typedef union _SYNTHVID_VERSION
+{
+    HV_UINT32 AsDWORD;
+    struct
+    {
+        HV_UINT16 MajorVersion;
+        HV_UINT16 MinorVersion;
+    };
+} SYNTHVID_VERSION, *PSYNTHVID_VERSION;
+
+// SynthvidError | 0
+
+// SynthvidVersionRequest | 1
+
+typedef struct _SYNTHVID_VERSION_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    SYNTHVID_VERSION Version;
+} SYNTHVID_VERSION_REQUEST_MESSAGE, *PSYNTHVID_VERSION_REQUEST_MESSAGE;
+
+// SynthvidVersionResponse | 2
+
+typedef struct _SYNTHVID_VERSION_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    SYNTHVID_VERSION Version;
+    HV_UINT8 IsAccepted;
+    HV_UINT8 MaxVideoOutputs;
+} SYNTHVID_VERSION_RESPONSE_MESSAGE, *PSYNTHVID_VERSION_RESPONSE_MESSAGE;
+
+// SynthvidVramLocation | 3
+
+// SynthvidVramLocationAck | 4
+
+// SynthvidSituationUpdate | 5
+
+// SynthvidSituationUpdateAck | 6
+
+// SynthvidPointerPosition | 7
+
+/* 694 */
+struct __unaligned __declspec(align(2)) SYNTHVID_POINTER_POSITION_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 IsVisible;
+    HV_UINT8 VideoOutput;
+    int ImageX;
+    int ImageY;
+};
+
+// SynthvidPointerShape | 8
+
+/* 584 */
+struct __unaligned __declspec(align(1)) SYNTHVID_POINTER_SHAPE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 PartialIndex;
+    HV_UINT8 CursorFlags;
+    unsigned int WidthPixels;
+    unsigned int HeightPixels;
+    unsigned int HotspotX;
+    unsigned int HotspotY;
+    HV_UINT8 PixelData[1];
+};
+
+// SynthvidFeatureChange | 9
+
+/* 695 */
+struct SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 IsDirtNeeded;
+    HV_UINT8 IsPointerPositionUpdatesNeeded;
+    HV_UINT8 IsPointerShapeUpdatesNeeded;
+    HV_UINT8 IsVideoSituationUpdatesNeeded;
+    HV_UINT8 EdidBlock[128];
+};
+
+// SynthvidDirt | 10
+
+/* 681 */
+struct __unaligned __declspec(align(2)) SYNTHVID_DIRT_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 VideoOutput;
+    HV_UINT8 DirtCount;
+    tagRECT Dirt[1];
+};
+
+// SynthvidBiosInfoRequest | 11
+
+// SynthvidBiosInfoResponse | 12
+
+// SynthvidSupportedResolutionsRequest | 13
+
+// SynthvidSupportedResolutionsResponse | 14
+
+// SynthvidCapabilityRequest | 15
+
+// SynthvidCapabilityResponse | 16
+
 #endif // !MILE_HYPERV_VMBUS
