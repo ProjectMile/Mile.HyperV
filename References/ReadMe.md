@@ -72,6 +72,7 @@ HV_CPUID_FUNCTION.
   - [vmbuspipe.dll](Symbols/14347/vmbuspipe.dll), [vmbuspipe.pdb](Symbols/14347/vmbuspipe.pdb)
   - [hyperkbd.sys](Symbols/14347/hyperkbd.sys), [vmbuspipe.pdb](Symbols/14347/hyperkbd.pdb)
   - [HyperVideo.sys](Symbols/14347/HyperVideo.sys), [HyperVideo.pdb](Symbols/14347/HyperVideo.pdb)
+  - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
 
 ## FreeBSD
 
