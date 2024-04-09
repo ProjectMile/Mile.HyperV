@@ -45,40 +45,6 @@ struct WDFDEVICE__;
 struct VMBCHANNEL__;
 struct _DV_RUNDOWN_BARRIER_WAIT_BLOCK;
 
-/* 87 */
-enum _HK_MESSAGE_TYPE : __int32
-{
-  HkMessageProtocolRequest = 0x1,
-  HkMessageProtocolResponse = 0x2,
-  HkMessageEvent = 0x3,
-  HkMessageSetLedIndicators = 0x4,
-};
-
-/* 568 */
-struct _HK_MESSAGE_HEADER
-{
-  _HK_MESSAGE_TYPE MessageType;
-};
-
-/* 569 */
-struct _HK_MESSAGE_KEYSTROKE
-{
-  _HK_MESSAGE_HEADER Header;
-  unsigned __int16 MakeCode;
-  unsigned __int32 IsUnicode : 1;
-  unsigned __int32 IsBreak : 1;
-  unsigned __int32 IsE0 : 1;
-  unsigned __int32 IsE1 : 1;
-  unsigned __int32 Reserved : 28;
-};
-
-/* 575 */
-struct _HK_MESSAGE_PROTOCOL_REQUEST
-{
-  _HK_MESSAGE_HEADER Header;
-  unsigned int Version;
-};
-
 /* 584 */
 struct $9173FCD3816CC8B2C9B7B935B941AC3F
 {
@@ -2028,33 +1994,8 @@ struct _ACCESS_STATE
   _UNICODE_STRING ObjectTypeName;
 };
 
-/* 589 */
-struct __declspec(align(4)) _HK_MESSAGE_LED_INDICATORS_STATE
-{
-  _HK_MESSAGE_HEADER Header;
-  unsigned __int16 LedFlags;
-};
-
-/* 590 */
-struct _HK_MESSAGE_PROTOCOL_RESPONSE
-{
-  _HK_MESSAGE_HEADER Header;
-  unsigned __int32 Accepted : 1;
-  unsigned __int32 Reserved : 31;
-};
-
-/* 822 */
-typedef _HK_MESSAGE_PROTOCOL_RESPONSE *PHK_MESSAGE_PROTOCOL_RESPONSE;
-
 /* 889 */
 typedef _HK_DEVICE_CONTEXT *PHK_DEVICE_CONTEXT;
 
 /* 1190 */
 typedef _HK_DEVICE_CONTEXT *WDF_POINTER_TYPE_HK_DEVICE_CONTEXT;
-
-/* 1326 */
-typedef _HK_MESSAGE_KEYSTROKE *PHK_MESSAGE_KEYSTROKE;
-
-/* 1508 */
-typedef _HK_MESSAGE_HEADER *PHK_MESSAGE_HEADER;
-
