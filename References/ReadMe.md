@@ -74,6 +74,7 @@ HV_CPUID_FUNCTION.
   - [HyperVideo.sys](Symbols/14347/HyperVideo.sys), [HyperVideo.pdb](Symbols/14347/HyperVideo.pdb)
   - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
   - [storvsc.sys](Symbols/14347/storvsc.sys), [storvsc.pdb](Symbols/14347/storvsc.pdb)
+  - [VMBusHID.sys](Symbols/14347/VMBusHID.sys), [VMBusHID.pdb](Symbols/14347/VMBusHID.pdb)
 
 ## FreeBSD
 
