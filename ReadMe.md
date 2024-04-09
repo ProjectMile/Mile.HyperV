@@ -29,11 +29,11 @@ projects.
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's vmbuspipe.dll
 - Mile.HyperV.VMBus.h
-  - Definitions conform with Windows 10 Build 19041's hyperkbd.sys
-  - Definitions conform with Windows 10 Build 19041's HyperVideo.sys
-  - Definitions conform with Windows 10 Build 19041's netvsc.sys
-  - Definitions conform with Windows 10 Build 19041's storvsc.sys
-  - Definitions conform with Windows 10 Build 19041's VMBusHID.sys
+  - Definitions conform with Windows 10 Build 14347's hyperkbd.sys
+  - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
+  - Definitions conform with Windows 10 Build 14347's netvsc.sys
+  - Definitions conform with Windows 10 Build 14347's storvsc.sys
+  - Definitions conform with Windows 10 Build 14347's VMBusHID.sys
 - Distributed under the MIT License
 
 ## Documents
