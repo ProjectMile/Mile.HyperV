@@ -71,10 +71,10 @@ HV_CPUID_FUNCTION.
   - [ntoskrnl.exe](Symbols/14347/ntoskrnl.exe), [ntkrpamp.pdb](Symbols/14347/ntkrpamp.pdb)
   - [vmbuspipe.dll](Symbols/14347/vmbuspipe.dll), [vmbuspipe.pdb](Symbols/14347/vmbuspipe.pdb)
   - [hyperkbd.sys](Symbols/14347/hyperkbd.sys), [vmbuspipe.pdb](Symbols/14347/hyperkbd.pdb)
-  - [HyperVideo.sys](Symbols/14347/HyperVideo.sys), [HyperVideo.pdb](Symbols/14347/HyperVideo.pdb)
+  - [HyperVideo.sys](Symbols/14347/HyperVideo.sys), [hypervideo.pdb](Symbols/14347/hypervideo.pdb)
   - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
   - [storvsc.sys](Symbols/14347/storvsc.sys), [storvsc.pdb](Symbols/14347/storvsc.pdb)
-  - [VMBusHID.sys](Symbols/14347/VMBusHID.sys), [VMBusHID.pdb](Symbols/14347/VMBusHID.pdb)
+  - [VMBusHID.sys](Symbols/14347/VMBusHID.sys), [vmbushid.pdb](Symbols/14347/vmbushid.pdb)
 
 ## FreeBSD
 
