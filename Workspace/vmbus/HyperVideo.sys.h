@@ -357,17 +357,6 @@ struct _DXGK_DISPLAY_INFORMATION
   unsigned int AcpiId;
 };
 
-/* 633 */
-struct __unaligned __declspec(align(2)) VIDEO_OUTPUT_SITUATION
-{
-  unsigned __int8 Active;
-  unsigned int PrimarySurfaceVramOffset;
-  unsigned __int8 DepthBits;
-  unsigned int WidthPixels;
-  unsigned int HeightPixels;
-  unsigned int PitchBytes;
-};
-
 /* 644 */
 struct _HVD_DEVICE_CONTEXT
 {
@@ -3600,93 +3589,6 @@ struct __declspec(align(2)) _SYNTHVID_LIB_CONTEXT
   unsigned __int8 LockOnDisconnect;
 };
 
-/* 696 */
-struct __unaligned __declspec(align(1)) SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 MaximumResolutionCount;
-};
-
-/* 393 */
-struct _HVD_SCREEN_INFO
-{
-  unsigned __int16 Width;
-  unsigned __int16 Height;
-};
-
-/* 697 */
-struct __unaligned __declspec(align(1)) SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int8 EdidBlock[128];
-  unsigned __int8 ResolutionCount;
-  unsigned __int8 DefaultResolutionIndex;
-  unsigned __int8 IsStandard;
-  _HVD_SCREEN_INFO SupportedResolution[1];
-};
-
-/* 698 */
-struct SYNTHVID_CAPABILITY_REQUEST_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-};
-
-/* 699 */
-struct SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int32 LockOnDisconnect : 1;
-  unsigned __int32 Reserved : 31;
-  unsigned int Reserved2[15];
-};
-
-/* 700 */
-struct __unaligned __declspec(align(1)) SYNTHVID_VRAM_LOCATION_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int64 UserContext;
-  unsigned __int8 IsVramGpaAddressSpecified;
-  unsigned __int64 VramGpaAddress;
-};
-
-/* 701 */
-struct SYNTHVID_VRAM_LOCATION_ACK_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int64 UserContext;
-};
-
-/* 702 */
-struct __unaligned __declspec(align(1)) SYNTHVID_SITUATION_UPDATE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int64 UserContext;
-  unsigned __int8 VideoOutputCount;
-  VIDEO_OUTPUT_SITUATION VideoOutput[1];
-};
-
-/* 703 */
-struct SYNTHVID_BIOS_INFO_REQUEST_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-};
-
-/* 704 */
-struct SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned int VmGeneration;
-  unsigned int ReservedInt32;
-  unsigned __int64 ReservedInt64;
-};
-
-/* 705 */
-struct SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE
-{
-  SYNTHVID_MESSAGE_HEADER Header;
-  unsigned __int64 UserContext;
-};
-
 /* 934 */
 struct $5DCC2531AF8711E736C4006E6621E423
 {
@@ -3694,30 +3596,11 @@ struct $5DCC2531AF8711E736C4006E6621E423
   unsigned __int8 ExtraPixelData[7];
 };
 
-/* 1011 */
-typedef SYNTHVID_BIOS_INFO_REQUEST_MESSAGE *PSYNTHVID_BIOS_INFO_REQUEST_MESSAGE;
-
-/* 1059 */
-typedef SYNTHVID_SITUATION_UPDATE_MESSAGE *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
-
-/* 1455 */
-typedef SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
-
-/* 1462 */
-typedef SYNTHVID_VRAM_LOCATION_MESSAGE *PSYNTHVID_VRAM_LOCATION_MESSAGE;
-
 /* 1498 */
 typedef SYNTHVID_HANDLE__ *SYNTHVID_HANDLE;
-
-/* 1538 */
-typedef SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE *PSYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE;
 
 /* 1554 */
 typedef _SYNTHVID_LIB_CONTEXT *PSYNTHVID_LIB_CONTEXT;
 
 /* 1558 */
 typedef _SYNTHVID_RESPONSE *PSYNTHVID_RESPONSE;
-
-/* 1831 */
-typedef SYNTHVID_CAPABILITY_REQUEST_MESSAGE *PSYNTHVID_CAPABILITY_REQUEST_MESSAGE;
-

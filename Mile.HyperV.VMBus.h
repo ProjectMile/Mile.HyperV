@@ -21,69 +21,13 @@ typedef struct _HV_GUID
     HV_UINT8 Data4[8];
 } HV_GUID, *PHV_GUID;
 
-// *****************************************************************************
-// Microsoft Hyper-V Virtual Keyboard
-//
-
-// {F912AD6D-2B17-48EA-BD65-F927A61C7684}
-const HV_GUID HK_CONTROL_CLASS_ID =
+typedef struct _HV_RECT
 {
-    0xF912AD6D,
-    0x2B17,
-    0x48EA,
-    { 0xBD, 0x65, 0xF9, 0x27, 0xA6, 0x1C, 0x76, 0x84 }
-};
-
-typedef enum _HK_MESSAGE_TYPE
-{
-    HkMessageProtocolRequest = 1,
-    HkMessageProtocolResponse = 2,
-    HkMessageEvent = 3,
-    HkMessageSetLedIndicators = 4,
-} HK_MESSAGE_TYPE, *PHK_MESSAGE_TYPE;
-
-typedef struct _HK_MESSAGE_HEADER
-{
-    HK_MESSAGE_TYPE MessageType;
-} HK_MESSAGE_HEADER, *PHK_MESSAGE_HEADER;
-
-// HkMessageProtocolRequest | 1
-
-typedef struct _HK_MESSAGE_PROTOCOL_REQUEST
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT32 Version;
-} HK_MESSAGE_PROTOCOL_REQUEST, *PHK_MESSAGE_PROTOCOL_REQUEST;
-
-// HkMessageProtocolResponse | 2
-
-typedef struct _HK_MESSAGE_PROTOCOL_RESPONSE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT32 Accepted : 1;
-    HV_UINT32 Reserved : 31;
-} HK_MESSAGE_PROTOCOL_RESPONSE, *PHK_MESSAGE_PROTOCOL_RESPONSE;
-
-// HkMessageEvent | 3
-
-typedef struct _HK_MESSAGE_KEYSTROKE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT16 MakeCode;
-    HV_UINT32 IsUnicode : 1;
-    HV_UINT32 IsBreak : 1;
-    HV_UINT32 IsE0 : 1;
-    HV_UINT32 IsE1 : 1;
-    HV_UINT32 Reserved : 28;
-} HK_MESSAGE_KEYSTROKE, *PHK_MESSAGE_KEYSTROKE;
-
-// HkMessageSetLedIndicators | 4
-
-typedef struct _HK_MESSAGE_LED_INDICATORS_STATE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT16 LedFlags;
-} HK_MESSAGE_LED_INDICATORS_STATE, *PHK_MESSAGE_LED_INDICATORS_STATE;
+    HV_INT32 Left;
+    HV_INT32 Top;
+    HV_INT32 Right;
+    HV_INT32 Bottom;
+} HV_RECT, *PHV_RECT;
 
 // *****************************************************************************
 // Microsoft Hyper-V Video
@@ -151,6 +95,24 @@ typedef union _SYNTHVID_VERSION
     };
 } SYNTHVID_VERSION, *PSYNTHVID_VERSION;
 
+#pragma pack(1)
+typedef struct _VIDEO_OUTPUT_SITUATION
+{
+    HV_UINT8 Active;
+    HV_UINT32 PrimarySurfaceVramOffset;
+    HV_UINT8 DepthBits;
+    HV_UINT32 WidthPixels;
+    HV_UINT32 HeightPixels;
+    HV_UINT32 PitchBytes;
+} VIDEO_OUTPUT_SITUATION, *PVIDEO_OUTPUT_SITUATION;
+#pragma pack()
+
+typedef struct _HVD_SCREEN_INFO
+{
+    HV_UINT16 Width;
+    HV_UINT16 Height;
+} HVD_SCREEN_INFO, *PHVD_SCREEN_INFO;
+
 // SynthvidError | 0
 
 // SynthvidVersionRequest | 1
@@ -163,6 +125,7 @@ typedef struct _SYNTHVID_VERSION_REQUEST_MESSAGE
 
 // SynthvidVersionResponse | 2
 
+#pragma pack(1)
 typedef struct _SYNTHVID_VERSION_RESPONSE_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
@@ -170,46 +133,80 @@ typedef struct _SYNTHVID_VERSION_RESPONSE_MESSAGE
     HV_UINT8 IsAccepted;
     HV_UINT8 MaxVideoOutputs;
 } SYNTHVID_VERSION_RESPONSE_MESSAGE, *PSYNTHVID_VERSION_RESPONSE_MESSAGE;
+#pragma pack()
 
 // SynthvidVramLocation | 3
 
+#pragma pack(1)
+typedef struct _SYNTHVID_VRAM_LOCATION_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+    HV_UINT8 IsVramGpaAddressSpecified;
+    HV_UINT64 VramGpaAddress;
+} SYNTHVID_VRAM_LOCATION_MESSAGE, *PSYNTHVID_VRAM_LOCATION_MESSAGE;
+#pragma pack()
+
 // SynthvidVramLocationAck | 4
+
+typedef struct _SYNTHVID_VRAM_LOCATION_ACK_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+} SYNTHVID_VRAM_LOCATION_ACK_MESSAGE, *PSYNTHVID_VRAM_LOCATION_ACK_MESSAGE;
 
 // SynthvidSituationUpdate | 5
 
+#pragma pack(1)
+typedef struct _SYNTHVID_SITUATION_UPDATE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+    HV_UINT8 VideoOutputCount;
+    VIDEO_OUTPUT_SITUATION VideoOutput[ANYSIZE_ARRAY];
+} SYNTHVID_SITUATION_UPDATE_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
+#pragma pack()
+
 // SynthvidSituationUpdateAck | 6
+
+typedef struct _SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+} SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
 
 // SynthvidPointerPosition | 7
 
-/* 694 */
-struct __unaligned __declspec(align(2)) SYNTHVID_POINTER_POSITION_MESSAGE
+#pragma pack(1)
+typedef struct _SYNTHVID_POINTER_POSITION_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT8 IsVisible;
     HV_UINT8 VideoOutput;
-    int ImageX;
-    int ImageY;
-};
+    HV_INT32 ImageX;
+    HV_INT32 ImageY;
+} SYNTHVID_POINTER_POSITION_MESSAGE, *PSYNTHVID_POINTER_POSITION_MESSAGE;
+#pragma pack()
 
 // SynthvidPointerShape | 8
 
-/* 584 */
-struct __unaligned __declspec(align(1)) SYNTHVID_POINTER_SHAPE_MESSAGE
+#pragma pack(1)
+typedef struct _SYNTHVID_POINTER_SHAPE_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT8 PartialIndex;
     HV_UINT8 CursorFlags;
-    unsigned int WidthPixels;
-    unsigned int HeightPixels;
-    unsigned int HotspotX;
-    unsigned int HotspotY;
-    HV_UINT8 PixelData[1];
-};
+    HV_UINT32 WidthPixels;
+    HV_UINT32 HeightPixels;
+    HV_UINT32 HotspotX;
+    HV_UINT32 HotspotY;
+    HV_UINT8 PixelData[ANYSIZE_ARRAY];
+} SYNTHVID_POINTER_SHAPE_MESSAGE, *PSYNTHVID_POINTER_SHAPE_MESSAGE;
+#pragma pack()
 
 // SynthvidFeatureChange | 9
 
-/* 695 */
-struct SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
+typedef struct _SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT8 IsDirtNeeded;
@@ -217,29 +214,140 @@ struct SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
     HV_UINT8 IsPointerShapeUpdatesNeeded;
     HV_UINT8 IsVideoSituationUpdatesNeeded;
     HV_UINT8 EdidBlock[128];
-};
+} SYNTHVID_FEATURE_CHANGE_MESSAGE_V2, *PSYNTHVID_FEATURE_CHANGE_MESSAGE_V2;
 
 // SynthvidDirt | 10
 
-/* 681 */
-struct __unaligned __declspec(align(2)) SYNTHVID_DIRT_MESSAGE
+#pragma pack(1)
+typedef struct _SYNTHVID_DIRT_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT8 VideoOutput;
     HV_UINT8 DirtCount;
-    tagRECT Dirt[1];
-};
+    HV_RECT Dirt[ANYSIZE_ARRAY];
+} SYNTHVID_DIRT_MESSAGE, *PSYNTHVID_DIRT_MESSAGE;
+#pragma pack()
 
 // SynthvidBiosInfoRequest | 11
 
+typedef struct _SYNTHVID_BIOS_INFO_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+} SYNTHVID_BIOS_INFO_REQUEST_MESSAGE, *PSYNTHVID_BIOS_INFO_REQUEST_MESSAGE;
+
 // SynthvidBiosInfoResponse | 12
+
+typedef struct _SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT32 VmGeneration;
+    HV_UINT32 ReservedInt32;
+    HV_UINT64 ReservedInt64;
+} SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE, *PSYNTHVID_BIOS_INFO_RESPONSE_MESSAGE;
 
 // SynthvidSupportedResolutionsRequest | 13
 
+#pragma pack(1)
+typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 MaximumResolutionCount;
+} SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE;
+#pragma pack()
+
 // SynthvidSupportedResolutionsResponse | 14
+
+#pragma pack(1)
+typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 EdidBlock[128];
+    HV_UINT8 ResolutionCount;
+    HV_UINT8 DefaultResolutionIndex;
+    HV_UINT8 IsStandard;
+    HVD_SCREEN_INFO SupportedResolution[ANYSIZE_ARRAY];
+} SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
+#pragma pack()
 
 // SynthvidCapabilityRequest | 15
 
+typedef struct _SYNTHVID_CAPABILITY_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+} SYNTHVID_CAPABILITY_REQUEST_MESSAGE, *PSYNTHVID_CAPABILITY_REQUEST_MESSAGE;
+
 // SynthvidCapabilityResponse | 16
+
+typedef struct _SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT32 LockOnDisconnect : 1;
+    HV_UINT32 Reserved : 31;
+    HV_UINT32 Reserved2[15];
+} SYNTHVID_CAPABILITY_RESPONSE_MESSAGE, *PSYNTHVID_CAPABILITY_RESPONSE_MESSAGE;
+
+// *****************************************************************************
+// Microsoft Hyper-V Virtual Keyboard
+//
+
+// {F912AD6D-2B17-48EA-BD65-F927A61C7684}
+const HV_GUID HK_CONTROL_CLASS_ID =
+{
+    0xF912AD6D,
+    0x2B17,
+    0x48EA,
+    { 0xBD, 0x65, 0xF9, 0x27, 0xA6, 0x1C, 0x76, 0x84 }
+};
+
+typedef enum _HK_MESSAGE_TYPE
+{
+    HkMessageProtocolRequest = 1,
+    HkMessageProtocolResponse = 2,
+    HkMessageEvent = 3,
+    HkMessageSetLedIndicators = 4,
+} HK_MESSAGE_TYPE, *PHK_MESSAGE_TYPE;
+
+typedef struct _HK_MESSAGE_HEADER
+{
+    HK_MESSAGE_TYPE MessageType;
+} HK_MESSAGE_HEADER, *PHK_MESSAGE_HEADER;
+
+// HkMessageProtocolRequest | 1
+
+typedef struct _HK_MESSAGE_PROTOCOL_REQUEST
+{
+    HK_MESSAGE_HEADER Header;
+    HV_UINT32 Version;
+} HK_MESSAGE_PROTOCOL_REQUEST, *PHK_MESSAGE_PROTOCOL_REQUEST;
+
+// HkMessageProtocolResponse | 2
+
+typedef struct _HK_MESSAGE_PROTOCOL_RESPONSE
+{
+    HK_MESSAGE_HEADER Header;
+    HV_UINT32 Accepted : 1;
+    HV_UINT32 Reserved : 31;
+} HK_MESSAGE_PROTOCOL_RESPONSE, *PHK_MESSAGE_PROTOCOL_RESPONSE;
+
+// HkMessageEvent | 3
+
+typedef struct _HK_MESSAGE_KEYSTROKE
+{
+    HK_MESSAGE_HEADER Header;
+    HV_UINT16 MakeCode;
+    HV_UINT32 IsUnicode : 1;
+    HV_UINT32 IsBreak : 1;
+    HV_UINT32 IsE0 : 1;
+    HV_UINT32 IsE1 : 1;
+    HV_UINT32 Reserved : 28;
+} HK_MESSAGE_KEYSTROKE, *PHK_MESSAGE_KEYSTROKE;
+
+// HkMessageSetLedIndicators | 4
+
+typedef struct _HK_MESSAGE_LED_INDICATORS_STATE
+{
+    HK_MESSAGE_HEADER Header;
+    HV_UINT16 LedFlags;
+} HK_MESSAGE_LED_INDICATORS_STATE, *PHK_MESSAGE_LED_INDICATORS_STATE;
 
 #endif // !MILE_HYPERV_VMBUS
