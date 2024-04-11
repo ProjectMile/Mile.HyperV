@@ -64,11 +64,8 @@ struct _XPART_PARTITION;
 struct _XPART_SEND_MESSAGE;
 struct _XPART_INTERRUPT;
 struct _XPART_INTERRUPT_REQUIREMENTS;
-struct _VMBUS_CHANNEL_CLOSE_CHANNEL;
-struct _VMBUS_CHANNEL_RELID_RELEASED;
 struct _HV_MESSAGE_PAGE;
 struct _MVM_CONTEXT;
-struct _GPA_RANGE;
 struct VMBWORKITEM__;
 
 /* 106 */
@@ -160,16 +157,6 @@ enum _VMBUS_CRASH_PACKET_TYPE : __int32
   VmbusCrashPacketCompletion = 0x3,
 };
 
-/* 119 */
-enum _VMPIPE_PROTOCOL_MESSAGE_TYPE : __int32
-{
-  VmPipeMessageInvalid = 0x0,
-  VmPipeMessageData = 0x1,
-  VmPipeMessagePartial = 0x2,
-  VmPipeMessageSetupGpaDirect = 0x3,
-  VmPipeMessageTeardownGpaDirect = 0x4,
-};
-
 /* 122 */
 enum _VMBUS_PACKET_TYPE : __int32
 {
@@ -189,34 +176,6 @@ enum _VMBUS_DEVICE_INTERFACE_STATE : __int32
   VmbusDeviceInterfaceNotifyPending = 0x2,
   VmbusDeviceInterfaceOpened = 0x3,
   VmbusDeviceInterfaceRemoved = 0x4,
-};
-
-/* 135 */
-enum _VMBUS_CHANNEL_MESSAGE_TYPE : __int32
-{
-  ChannelMessageInvalid = 0x0,
-  ChannelMessageOfferChannel = 0x1,
-  ChannelMessageRescindChannelOffer = 0x2,
-  ChannelMessageRequestOffers = 0x3,
-  ChannelMessageAllOffersDelivered = 0x4,
-  ChannelMessageOpenChannel = 0x5,
-  ChannelMessageOpenChannelResult = 0x6,
-  ChannelMessageCloseChannel = 0x7,
-  ChannelMessageGpadlHeader = 0x8,
-  ChannelMessageGpadlBody = 0x9,
-  ChannelMessageGpadlCreated = 0xA,
-  ChannelMessageGpadlTeardown = 0xB,
-  ChannelMessageGpadlTorndown = 0xC,
-  ChannelMessageRelIdReleased = 0xD,
-  ChannelMessageInitiateContact = 0xE,
-  ChannelMessageVersionResponse = 0xF,
-  ChannelMessageUnload = 0x10,
-  ChannelMessageUnloadComplete = 0x11,
-  ChannelMessageOpenReservedChannel = 0x12,
-  ChannelMessageCloseReservedChannel = 0x13,
-  ChannelMessageCloseReservedResponse = 0x14,
-  ChannelMessageTlConnectRequest = 0x15,
-  ChannelMessageCount = 0x16,
 };
 
 /* 145 */
@@ -2342,14 +2301,6 @@ struct _CHANNEL_OFFER_CACHE_ENTRY
   _VMBUS_CHANNEL_OFFER Offer;
 };
 
-/* 778 */
-struct _VMBUS_CHANNEL_RESCIND_OFFER
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-};
-
 /* 776 */
 struct _CHANNEL_ISR
 {
@@ -2667,22 +2618,6 @@ struct _XPART_INTERRUPT
   volatile int SpuriousCount;
   unsigned int ChannelLock;
   $65100114B277440569C27DAA27F985E5 Pnc;
-};
-
-/* 780 */
-struct _VMBUS_CHANNEL_CLOSE_CHANNEL
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-};
-
-/* 781 */
-struct _VMBUS_CHANNEL_RELID_RELEASED
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
 };
 
 /* 334 */
@@ -3275,14 +3210,6 @@ struct _VMBUS_INTERFACE_STANDARD
   void (__stdcall *ChUnmapChildMmioSpace)(void *, void *);
 };
 
-/* 824 */
-struct _GPA_RANGE
-{
-  unsigned int ByteCount;
-  unsigned int ByteOffset;
-  unsigned __int64 PfnArray[1];
-};
-
 /* 826 */
 struct VMBWORKITEM__
 {
@@ -3362,27 +3289,6 @@ struct _VMPACKET_DESCRIPTOR
   unsigned __int64 TransactionId;
 };
 
-/* 837 */
-struct $3735A1E240B731E4EC260DCADCCE027A
-{
-  unsigned __int16 DataSize;
-  unsigned __int16 Offset;
-};
-
-/* 838 */
-union $22060F1595C656C2FC37D2DD960BDDA3
-{
-  unsigned int DataSize;
-  $3735A1E240B731E4EC260DCADCCE027A Partial;
-};
-
-/* 839 */
-struct _VMPIPE_PROTOCOL_HEADER
-{
-  _VMPIPE_PROTOCOL_MESSAGE_TYPE PacketType;
-  $22060F1595C656C2FC37D2DD960BDDA3 ___u1;
-};
-
 /* 840 */
 struct _VMPIPE_TEARDOWN_GPA_DIRECT_BODY
 {
@@ -3453,174 +3359,6 @@ struct _VMDATA_GPA_DIRECT
   _GPA_RANGE Range[1];
 };
 
-/* 869 */
-struct $E8822EC98923B7C6AAFA78E5E1596B17
-{
-  unsigned __int16 IsDedicatedInterrupt : 1;
-  unsigned __int16 Reserved5 : 15;
-};
-
-/* 870 */
-union $9E70783F0B292B945F2D63E44D918A6F
-{
-  $E8822EC98923B7C6AAFA78E5E1596B17 __s0;
-  unsigned __int8 Windows6Offset;
-};
-
-/* 871 */
-struct __unaligned __declspec(align(4)) _VMBUS_CHANNEL_OFFER_CHANNEL
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  _GUID InterfaceType;
-  _GUID InterfaceInstance;
-  unsigned __int64 Reserved;
-  unsigned __int64 Reserved2;
-  unsigned __int16 Flags;
-  unsigned __int16 MmioMegabytes;
-  unsigned __int8 UserDefined[120];
-  unsigned __int16 SubChannelIndex;
-  unsigned __int16 MmioMegabytesOptional;
-  unsigned int ChildRelId;
-  unsigned __int8 MonitorId;
-  unsigned __int8 MonitorAllocated : 1;
-  unsigned __int8 Reserved4 : 7;
-  $9E70783F0B292B945F2D63E44D918A6F ___u15;
-  unsigned int ConnectionId;
-};
-
-/* 872 */
-struct _VMBUS_CHANNEL_MESSAGE_HEADER
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-};
-
-/* 873 */
-struct _VMBUS_CHANNEL_GPADL_BODY
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int MessageNumber;
-  unsigned int Gpadl;
-  unsigned __int64 Pfn[1];
-};
-
-/* 874 */
-struct _VMBUS_CHANNEL_OPEN_RESERVED_CHANNEL
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChannelId;
-  unsigned int TargetVp;
-  unsigned int TargetSint;
-  unsigned int RingBufferGpadl;
-  unsigned int DownstreamPageOffset;
-};
-
-/* 875 */
-struct _VMBUS_CHANNEL_OPEN_RESULT
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-  unsigned int OpenId;
-  unsigned int Status;
-};
-
-/* 876 */
-struct _VMBUS_CHANNEL_OPEN_CHANNEL
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-  unsigned int OpenId;
-  unsigned int RingBufferGpadlHandle;
-  unsigned int TargetVp;
-  unsigned int DownstreamRingBufferPageOffset;
-  unsigned __int8 UserData[120];
-};
-
-/* 877 */
-struct _VMBUS_CHANNEL_GPADL_CREATED
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-  unsigned int Gpadl;
-  unsigned int CreationStatus;
-};
-
-/* 878 */
-struct _VMBUS_CHANNEL_GPADL_TORNDOWN
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int Gpadl;
-};
-
-/* 879 */
-struct _VMBUS_CHANNEL_INITIATE_CONTACT
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int VMBusVersionRequested;
-  unsigned int TargetMessageVp;
-  unsigned __int64 InterruptPage;
-  unsigned __int64 ParentToChildMonitorPageGpa;
-  unsigned __int64 ChildToParentMonitorPageGpa;
-};
-
-/* 880 */
-struct _VMBUS_CHANNEL_GPADL_TEARDOWN
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-  unsigned int Gpadl;
-};
-
-/* 881 */
-struct _VMBUS_CHANNEL_CLOSE_RESERVED_RESPONSE
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChannelId;
-};
-
-/* 882 */
-struct __unaligned __declspec(align(4)) _VMBUS_CHANNEL_GPADL_HEADER
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChildRelId;
-  unsigned int Gpadl;
-  unsigned __int16 RangeBufLen;
-  unsigned __int16 RangeCount;
-  _GPA_RANGE Range[1];
-};
-
-/* 883 */
-struct _VMBUS_CHANNEL_VERSION_RESPONSE
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned __int8 VersionSupported;
-  unsigned __int8 ConnectionState;
-  unsigned __int8 Pad[2];
-  unsigned int SelectedVersion;
-};
-
-/* 884 */
-struct _VMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  unsigned int ChannelId;
-  unsigned int TargetVp;
-  unsigned int TargetSint;
-};
-
 /* 885 */
 union $3B0EE10C4D1D1040C98DAF18A06592CF
 {
@@ -3676,15 +3414,6 @@ struct _GPADL_CONTEXT
   void (__stdcall *GpadlTorndownFunction)(void *, _MDL *);
   void *GpadlTorndownContext;
   _VMBUS_CHANNEL_GPADL_TEARDOWN *TeardownMessage;
-};
-
-/* 915 */
-struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
-{
-  _VMBUS_CHANNEL_MESSAGE_TYPE MessageType;
-  unsigned int Padding;
-  _GUID EndpointId;
-  _GUID ServiceId;
 };
 
 /* 918 */
@@ -3746,20 +3475,8 @@ typedef _VMBUS_PIPE *PVMBUS_PIPE;
 /* 1069 */
 typedef _VMBUS_RING_BUFFER_PARAMETERS *PVMBUS_RING_BUFFER_PARAMETERS;
 
-/* 1075 */
-typedef _VMBUS_CHANNEL_OFFER_CHANNEL *PVMBUS_CHANNEL_OFFER_CHANNEL;
-
 /* 1081 */
 typedef void (__stdcall *PFN_VMB_CHANNEL_CLOSED)(VMBCHANNEL__ *);
-
-/* 1083 */
-typedef _VMBUS_CHANNEL_OPEN_RESULT *PVMBUS_CHANNEL_OPEN_RESULT;
-
-/* 1093 */
-typedef _VMBUS_CHANNEL_CLOSE_CHANNEL *PVMBUS_CHANNEL_CLOSE_CHANNEL;
-
-/* 1096 */
-typedef _VMPIPE_PROTOCOL_HEADER *PVMPIPE_PROTOCOL_HEADER;
 
 /* 1102 */
 typedef int (__stdcall *PFN_VMB_CHANNEL_OPENED)(VMBCHANNEL__ *);
@@ -3776,14 +3493,8 @@ typedef void (__stdcall *PFN_VMB_CHANNEL_POST_STARTED)(VMBCHANNEL__ *);
 /* 1165 */
 typedef int __stdcall EVT_VMB_CHANNEL_OPENED(VMBCHANNEL__ *);
 
-/* 1167 */
-typedef _VMBUS_CHANNEL_INITIATE_CONTACT *PVMBUS_CHANNEL_INITIATE_CONTACT;
-
 /* 1185 */
 typedef void __stdcall EVT_VMB_CHANNEL_CLOSED(VMBCHANNEL__ *);
-
-/* 1187 */
-typedef _VMBUS_CHANNEL_MESSAGE_HEADER *PVMBUS_CHANNEL_UNLOAD;
 
 /* 1207 */
 typedef _VMBUS_INSTANCE_CONTEXT *WDF_POINTER_TYPE_VMBUS_INSTANCE_CONTEXT;
@@ -3800,29 +3511,14 @@ typedef _VMPIPE_TEARDOWN_GPA_DIRECT_BODY *PVMPIPE_TEARDOWN_GPA_DIRECT_BODY;
 /* 1294 */
 typedef _VMBUS_WAIT_FOR_ACTION_OUTPUT_PARAMETERS *PVMBUS_WAIT_FOR_ACTION_OUTPUT_PARAMETERS;
 
-/* 1295 */
-typedef _VMBUS_CHANNEL_TL_CONNECT_REQUEST *PVMBUS_CHANNEL_TL_CONNECT_REQUEST;
-
 /* 1316 */
 typedef int (__stdcall *pChOpenChannel)(void *, _VMBUS_QUERY_SERVER_OPEN_CHANNEL_OUTPUT_PARAMETERS *);
 
 /* 1337 */
 typedef _VMBUS_PIPE_DATA_INDICATION_CONTEXT *PVMBUS_PIPE_DATA_INDICATION_CONTEXT;
 
-/* 1347 */
-typedef _VMBUS_CHANNEL_OPEN_CHANNEL *PVMBUS_CHANNEL_OPEN_CHANNEL;
-
-/* 1350 */
-typedef _VMBUS_CHANNEL_GPADL_TORNDOWN *PVMBUS_CHANNEL_GPADL_TORNDOWN;
-
 /* 1363 */
 typedef _VMBUS_OPEN_CHANNEL_INPUT_PARAMETERS *PVMBUS_OPEN_CHANNEL_INPUT_PARAMETERS;
-
-/* 1383 */
-typedef _VMBUS_CHANNEL_GPADL_CREATED *PVMBUS_CHANNEL_GPADL_CREATED;
-
-/* 1419 */
-typedef _VMBUS_CHANNEL_GPADL_HEADER *PVMBUS_CHANNEL_GPADL_HEADER;
 
 /* 1421 */
 typedef int (__stdcall *pPipeCreate)(unsigned __int8, _VMBUS_PIPE **);
@@ -3841,12 +3537,6 @@ typedef void (__stdcall *pPipePollForIndication)(_VMBUS_PIPE *);
 
 /* 1544 */
 typedef int (__stdcall *pPipeRead)(_VMBUS_PIPE *, _IRP *);
-
-/* 1553 */
-typedef _VMBUS_CHANNEL_GPADL_TEARDOWN *PVMBUS_CHANNEL_GPADL_TEARDOWN;
-
-/* 1555 */
-typedef _VMBUS_CHANNEL_VERSION_RESPONSE *PVMBUS_CHANNEL_VERSION_RESPONSE;
 
 /* 1575 */
 typedef _VMBUS_TL_INTERFACE *PVMBUS_TL_INTERFACE;
@@ -3877,9 +3567,6 @@ typedef _VMBUS_GET_SERVICE_INFO_INPUT_PARAMETERS *PVMBUS_GET_SERVICE_INFO_INPUT_
 
 /* 1710 */
 typedef _VMBUS_FDO_CONTEXT *WDF_POINTER_TYPE_VMBUS_FDO_CONTEXT;
-
-/* 1715 */
-typedef _VMBUS_CHANNEL_RELID_RELEASED *PVMBUS_CHANNEL_RELID_RELEASED;
 
 /* 1762 */
 typedef void (__stdcall *PFN_CHANNEL_ARRIVAL_CALLBACK)(void *, WDFDEVICE__ *, _FILE_OBJECT *, _VMBUS_CHANNEL_OFFER *);
@@ -3926,9 +3613,6 @@ typedef _VMRCB *PVMRCB;
 /* 2042 */
 typedef int (__stdcall *pPipeWrite)(_VMBUS_PIPE *, _IRP *);
 
-/* 2044 */
-typedef _VMBUS_CHANNEL_MESSAGE_HEADER *PVMBUS_CHANNEL_MESSAGE_HEADER;
-
 /* 2071 */
 typedef _VMBUS_INTERFACE_STANDARD *PVMBUS_INTERFACE_STANDARD;
 
@@ -3950,9 +3634,6 @@ typedef void (__stdcall *pPipeClose)(_VMBUS_PIPE *);
 /* 2206 */
 typedef _VMBUS_QUERY_CHANNEL_PARAMETERS *PVMBUS_QUERY_CHANNEL_PARAMETERS;
 
-/* 2215 */
-typedef _VMBUS_CHANNEL_GPADL_BODY *PVMBUS_CHANNEL_GPADL_BODY;
-
 /* 2230 */
 typedef void (__stdcall *pPipeCompleteIndication)(_VMBUS_PIPE *, VMBUS_PIPE_INDICATION_CONTEXT__ *);
 
@@ -3964,9 +3645,6 @@ typedef int (__stdcall *pPipeOffer)(_VMBUS_PIPE *, WDFDEVICE__ *, void *, _GUID 
 
 /* 2299 */
 typedef _VMBUS_QUERY_SERVER_OPEN_CHANNEL_OUTPUT_PARAMETERS *PVMBUS_SERVER_OPEN_CHANNEL_OUTPUT_PARAMETERS;
-
-/* 2306 */
-typedef _VMBUS_CHANNEL_RESCIND_OFFER *PVMBUS_CHANNEL_RESCIND_OFFER;
 
 /* 2328 */
 typedef _VMBUS_DPC_ARRAY *PVMBUS_DPC_ARRAY;
