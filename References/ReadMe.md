@@ -70,11 +70,12 @@ HV_CPUID_FUNCTION.
 - Build 14347
   - [ntoskrnl.exe](Symbols/14347/ntoskrnl.exe), [ntkrpamp.pdb](Symbols/14347/ntkrpamp.pdb)
   - [vmbuspipe.dll](Symbols/14347/vmbuspipe.dll), [vmbuspipe.pdb](Symbols/14347/vmbuspipe.pdb)
-  - [hyperkbd.sys](Symbols/14347/hyperkbd.sys), [vmbuspipe.pdb](Symbols/14347/hyperkbd.pdb)
+  - [vmbus.sys](Symbols/14347/vmbus.sys), [vmbus.pdb](Symbols/14347/vmbus.pdb)
   - [HyperVideo.sys](Symbols/14347/HyperVideo.sys), [hypervideo.pdb](Symbols/14347/hypervideo.pdb)
-  - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
-  - [storvsc.sys](Symbols/14347/storvsc.sys), [storvsc.pdb](Symbols/14347/storvsc.pdb)
+  - [hyperkbd.sys](Symbols/14347/hyperkbd.sys), [vmbuspipe.pdb](Symbols/14347/hyperkbd.pdb)
   - [VMBusHID.sys](Symbols/14347/VMBusHID.sys), [vmbushid.pdb](Symbols/14347/vmbushid.pdb)
+  - [storvsc.sys](Symbols/14347/storvsc.sys), [storvsc.pdb](Symbols/14347/storvsc.pdb)
+  - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
 
 ## FreeBSD
 
