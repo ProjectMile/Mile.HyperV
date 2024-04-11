@@ -157,17 +157,6 @@ enum _VMBUS_CRASH_PACKET_TYPE : __int32
   VmbusCrashPacketCompletion = 0x3,
 };
 
-/* 122 */
-enum _VMBUS_PACKET_TYPE : __int32
-{
-  VmbusPacketTypeInvalid = 0x0,
-  VmbusPacketTypeDataInBand = 0x6,
-  VmbusPacketTypeDataUsingTransferPages = 0x7,
-  VmbusPacketTypeDataUsingGpaDirect = 0x9,
-  VmbusPacketTypeCancelRequest = 0xA,
-  VmbusPacketTypeCompletion = 0xB,
-};
-
 /* 126 */
 enum _VMBUS_DEVICE_INTERFACE_STATE : __int32
 {
@@ -199,30 +188,6 @@ struct _GUID
 struct _VMBUS_GET_SERVICE_INFO_INPUT_PARAMETERS
 {
   _GUID ServiceId;
-};
-
-/* 715 */
-struct $A98EA6D065974697590D490AFD91554B
-{
-  unsigned __int32 SupportsPendingSendSize : 1;
-};
-
-/* 716 */
-union $9207F700DACD7E12AEA9763B25A2A41F
-{
-  $A98EA6D065974697590D490AFD91554B __s0;
-  unsigned int Value;
-};
-
-/* 717 */
-struct _VMRCB
-{
-  unsigned int In;
-  unsigned int Out;
-  unsigned int InterruptMask;
-  unsigned int PendingSendSize;
-  unsigned int Reserved[12];
-  $9207F700DACD7E12AEA9763B25A2A41F FeatureBits;
 };
 
 /* 718 */
@@ -3279,16 +3244,6 @@ struct _VMBUS_PIPE_DATA_INDICATION_CONTEXT
   _VMPIPE_PROTOCOL_MESSAGE_TYPE PacketType;
 };
 
-/* 836 */
-struct _VMPACKET_DESCRIPTOR
-{
-  unsigned __int16 Type;
-  unsigned __int16 DataOffset8;
-  unsigned __int16 Length8;
-  unsigned __int16 Flags;
-  unsigned __int64 TransactionId;
-};
-
 /* 840 */
 struct _VMPIPE_TEARDOWN_GPA_DIRECT_BODY
 {
@@ -3324,39 +3279,12 @@ struct _VMBUS_CRASH_PAGES
   unsigned __int8 SintMessagePage[4096];
 };
 
-/* 863 */
-struct _VMTRANSFER_PAGE_RANGE
-{
-  unsigned int ByteCount;
-  unsigned int ByteOffset;
-};
-
 /* 862 */
 struct _VMTRANSFER_PAGE_RANGES
 {
   _VMTRANSFER_PAGE_RANGES *Next;
   unsigned int RangeCount;
   _VMTRANSFER_PAGE_RANGE Range[1];
-};
-
-/* 864 */
-struct _VMTRANSFER_PAGE_PACKET_HEADER
-{
-  _VMPACKET_DESCRIPTOR Descriptor;
-  unsigned __int16 TransferPageSetId;
-  unsigned __int8 SenderOwnsSet;
-  unsigned __int8 Reserved;
-  unsigned int RangeCount;
-  _VMTRANSFER_PAGE_RANGE Ranges[1];
-};
-
-/* 867 */
-struct _VMDATA_GPA_DIRECT
-{
-  _VMPACKET_DESCRIPTOR Descriptor;
-  unsigned int Reserved;
-  unsigned int RangeCount;
-  _GPA_RANGE Range[1];
 };
 
 /* 885 */
@@ -3550,9 +3478,6 @@ typedef _VMBUS_CREATE_PIPE_INPUT_PARAMETERS *PVMBUS_CREATE_PIPE_INPUT_PARAMETERS
 /* 1639 */
 typedef void (__stdcall *PFN_VMB_CHANNEL_STARTED)(VMBCHANNEL__ *);
 
-/* 1640 */
-typedef _VMTRANSFER_PAGE_PACKET_HEADER *PVMTRANSFER_PAGE_PACKET_HEADER;
-
 /* 1667 */
 typedef void (__stdcall *pPipeSetContext)(_VMBUS_PIPE *, void *);
 
@@ -3571,17 +3496,11 @@ typedef _VMBUS_FDO_CONTEXT *WDF_POINTER_TYPE_VMBUS_FDO_CONTEXT;
 /* 1762 */
 typedef void (__stdcall *PFN_CHANNEL_ARRIVAL_CALLBACK)(void *, WDFDEVICE__ *, _FILE_OBJECT *, _VMBUS_CHANNEL_OFFER *);
 
-/* 1801 */
-typedef _VMDATA_GPA_DIRECT *PVMDATA_GPA_DIRECT;
-
 /* 1822 */
 typedef _VMTRANSFER_PAGE_RANGES *PVMTRANSFER_PAGE_RANGES;
 
 /* 1828 */
 typedef int (__stdcall *pHvSocketProviderSetupPartition)(void *, WDFDEVICE__ *, _DEVICE_OBJECT *, void *, _GUID, void *, _VMBUS_TL_INTERFACE *, void **);
-
-/* 1830 */
-typedef _VMPACKET_DESCRIPTOR *PVMPACKET_DESCRIPTOR;
 
 /* 1841 */
 typedef _VMBUS_PIPE_INTERFACE *PVMBUS_PIPE_INTERFACE;
@@ -3606,9 +3525,6 @@ typedef _VMBUS_CRASH_INTERFACE *PVMBUS_CRASH_INTERFACE;
 
 /* 2016 */
 typedef _VMBUS_PROCESSOR *PVMBUS_PROCESSOR;
-
-/* 2026 */
-typedef _VMRCB *PVMRCB;
 
 /* 2042 */
 typedef int (__stdcall *pPipeWrite)(_VMBUS_PIPE *, _IRP *);

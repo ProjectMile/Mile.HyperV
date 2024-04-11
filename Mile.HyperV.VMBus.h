@@ -323,6 +323,66 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
     HV_GUID ServiceId;
 } VMBUS_CHANNEL_TL_CONNECT_REQUEST, *PVMBUS_CHANNEL_TL_CONNECT_REQUEST;
 
+typedef struct _VMRCB
+{
+    HV_UINT32 In;
+    HV_UINT32 Out;
+    HV_UINT32 InterruptMask;
+    HV_UINT32 PendingSendSize;
+    HV_UINT32 Reserved[12];
+    union
+    {
+        HV_UINT32 Value;
+        struct
+        {
+            HV_UINT32 SupportsPendingSendSize : 1;
+        };
+    } FeatureBits;
+} VMRCB, *PVMRCB;
+
+typedef enum _VMBUS_PACKET_TYPE
+{
+    VmbusPacketTypeInvalid = 0,
+    VmbusPacketTypeDataInBand = 6,
+    VmbusPacketTypeDataUsingTransferPages = 7,
+    VmbusPacketTypeDataUsingGpaDirect = 9,
+    VmbusPacketTypeCancelRequest = 10,
+    VmbusPacketTypeCompletion = 11,
+} VMBUS_PACKET_TYPE, *PVMBUS_PACKET_TYPE;
+
+typedef struct _VMPACKET_DESCRIPTOR
+{
+    HV_UINT16 Type; // VMBUS_PACKET_TYPE
+    HV_UINT16 DataOffset8;
+    HV_UINT16 Length8;
+    HV_UINT16 Flags;
+    HV_UINT64 TransactionId;
+} VMPACKET_DESCRIPTOR, *PVMPACKET_DESCRIPTOR;
+
+typedef struct _VMTRANSFER_PAGE_RANGE
+{
+    HV_UINT32 ByteCount;
+    HV_UINT32 ByteOffset;
+} VMTRANSFER_PAGE_RANGE, *PVMTRANSFER_PAGE_RANGE;
+
+typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
+{
+    VMPACKET_DESCRIPTOR Descriptor;
+    HV_UINT16 TransferPageSetId;
+    HV_UINT8 SenderOwnsSet;
+    HV_UINT8 Reserved;
+    HV_UINT32 RangeCount;
+    VMTRANSFER_PAGE_RANGE Ranges[ANYSIZE_ARRAY];
+} VMTRANSFER_PAGE_PACKET_HEADER, *PVMTRANSFER_PAGE_PACKET_HEADER;
+
+typedef struct _VMDATA_GPA_DIRECT
+{
+    VMPACKET_DESCRIPTOR Descriptor;
+    HV_UINT32 Reserved;
+    HV_UINT32 RangeCount;
+    GPA_RANGE Range[ANYSIZE_ARRAY];
+} VMDATA_GPA_DIRECT, *PVMDATA_GPA_DIRECT;
+
 // *****************************************************************************
 // Microsoft Hyper-V Video
 //
