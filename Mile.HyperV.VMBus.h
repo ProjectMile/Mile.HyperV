@@ -350,4 +350,134 @@ typedef struct _HK_MESSAGE_LED_INDICATORS_STATE
     HV_UINT16 LedFlags;
 } HK_MESSAGE_LED_INDICATORS_STATE, *PHK_MESSAGE_LED_INDICATORS_STATE;
 
+// *****************************************************************************
+// Microsoft Hyper-V Input
+//
+
+// {CFA8B69E-5B4A-4CC0-B98B-8BA1A1F3F95A}
+const HV_GUID SYNTHHID_CONTROL_CLASS_ID =
+{
+    0xCFA8B69E,
+    0x5B4A,
+    0x4CC0,
+    { 0xB9, 0x8B, 0x8B, 0xA1, 0xA1, 0xF3, 0xF9, 0x5A }
+};
+
+typedef enum _SYNTHHID_MESSAGE_TYPE
+{
+    SynthHidProtocolRequest = 0,
+    SynthHidProtocolResponse = 1,
+    SynthHidInitialDeviceInfo = 2,
+    SynthHidInitialDeviceInfoAck = 3,
+    SynthHidInputReport = 4,
+    SynthHidMax = 5,
+} SYNTHHID_MESSAGE_TYPE, *PSYNTHHID_MESSAGE_TYPE;
+
+typedef struct _SYNTHHID_MESSAGE_HEADER
+{
+    SYNTHHID_MESSAGE_TYPE Type;
+    HV_UINT32 Size;
+} SYNTHHID_MESSAGE_HEADER, *PSYNTHHID_MESSAGE_HEADER;
+
+typedef union _SYNTHHID_VERSION
+{
+    HV_UINT32 AsDWord;
+    struct
+    {
+        HV_UINT16 Minor;
+        HV_UINT16 Major;
+    };
+} SYNTHHID_VERSION, *PSYNTHHID_VERSION;
+
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict 
+typedef struct _HV_HID_DEVICE_ATTRIBUTES
+{
+    // sizeof (struct _HV_HID_DEVICE_ATTRIBUTES)
+
+    HV_UINT32 Size;
+
+    // Vendor ids of this hid device
+
+    HV_UINT16 VendorID;
+    HV_UINT16 ProductID;
+    HV_UINT16 VersionNumber;
+    HV_UINT16 Reserved[11];
+} HV_HID_DEVICE_ATTRIBUTES, *PHV_HID_DEVICE_ATTRIBUTES;
+
+#pragma pack(1)
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_HID_DESCRIPTOR_DESC_LIST
+{
+    HV_UINT8 bReportType;
+    HV_UINT16 wReportLength;
+} HV_HID_DESCRIPTOR_DESC_LIST, *PHV_HID_DESCRIPTOR_DESC_LIST;
+#pragma pack()
+
+#pragma pack(1)
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_HID_DESCRIPTOR
+{
+    HV_UINT8 bLength;
+    HV_UINT8 bDescriptorType;
+    HV_UINT16 bcdHID;
+    HV_UINT8 bCountry;
+    HV_UINT8 bNumDescriptors;
+    // An array of one OR MORE descriptors.
+    HV_HID_DESCRIPTOR_DESC_LIST DescriptorList[ANYSIZE_ARRAY];
+} HV_HID_DESCRIPTOR, *PHV_HID_DESCRIPTOR;
+#pragma pack()
+
+// SynthHidProtocolRequest | 0
+
+typedef struct _SYNTHHID_PROTOCOL_REQUEST
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    SYNTHHID_VERSION VersionRequested;
+} SYNTHHID_PROTOCOL_REQUEST, *PSYNTHHID_PROTOCOL_REQUEST;
+
+// SynthHidProtocolResponse | 1
+
+#pragma pack(1)
+typedef struct _SYNTHHID_PROTOCOL_RESPONSE
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    SYNTHHID_VERSION VersionRequested;
+    HV_UINT8 Approved;
+} SYNTHHID_PROTOCOL_RESPONSE, *PSYNTHHID_PROTOCOL_RESPONSE;
+#pragma pack()
+
+// SynthHidInitialDeviceInfo | 2
+
+#pragma pack(1)
+typedef struct _SYNTHHID_DEVICE_INFO
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    HV_HID_DEVICE_ATTRIBUTES HidDeviceAttributes;
+    HV_UINT8 HidDescriptorInformation[ANYSIZE_ARRAY];
+} SYNTHHID_DEVICE_INFO, *PSYNTHHID_DEVICE_INFO;
+#pragma pack()
+
+// SynthHidInitialDeviceInfoAck | 3
+
+#pragma pack(1)
+typedef struct _SYNTHHID_DEVICE_INFO_ACK
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    HV_UINT8 Reserved;
+} SYNTHHID_DEVICE_INFO_ACK, *PSYNTHHID_DEVICE_INFO_ACK;
+#pragma pack()
+
+// SynthHidInputReport | 4
+
+#pragma pack(1)
+typedef struct _SYNTHHID_MESSAGE
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    HV_UINT8 Data[ANYSIZE_ARRAY];
+} SYNTHHID_MESSAGE, *PSYNTHHID_MESSAGE;
+#pragma pack()
+
 #endif // !MILE_HYPERV_VMBUS

@@ -42,85 +42,6 @@ struct _HID_DESCRIPTOR;
 struct IO_PACKAGE;
 struct _DEVICE_EXTENSION;
 
-/* 19 */
-enum SYNTHHID_MESSAGE_TYPE : __int32
-{
-  SynthHidProtocolRequest = 0x0,
-  SynthHidProtocolResponse = 0x1,
-  SynthHidInitialDeviceInfo = 0x2,
-  SynthHidInitialDeviceInfoAck = 0x3,
-  SynthHidInputReport = 0x4,
-  SynthHidMax = 0x5,
-};
-
-/* 196 */
-struct SYNTHHID_MESSAGE_HEADER
-{
-  SYNTHHID_MESSAGE_TYPE Type;
-  unsigned int Size;
-};
-
-/* 197 */
-struct __unaligned __declspec(align(1)) SYNTHHID_MESSAGE
-{
-  SYNTHHID_MESSAGE_HEADER Header;
-  unsigned __int8 Data[1];
-};
-
-/* 191 */
-struct _HID_DEVICE_ATTRIBUTES
-{
-  unsigned int Size;
-  unsigned __int16 VendorID;
-  unsigned __int16 ProductID;
-  unsigned __int16 VersionNumber;
-  unsigned __int16 Reserved[11];
-};
-
-/* 235 */
-struct __unaligned __declspec(align(1)) SYNTHHID_DEVICE_INFO
-{
-  SYNTHHID_MESSAGE_HEADER Header;
-  _HID_DEVICE_ATTRIBUTES HidDeviceAttributes;
-  unsigned __int8 HidDescriptorInformation[1];
-};
-
-/* 236 */
-struct $B7B8EEE8C77511020846986DE4BC0E47
-{
-  unsigned __int16 Minor;
-  unsigned __int16 Major;
-};
-
-/* 237 */
-union SYNTHHID_VERSION
-{
-  $B7B8EEE8C77511020846986DE4BC0E47 __s0;
-  unsigned int AsDWord;
-};
-
-/* 238 */
-struct SYNTHHID_PROTOCOL_REQUEST
-{
-  SYNTHHID_MESSAGE_HEADER Header;
-  SYNTHHID_VERSION VersionRequested;
-};
-
-/* 239 */
-struct __unaligned __declspec(align(1)) SYNTHHID_PROTOCOL_RESPONSE
-{
-  SYNTHHID_MESSAGE_HEADER Header;
-  SYNTHHID_VERSION VersionRequested;
-  unsigned __int8 Approved;
-};
-
-/* 240 */
-struct __unaligned __declspec(align(1)) SYNTHHID_DEVICE_INFO_ACK
-{
-  SYNTHHID_MESSAGE_HEADER Header;
-  unsigned __int8 Reserved;
-};
-
 /* 265 */
 typedef int (__stdcall *MESSAGE_HANDLER)(_DEVICE_EXTENSION *, SYNTHHID_MESSAGE *);
 
@@ -1958,13 +1879,3 @@ struct _ACCESS_STATE
   _UNICODE_STRING ObjectName;
   _UNICODE_STRING ObjectTypeName;
 };
-
-/* 301 */
-typedef SYNTHHID_PROTOCOL_RESPONSE *PSYNTHHID_PROTOCOL_RESPONSE;
-
-/* 351 */
-typedef SYNTHHID_MESSAGE *PSYNTHHID_MESSAGE;
-
-/* 434 */
-typedef SYNTHHID_DEVICE_INFO *PSYNTHHID_DEVICE_INFO;
-
