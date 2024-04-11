@@ -834,4 +834,153 @@ typedef struct _SYNTHHID_MESSAGE
 } SYNTHHID_MESSAGE, *PSYNTHHID_MESSAGE;
 #pragma pack()
 
+// *****************************************************************************
+// Microsoft Hyper-V SCSI Controller
+//
+
+// {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
+const HV_GUID VSTOR_CONTROL_CLASS_ID =
+{
+    0xBA6163D9,
+    0x04A1,
+    0x4D29,
+    { 0xB6, 0x05, 0x72, 0xE2, 0xFF, 0xB1, 0xDC, 0x7F }
+};
+
+typedef enum _VSTOR_PACKET_OPERATION
+{
+    VStorOperationCompleteIo = 1,
+    VStorOperationRemoveDevice = 2,
+    VStorOperationExecuteSRB = 3,
+    VStorOperationResetLun = 4,
+    VStorOperationResetAdapter = 5,
+    VStorOperationResetBus = 6,
+    VStorOperationBeginInitialization = 7,
+    VStorOperationEndInitialization = 8,
+    VStorOperationQueryProtocolVersion = 9,
+    VStorOperationQueryProperties = 10,
+    VStorOperationEnumerateBus = 11,
+    VStorOperationFcHbaData = 12,
+    VStorOperationCreateSubChannels = 13,
+    VStorOperationEventNotification = 14,
+    VStorOperationMaximum = 15,
+} VSTOR_PACKET_OPERATION, *PVSTOR_PACKET_OPERATION;
+
+typedef struct _VMSCSI_REQUEST
+{
+    HV_UINT16 Length;
+    HV_UINT8 SrbStatus;
+    HV_UINT8 ScsiStatus;
+    HV_UINT8 Reserved1;
+    HV_UINT8 PathId;
+    HV_UINT8 TargetId;
+    HV_UINT8 Lun;
+    HV_UINT8 CdbLength;
+    HV_UINT8 SenseInfoExLength;
+    HV_UINT8 DataIn;
+    HV_UINT8 Properties;
+    HV_UINT32 DataTransferLength;
+    union
+    {
+        HV_UINT8 Cdb[16];
+        HV_UINT8 SenseDataEx[20];
+        HV_UINT8 ReservedArray[20];
+    };
+    HV_UINT16 Reserve;
+    HV_UINT8 QueueTag;
+    HV_UINT8 QueueAction;
+    HV_UINT32 SrbFlags;
+    HV_UINT32 TimeOutValue;
+    HV_UINT32 QueueSortKey;
+} VMSCSI_REQUEST, *PVMSCSI_REQUEST;
+
+typedef struct _VMSTORAGE_CHANNEL_PROPERTIES
+{
+    HV_UINT32 Reserved;
+    HV_UINT16 MaximumSubChannelCount;
+    HV_UINT16 Reserved2;
+    HV_UINT32 Flags;
+    HV_UINT32 MaxTransferBytes;
+    HV_UINT64 Reserved3;
+} VMSTORAGE_CHANNEL_PROPERTIES, *PVMSTORAGE_CHANNEL_PROPERTIES;
+
+typedef struct _VMSTORAGE_PROTOCOL_VERSION
+{
+    HV_UINT16 MajorMinor;
+    HV_UINT16 Reserved;
+} VMSTORAGE_PROTOCOL_VERSION, *PVMSTORAGE_PROTOCOL_VERSION;
+
+typedef struct _VMFC_WWN_PACKET
+{
+    HV_UINT8 PrimaryWwnActive;
+    char Reserved1;
+    HV_UINT16 Reserved2;
+    char PrimaryPortWwn[8];
+    char PrimaryNodeWwn[8];
+    char SecondaryPortWwn[8];
+    char SecondaryNodeWwn[8];
+} VMFC_WWN_PACKET, *PVMFC_WWN_PACKET;
+
+typedef struct _VSTOR_CLIENT_PROPERTIES
+{
+    HV_UINT32 AsyncNotifyCapable : 1;
+    HV_UINT32 Reserved : 31;
+} VSTOR_CLIENT_PROPERTIES, *PVSTOR_CLIENT_PROPERTIES;
+
+typedef struct _VSTOR_NOTIFICATION_PACKET
+{
+    HV_UINT8 Lun;
+    HV_UINT8 Target;
+    HV_UINT8 Path;
+    HV_UINT8 Flags;
+} VSTOR_NOTIFICATION_PACKET, *PVSTOR_NOTIFICATION_PACKET;
+
+#pragma pack(1)
+typedef struct _VSTOR_PACKET
+{
+    VSTOR_PACKET_OPERATION Operation;
+    HV_UINT32 Flags;
+    HV_UINT32 Status;
+    union
+    {
+        VMSCSI_REQUEST VmSrb;
+        VMSTORAGE_CHANNEL_PROPERTIES StorageChannelProperties;
+        VMSTORAGE_PROTOCOL_VERSION Version;
+        VMFC_WWN_PACKET FcWwnPacket;
+        HV_UINT16 SubChannelCount;
+        VSTOR_CLIENT_PROPERTIES ClientProperties;
+        VSTOR_NOTIFICATION_PACKET NotificationPacket;
+        HV_UINT8 Buffer[52];
+    };
+} VSTOR_PACKET, *PVSTOR_PACKET;
+#pragma pack()
+
+// VStorOperationCompleteIo | 1
+
+// VStorOperationRemoveDevice | 2
+
+// VStorOperationExecuteSRB | 3
+
+// VStorOperationResetLun | 4
+
+// VStorOperationResetAdapter | 5
+
+// VStorOperationResetBus | 6
+
+// VStorOperationBeginInitialization | 7
+
+// VStorOperationEndInitialization | 8
+
+// VStorOperationQueryProtocolVersion | 9
+
+// VStorOperationQueryProperties | 10
+
+// VStorOperationEnumerateBus | 11
+
+// VStorOperationFcHbaData | 12
+
+// VStorOperationCreateSubChannels | 13
+
+// VStorOperationEventNotification | 14
+
 #endif // !MILE_HYPERV_VMBUS

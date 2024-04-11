@@ -45,126 +45,6 @@ struct VMBCHANNEL__;
 struct _VSTOR_CHANNEL_ETW_TRACE_INFO;
 struct _STOR_CHANNEL_PROCESSOR_INFO;
 
-/* 5 */
-enum VSTOR_PACKET_OPERATION : __int32
-{
-  VStorOperationCompleteIo = 0x1,
-  VStorOperationRemoveDevice = 0x2,
-  VStorOperationExecuteSRB = 0x3,
-  VStorOperationResetLun = 0x4,
-  VStorOperationResetAdapter = 0x5,
-  VStorOperationResetBus = 0x6,
-  VStorOperationBeginInitialization = 0x7,
-  VStorOperationEndInitialization = 0x8,
-  VStorOperationQueryProtocolVersion = 0x9,
-  VStorOperationQueryProperties = 0xA,
-  VStorOperationEnumerateBus = 0xB,
-  VStorOperationFcHbaData = 0xC,
-  VStorOperationCreateSubChannels = 0xD,
-  VStorOperationEventNotification = 0xE,
-  VStorOperationMaximum = 0xE,
-};
-
-/* 277 */
-struct _VSTOR_NOTIFICATION_PACKET
-{
-  unsigned __int8 Lun;
-  unsigned __int8 Target;
-  unsigned __int8 Path;
-  unsigned __int8 Flags;
-};
-
-/* 287 */
-struct _VSTOR_CLIENT_PROPERTIES
-{
-  unsigned __int32 AsyncNotifyCapable : 1;
-  unsigned __int32 Reserved : 31;
-};
-
-/* 319 */
-union $C31D388710BC1A3EDC6868A821A3B876
-{
-  unsigned __int8 Cdb[16];
-  unsigned __int8 SenseDataEx[20];
-  unsigned __int8 ReservedArray[20];
-};
-
-/* 320 */
-struct _VMSCSI_REQUEST
-{
-  unsigned __int16 Length;
-  unsigned __int8 SrbStatus;
-  unsigned __int8 ScsiStatus;
-  unsigned __int8 Reserved1;
-  unsigned __int8 PathId;
-  unsigned __int8 TargetId;
-  unsigned __int8 Lun;
-  unsigned __int8 CdbLength;
-  unsigned __int8 SenseInfoExLength;
-  unsigned __int8 DataIn;
-  unsigned __int8 Properties;
-  unsigned int DataTransferLength;
-  $C31D388710BC1A3EDC6868A821A3B876 ___u12;
-  unsigned __int16 Reserve;
-  unsigned __int8 QueueTag;
-  unsigned __int8 QueueAction;
-  unsigned int SrbFlags;
-  unsigned int TimeOutValue;
-  unsigned int QueueSortKey;
-};
-
-/* 286 */
-struct _VMSTORAGE_CHANNEL_PROPERTIES
-{
-  unsigned int Reserved;
-  unsigned __int16 MaximumSubChannelCount;
-  unsigned __int16 Reserved2;
-  unsigned int Flags;
-  unsigned int MaxTransferBytes;
-  unsigned __int64 Reserved3;
-};
-
-/* 321 */
-struct _VMSTORAGE_PROTOCOL_VERSION
-{
-  unsigned __int16 MajorMinor;
-  unsigned __int16 Reserved;
-};
-
-/* 241 */
-struct _VMFC_WWN_PACKET
-{
-  unsigned __int8 PrimaryWwnActive;
-  char Reserved1;
-  unsigned __int16 Reserved2;
-  char PrimaryPortWwn[8];
-  char PrimaryNodeWwn[8];
-  char SecondaryPortWwn[8];
-  char SecondaryNodeWwn[8];
-};
-
-/* 322 */
-union __unaligned __declspec(align(4)) $EEF7DEDE7BA641DD1B6DDD8C71C1DA0C
-{
-  _VMSCSI_REQUEST VmSrb;
-  _VMSTORAGE_CHANNEL_PROPERTIES StorageChannelProperties;
-  _VMSTORAGE_PROTOCOL_VERSION Version;
-  _VMFC_WWN_PACKET FcWwnPacket;
-  unsigned __int16 SubChannelCount;
-  _VSTOR_CLIENT_PROPERTIES ClientProperties;
-  _VSTOR_NOTIFICATION_PACKET NotificationPacket;
-  unsigned __int8 Buffer[52];
-};
-
-/* 323 */
-struct _VSTOR_PACKET
-{
-  VSTOR_PACKET_OPERATION Operation;
-  unsigned int Flags;
-  unsigned int Status;
-  $EEF7DEDE7BA641DD1B6DDD8C71C1DA0C ___u3;
-};
-
 /* 348 */
 union $9A3AC779B8C5F2EFE3F1D75AB1834BA5
 {
@@ -2063,9 +1943,6 @@ typedef void (__stdcall *PVSTOR_CHANNEL_COMPLETION_ROUTINE)(VMBCHANNEL__ *, VSTO
 
 /* 594 */
 typedef int (__stdcall *PCHANNEL_EVENT_CALLBACK)(VMBCHANNEL__ *, _VSTOR_PACKET *);
-
-/* 675 */
-typedef _VSTOR_PACKET *PVSTOR_PACKET;
 
 /* 767 */
 typedef void __stdcall VSTOR_CHANNEL_COMPLETION_ROUTINE(VMBCHANNEL__ *, VSTOR_PACKET_OPERATION, _VSTOR_PACKET *, _VSTOR_CHANNEL_REQUEST *);
