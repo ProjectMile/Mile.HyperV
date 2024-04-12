@@ -42,6 +42,7 @@ projects.
 - [License](License.md)
 - [Mile.HyperV Definition References](References/ReadMe.md)
 - [Release Notes](ReleaseNotes.md)
+- [Versioning](Versioning.md)
 
 ## Thanks
 
