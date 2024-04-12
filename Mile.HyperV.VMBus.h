@@ -1426,7 +1426,7 @@ typedef struct _NVSP_6_MESSAGE_PD_API_REQUEST
         } FreeCommonBuffer;
     };
 } NVSP_6_MESSAGE_PD_API_REQUEST, *PNVSP_6_MESSAGE_PD_API_REQUEST;
-#pragma pack(0)
+#pragma pack()
 
 #pragma pack(1)
 typedef struct _NVSP_6_MESSAGE_PD_API_COMPLETE
@@ -1464,7 +1464,7 @@ typedef struct _NVSP_6_MESSAGE_PD_API_COMPLETE
         } AllocateCommonBuffer;
     };
 } NVSP_6_MESSAGE_PD_API_COMPLETE, *PNVSP_6_MESSAGE_PD_API_COMPLETE;
-#pragma pack(0)
+#pragma pack()
 
 // NvspMessage6TypePdPostBatch | 136
 
