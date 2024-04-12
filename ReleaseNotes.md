@@ -1,5 +1,14 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 0.3.205**
+
+- Improve the comment style via using C++ style comments which supported since
+  Microsoft C/C++ 6.0 or other C compilers which supports C99.
+- Revise the Mile.HyperV.TLFS definition via Build 14347 ntoskrnl.exe and Build
+  26063 kdhv.lib debug symbols from Microsoft.
+- Add Mile.HyperV.Windows.VMBusPipe definitions.
+- Add Mile.HyperV.VMBus definitions.
+
 **Mile.HyperV 0.2**
 
 - Revise the Mile.HyperV.TLFS definitions via hvgdk.h from Windows Driver Kit
