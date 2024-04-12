@@ -983,4 +983,162 @@ typedef struct _VSTOR_PACKET
 
 // VStorOperationEventNotification | 14
 
+// *****************************************************************************
+// Microsoft Hyper-V Network Adapter
+//
+
+// {F8615163-DF3E-46C5-913F-F2D2F965ED0E}
+const HV_GUID NVSP_CONTROL_CLASS_ID =
+{
+    0xF8615163,
+    0xDF3E,
+    0x46C5,
+    { 0x91, 0x3F, 0xF2, 0xD2, 0xF9, 0x65, 0xED, 0x0E }
+};
+
+typedef enum _NVSP_MESSAGE_TYPE
+{
+    NvspMessageTypeNone = 0,
+    NvspMessageTypeInit = 1,
+    NvspMessageTypeInitComplete = 2,
+    NvspVersionMessageStart = 0x64,
+    NvspMessage1TypeSendNdisVersion = 0x64,
+    NvspMessage1TypeSendReceiveBuffer = 0x65,
+    NvspMessage1TypeSendReceiveBufferComplete = 0x66,
+    NvspMessage1TypeRevokeReceiveBuffer = 0x67,
+    NvspMessage1TypeSendSendBuffer = 0x68,
+    NvspMessage1TypeSendSendBufferComplete = 0x69,
+    NvspMessage1TypeRevokeSendBuffer = 0x6A,
+    NvspMessage1TypeSendRNDISPacket = 0x6B,
+    NvspMessage1TypeSendRNDISPacketComplete = 0x6C,
+    NvspMessage1Max = 0x6C,
+    NvspMessage2TypeSendChimneyDelegatedBuffer = 0x6D,
+    NvspMessage2TypeSendChimneyDelegatedBufferComplete = 0x6E,
+    NvspMessage2TypeRevokeChimneyDelegatedBuffer = 0x6F,
+    NvspMessage2TypeResumeChimneyRXIndication = 0x70,
+    NvspMessage2TypeTerminateChimney = 0x71,
+    NvspMessage2TypeTerminateChimneyComplete = 0x72,
+    NvspMessage2TypeIndicateChimneyEvent = 0x73,
+    NvspMessage2TypeSendChimneyPacket = 0x74,
+    NvspMessage2TypeSendChimneyPacketComplete = 0x75,
+    NvspMessage2TypePostChimneyRecvRequest = 0x76,
+    NvspMessage2TypePostChimneyRecvRequestComplete = 0x77,
+    NvspMessage2TypeAllocateReceiveBufferDeprecated = 0x78,
+    NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated = 0x79,
+    NvspMessage2TypeFreeReceiveBufferDeprecated = 0x7A,
+    NvspMessage2SendVmqRndisPacketDeprecated = 0x7B,
+    NvspMessage2SendVmqRndisPacketCompleteDeprecated = 0x7C,
+    NvspMessage2TypeSendNdisConfig = 0x7D,
+    NvspMessage2TypeAllocateChimneyHandle = 0x7E,
+    NvspMessage2TypeAllocateChimneyHandleComplete = 0x7F,
+    NvspMessage2Max = 0x7F,
+    NvspMessage4TypeSendVFAssociation = 0x80,
+    NvspMessage4TypeSwitchDataPath = 0x81,
+    NvspMessage4TypeUplinkConnectStateDeprecated = 0x82,
+    NvspMessage4Max = 0x82,
+    NvspMessage5TypeOidQueryEx = 0x83,
+    NvspMessage5TypeOidQueryExComplete = 0x84,
+    NvspMessage5TypeSubChannel = 0x85,
+    NvspMessage5TypeSendIndirectionTable = 0x86,
+    NvspMessage5Max = 0x86,
+    NvspMessage6TypePdApi = 0x87,
+    NvspMessage6TypePdPostBatch = 0x88,
+    NvspMessage6Max = 0x88,
+} NVSP_MESSAGE_TYPE, *PNVSP_MESSAGE_TYPE;
+
+typedef enum _NVSP_STATUS
+{
+    NvspStatusNone = 0,
+    NvspStatusSuccess = 1,
+    NvspStatusFailure = 2,
+    NvspStatusDeprecated1 = 3,
+    NvspStatusDeprecated2 = 4,
+    NvspStatusInvalidRndisPacket = 5,
+    NvspStatusBusy = 6,
+    NvspStatusProtocolVersionUnsupported = 7,
+    NvspStatusMax = 8,
+} NVSP_STATUS, *PNVSP_STATUS;
+
+// NvspMessageTypeNone | 0
+
+// NvspMessageTypeInit | 1
+
+// NvspMessageTypeInitComplete | 2
+
+// NvspVersionMessageStart | 0x64
+
+// NvspMessage1TypeSendNdisVersion | 0x64
+
+// NvspMessage1TypeSendReceiveBuffer | 0x65
+
+// NvspMessage1TypeSendReceiveBufferComplete | 0x66
+
+// NvspMessage1TypeRevokeReceiveBuffer | 0x67
+
+// NvspMessage1TypeSendSendBuffer | 0x68
+
+// NvspMessage1TypeSendSendBufferComplete | 0x69
+
+// NvspMessage1TypeRevokeSendBuffer | 0x6A
+
+// NvspMessage1TypeSendRNDISPacket | 0x6B
+
+// NvspMessage1TypeSendRNDISPacketComplete | 0x6C
+
+// NvspMessage2TypeSendChimneyDelegatedBuffer | 0x6D
+
+// NvspMessage2TypeSendChimneyDelegatedBufferComplete | 0x6E
+
+// NvspMessage2TypeRevokeChimneyDelegatedBuffer | 0x6F
+
+// NvspMessage2TypeResumeChimneyRXIndication | 0x70
+
+// NvspMessage2TypeTerminateChimney | 0x71
+
+// NvspMessage2TypeTerminateChimneyComplete | 0x72
+
+// NvspMessage2TypeIndicateChimneyEvent | 0x73
+
+// NvspMessage2TypeSendChimneyPacket | 0x74
+
+// NvspMessage2TypeSendChimneyPacketComplete | 0x75
+
+// NvspMessage2TypePostChimneyRecvRequest | 0x76
+
+// NvspMessage2TypePostChimneyRecvRequestComplete | 0x77
+
+// NvspMessage2TypeAllocateReceiveBufferDeprecated | 0x78
+
+// NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated | 0x79
+
+// NvspMessage2TypeFreeReceiveBufferDeprecated | 0x7A
+
+// NvspMessage2SendVmqRndisPacketDeprecated | 0x7B
+
+// NvspMessage2SendVmqRndisPacketCompleteDeprecated | 0x7C
+
+// NvspMessage2TypeSendNdisConfig | 0x7D
+
+// NvspMessage2TypeAllocateChimneyHandle | 0x7E
+
+// NvspMessage2TypeAllocateChimneyHandleComplete | 0x7F
+
+// NvspMessage4TypeSendVFAssociation | 0x80
+
+// NvspMessage4TypeSwitchDataPath | 0x81
+
+// NvspMessage4TypeUplinkConnectStateDeprecated | 0x82
+
+// NvspMessage5TypeOidQueryEx | 0x83
+
+// NvspMessage5TypeOidQueryExComplete | 0x84
+
+// NvspMessage5TypeSubChannel | 0x85
+
+// NvspMessage5TypeSendIndirectionTable | 0x86
+
+// NvspMessage6TypePdApi | 0x87
+
+// NvspMessage6TypePdPostBatch | 0x88
+
 #endif // !MILE_HYPERV_VMBUS

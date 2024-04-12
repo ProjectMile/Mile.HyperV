@@ -26,71 +26,6 @@ struct _NVSP_MESSAGE;
 struct _NVSC_V1_SEND_BUFFER_SECTION;
 struct VMBPACKET__;
 
-/* 127 */
-enum _NVSP_MESSAGE_TYPE : __int32
-{
-  NvspMessageTypeNone = 0x0,
-  NvspMessageTypeInit = 0x1,
-  NvspMessageTypeInitComplete = 0x2,
-  NvspVersionMessageStart = 0x64,
-  NvspMessage1TypeSendNdisVersion = 0x64,
-  NvspMessage1TypeSendReceiveBuffer = 0x65,
-  NvspMessage1TypeSendReceiveBufferComplete = 0x66,
-  NvspMessage1TypeRevokeReceiveBuffer = 0x67,
-  NvspMessage1TypeSendSendBuffer = 0x68,
-  NvspMessage1TypeSendSendBufferComplete = 0x69,
-  NvspMessage1TypeRevokeSendBuffer = 0x6A,
-  NvspMessage1TypeSendRNDISPacket = 0x6B,
-  NvspMessage1TypeSendRNDISPacketComplete = 0x6C,
-  NvspMessage1Max = 0x6C,
-  NvspMessage2TypeSendChimneyDelegatedBuffer = 0x6D,
-  NvspMessage2TypeSendChimneyDelegatedBufferComplete = 0x6E,
-  NvspMessage2TypeRevokeChimneyDelegatedBuffer = 0x6F,
-  NvspMessage2TypeResumeChimneyRXIndication = 0x70,
-  NvspMessage2TypeTerminateChimney = 0x71,
-  NvspMessage2TypeTerminateChimneyComplete = 0x72,
-  NvspMessage2TypeIndicateChimneyEvent = 0x73,
-  NvspMessage2TypeSendChimneyPacket = 0x74,
-  NvspMessage2TypeSendChimneyPacketComplete = 0x75,
-  NvspMessage2TypePostChimneyRecvRequest = 0x76,
-  NvspMessage2TypePostChimneyRecvRequestComplete = 0x77,
-  NvspMessage2TypeAllocateReceiveBufferDeprecated = 0x78,
-  NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated = 0x79,
-  NvspMessage2TypeFreeReceiveBufferDeprecated = 0x7A,
-  NvspMessage2SendVmqRndisPacketDeprecated = 0x7B,
-  NvspMessage2SendVmqRndisPacketCompleteDeprecated = 0x7C,
-  NvspMessage2TypeSendNdisConfig = 0x7D,
-  NvspMessage2TypeAllocateChimneyHandle = 0x7E,
-  NvspMessage2TypeAllocateChimneyHandleComplete = 0x7F,
-  NvspMessage2Max = 0x7F,
-  NvspMessage4TypeSendVFAssociation = 0x80,
-  NvspMessage4TypeSwitchDataPath = 0x81,
-  NvspMessage4TypeUplinkConnectStateDeprecated = 0x82,
-  NvspMessage4Max = 0x82,
-  NvspMessage5TypeOidQueryEx = 0x83,
-  NvspMessage5TypeOidQueryExComplete = 0x84,
-  NvspMessage5TypeSubChannel = 0x85,
-  NvspMessage5TypeSendIndirectionTable = 0x86,
-  NvspMessage5Max = 0x86,
-  NvspMessage6TypePdApi = 0x87,
-  NvspMessage6TypePdPostBatch = 0x88,
-  NvspMessage6Max = 0x88,
-};
-
-/* 135 */
-enum _NVSP_STATUS : __int32
-{
-  NvspStatusNone = 0x0,
-  NvspStatusSuccess = 0x1,
-  NvspStatusFailure = 0x2,
-  NvspStatusDeprecated1 = 0x3,
-  NvspStatusDeprecated2 = 0x4,
-  NvspStatusInvalidRndisPacket = 0x5,
-  NvspStatusBusy = 0x6,
-  NvspStatusProtocolVersionUnsupported = 0x7,
-  NvspStatusMax = 0x8,
-};
-
 /* 139 */
 enum _NVSP_VM_DATA_PATH : __int32
 {
@@ -1167,9 +1102,6 @@ typedef _NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE *PNVSP_5_MESSAGE_OID_QUERY_EX_COMP
 /* 3992 */
 typedef _NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER *PNVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER;
 
-/* 4223 */
-typedef _NVSP_MESSAGE_TYPE *PNVSP_MESSAGE_TYPE;
-
 /* 4715 */
 typedef _NVSP_MESSAGE_INIT_COMPLETE *PNVSP_MESSAGE_INIT_COMPLETE;
 
@@ -1226,9 +1158,6 @@ typedef _NVSP_SUBCHANNEL_OPERATION *PNVSP_SUBCHANNEL_OPERATION;
 
 /* 6556 */
 typedef _NVSP_1_MESSAGE_SEND_SEND_BUFFER *PNVSP_1_MESSAGE_SEND_SEND_BUFFER;
-
-/* 6576 */
-typedef _NVSP_STATUS *PNVSP_STATUS;
 
 /* 6687 */
 typedef _NVSP_VM_DATA_PATH *PNVSP_VM_DATA_PATH;
