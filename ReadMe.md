@@ -4,8 +4,8 @@ The lightweight library for Hyper-V guest interfaces.
 
 ## Usage
 
-Currently, include `Mile.HyperV.*.h` which you actually needed to your C/C++
-projects.
+Currently, include `Mile.HyperV.*.h` in `Mile.HyperV` folder which you actually
+needed to your C/C++ projects.
 
 ## Features
 
