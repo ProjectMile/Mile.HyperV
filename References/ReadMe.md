@@ -76,6 +76,7 @@ HV_CPUID_FUNCTION.
   - [VMBusHID.sys](Symbols/14347/VMBusHID.sys), [vmbushid.pdb](Symbols/14347/vmbushid.pdb)
   - [storvsc.sys](Symbols/14347/storvsc.sys), [storvsc.pdb](Symbols/14347/storvsc.pdb)
   - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
+  - [fcvsc.sys](Symbols/14347/fcvsc.sys), [fcvsc.pdb](Symbols/14347/fcvsc.pdb)
 
 ## FreeBSD
 
