@@ -848,15 +848,25 @@ typedef struct _SYNTHHID_MESSAGE
 
 // *****************************************************************************
 // Microsoft Hyper-V SCSI Controller
+// Microsoft Hyper-V Fibre Channel HBA
 //
 
 // {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
-const HV_GUID VSTOR_CONTROL_CLASS_ID =
+const HV_GUID VSTOR_SCSI_CONTROL_CLASS_ID =
 {
     0xBA6163D9,
     0x04A1,
     0x4D29,
     { 0xB6, 0x05, 0x72, 0xE2, 0xFF, 0xB1, 0xDC, 0x7F }
+};
+
+// {2F9BCC4A-0069-4AF3-B76B-6FD0BE528CDA}
+const HV_GUID VSTOR_FC_CONTROL_CLASS_ID =
+{
+    0x2F9BCC4A,
+    0x0069,
+    0x4AF3,
+    { 0xB7, 0x6B, 0x6F, 0xD0, 0xBE, 0x52, 0x8C, 0xDA }
 };
 
 typedef enum _VSTOR_PACKET_OPERATION

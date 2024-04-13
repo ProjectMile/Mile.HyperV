@@ -35,6 +35,7 @@ needed to your C/C++ projects.
   - Definitions conform with Windows 10 Build 14347's VMBusHID.sys
   - Definitions conform with Windows 10 Build 14347's storvsc.sys
   - Definitions conform with Windows 10 Build 14347's netvsc.sys
+  - Definitions conform with Windows 10 Build 14347's fcvsc.sys
 - Distributed under the MIT License
 
 ## Documents
