@@ -1549,6 +1549,175 @@ typedef struct _NVSP_MESSAGE
     NVSP_ALL_MESSAGES Messages;
 } NVSP_MESSAGE, *PNVSP_MESSAGE;
 
+// *****************************************************************************
+// Microsoft Hyper-V Integration Components
+// - Microsoft Hyper-V Heartbeat
+// - Microsoft Hyper-V Data Exchange
+// - Microsoft Hyper-V Guest Shutdown
+// - Microsoft Hyper-V Time Synchronization
+// - Microsoft Hyper-V Volume Shadow Copy
+// - Microsoft Hyper-V Remote Desktop Virtualization
+// - Microsoft Hyper-V Guest Service Interface
+//
+
+// {9722C3E7-8F86-456D-8B6C-6009DA4CCD0B}
+const HV_GUID IC_NEGOTIATE_CONTROL_CLASS_ID =
+{
+    0x9722C3E7,
+    0x8F86,
+    0x456D,
+    { 0x8B, 0x6C, 0x60, 0x09, 0xDA, 0x4C, 0xCD, 0x0B }
+};
+
+// {77B80A1A-C226-427B-B65B-DBA0DF85C812}
+const HV_GUID IC_NEGOTIATE_INSTANCE_ID =
+{
+    0x77B80A1A,
+    0xC226,
+    0x427B,
+    { 0xB6, 0x5B, 0xDB, 0xA0, 0xDF, 0x85, 0xC8, 0x12 }
+};
+
+// {57164F39-9115-4E78-AB55-382F3BD5422D}
+const HV_GUID IC_HEARTBEAT_CONTROL_CLASS_ID =
+{
+    0x57164F39,
+    0x9115,
+    0x4E78,
+    { 0xAB, 0x55, 0x38, 0x2F, 0x3B, 0xD5, 0x42, 0x2D }
+};
+
+// {FD149E91-82E0-4A7D-AFA6-2A4166CBD7C0}
+const HV_GUID IC_HEARTBEAT_INSTANCE_ID =
+{
+    0xFD149E91,
+    0x82E0,
+    0x4A7D,
+    { 0xAF, 0xA6, 0x2A, 0x41, 0x66, 0xCB, 0xD7, 0xC0 }
+};
+
+// {A9A0F4E7-5A45-4D96-B827-8A841E8C03E6}
+const HV_GUID IC_KVP_EXCHANGE_CONTROL_CLASS_ID =
+{
+    0xA9A0F4E7,
+    0x5A45,
+    0x4D96,
+    { 0xB8, 0x27, 0x8A, 0x84, 0x1E, 0x8C, 0x03, 0xE6 }
+};
+
+// {242FF919-07DB-4180-9C2E-B86CB68C8C55}
+const HV_GUID IC_KVP_EXCHANGE_INSTANCE_ID =
+{
+    0x242FF919,
+    0x07DB,
+    0x4180,
+    { 0x9C, 0x2E, 0xB8, 0x6C, 0xB6, 0x8C, 0x8C, 0x55 }
+};
+
+// {0E0B6031-5213-4934-818B-38D90CED39DB}
+const HV_GUID IC_SHUTDOWN_CONTROL_CLASS_ID =
+{
+    0x0E0B6031,
+    0x5213,
+    0x4934,
+    { 0x81, 0x8B, 0x38, 0xD9, 0x0C, 0xED, 0x39, 0xDB }
+};
+
+// {B6650FF7-33BC-4840-8048-E0676786F393}
+const HV_GUID IC_SHUTDOWN_INSTANCE_ID =
+{
+    0xB6650FF7,
+    0x33BC,
+    0x4840,
+    { 0x80, 0x48, 0xE0, 0x67, 0x67, 0x86, 0xF3, 0x93 }
+};
+
+// {9527E630-D0AE-497B-ADCE-E80AB0175CAF}
+const HV_GUID IC_TIMESYNC_CONTROL_CLASS_ID =
+{
+    0x9527E630,
+    0xD0AE,
+    0x497B,
+    { 0xAD, 0xCE, 0xE8, 0x0A, 0xB0, 0x17, 0x5C, 0xAF }
+};
+
+// {2DD1CE17-079E-403C-B352-A1921EE207EE}
+const HV_GUID IC_TIMESYNC_INSTANCE_ID =
+{
+    0x2DD1CE17,
+    0x079E,
+    0x403C,
+    { 0xB3, 0x52, 0xA1, 0x92, 0x1E, 0xE2, 0x07, 0xEE }
+};
+
+// {35FA2E29-EA23-4236-96AE-3A6EBACBA440}
+const HV_GUID IC_VSS_CONTROL_CLASS_ID =
+{
+    0x35FA2E29,
+    0xEA23,
+    0x4236,
+    { 0x96, 0xAE, 0x3A, 0x6E, 0xBA, 0xCB, 0xA4, 0x40 }
+};
+
+// {2450EE40-33BF-4FBD-892E-9FB06E9214CF}
+const HV_GUID IC_VSS_INSTANCE_ID =
+{
+    0x2450EE40,
+    0x33BF,
+    0x4FBD,
+    { 0x89, 0x2E, 0x9F, 0xB0, 0x6E, 0x92, 0x14, 0xCF }
+};
+
+// {276AACF4-AC15-426C-98DD-7521AD3F01FE}
+const HV_GUID IC_RDV_CONTROL_CLASS_ID =
+{
+    0x276AACF4,
+    0xAC15,
+    0x426C,
+    { 0x98, 0xDD, 0x75, 0x21, 0xAD, 0x3F, 0x01, 0xFE }
+};
+
+// {F5BEE29C-1741-4AAD-A4C2-8FDEDB46DCC2}
+const HV_GUID IC_RDV_INSTANCE_ID =
+{
+    0xF5BEE29C,
+    0x1741,
+    0x4AAD,
+    { 0xA4, 0xC2, 0x8F, 0xDE, 0xDB, 0x46, 0xDC, 0xC2 }
+};
+
+// {34D14BE3-DEE4-41C8-9AE7-6B174977C192}
+const HV_GUID IC_GUESTSVC_CONTROL_CLASS_ID =
+{
+    0x34D14BE3,
+    0xDEE4,
+    0x41C8,
+    { 0x9A, 0xE7, 0x6B, 0x17, 0x49, 0x77, 0xC1, 0x92 }
+};
+
+// {EB765408-105F-49B6-B4AA-C123B64D17D4}
+const HV_GUID IC_GUESTSVC_INSTANCE_ID =
+{
+    0xEB765408,
+    0x105F,
+    0x49B6,
+    { 0xB4, 0xAA, 0xC1, 0x23, 0xB6, 0x4D, 0x17, 0xD4 }
+};
+
+typedef enum GUEST_APPLICATION_STATE
+{
+    GuestApplicationStateUnknown = 0,
+    GuestApplicationStateHealthy = 1,
+    GuestApplicationStateCritical = 2,
+} GUEST_APPLICATION_STATE, *PGUEST_APPLICATION_STATE;
+
+typedef struct _IC_HEARTBEAT_MSG_DATA
+{
+    HV_UINT64 SeqNum;
+    GUEST_APPLICATION_STATE ApplicationState;
+    HV_UINT8 Reserved[4];
+} IC_HEARTBEAT_MSG_DATA, *PIC_HEARTBEAT_MSG_DATA;
+
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)

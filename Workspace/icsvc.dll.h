@@ -364,22 +364,6 @@ struct __declspec(align(8)) IC_GUESTIFACE_COPY_OPERATION_MESSAGE
   unsigned __int8 Data[6144];
 };
 
-/* 427 */
-enum GUEST_APPLICATION_STATE : __int32
-{
-  GuestApplicationStateUnknown = 0x0,
-  GuestApplicationStateHealthy = 0x1,
-  GuestApplicationStateCritical = 0x2,
-};
-
-/* 3907 */
-struct _IC_HEARTBEAT_MSG_DATA
-{
-  unsigned __int64 SeqNum;
-  GUEST_APPLICATION_STATE ApplicationState;
-  unsigned __int8 Reserved[4];
-};
-
 /* 235 */
 enum _COMPUTER_NAME_FORMAT : __int32
 {
