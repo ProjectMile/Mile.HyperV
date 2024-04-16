@@ -37,6 +37,7 @@ folder which you actually needed to your C/C++ projects.
   - Definitions conform with Windows 10 Build 14347's netvsc.sys
   - Definitions conform with Windows 10 Build 14347's fcvsc.sys
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
+  - Definitions conform with Windows 10 Build 14347's icsvcext.dll
 - Distributed under the MIT License
 
 ## Documents

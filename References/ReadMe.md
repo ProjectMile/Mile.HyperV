@@ -78,6 +78,7 @@ HV_CPUID_FUNCTION.
   - [netvsc.sys](Symbols/14347/netvsc.sys), [netvsc.pdb](Symbols/14347/netvsc.pdb)
   - [fcvsc.sys](Symbols/14347/fcvsc.sys), [fcvsc.pdb](Symbols/14347/fcvsc.pdb)
   - [icsvc.dll](Symbols/14347/icsvc.dll), [icsvc.pdb](Symbols/14347/icsvc.pdb)
+  - [icsvcext.dll](Symbols/14347/icsvcext.dll), [icsvcext.pdb](Symbols/14347/icsvcext.pdb)
 
 ## FreeBSD
 
