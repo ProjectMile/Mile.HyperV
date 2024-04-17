@@ -1704,12 +1704,284 @@ const HV_GUID IC_GUESTSVC_INSTANCE_ID =
     { 0xB4, 0xAA, 0xC1, 0x23, 0xB6, 0x4D, 0x17, 0xD4 }
 };
 
-typedef enum GUEST_APPLICATION_STATE
+typedef HV_UINT16 IC_VERSION_FIELD, *PIC_VERSION_FIELD;
+
+typedef struct _IC_VERSION
+{
+    IC_VERSION_FIELD Major;
+    IC_VERSION_FIELD Minor;
+} IC_VERSION, *PIC_VERSION;
+
+typedef enum _IC_FEATURE_IDX
+{
+    ICFeatureVersionNegotiation = 0,
+    ICFeatureIdxHeartbeat = 1,
+    ICFeatureIdxKvpExchange = 2,
+    ICFeatureIdxShutdown = 3,
+    ICFeatureIdxTimeSync = 4,
+    ICFeatureIdxVss = 5,
+    ICFeatureIdxRdv = 6,
+    ICFeatureIdxGuestInterface = 7,
+    ICFeatureIdxVMSession = 8,
+    ICFeatureCount = 9,
+} IC_FEATURE_IDX, *PIC_FEATURE_IDX;
+
+typedef HV_UINT16 IC_MSG_TYPE, *PIC_MSG_TYPE;
+
+typedef HV_UINT8 IC_MSG_TRANS_ID, *PIC_MSG_TRANS_ID;
+
+typedef HV_UINT8 IC_MSG_HDR_FLAG, *PIC_MSG_HDR_FLAG;
+
+typedef struct _IC_MSG_HDR
+{
+    IC_VERSION ICVerFramework;
+    IC_MSG_TYPE ICMsgType; // IC_FEATURE_IDX
+    IC_VERSION ICVerMessage;
+    HV_UINT16 ICMsgSize;
+    HV_UINT32 Status;
+    IC_MSG_TRANS_ID ICTransactionId;
+    IC_MSG_HDR_FLAG ICFlags;
+    HV_UINT8 RESERVED[2];
+} IC_MSG_HDR, *PIC_MSG_HDR;
+
+typedef enum _GUEST_APPLICATION_STATE
 {
     GuestApplicationStateUnknown = 0,
     GuestApplicationStateHealthy = 1,
     GuestApplicationStateCritical = 2,
 } GUEST_APPLICATION_STATE, *PGUEST_APPLICATION_STATE;
+
+typedef enum _IC_KVP_EXCHANGE_OPERATION
+{
+    ICKvpExchangeOperationGet = 0,
+    ICKvpExchangeOperationSet = 1,
+    ICKvpExchangeOperationDelete = 2,
+    ICKvpExchangeOperationEnumerate = 3,
+    ICKvpExchangeOperationGetIpAddressInfo = 4,
+    ICKvpExchangeOperationSetIpAddressInfo = 5,
+    ICKvpExchangeOperationCount = 6,
+} IC_KVP_EXCHANGE_OPERATION, *PIC_KVP_EXCHANGE_OPERATION;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_HDR
+{
+    HV_UINT8 Operation; // IC_KVP_EXCHANGE_OPERATION
+    HV_UINT8 Pool;
+} IC_KVP_EXCHANGE_MSG_HDR, *PIC_KVP_EXCHANGE_MSG_HDR;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_VALUE
+{
+    HV_UINT32 ValueType;
+    HV_UINT32 KeySize;
+    HV_UINT32 ValueSize;
+    HV_UINT8 Key[512];
+    HV_UINT8 Value[2048];
+} IC_KVP_EXCHANGE_MSG_VALUE, *PIC_KVP_EXCHANGE_MSG_VALUE;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_GET
+{
+    IC_KVP_EXCHANGE_MSG_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_GET, *PIC_KVP_EXCHANGE_MSG_GET;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_SET
+{
+    IC_KVP_EXCHANGE_MSG_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_SET, *PIC_KVP_EXCHANGE_MSG_SET;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_DELETE
+{
+    HV_UINT32 KeySize;
+    HV_UINT8 Key[512];
+} IC_KVP_EXCHANGE_MSG_DELETE, *PIC_KVP_EXCHANGE_MSG_DELETE;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_ENUMERATE
+{
+    HV_UINT32 Index;
+    IC_KVP_EXCHANGE_MSG_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_ENUMERATE, *PIC_KVP_EXCHANGE_MSG_ENUMERATE;
+
+typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE
+{
+    HV_UINT16 AdapterId[128]; // 2-bytes wchar_t
+    HV_UINT8 AddressFamily;
+    HV_UINT8 DHCPEnabled;
+    HV_UINT16 IPAddress[1024]; // 2-bytes wchar_t
+    HV_UINT16 Subnet[1024]; // 2-bytes wchar_t
+    HV_UINT16 Gateway[512]; // 2-bytes wchar_t
+    HV_UINT16 DNSServerAddresses[1024]; // 2-bytes wchar_t
+} IC_KVP_EXCHANGE_IP_ADDRESS_VALUE, *PIC_KVP_EXCHANGE_IP_ADDRESS_VALUE;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO
+{
+    IC_KVP_EXCHANGE_MSG_HDR Header;
+    IC_KVP_EXCHANGE_IP_ADDRESS_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO;
+
+typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER
+{
+    HV_UINT32 IPv4AddressCount;
+    HV_UINT32 IPv6AddressCount;
+    HV_UINT32 IPv4GatewayCount;
+    HV_UINT32 IPv6GatewayCount;
+    HV_UINT32 IPv4DNSServerCount;
+    HV_UINT32 IPv6DNSServerCount;
+} IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER, *PIC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER;
+
+typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY
+{
+    IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER Header;
+    HV_UINT16 AdapterId[128]; // 2-bytes wchar_t
+    HV_UINT8 AddressFamily;
+    HV_UINT8 DHCPEnabled;
+    HV_UINT32 IPv4Addresses[64];
+    HV_IPV6_ADDRESS IPv6Addresses[64];
+    HV_UINT32 IPv4Subnets[64];
+    HV_UINT32 IPv6Subnets[64];
+    HV_UINT32 IPv4Gateways[5];
+    HV_IPV6_ADDRESS IPv6Gateways[5];
+    HV_UINT32 IPv4DNSServers[64];
+    HV_IPV6_ADDRESS IPv6DNSServers[64];
+    HV_UINT16 IPAddressOrigins[128];
+} IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY, *PIC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY;
+
+typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY
+{
+    IC_KVP_EXCHANGE_MSG_HDR Header;
+    IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY Value;
+} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY;
+
+typedef enum _IC_VSS_OPERATION
+{
+    ICVssOperationCreate = 0,
+    ICVssOperationDelete = 1,
+    ICVssOperationCheckHotBackup = 2,
+    ICVssOperationGetDirectMappedDevicesInfo = 3,
+    ICVssOperationBackupComplete = 4,
+    ICVssOperationFreezeApplications = 5,
+    ICVssOperationThawApplications = 6,
+    ICVssOperationAutoRecover = 7,
+    ICVssOperationQueryGuestClusterInformation = 8,
+    ICVssOperationCount = 9,
+} IC_VSS_OPERATION, *PIC_VSS_OPERATION;
+
+typedef struct _IC_VSS_MSG_HDR
+{
+    HV_UINT8 Operation; // IC_VSS_OPERATION
+    HV_UINT8 Reserved[4];
+} IC_VSS_MSG_HDR, *PIC_VSS_MSG_HDR;
+
+typedef struct _IC_VSS_MSG_DELETE
+{
+    HV_GUID SnapshotSetId;
+} IC_VSS_MSG_DELETE, *PIC_VSS_MSG_DELETE;
+
+typedef struct _IC_VSS_MSG_CHECK_HOT_BACKUP
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_CHECK_HOT_BACKUP, *PIC_VSS_MSG_CHECK_HOT_BACKUP;
+
+typedef struct _IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO, *PIC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO;
+
+typedef struct _IC_VSS_MSG_BACKUP_COMPLETE
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_BACKUP_COMPLETE, *PIC_VSS_MSG_BACKUP_COMPLETE;
+
+typedef struct _IC_VSS_MSG_CREATE_V2
+{
+    HV_GUID SnapshotSetId;
+    HV_UINT32 BackupType;
+} IC_VSS_MSG_CREATE_V2, *PIC_VSS_MSG_CREATE_V2;
+
+typedef struct _IC_VSS_MSG_THAW_APPLICATIONS
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_THAW_APPLICATIONS, *PIC_VSS_MSG_THAW_APPLICATIONS;
+
+typedef enum _IC_VSS_LUN_INFO_BUS_TYPE
+{
+    IcVssLunInfoBusTypeInvalid = 0,
+    IcVssLunInfoBusTypeSCSI = 1,
+    IcVssLunInfoBusTypeIDE = 2,
+} IC_VSS_LUN_INFO_BUS_TYPE, *PIC_VSS_LUN_INFO_BUS_TYPE;
+
+typedef struct _IC_VSS_LUN_INFO
+{
+    HV_UINT8 BusType; // IC_VSS_LUN_INFO_BUS_TYPE
+    HV_GUID Controller;
+    HV_UINT8 Port;
+    HV_UINT8 Target;
+    HV_UINT8 Lun;
+} IC_VSS_LUN_INFO, *PIC_VSS_LUN_INFO;
+
+typedef struct _IC_VSS_LUN_OFFSET
+{
+    HV_UINT32 DiskNumber;
+    HV_INT64 StartingOffset;
+} IC_VSS_LUN_OFFSET, *PIC_VSS_LUN_OFFSET;
+
+typedef struct _IC_VSS_DISK_SIGNATURE
+{
+    HV_UINT32 PartitionStyle;
+    union
+    {
+        struct
+        {
+            HV_UINT32 Signature;
+        } Mbr;
+        struct
+        {
+            HV_GUID DiskId;
+        } Gpt;
+    };
+} IC_VSS_DISK_SIGNATURE, *PIC_VSS_DISK_SIGNATURE;
+
+typedef enum _IC_VSS_FREEZE_FLAGS
+{
+    IcVssFreezeFlagNone = 0,
+    IcVssFreezeFlagAutoRecovery = 1,
+    IcVssFreezeFlagIncludesSharedLuns = 2,
+} IC_VSS_FREEZE_FLAGS ,*PIC_VSS_FREEZE_FLAGS;
+
+typedef enum _IC_VSS_CLIENT_STATE
+{
+    ICVssClientStateNone = 0,
+    ICVssClientStateFreeze = 1,
+    ICVssClientStateThaw = 2,
+    ICVssClientStateAutoRecovery = 3,
+    ICVssClientStateBackupComplete = 4,
+    ICVssClientStateCount = 5,
+} IC_VSS_CLIENT_STATE, *PIC_VSS_CLIENT_STATE;
+
+typedef enum _IC_TRANSPORT_ROLE
+{
+    ICTransportRoleClient = 0x0,
+    ICTransportRoleServer = 0x1,
+    ICTransportRoleCount = 0x2,
+} IC_TRANSPORT_ROLE, *PIC_TRANSPORT_ROLE;
+
+typedef enum _IC_TRANSPORT_PROTO
+{
+    ICTransportProtoVMBus = 0x0,
+    ICTransportProtoNamed = 0x1,
+    ICTransportProtoCount = 0x2,
+} IC_TRANSPORT_PROTO, *PIC_TRANSPORT_PROTO;
+
+typedef HV_UINT8 IC_TRANSPORT_FLAG, *PIC_TRANSPORT_FLAG;
+
+/* ICFeatureVersionNegotiation | 0 */
+
+typedef struct _IC_MSG_NEGOTIATE
+{
+    HV_UINT16 ICFrameworkVersionCount;
+    HV_UINT16 ICMessageVersionCount;
+    HV_UINT32 Reserved;
+    IC_VERSION ICVersionData[ANYSIZE_ARRAY];
+} IC_MSG_NEGOTIATE, *PIC_MSG_NEGOTIATE;
+
+/* ICFeatureIdxHeartbeat | 1 */
 
 typedef struct _IC_HEARTBEAT_MSG_DATA
 {
@@ -1717,6 +1989,178 @@ typedef struct _IC_HEARTBEAT_MSG_DATA
     GUEST_APPLICATION_STATE ApplicationState;
     HV_UINT8 Reserved[4];
 } IC_HEARTBEAT_MSG_DATA, *PIC_HEARTBEAT_MSG_DATA;
+
+/* ICFeatureIdxKvpExchange | 2 */
+
+typedef struct _IC_KVP_EXCHANGE_MSG
+{
+    IC_KVP_EXCHANGE_MSG_HDR Header;
+    union
+    {
+        IC_KVP_EXCHANGE_MSG_GET Get;
+        IC_KVP_EXCHANGE_MSG_SET Set;
+        IC_KVP_EXCHANGE_MSG_DELETE Delete;
+        IC_KVP_EXCHANGE_MSG_ENUMERATE Enumerate;
+    } Body;
+} IC_KVP_EXCHANGE_MSG, *PIC_KVP_EXCHANGE_MSG;
+
+typedef struct _IC_KVP_EXCHANGE_MSG2
+{
+    union
+    {
+        IC_KVP_EXCHANGE_MSG_HDR Header;
+        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO IpAddressInfo;
+        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY IpAddressInfoBinary;
+    } IpMsg;
+} IC_KVP_EXCHANGE_MSG2, *PIC_KVP_EXCHANGE_MSG2;
+
+/* ICFeatureIdxShutdown | 3 */
+
+typedef struct _IC_SHUTDOWN_MSG_DATA
+{
+    HV_UINT32 ReasonCode;
+    HV_UINT32 TimeoutInSeconds;
+    HV_UINT32 Flags;
+    HV_UINT8 Message[2048];
+} IC_SHUTDOWN_MSG_DATA, *PIC_SHUTDOWN_MSG_DATA;
+
+/* ICFeatureIdxTimeSync | 4 */
+
+typedef struct _IC_TIMESYNC_PROVIDER_MSG_DATA
+{
+    HV_INT64 Offset;
+    HV_UINT64 Delay;
+    HV_UINT64 Dispersion;
+    HV_UINT32 Flags;
+    HV_UINT8 LeapFlags;
+    HV_UINT8 Stratum;
+    HV_UINT8 Reserved[3];
+} IC_TIMESYNC_PROVIDER_MSG_DATA, *PIC_TIMESYNC_PROVIDER_MSG_DATA;
+
+typedef struct _IC_TIMESYNC_MSG_DATA
+{
+    HV_UINT64 ParentTime; // FILETIME
+    HV_UINT64 ChildTime; // FILETIME
+    HV_UINT64 RoundTripTime; // FILETIME
+    HV_UINT8 Flags;
+} IC_TIMESYNC_MSG_DATA, *PIC_TIMESYNC_MSG_DATA;
+
+typedef struct _IC_TIMESYNC_REFERENCE_MSG_DATA
+{
+    HV_UINT64 ParentTime; // FILETIME
+    HV_UINT64 VmReferenceTime;
+    HV_UINT8 Flags;
+    HV_UINT8 LeapFlags;
+    HV_UINT8 Stratum;
+    HV_UINT8 Reserved[3];
+} IC_TIMESYNC_REFERENCE_MSG_DATA, *PIC_TIMESYNC_REFERENCE_MSG_DATA;
+
+/* ICFeatureIdxVss | 5 */
+
+typedef struct _IC_VSS_MSG
+{
+    IC_VSS_MSG_HDR Header;
+    union
+    {
+        IC_VSS_MSG_DELETE Delete;
+        IC_VSS_MSG_CHECK_HOT_BACKUP CheckHotBackup;
+        IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO DirectMapInfo;
+        IC_VSS_MSG_BACKUP_COMPLETE BackupComplete;
+        IC_VSS_MSG_CREATE_V2 CreateV2;
+        IC_VSS_MSG_THAW_APPLICATIONS ThawApplications;
+    } Body;
+    HV_UINT8 Reserved[4];
+} IC_VSS_MSG, *PIC_VSS_MSG;
+
+typedef struct _IC_VSS_MSG2
+{
+    IC_VSS_MSG_HDR Header;
+    HV_UINT32 BackupType;
+    HV_UINT32 Flags;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO Luns[260];
+} IC_VSS_MSG2, *PIC_VSS_MSG2;
+
+typedef struct _IC_VSS_MSG2_EX
+{
+    IC_VSS_MSG_HDR Header;
+    HV_UINT32 BackupType;
+    HV_UINT32 Flags;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO Luns[260];
+    IC_VSS_LUN_INFO ShadowLuns[260];
+} IC_VSS_MSG2_EX, *PIC_VSS_MSG2_EX;
+
+typedef struct _IC_VSS_MSG3
+{
+    IC_VSS_MSG_HDR Header;
+    HV_GUID ClusterId;
+    HV_UINT32 ClusterSize;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO SharedLuns[260];
+    HV_UINT32 SharedLunStatus[260];
+} IC_VSS_MSG3, *PIC_VSS_MSG3;
+
+typedef struct _IC_VSS_MSG3_EX
+{
+    IC_VSS_MSG_HDR Header;
+    HV_GUID ClusterId;
+    HV_UINT32 ClusterSize;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO SharedLuns[260];
+    HV_UINT32 SharedLunStatus[260];
+    HV_UINT64 LastMoveTime;
+} IC_VSS_MSG3_EX, *PIC_VSS_MSG3_EX;
+
+/* ICFeatureIdxRdv | 6 */
+
+typedef struct _IC_RDV_MSG_DATA
+{
+    HV_UINT32 Flags;
+    HV_UINT8 Message[2048];
+} IC_RDV_MSG_DATA, *PIC_RDV_MSG_DATA;
+
+/* ICFeatureIdxGuestInterface | 7 */
+
+typedef enum _IC_GUESTSVC_OPERATION
+{
+    ICGuestSvcOperationStartFileCopy = 0,
+    ICGuestSvcOperationWriteToFile = 1,
+    ICGuestSvcOperationCompleteFileCopy = 2,
+    ICGuestSvcOperationCancelFileCopy = 3,
+} IC_GUESTSVC_OPERATION, *PIC_GUESTSVC_OPERATION;
+
+typedef struct _IC_GUESTSVC_MSG_HEADER
+{
+    IC_GUESTSVC_OPERATION Operation;
+    HV_GUID ServiceID;
+    HV_GUID SessionID;
+} IC_GUESTSVC_MSG_HEADER, *PIC_GUESTSVC_MSG_HEADER;
+
+typedef enum _IC_GUESTSVC_FLAGS
+{
+    ICGuestSvcStartFileCopyFlagsOverwrite = 1,
+    ICGuestSvcStartFileCopyFlagsCreateFullPath = 2,
+} IC_GUESTSVC_FLAGS, *PIC_GUESTSVC_FLAGS;
+
+typedef struct _IC_GUESTIFACE_START_OPERATION_MESSAGE
+{
+    IC_GUESTSVC_MSG_HEADER Header;
+    HV_UINT16 SourceFileName[260]; // 2-bytes wchar_t
+    HV_UINT16 DestinationFilePath[260]; // 2-bytes wchar_t
+    IC_GUESTSVC_FLAGS Flags;
+    HV_UINT64 FileSizeInBytes;
+} IC_GUESTIFACE_START_OPERATION_MESSAGE, *PIC_GUESTIFACE_START_OPERATION_MESSAGE;
+
+typedef struct _IC_GUESTIFACE_COPY_OPERATION_MESSAGE
+{
+    IC_GUESTSVC_MSG_HEADER Header;
+    HV_INT64 Offset;
+    HV_UINT32 Size;
+    HV_UINT8 Data[6144];
+} IC_GUESTIFACE_COPY_OPERATION_MESSAGE, *PIC_GUESTIFACE_COPY_OPERATION_MESSAGE;
+
+/* ICFeatureIdxVMSession | 8 */
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
