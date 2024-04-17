@@ -2162,6 +2162,134 @@ typedef struct _IC_GUESTIFACE_COPY_OPERATION_MESSAGE
 
 /* ICFeatureIdxVMSession | 8 */
 
+// *****************************************************************************
+// Microsoft Hyper-V Remote Desktop Control Channel
+// Microsoft Hyper-V Remote Desktop Data Channel
+//
+
+// {F8E65716-3CB3-4A06-9A60-1889C5CCCAB5}
+const HV_GUID SYNTHRDP_CONTROL_CLASS_ID =
+{
+    0xF8E65716,
+    0x3CB3,
+    0x4A06,
+    { 0x9A, 0x60, 0x18, 0x89, 0xC5, 0xCC, 0xCA, 0xB5 }
+};
+
+// {99221FA0-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_CONTROL_INSTANCE_ID =
+{
+    0x99221FA0,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+// {F9E9C0D3-B511-4A48-8046-D38079A8830C}
+const HV_GUID SYNTHRDP_DATA_CLASS_ID =
+{
+    0xF9E9C0D3,
+    0xB511,
+    0x4A48,
+    { 0x80, 0x46, 0xD3, 0x80, 0x79, 0xA8, 0x83, 0x0C }
+};
+
+// {99221FA1-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_DATA_INSTANCE_ID_1 =
+{
+    0x99221FA1,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+// {99221FA2-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_DATA_INSTANCE_ID_2 =
+{
+    0x99221FA2,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+// {99221FA3-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_DATA_INSTANCE_ID_3 =
+{
+    0x99221FA3,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+// {99221FA4-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_DATA_INSTANCE_ID_4 =
+{
+    0x99221FA4,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+// {99221FA5-24AD-11E2-BE98-001AA01BBF6E}
+const HV_GUID SYNTHRDP_DATA_INSTANCE_ID_5 =
+{
+    0x99221FA5,
+    0x24AD,
+    0x11E2,
+    { 0xBE, 0x98, 0x00, 0x1A, 0xA0, 0x1B, 0xBF, 0x6E }
+};
+
+typedef enum _SYNTHRDP_MESSAGE_TYPE
+{
+    SynthrdpError = 0,
+    SynthrdpVersionRequest = 1,
+    SynthrdpVersionResponse = 2,
+    SynthvidMax = 3,
+} SYNTHRDP_MESSAGE_TYPE, *PSYNTHRDP_MESSAGE_TYPE;
+
+typedef struct _SYNTHRDP_MESSAGE_HEADER
+{
+    SYNTHRDP_MESSAGE_TYPE Type;
+    HV_UINT32 Size;
+} SYNTHRDP_MESSAGE_HEADER, *PSYNTHRDP_MESSAGE_HEADER;
+
+typedef union _SYNTHRDP_VERSION
+{
+    HV_UINT32 AsDWORD;
+    struct
+    {
+        HV_UINT16 MajorVersion;
+        HV_UINT16 MinorVersion;
+    };
+} SYNTHRDP_VERSION, *PSYNTHRDP_VERSION;
+
+#define SYNTHRDP_VERSION_WIN81 { 1, 0 }
+
+// SynthrdpError | 0
+
+// SynthrdpVersionRequest | 1
+
+typedef struct _SYNTHRDP_VERSION_REQUEST_MESSAGE
+{
+    SYNTHRDP_MESSAGE_HEADER Header;
+    SYNTHRDP_VERSION Version;
+    HV_UINT32 Reserved;
+} SYNTHRDP_VERSION_REQUEST_MESSAGE, *PSYNTHRDP_VERSION_REQUEST_MESSAGE;
+
+// SynthrdpVersionResponse | 2
+
+#define SYNTHRDP_TRUE_WITH_VERSION_EXCHANGE 2
+
+#pragma pack(1)
+typedef struct _SYNTHRDP_VERSION_RESPONSE_MESSAGE
+{
+    SYNTHRDP_MESSAGE_HEADER Header;
+    SYNTHRDP_VERSION Version;
+    HV_UINT32 Reserved;
+    HV_UINT8 IsAccepted;
+} SYNTHRDP_VERSION_RESPONSE_MESSAGE, *PSYNTHRDP_VERSION_RESPONSE_MESSAGE;
+#pragma pack()
+
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
