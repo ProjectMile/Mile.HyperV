@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PROJECT:   Mouri Internal Library Essentials
+  FILE:      Mile.HyperV.nuspec
+  PURPOSE:   NuGet package definition for Mile.HyperV
+
+  LICENSE:   The MIT License
+
+  MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Mile.HyperV</id>
+    <version>1.0.267.0</version>
+    <description>The lightweight library for Hyper-V guest interfaces</description>
+    <authors>Kenji Mouri</authors>
+    <projectUrl>https://github.com/ProjectMile/Mile.HyperV</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">License.md</license>
+    <readme>ReadMe.md</readme>
+    <repository type="git" url="https://github.com/ProjectMile/Mile.HyperV.git" />
+  </metadata>
+  <files>
+  
+    <file src="..\Mile.HyperV\**\*.*" target="Source\Native" />
+
+    <file src="Mile.HyperV.props" target="build\native" />
+    <file src="Mile.HyperV.targets" target="build\native" />
+
+    <file src="..\ReadMe.md" target="." />
+    <file src="..\License.md" target="." />
+    <file src="..\ReleaseNotes.md" target="." />
+
+  </files>
+</package>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+   PROJECT:   Mouri Internal Library Essentials
+   FILE:      Mile.HyperV.targets
+   PURPOSE:   MSBuild targets file for Mile.HyperV
+
+   LICENSE:   The MIT License
+
+   MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="MileHyperVBuildNativeSource" BeforeTargets="BeforeClCompile">
+    <ItemGroup Condition="'$(MileHyperVEnableWindowsPlatformSupport)' == 'true'">
+      <ClCompile Include="$(MSBuildThisFileDirectory)..\..\Source\Native\Mile.HyperV.Windows.VMBusPipe.cpp" />
+    </ItemGroup>
+  </Target>
+</Project>
