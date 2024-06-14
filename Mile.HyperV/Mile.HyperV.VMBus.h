@@ -2244,7 +2244,7 @@ typedef enum _SYNTHRDP_MESSAGE_TYPE
     SynthrdpError = 0,
     SynthrdpVersionRequest = 1,
     SynthrdpVersionResponse = 2,
-    SynthvidMax = 3,
+    SynthrdpMax = 3,
 } SYNTHRDP_MESSAGE_TYPE, *PSYNTHRDP_MESSAGE_TYPE;
 
 typedef struct _SYNTHRDP_MESSAGE_HEADER
