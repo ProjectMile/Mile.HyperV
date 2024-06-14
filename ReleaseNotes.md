@@ -1,6 +1,6 @@
 ﻿# Mile.HyperV Release Notes
 
-**Mile.HyperV 1.0.267.0**
+**Mile.HyperV 1.0.268.0**
 
 - Add Microsoft Hyper-V Fibre Channel HBA definitions from Windows 10 Build
   14347's fcvsc.sys.
