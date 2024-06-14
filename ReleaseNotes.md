@@ -1,5 +1,9 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.0.267.0**
+
+- Provide NuGet package.
+
 **Mile.HyperV 0.3.205**
 
 - Improve the comment style via using C++ style comments which supported since

@@ -1,5 +1,7 @@
 ﻿# Mile.HyperV
 
+[![NuGet Package](https://img.shields.io/nuget/vpre/Mile.HyperV)](https://www.nuget.org/packages/Mile.HyperV)
+
 The lightweight library for Hyper-V guest interfaces.
 
 ## Usage
@@ -41,6 +43,15 @@ folder which you actually needed to your C/C++ projects.
   - Definitions conform with Windows 10 Build 19041's rdpcorets.dll
   - Definitions conform with Windows 10 Build 19041's vmuidevices.dll
 - Distributed under the MIT License
+- Provide NuGet package.
+
+## NuGet Package Usage
+
+### How to enable the Windows specific wrappers in the property group.
+
+```
+<MileHyperVEnableWindowsPlatformSupport>true</MileHyperVEnableWindowsPlatformSupport>
+```
 
 ## Documents
 
