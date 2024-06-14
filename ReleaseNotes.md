@@ -2,7 +2,13 @@
 
 **Mile.HyperV 1.0.267.0**
 
-- Provide NuGet package.
+- Add Microsoft Hyper-V Fibre Channel HBA definitions from Windows 10 Build
+  14347's fcvsc.sys.
+- Add Microsoft Hyper-V Integration Components definitions from Windows 10 Build
+  14347's icsvc.dll and icsvcext.dll.
+- Add Microsoft Hyper-V Remote Desktop definitions from Windows 10 Build 19041's
+  rdpcorets.dll and vmuidevices.dll.
+- Start to provide NuGet package.
 
 **Mile.HyperV 0.3.205**
 
