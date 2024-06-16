@@ -709,6 +709,12 @@ typedef struct _HK_MESSAGE_HEADER
 
 // HkMessageProtocolRequest | 1
 
+#define HK_MAKE_VERSION(Major, Minor) ((Major) << 16 | (Minor))
+#define HK_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
+#define HK_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
+
+#define HK_VERSION_CURRENT HK_MAKE_VERSION(1, 0)
+
 typedef struct _HK_MESSAGE_PROTOCOL_REQUEST
 {
     HK_MESSAGE_HEADER Header;
