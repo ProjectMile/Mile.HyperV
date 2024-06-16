@@ -25,6 +25,9 @@
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
+#ifdef GUID_DEFINED
+typedef GUID HV_GUID, *PHV_GUID;
+#else
 typedef struct _HV_GUID
 {
     HV_UINT32 Data1;
@@ -32,6 +35,7 @@ typedef struct _HV_GUID
     HV_UINT16 Data3;
     HV_UINT8 Data4[8];
 } HV_GUID, *PHV_GUID;
+#endif // GUID_DEFINED
 
 typedef struct _HV_RECT
 {
