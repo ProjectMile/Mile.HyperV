@@ -1221,6 +1221,17 @@ typedef struct _NVSP_6_PD_BUFFER
 
 // NvspMessageTypeInit | 1
 
+#define NVSP_MAKE_VERSION(Major, Minor) ((Major) << 16 | (Minor))
+#define NVSP_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
+#define NVSP_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
+
+#define NVSP_VERSION_1 NVSP_MAKE_VERSION(0, 2)
+#define NVSP_VERSION_2 NVSP_MAKE_VERSION(3, 2)
+#define NVSP_VERSION_4 NVSP_MAKE_VERSION(4, 0)
+#define NVSP_VERSION_5 NVSP_MAKE_VERSION(5, 0)
+#define NVSP_VERSION_6 NVSP_MAKE_VERSION(6, 0)
+#define NVSP_VERSION_61 NVSP_MAKE_VERSION(6, 1)
+
 typedef struct _NVSP_MESSAGE_INIT
 {
     union
