@@ -1774,6 +1774,34 @@ typedef struct _IC_VERSION
     IC_VERSION_FIELD Minor;
 } IC_VERSION, *PIC_VERSION;
 
+#define IC_VERSION_NULL { 0, 0 }
+
+#define IC_FRAMEWORK_VERSION_1 { 1, 0 }
+#define IC_FRAMEWORK_VERSION_3 { 3, 0 }
+
+#define IC_HEARTBEAT_VERSION_3 { 3, 0 }
+#define IC_HEARTBEAT_VERSION_31 { 3, 1 }
+
+#define IC_KVP_EXCHANGE_VERSION_3 { 3, 0 }
+#define IC_KVP_EXCHANGE_VERSION_4 { 4, 0 }
+#define IC_KVP_EXCHANGE_VERSION_5 { 5, 0 }
+
+#define IC_SHUTDOWN_VERSION_1 { 1, 0 }
+#define IC_SHUTDOWN_VERSION_3 { 3, 0 }
+#define IC_SHUTDOWN_VERSION_31 { 3, 1 }
+
+#define IC_TIMESYNC_VERSION_1 { 1, 0 }
+#define IC_TIMESYNC_VERSION_3 { 3, 0 }
+#define IC_TIMESYNC_VERSION_4 { 4, 0 }
+
+#define IC_VSS_VERSION_6 { 6, 0 }
+#define IC_VSS_VERSION_7 { 7, 0 }
+
+#define IC_RDV_VERSION_1 { 1, 0 }
+#define IC_RDV_VERSION_3 { 3, 0 }
+
+#define IC_GUESTIFACE_VERSION_11 { 1, 1 }
+
 typedef enum _IC_FEATURE_IDX
 {
     ICFeatureVersionNegotiation = 0,
