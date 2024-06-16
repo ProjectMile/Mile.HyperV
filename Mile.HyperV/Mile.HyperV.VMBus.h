@@ -2282,6 +2282,12 @@ typedef struct _SYNTHRDP_MESSAGE_HEADER
     HV_UINT32 Size;
 } SYNTHRDP_MESSAGE_HEADER, *PSYNTHRDP_MESSAGE_HEADER;
 
+#define SYNTHRDP_MAKE_VERSION(Major, Minor) ((Minor) << 16 | (Major))
+#define SYNTHRDP_VERSION_MAJOR(Version) ((Version) & 0x0000FFFF)
+#define SYNTHRDP_VERSION_MINOR(Version) (((Version) & 0xFFFF0000) >> 16)
+
+#define SYNTHRDP_VERSION_WINBLUE SYNTHRDP_MAKE_VERSION(1, 0)
+
 typedef union _SYNTHRDP_VERSION
 {
     HV_UINT32 AsDWORD;
@@ -2291,8 +2297,6 @@ typedef union _SYNTHRDP_VERSION
         HV_UINT16 MinorVersion;
     };
 } SYNTHRDP_VERSION, *PSYNTHRDP_VERSION;
-
-#define SYNTHRDP_VERSION_WIN81 { 1, 0 }
 
 // SynthrdpError | 0
 
