@@ -440,19 +440,44 @@ typedef struct _SYNTHVID_MESSAGE_HEADER
     HV_UINT32 Size;
 } SYNTHVID_MESSAGE_HEADER, *PSYNTHVID_MESSAGE_HEADER;
 
+#define SYNTHVID_MAKE_VERSION(Major, Minor) ((Minor) << 16 | (Major))
+#define SYNTHVID_VERSION_MAJOR(Version) ((Version) & 0x0000FFFF)
+#define SYNTHVID_VERSION_MINOR(Version) (((Version) & 0xFFFF0000) >> 16)
+
+#define SYNTHVID_VERSION_WIN7 SYNTHVID_MAKE_VERSION(3, 0)
+#define SYNTHVID_VERSION_WIN8 SYNTHVID_MAKE_VERSION(3, 2)
+#define SYNTHVID_VERSION_WINBLUE SYNTHVID_MAKE_VERSION(3, 3)
+#define SYNTHVID_VERSION_WINTHRESHOLD_M1 SYNTHVID_MAKE_VERSION(3, 4)
+#define SYNTHVID_VERSION_WINTHRESHOLD_M2 SYNTHVID_MAKE_VERSION(3, 5)
+#define SYNTHVID_VERSION_WIN10 SYNTHVID_VERSION_WINTHRESHOLD_M2
+
+#define SYNTHVID_MAKE_FEATURE(Version) \
+    ((SYNTHVID_VERSION_MAJOR(Version) << 16) | SYNTHVID_VERSION_MINOR(Version))
+
+#define SYNTHVID_FEATURE_WIN7 \
+    SYNTHVID_MAKE_FEATURE(SYNTHVID_VERSION_WIN7)
+#define SYNTHVID_FEATURE_WIN8 \
+    SYNTHVID_MAKE_FEATURE(SYNTHVID_VERSION_WIN8)
+#define SYNTHVID_FEATURE_WINBLUE \
+    SYNTHVID_MAKE_FEATURE(SYNTHVID_VERSION_WINBLUE)
+#define SYNTHVID_FEATURE_WINTHRESHOLD_M1 \
+    SYNTHVID_MAKE_FEATURE(SYNTHVID_VERSION_WINTHRESHOLD_M1)
+#define SYNTHVID_FEATURE_WINTHRESHOLD_M2 \
+    SYNTHVID_MAKE_FEATURE(SYNTHVID_VERSION_WINTHRESHOLD_M2)
+
 typedef enum _SYNTHVID_FEATURE
 {
-    SynthVidFeatureWin7Rtm = 0x00030000,
-    SynthVidFeatureBasic = 0x00030000,
-    SynthVidFeatureWin8Rtm = 0x00030002,
-    SynthVidFeatureHighResolutions = 0x00030002,
-    SynthVidFeatureSupportsReinit = 0x00030002,
-    SynthVidFeatureWinBlue = 0x00030003,
-    SynthVidFeatureQueryBiosInfo = 0x00030003,
-    SynthVidFeatureWinThresholdM1 = 0x00030004,
-    SynthVidFeatureResolutionSetByHost = 0x00030004,
-    SynthVidFeatureWinThresholdM2 = 0x00030005,
-    SynthVidFeatureLockOnDisconnect = 0x00030005,
+    SynthVidFeatureWin7Rtm = SYNTHVID_FEATURE_WIN7,
+    SynthVidFeatureBasic = SynthVidFeatureWin7Rtm,
+    SynthVidFeatureWin8Rtm = SYNTHVID_FEATURE_WIN8,
+    SynthVidFeatureHighResolutions = SynthVidFeatureWin8Rtm,
+    SynthVidFeatureSupportsReinit = SynthVidFeatureWin8Rtm,
+    SynthVidFeatureWinBlue = SYNTHVID_FEATURE_WINBLUE,
+    SynthVidFeatureQueryBiosInfo = SynthVidFeatureWinBlue,
+    SynthVidFeatureWinThresholdM1 = SYNTHVID_FEATURE_WINTHRESHOLD_M1,
+    SynthVidFeatureResolutionSetByHost = SynthVidFeatureWinThresholdM1,
+    SynthVidFeatureWinThresholdM2 = SYNTHVID_FEATURE_WINTHRESHOLD_M2,
+    SynthVidFeatureLockOnDisconnect = SynthVidFeatureWinThresholdM2,
 } SYNTHVID_FEATURE, *PSYNTHVID_FEATURE;
 
 typedef union _SYNTHVID_VERSION
