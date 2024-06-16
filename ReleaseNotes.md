@@ -1,5 +1,10 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.0.270.0**
+
+- Add GUID interoperability support for HV_GUID.
+- Add version related macro definitions for Mile.HyperV.VMBus.h.
+
 **Mile.HyperV 1.0.268.0**
 
 - Add Microsoft Hyper-V Fibre Channel HBA definitions from Windows 10 Build
