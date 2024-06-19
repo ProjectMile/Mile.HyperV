@@ -25,6 +25,10 @@
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
+#ifndef ANYSIZE_ARRAY
+#define ANYSIZE_ARRAY 1
+#endif
+
 #ifdef GUID_DEFINED
 typedef GUID HV_GUID, *PHV_GUID;
 #else
