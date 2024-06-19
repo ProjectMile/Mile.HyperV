@@ -95,6 +95,13 @@ typedef struct DECLSPEC_ALIGN(32) _HV_UINT512
     HV_UINT256 High128;
 } HV_UINT512, *PHV_UINT512;
 
+// Define a wide character type.
+#if WCHAR_MAX == 0xFFFF
+typedef wchar_t HV_WCHAR;
+#else
+typedef HV_UINT16 HV_WCHAR;
+#endif // WCHAR_MAX == 0xFFFF
+
 // Define an alignment for structures passed via hypercall.
 #define HV_CALL_ALIGNMENT 8
 
@@ -2847,7 +2854,7 @@ typedef struct _HV_CRASHDUMP_AREA_V1
     HV_UINT64 HypervisorBase;
     HV_UINT32 SizeOfImage;
     HV_UINT16 ImageNameLength;
-    HV_UINT16 ImageName[HV_IMAGE_NAME_MAX_LENGTH]; // 2-bytes wchar_t
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
 
     // Bugcheck error code fields
 
@@ -2932,7 +2939,7 @@ typedef struct _HV_CRASHDUMP_AREA_V2
     HV_UINT64 CompartmentFreePfns;
 
     HV_UINT16 ImageNameLength;
-    HV_UINT16 ImageName[HV_IMAGE_NAME_MAX_LENGTH]; // 2-bytes wchar_t
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
 
     // Bugcheck error code fields.
 
@@ -3000,7 +3007,7 @@ typedef struct _HV_CRASHDUMP_AREA
     HV_UINT64 CompartmentFreePfns;
 
     HV_UINT16 ImageNameLength;
-    HV_UINT16 ImageName[HV_IMAGE_NAME_MAX_LENGTH]; // 2-bytes wchar_t
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
 
     // Bugcheck error code fields.
 
@@ -5924,7 +5931,7 @@ typedef union _HV_FULL_PASID
     {
         HV_PASID Pasid;
         HV_PASID_SPACE_ID PasidSpaceId;
-    }; 
+    };
 } HV_FULL_PASID, *PHV_FULL_PASID;
 
 typedef union _HV_DEVICE_ADDRESS_SPACE
@@ -6167,7 +6174,7 @@ typedef struct _HV_IMAGE_COVERAGE_INFO
 {
     HV_UINT32 HeaderSize;
     HV_UINT32 Size;
-    HV_UINT16 ImageName[HV_IMAGE_NAME_MAX_LENGTH]; // 2-bytes wchar_t
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
 } HV_IMAGE_COVERAGE_INFO, *PHV_IMAGE_COVERAGE_INFO;
 
 typedef union _HV_SPA_PAGE_RANGE

@@ -797,7 +797,7 @@ typedef union _SYNTHHID_VERSION
 } SYNTHHID_VERSION, *PSYNTHHID_VERSION;
 
 // Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict 
+// Note: Add HV_ prefix to avoid conflict
 typedef struct _HV_HID_DEVICE_ATTRIBUTES
 {
     // sizeof (struct _HV_HID_DEVICE_ATTRIBUTES)
@@ -1171,7 +1171,7 @@ typedef enum _NVSP_VM_DATA_PATH
 } NVSP_VM_DATA_PATH, *PNVSP_VM_DATA_PATH;
 
 // Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict 
+// Note: Add HV_ prefix to avoid conflict
 typedef struct _HV_NDIS_OBJECT_HEADER
 {
     HV_UINT8 Type;
@@ -1891,13 +1891,13 @@ typedef struct _IC_KVP_EXCHANGE_MSG_ENUMERATE
 
 typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE
 {
-    HV_UINT16 AdapterId[128]; // 2-bytes wchar_t
+    HV_WCHAR AdapterId[128];
     HV_UINT8 AddressFamily;
     HV_UINT8 DHCPEnabled;
-    HV_UINT16 IPAddress[1024]; // 2-bytes wchar_t
-    HV_UINT16 Subnet[1024]; // 2-bytes wchar_t
-    HV_UINT16 Gateway[512]; // 2-bytes wchar_t
-    HV_UINT16 DNSServerAddresses[1024]; // 2-bytes wchar_t
+    HV_WCHAR IPAddress[1024];
+    HV_WCHAR Subnet[1024];
+    HV_WCHAR Gateway[512];
+    HV_WCHAR DNSServerAddresses[1024];
 } IC_KVP_EXCHANGE_IP_ADDRESS_VALUE, *PIC_KVP_EXCHANGE_IP_ADDRESS_VALUE;
 
 typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO
@@ -1919,7 +1919,7 @@ typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER
 typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY
 {
     IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER Header;
-    HV_UINT16 AdapterId[128]; // 2-bytes wchar_t
+    HV_WCHAR AdapterId[128];
     HV_UINT8 AddressFamily;
     HV_UINT8 DHCPEnabled;
     HV_UINT32 IPv4Addresses[64];
@@ -2236,8 +2236,8 @@ typedef enum _IC_GUESTSVC_FLAGS
 typedef struct _IC_GUESTIFACE_START_OPERATION_MESSAGE
 {
     IC_GUESTSVC_MSG_HEADER Header;
-    HV_UINT16 SourceFileName[260]; // 2-bytes wchar_t
-    HV_UINT16 DestinationFilePath[260]; // 2-bytes wchar_t
+    HV_WCHAR SourceFileName[260];
+    HV_WCHAR DestinationFilePath[260];
     IC_GUESTSVC_FLAGS Flags;
     HV_UINT64 FileSizeInBytes;
 } IC_GUESTIFACE_START_OPERATION_MESSAGE, *PIC_GUESTIFACE_START_OPERATION_MESSAGE;
