@@ -1,5 +1,10 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.0.272.0**
+
+- Add 2-bytes wchar_t interoperability support via introducing HV_WCHAR type.
+- Remove ANYSIZE_ARRAY dependency for Mile.HyperV.TLFS.
+
 **Mile.HyperV 1.0.270.0**
 
 - Add GUID interoperability support for HV_GUID.
