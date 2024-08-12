@@ -1,5 +1,9 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.0.327.0**
+
+- Fix definition typos for resolving issues in pure C projects.
+
 **Mile.HyperV 1.0.272.0**
 
 - Add 2-bytes wchar_t interoperability support via introducing HV_WCHAR type.

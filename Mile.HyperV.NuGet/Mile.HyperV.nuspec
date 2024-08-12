@@ -11,7 +11,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Mile.HyperV</id>
-    <version>1.0.272.0</version>
+    <version>1.0.327.0</version>
     <description>The lightweight library for Hyper-V guest interfaces</description>
     <authors>Kenji Mouri</authors>
     <projectUrl>https://github.com/ProjectMile/Mile.HyperV</projectUrl>
