@@ -16,10 +16,39 @@
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
 
+#if !defined(_M_AMD64) && !defined(_M_ARM64)
+#error [Mile.HyperV] Unknown/Unsupported architecture
+#endif
+
 #include <stdint.h>
 
 typedef uint16_t HV_UINT16, *PHV_UINT16;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
+
+// Status codes for hypervisor operations.
+typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
+
+// The specified hypercall succeeded.
+#define HV_STATUS_SUCCESS ((HV_STATUS)0x0000)
+
+// The hypervisor does not support the operation because the specified hypercall
+// code is not supported.
+#define HV_STATUS_INVALID_HYPERCALL_CODE ((HV_STATUS)0x0002)
+
+// The hypervisor does not support the operation because the encoding for the
+// hypercall input register is not supported.
+#define HV_STATUS_INVALID_HYPERCALL_INPUT ((HV_STATUS)0x0003)
+
+// The hypervisor could not perform the operation because a parameter has an
+// invalid alignment.
+#define HV_STATUS_INVALID_ALIGNMENT ((HV_STATUS)0x0004)
+
+// The hypervisor could not perform the operation because an invalid parameter
+// was specified.
+#define HV_STATUS_INVALID_PARAMETER ((HV_STATUS)0x0005)
+
+// Access to the specified object was denied.
+#define HV_STATUS_ACCESS_DENIED ((HV_STATUS)0x0006)
 
 #define HV_MAXIMUM_PROCESSORS 2048
 
@@ -65,35 +94,6 @@ typedef HV_UINT64 HV_GVA, *PHV_GVA;
 #define HV_LARGE_PAGE_SIZE HV_X64_LARGE_PAGE_SIZE
 #define HV_LARGE_PAGE_SIZE_1GB HV_X64_LARGE_PAGE_SIZE_1GB
 
-#else
-
-#error Unknown/Unsupported architecture
-
 #endif
-
-// Status codes for hypervisor operations.
-typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
-
-// The specified hypercall succeeded.
-#define HV_STATUS_SUCCESS ((HV_STATUS)0x0000)
-
-// The hypervisor does not support the operation because the specified hypercall
-// code is not supported.
-#define HV_STATUS_INVALID_HYPERCALL_CODE ((HV_STATUS)0x0002)
-
-// The hypervisor does not support the operation because the encoding for the
-// hypercall input register is not supported.
-#define HV_STATUS_INVALID_HYPERCALL_INPUT ((HV_STATUS)0x0003)
-
-// The hypervisor could not perform the operation because a parameter has an
-// invalid alignment.
-#define HV_STATUS_INVALID_ALIGNMENT ((HV_STATUS)0x0004)
-
-// The hypervisor could not perform the operation because an invalid parameter
-// was specified.
-#define HV_STATUS_INVALID_PARAMETER ((HV_STATUS)0x0005)
-
-// Access to the specified object was denied.
-#define HV_STATUS_ACCESS_DENIED ((HV_STATUS)0x0006)
 
 #endif // !MILE_HYPERV_GUEST_INTERFACE
