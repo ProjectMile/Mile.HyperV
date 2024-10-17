@@ -8,6 +8,19 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+// References
+// - Symbols in Windows version 10.0.14347.0's vmbus.sys
+// - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
+// - Symbols in Windows version 10.0.14347.0's hyperkbd.sys
+// - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
+// - Symbols in Windows version 10.0.14347.0's storvsc.sys
+// - Symbols in Windows version 10.0.14347.0's netvsc.sys
+// - Symbols in Windows version 10.0.14347.0's fcvsc.sys
+// - Symbols in Windows version 10.0.14347.0's icsvc.dll
+// - Symbols in Windows version 10.0.14347.0's icsvcext.dll
+// - Symbols in Windows version 10.0.19041.0's rdpcorets.dll
+// - Symbols in Windows version 10.0.19041.0's vmuidevices.dll
+
 #ifndef MILE_HYPERV_VMBUS
 #define MILE_HYPERV_VMBUS
 
