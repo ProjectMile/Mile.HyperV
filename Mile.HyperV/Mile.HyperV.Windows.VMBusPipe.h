@@ -8,6 +8,10 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+// References
+// - Symbols in Windows version 10.0.19041.0's vmbuspipe.dll
+// - Symbols in Windows version 10.0.14347.0's vmbuspipe.dll
+
 #ifndef MILE_HYPERV_WINDOWS_VMBUSPIPE
 #define MILE_HYPERV_WINDOWS_VMBUSPIPE
 
