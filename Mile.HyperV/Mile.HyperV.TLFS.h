@@ -61,9 +61,6 @@ typedef int16_t HV_INT16, *PHV_INT16;
 typedef int32_t HV_INT32, *PHV_INT32;
 typedef int64_t HV_INT64, *PHV_INT64;
 
-typedef uint8_t HV_UINT8, *PHV_UINT8;
-typedef uint32_t HV_UINT32, *PHV_UINT32;
-
 // Define a 128bit type.
 typedef struct DECLSPEC_ALIGN(16) _HV_UINT128
 {
@@ -175,11 +172,6 @@ typedef struct _HV_LOADER_BLOCK *PHV_LOADER_BLOCK;
 #define HV_STATUS_CALL_PENDING ((HV_STATUS)0x0079)
 #define HV_STATUS_VTL_ALREADY_ENABLED ((HV_STATUS)0x0086)
 
-// Time in the hypervisor is measured in 100 nanosecond units
-
-typedef HV_UINT64 HV_NANO100_TIME, *PHV_NANO100_TIME;
-typedef HV_UINT64 HV_NANO100_DURATION, *PHV_NANO100_DURATION;
-
 typedef union _HV_X64_FP_REGISTER
 {
     HV_UINT128 AsUINT128;
@@ -233,36 +225,6 @@ typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
         HV_UINT32 XmmStatusControlMask;
     };
 } HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
-
-typedef struct _HV_X64_SEGMENT_REGISTER
-{
-    HV_UINT64 Base;
-    HV_UINT32 Limit;
-    HV_UINT16 Selector;
-    union
-    {
-        struct
-        {
-            HV_UINT16 SegmentType : 4;
-            HV_UINT16 NonSystemSegment : 1;
-            HV_UINT16 DescriptorPrivilegeLevel : 2;
-            HV_UINT16 Present : 1;
-            HV_UINT16 Reserved : 4;
-            HV_UINT16 Available : 1;
-            HV_UINT16 Long : 1;
-            HV_UINT16 Default : 1;
-            HV_UINT16 Granularity : 1;
-        };
-        HV_UINT16 Attributes;
-    };
-} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
-
-typedef struct _HV_X64_TABLE_REGISTER
-{
-    HV_UINT16 Pad[3];
-    HV_UINT16 Limit;
-    HV_UINT64 Base;
-} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
 
 // An architecture is a set of processor instruction sets and operating modes
 typedef enum _HV_ARCHITECTURE
@@ -2025,8 +1987,6 @@ typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 
 // Define the intercept access types.
 
-typedef HV_UINT8 HV_INTERCEPT_ACCESS_TYPE;
-
 #define HV_INTERCEPT_ACCESS_READ 0
 #define HV_INTERCEPT_ACCESS_WRITE 1
 #define HV_INTERCEPT_ACCESS_EXECUTE 2
@@ -2089,11 +2049,6 @@ typedef struct _HV_INTERCEPT_DESCRIPTOR
     HV_INTERCEPT_PARAMETERS Parameters;
 } HV_INTERCEPT_DESCRIPTOR, *PHV_INTERCEPT_DESCRIPTOR;
 typedef const HV_INTERCEPT_DESCRIPTOR* PCHV_INTERCEPT_DESCRIPTOR;
-
-// Virtual Processor Indices
-typedef HV_UINT32 HV_VP_INDEX;
-
-#define HV_MAXIMUM_PROCESSORS 2048
 
 #define HV_MAX_VP_INDEX (HV_MAXIMUM_PROCESSORS - 1)
 
@@ -2208,14 +2163,8 @@ typedef enum _HV_CACHE_TYPE
     HvCacheTypeX64WriteBack = 6
 } HV_CACHE_TYPE, *PHV_CACHE_TYPE;
 
-// Flags to describe the access a partition has to a GPA page.
-typedef HV_UINT32 HV_MAP_GPA_FLAGS;
-
 // HV Map GPA (Guest Physical Address) Flags
 
-#define HV_MAP_GPA_PERMISSIONS_NONE 0x00000000
-#define HV_MAP_GPA_READABLE 0x00000001
-#define HV_MAP_GPA_WRITABLE 0x00000002
 #define HV_MAP_GPA_KERNEL_EXECUTABLE 0x00000004
 #define HV_MAP_GPA_USER_EXECUTABLE 0x00000008
 #define HV_MAP_GPA_EXECUTABLE 0x0000000C
@@ -2375,14 +2324,6 @@ typedef struct _HV_X64_APIC_EOI_MESSAGE
 
 // Define the synthetic interrupt source index type.
 typedef HV_UINT32 HV_SYNIC_SINT_INDEX, *PHV_SYNIC_SINT_INDEX;
-
-// Define partition identifier type.
-typedef HV_UINT64 HV_PARTITION_ID, *PHV_PARTITION_ID;
-
-// Define invalid partition identifier.
-#define HV_PARTITION_ID_INVALID ((HV_PARTITION_ID)0x0)
-
-#define HV_PARTITION_ID_SELF ((HV_PARTITION_ID)-1)
 
 // Define connection identifier type.
 typedef union _HV_CONNECTION_ID
@@ -3951,8 +3892,6 @@ typedef const HV_FLUSH_FLAGS* PCHV_FLUSH_FLAGS;
 
 typedef const HV_TRANSLATE_GVA_CONTROL_FLAGS* PCHV_TRANSLATE_GVA_CONTROL_FLAGS;
 
-typedef HV_UINT8 HV_VTL;
-typedef HV_VTL* PHV_VTL;
 typedef const HV_VTL* PCHV_VTL;
 
 #define HV_NUM_VTLS 2
@@ -4286,39 +4225,7 @@ typedef union _HV_INPUT_VTL
     };
 } HV_INPUT_VTL, *PHV_INPUT_VTL;
 
-typedef HV_MAP_GPA_FLAGS* PHV_MAP_GPA_FLAGS;
 typedef const HV_MAP_GPA_FLAGS* PCHV_MAP_GPA_FLAGS;
-
-typedef struct _HV_INITIAL_VP_CONTEXT
-{
-    HV_UINT64 Rip;
-    HV_UINT64 Rsp;
-    HV_UINT64 Rflags;
-
-    // Segment selector registers together with their hidden state.
-
-    HV_X64_SEGMENT_REGISTER Cs;
-    HV_X64_SEGMENT_REGISTER Ds;
-    HV_X64_SEGMENT_REGISTER Es;
-    HV_X64_SEGMENT_REGISTER Fs;
-    HV_X64_SEGMENT_REGISTER Gs;
-    HV_X64_SEGMENT_REGISTER Ss;
-    HV_X64_SEGMENT_REGISTER Tr;
-    HV_X64_SEGMENT_REGISTER Ldtr;
-
-    // Global and Interrupt Descriptor tables
-
-    HV_X64_TABLE_REGISTER Idtr;
-    HV_X64_TABLE_REGISTER Gdtr;
-
-    // Control registers and MSR's
-
-    HV_UINT64 Efer;
-    HV_UINT64 Cr0;
-    HV_UINT64 Cr3;
-    HV_UINT64 Cr4;
-    HV_UINT64 MsrCrPat;
-} HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
 
 /* Nested Virtualization */
 
@@ -6877,7 +6784,6 @@ typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
 
 #define HV_X64_MSR_VP_INDEX HvSyntheticMsrVpIndex
 
-typedef HV_VP_INDEX* PHV_VP_INDEX;
 typedef const HV_VP_INDEX* PCHV_VP_INDEX;
 
 typedef union _HV_X64_MSR_SYNMC_STATUS_CONTENTS

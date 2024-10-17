@@ -22,8 +22,14 @@
 
 #include <stdint.h>
 
+typedef uint8_t HV_UINT8, *PHV_UINT8;
 typedef uint16_t HV_UINT16, *PHV_UINT16;
+typedef uint32_t HV_UINT32, *PHV_UINT32;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
+
+// *****************************************************************************
+// HV_STATUS Definitions 
+//
 
 // Status codes for hypervisor operations.
 typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
@@ -213,6 +219,10 @@ typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
 // operation.
 #define HV_STATUS_INSUFFICIENT_ROOT_MEMORY ((HV_STATUS)0x0073)
 
+// *****************************************************************************
+// Basic Type Definitions 
+//
+
 #define HV_MAXIMUM_PROCESSORS 2048
 
 // Memory Types
@@ -258,5 +268,128 @@ typedef HV_UINT64 HV_GVA, *PHV_GVA;
 #define HV_LARGE_PAGE_SIZE_1GB HV_X64_LARGE_PAGE_SIZE_1GB
 
 #endif
+
+// Define partition identifier type.
+typedef HV_UINT64 HV_PARTITION_ID, *PHV_PARTITION_ID;
+
+// Define invalid partition identifier and "self" partition identifier.
+
+#define HV_PARTITION_ID_INVALID ((HV_PARTITION_ID)0x0)
+#define HV_PARTITION_ID_SELF ((HV_PARTITION_ID)-1)
+
+// Time in the hypervisor is measured in 100 nanosecond units.
+
+typedef HV_UINT64 HV_NANO100_TIME, *PHV_NANO100_TIME;
+typedef HV_UINT64 HV_NANO100_DURATION, *PHV_NANO100_DURATION;
+
+#define HV_NANO100_TIME_NEVER ((HV_NANO100_TIME)-1)
+
+typedef HV_UINT32 HV_IOMMU_ID, *PHV_IOMMU_ID;
+
+// Define the intercept access types.
+typedef HV_UINT8 HV_INTERCEPT_ACCESS_TYPE;
+
+// Virtual Processor Indices
+typedef HV_UINT32 HV_VP_INDEX, *PHV_VP_INDEX;
+
+// VSM Definitions
+// Define a virtual trust level (VTL)
+typedef HV_UINT8 HV_VTL, *PHV_VTL;
+
+// Flags to describe the access a partition has to a GPA page.
+typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
+
+#if defined(_M_AMD64)
+
+typedef struct _HV_X64_SEGMENT_REGISTER
+{
+    HV_UINT64 Base;
+    HV_UINT32 Limit;
+    HV_UINT16 Selector;
+#pragma warning(disable:4201) // nameless struct/union
+    union
+    {
+        struct
+        {
+            HV_UINT16 SegmentType : 4;
+            HV_UINT16 NonSystemSegment : 1;
+            HV_UINT16 DescriptorPrivilegeLevel : 2;
+            HV_UINT16 Present : 1;
+            HV_UINT16 Reserved : 4;
+            HV_UINT16 Available : 1;
+            HV_UINT16 Long : 1;
+            HV_UINT16 Default : 1;
+            HV_UINT16 Granularity : 1;
+        };
+        HV_UINT16 Attributes;
+    };
+#pragma warning(default:4201) // nameless struct/union
+} HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
+
+typedef struct _HV_X64_TABLE_REGISTER
+{
+    HV_UINT16 Pad[3];
+    HV_UINT16 Limit;
+    HV_UINT64 Base;
+} HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
+
+#endif
+
+// Initial X64 VP context for a newly enabled VTL
+typedef struct _HV_INITIAL_VP_CONTEXT
+{
+#if defined(_M_ARM64)
+
+    HV_UINT64 Pc;
+    HV_UINT64 Sp_ELh;
+    HV_UINT64 SCTLR_EL1;
+    HV_UINT64 MAIR_EL1;
+    HV_UINT64 TCR_EL1;
+    HV_UINT64 VBAR_EL1;
+    HV_UINT64 TTBR0_EL1;
+    HV_UINT64 TTBR1_EL1;
+    HV_UINT64 X18;
+
+#elif defined(_M_AMD64)
+
+    HV_UINT64 Rip;
+    HV_UINT64 Rsp;
+    HV_UINT64 Rflags;
+
+    // Segment selector registers together with their hidden state.
+
+    HV_X64_SEGMENT_REGISTER Cs;
+    HV_X64_SEGMENT_REGISTER Ds;
+    HV_X64_SEGMENT_REGISTER Es;
+    HV_X64_SEGMENT_REGISTER Fs;
+    HV_X64_SEGMENT_REGISTER Gs;
+    HV_X64_SEGMENT_REGISTER Ss;
+    HV_X64_SEGMENT_REGISTER Tr;
+    HV_X64_SEGMENT_REGISTER Ldtr;
+
+    // Global and Interrupt Descriptor tables
+
+    HV_X64_TABLE_REGISTER Idtr;
+    HV_X64_TABLE_REGISTER Gdtr;
+
+    // Control registers and MSR's
+
+    HV_UINT64 Efer;
+    HV_UINT64 Cr0;
+    HV_UINT64 Cr3;
+    HV_UINT64 Cr4;
+    HV_UINT64 MsrCrPat;
+
+#endif
+} HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
+
+// HV Map GPA (Guest Physical Address) Flags
+// Definitions of flags to describe the access a partition has to a GPA page.
+// (used with HV_MAP_GPA_FLAGS).
+// The first byte is reserved for permissions.
+
+#define HV_MAP_GPA_PERMISSIONS_NONE 0x0
+#define HV_MAP_GPA_READABLE 0x1
+#define HV_MAP_GPA_WRITABLE 0x2
 
 #endif // !MILE_HYPERV_GUEST_INTERFACE
