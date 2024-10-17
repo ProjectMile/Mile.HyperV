@@ -62,9 +62,7 @@ typedef int32_t HV_INT32, *PHV_INT32;
 typedef int64_t HV_INT64, *PHV_INT64;
 
 typedef uint8_t HV_UINT8, *PHV_UINT8;
-typedef uint16_t HV_UINT16, *PHV_UINT16;
 typedef uint32_t HV_UINT32, *PHV_UINT32;
-typedef uint64_t HV_UINT64, *PHV_UINT64;
 
 // Define a 128bit type.
 typedef struct DECLSPEC_ALIGN(16) _HV_UINT128
@@ -109,45 +107,37 @@ typedef HV_UINT16 HV_WCHAR;
 // System physical addresses (SPAs) define the physical address space of the
 // underlying hardware. There is only one system physical address space for the
 // entire machine.
-//
-// Guest physical addresses (GPAs) define the guest's view of physical memory.
-// GPAs can be mapped to underlying SPAs. There is one guest physical address
-// space per partition.
-//
-// Guest virtual addresses (GVAs) are used within the guest when it enables
-// address translation and provides a valid guest page table.
 
 typedef HV_UINT64 HV_SPA, *PHV_SPA;
-typedef HV_UINT64 HV_GPA, *PHV_GPA;
-typedef HV_UINT64 HV_GVA, *PHV_GVA;
+
+#if defined(_M_AMD64)
 
 // Number of bytes in a page for X64.
 #ifndef X64_PAGE_SIZE
-#define X64_PAGE_SIZE 0x1000
+#define X64_PAGE_SIZE HV_X64_PAGE_SIZE
 #endif
 
 // Number of bytes in a large page for X64.
 #ifndef X64_LARGE_PAGE_SIZE
-#define X64_LARGE_PAGE_SIZE 0x200000
+#define X64_LARGE_PAGE_SIZE HV_X64_LARGE_PAGE_SIZE
 #endif
 
 // Number of bytes in a 1GB page for X64.
 #ifndef X64_1GB_PAGE_SIZE
-#define X64_1GB_PAGE_SIZE 0x40000000
+#define X64_1GB_PAGE_SIZE HV_X64_LARGE_PAGE_SIZE_1GB
 #endif
 
 #define HV_X64_MAX_PAGE_NUMBER (UINT64_MAX/X64_PAGE_SIZE)
 #define HV_X64_MAX_LARGE_PAGE_NUMBER (UINT64_MAX/X64_LARGE_PAGE_SIZE)
 #define HV_X64_MAX_1GB_PAGE_NUMBER (UINT64_MAX/X64_1GB_PAGE_SIZE)
-#define HV_PAGE_SIZE X64_PAGE_SIZE
-#define HV_LARGE_PAGE_SIZE X64_LARGE_PAGE_SIZE
 #define HV_1GB_PAGE_SIZE X64_1GB_PAGE_SIZE
 #define HV_PAGE_MASK (HV_PAGE_SIZE - 1)
 #define HV_LARGE_PAGE_MASK (HV_LARGE_PAGE_SIZE - 1)
 #define HV_1GB_PAGE_MASK (HV_1GB_PAGE_SIZE - 1)
 
+#endif
+
 typedef HV_UINT64 HV_SPA_PAGE_NUMBER, *PHV_SPA_PAGE_NUMBER;
-typedef HV_UINT64 HV_GPA_PAGE_NUMBER, *PHV_GPA_PAGE_NUMBER;
 typedef HV_UINT64 HV_GVA_PAGE_NUMBER, *PHV_GVA_PAGE_NUMBER;
 
 typedef const HV_SPA_PAGE_NUMBER *PCHV_SPA_PAGE_NUMBER;
@@ -159,15 +149,6 @@ typedef HV_UINT16 HV_IO_PORT, *PHV_IO_PORT;
 // Forward declare the loader block.
 typedef struct _HV_LOADER_BLOCK *PHV_LOADER_BLOCK;
 
-// Status codes for hypervisor operations.
-typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
-
-#define HV_STATUS_SUCCESS ((HV_STATUS)0x0000)
-#define HV_STATUS_INVALID_HYPERCALL_CODE ((HV_STATUS)0x0002)
-#define HV_STATUS_INVALID_HYPERCALL_INPUT ((HV_STATUS)0x0003)
-#define HV_STATUS_INVALID_ALIGNMENT ((HV_STATUS)0x0004)
-#define HV_STATUS_INVALID_PARAMETER ((HV_STATUS)0x0005)
-#define HV_STATUS_ACCESS_DENIED ((HV_STATUS)0x0006)
 #define HV_STATUS_INVALID_PARTITION_STATE ((HV_STATUS)0x0007)
 #define HV_STATUS_OPERATION_DENIED ((HV_STATUS)0x0008)
 #define HV_STATUS_UNKNOWN_PROPERTY ((HV_STATUS)0x0009)
