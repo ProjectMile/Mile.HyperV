@@ -34,7 +34,7 @@
 #ifndef MILE_HYPERV_TLFS
 #define MILE_HYPERV_TLFS
 
-#include <stdint.h>
+#include "Mile.HyperV.Guest.Interface.h"
 
 #ifdef _MSC_VER
 #if _MSC_VER > 1000
