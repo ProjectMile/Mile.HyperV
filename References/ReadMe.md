@@ -99,3 +99,38 @@ yellow items are defined in MIT licensed Hyper-V headers from Microsoft. All
 green items are detail defined in Hypervisor Top Level Functional Specification.
 
 - [HvCallList.xlsx](HvCallList.xlsx)
+
+## Hyper-V Generation 2 Virtual Machine UEFI Firmware
+
+https://github.com/microsoft/mu_msvm
+
+### Referenced Version
+
+https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
+
+### Referenced by Mile.HyperV:
+
+- MsvmPkg\Include\Hv\HvGuest.h
+- MsvmPkg\Include\Hv\HvGuestCpuid.h
+- MsvmPkg\Include\Hv\HvGuestHypercall.h
+- MsvmPkg\Include\Hv\HvGuestMsr.h
+- MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
+- MsvmPkg\Include\Hv\HvStatus.h
+- MsvmPkg\Include\Protocol\EfiHv.h
+- MsvmPkg\Include\Protocol\Emcl.h
+- MsvmPkg\Include\Protocol\SynthKeyProtocol.h
+- MsvmPkg\Include\Protocol\Vmbus.h
+- MsvmPkg\Include\Protocol\VmbusFileSystem.h
+- MsvmPkg\Include\Vmbus\NtStatus.h
+- MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
+- MsvmPkg\Include\Vmbus\VmbusPacketInterface.h
+- MsvmPkg\Include\MsvmBase.h
+- MsvmPkg\Include\VirtualDeviceId.h
+- MsvmPkg\Library\HvHypercallLib\HvHypercallLib.c
+- MsvmPkg\NetvscDxe\nvspprotocol.h
+- MsvmPkg\StorvscDxe\VstorageProtocol.h
+- MsvmPkg\VideoDxe\SynthVidProtocol.h
+- MsvmPkg\VideoDxe\VramSize.h
+- MsvmPkg\VmbusDxe\ChannelMessages.h
+- MsvmPkg\VpcivscDxe\VpciProtocol.h
+- MsvmPkg\VpcivscDxe\wdm.h
