@@ -10,14 +10,25 @@
 
 // References
 // - Hyper-V Generation 2 Virtual Machine UEFI Firmware
-//   - MsvmPkg\Include\Hv\HvGuest.h
 //   - MsvmPkg\Include\Hv\HvStatus.h
+//   - MsvmPkg\Include\Hv\HvGuest.h
+//   - MsvmPkg\Include\Hv\HvGuestCpuid.h
 
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
 
 #if !defined(_M_AMD64) && !defined(_M_ARM64)
 #error [Mile.HyperV] Unknown/Unsupported architecture
+#endif
+
+#ifdef _MSC_VER
+#if _MSC_VER > 1000
+#pragma once
+#endif
+#if (_MSC_VER >= 1200)
+#pragma warning(push)
+#endif
+#pragma warning(disable:4201) // nameless struct/union
 #endif
 
 #include <stdint.h>
@@ -28,7 +39,7 @@ typedef uint32_t HV_UINT32, *PHV_UINT32;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
 
 // *****************************************************************************
-// HV_STATUS Definitions 
+// HV_STATUS Definitions
 //
 
 // Status codes for hypervisor operations.
@@ -220,7 +231,7 @@ typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
 #define HV_STATUS_INSUFFICIENT_ROOT_MEMORY ((HV_STATUS)0x0073)
 
 // *****************************************************************************
-// Basic Type Definitions 
+// Basic Type Definitions
 //
 
 #define HV_MAXIMUM_PROCESSORS 2048
@@ -300,13 +311,11 @@ typedef HV_UINT8 HV_VTL, *PHV_VTL;
 typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
 
 #if defined(_M_AMD64)
-
 typedef struct _HV_X64_SEGMENT_REGISTER
 {
     HV_UINT64 Base;
     HV_UINT32 Limit;
     HV_UINT16 Selector;
-#pragma warning(disable:4201) // nameless struct/union
     union
     {
         struct
@@ -323,16 +332,16 @@ typedef struct _HV_X64_SEGMENT_REGISTER
         };
         HV_UINT16 Attributes;
     };
-#pragma warning(default:4201) // nameless struct/union
 } HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
+#endif
 
+#if defined(_M_AMD64)
 typedef struct _HV_X64_TABLE_REGISTER
 {
     HV_UINT16 Pad[3];
     HV_UINT16 Limit;
     HV_UINT64 Base;
 } HV_X64_TABLE_REGISTER, *PHV_X64_TABLE_REGISTER;
-
 #endif
 
 // Initial X64 VP context for a newly enabled VTL
@@ -391,5 +400,616 @@ typedef struct _HV_INITIAL_VP_CONTEXT
 #define HV_MAP_GPA_PERMISSIONS_NONE 0x0
 #define HV_MAP_GPA_READABLE 0x1
 #define HV_MAP_GPA_WRITABLE 0x2
+
+// *****************************************************************************
+// CPUID Definitions
+//
+
+// Microsoft hypervisor interface signature.
+typedef enum _HV_HYPERVISOR_INTERFACE
+{
+    HvMicrosoftHypervisorInterface = '1#vH'
+} HV_HYPERVISOR_INTERFACE, *PHV_HYPERVISOR_INTERFACE;
+
+// Version info reported by hypervisors
+typedef struct _HV_HYPERVISOR_VERSION_INFO
+{
+    HV_UINT32 BuildNumber;
+
+    HV_UINT32 MinorVersion : 16;
+    HV_UINT32 MajorVersion : 16;
+
+    HV_UINT32 ServicePack;
+
+    HV_UINT32 ServiceNumber : 24;
+    HV_UINT32 ServiceBranch : 8; // Type is HV_SERVICE_BRANCH
+} HV_HYPERVISOR_VERSION_INFO, *PHV_HYPERVISOR_VERSION_INFO;
+
+// VM Partition Privileges mask. Please also update the bitmask along with the
+// below union.
+typedef union _HV_PARTITION_PRIVILEGE_MASK
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // Access to virtual MSRs
+
+        HV_UINT64 AccessVpRunTimeReg : 1;
+        HV_UINT64 AccessPartitionReferenceCounter : 1;
+        HV_UINT64 AccessSynicRegs : 1;
+        HV_UINT64 AccessSyntheticTimerRegs : 1;
+        HV_UINT64 AccessIntrCtrlRegs : 1;
+        HV_UINT64 AccessHypercallMsrs : 1;
+        HV_UINT64 AccessVpIndex : 1;
+        HV_UINT64 AccessResetReg : 1;
+        HV_UINT64 AccessStatsReg : 1;
+        HV_UINT64 AccessPartitionReferenceTsc : 1;
+        HV_UINT64 AccessGuestIdleReg : 1;
+        HV_UINT64 AccessFrequencyRegs : 1;
+        HV_UINT64 AccessDebugRegs : 1;
+        HV_UINT64 AccessReenlightenmentControls : 1;
+        HV_UINT64 AccessRootSchedulerReg : 1;
+        HV_UINT64 Reserved1 : 17;
+
+        // Access to hypercalls
+
+        HV_UINT64 CreatePartitions : 1;
+        HV_UINT64 AccessPartitionId : 1;
+        HV_UINT64 AccessMemoryPool : 1;
+        HV_UINT64 AdjustMessageBuffers : 1;
+        HV_UINT64 PostMessages : 1;
+        HV_UINT64 SignalEvents : 1;
+        HV_UINT64 CreatePort : 1;
+        HV_UINT64 ConnectPort : 1;
+        HV_UINT64 AccessStats : 1;
+        HV_UINT64 Reserved2 : 2;
+        HV_UINT64 Debugging : 1;
+        HV_UINT64 CpuManagement : 1;
+        HV_UINT64 ConfigureProfiler : 1;
+        HV_UINT64 AccessVpExitTracing : 1;
+        HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
+        HV_UINT64 AccessVsm : 1;
+        HV_UINT64 AccessVpRegisters : 1;
+        HV_UINT64 UnusedBit : 1;
+        HV_UINT64 FastHypercallOutput : 1;
+        HV_UINT64 EnableExtendedHypercalls : 1;
+        HV_UINT64 StartVirtualProcessor : 1;
+        HV_UINT64 Isolation : 1;
+        HV_UINT64 Reserved3 : 9;
+    };
+} HV_PARTITION_PRIVILEGE_MASK, *PHV_PARTITION_PRIVILEGE_MASK;
+
+#if defined(_M_AMD64)
+typedef union _HV_X64_PLATFORM_CAPABILITIES
+{
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        // Eax
+
+        HV_UINT32 AllowRedSignedCode : 1;
+        HV_UINT32 AllowKernelModeDebugging : 1;
+        HV_UINT32 AllowUserModeDebugging : 1;
+        HV_UINT32 AllowTelnetServer : 1;
+        HV_UINT32 AllowIOPorts : 1;
+        HV_UINT32 AllowFullMsrSpace : 1;
+        HV_UINT32 AllowPerfCounters : 1;
+        HV_UINT32 AllowHost512MB : 1;
+        HV_UINT32 ReservedEax1 : 1;
+        HV_UINT32 AllowRemoteRecovery : 1;
+        HV_UINT32 AllowStreaming : 1;
+        HV_UINT32 AllowPushDeployment : 1;
+        HV_UINT32 AllowPullDeployment : 1;
+        HV_UINT32 AllowProfiling : 1;
+        HV_UINT32 AllowJsProfiling : 1;
+        HV_UINT32 AllowCrashDump : 1;
+        HV_UINT32 AllowVsCrashDump : 1;
+        HV_UINT32 AllowToolFileIO : 1;
+        HV_UINT32 AllowConsoleMgmt : 1;
+        HV_UINT32 AllowTracing : 1;
+        HV_UINT32 AllowXStudio : 1;
+        HV_UINT32 AllowGestureBuilder : 1;
+        HV_UINT32 AllowSpeechLab : 1;
+        HV_UINT32 AllowSmartglassStudio : 1;
+        HV_UINT32 AllowNetworkTools : 1;
+        HV_UINT32 AllowTcrTool : 1;
+        HV_UINT32 AllowHostNetworkStack : 1;
+        HV_UINT32 AllowSystemUpdateTest : 1;
+        HV_UINT32 AllowOffChipPerfCtrStreaming : 1;
+        HV_UINT32 AllowToolingMemory : 1;
+        HV_UINT32 AllowSystemDowngrade : 1;
+        HV_UINT32 AllowGreenDiskLicenses : 1;
+
+        // Ebx
+
+        HV_UINT32 IsLiveConnected : 1;
+        HV_UINT32 IsMteBoosted : 1;
+        HV_UINT32 IsQaSlt : 1;
+        HV_UINT32 IsStockImage : 1;
+        HV_UINT32 IsMsTestLab : 1;
+        HV_UINT32 IsRetailDebugger : 1;
+        HV_UINT32 IsXvdSrt : 1;
+        HV_UINT32 IsGreenDebug : 1;
+        HV_UINT32 IsHwDevTest : 1;
+        HV_UINT32 AllowDiskLicenses : 1;
+        HV_UINT32 AllowInstrumentation : 1;
+        HV_UINT32 AllowWifiTester : 1;
+        HV_UINT32 AllowWifiTesterDFS : 1;
+        HV_UINT32 IsHwTest : 1;
+        HV_UINT32 AllowHostOddTest : 1;
+        HV_UINT32 IsLiveUnrestricted : 1;
+        HV_UINT32 AllowDiscLicensesWithoutMediaAuth : 1;
+        HV_UINT32 ReservedEbx : 15;
+
+        // Ecx
+
+        HV_UINT32 ReservedEcx;
+
+        // Edx
+
+        HV_UINT32 ReservedEdx : 31;
+        HV_UINT32 UseAlternateXvd : 1;
+    };
+} HV_X64_PLATFORM_CAPABILITIES, *PHV_X64_PLATFORM_CAPABILITIES;
+#endif
+
+// Typedefs for CPUID leaves on HvMicrosoftHypercallInterface-supporting
+// hypervisors.
+//
+// The below CPUID leaves are present if VersionAndFeatures.HypervisorPresent is
+// set by CPUID(HvCpuIdFunctionVersionAndFeatures).
+typedef enum _HV_CPUID_FUNCTION
+{
+    HvCpuIdFunctionVersionAndFeatures = 0x00000001,
+    HvCpuIdFunctionHvVendorAndMaxFunction = 0x40000000,
+    HvCpuIdFunctionHvInterface = 0x40000001,
+
+    // The remaining functions depend on the value of HvCpuIdFunctionInterface
+
+    HvCpuIdFunctionMsHvVersion = 0x40000002,
+    HvCpuIdFunctionMsHvFeatures = 0x40000003,
+    HvCpuIdFunctionMsHvEnlightenmentInformation = 0x40000004,
+    HvCpuIdFunctionMsHvImplementationLimits = 0x40000005,
+    HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
+    HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
+    HvCpuIdFunctionMsHvSvmFeatures = 0x40000008,
+    HvCpuIdFunctionMsHvSkipLevelFeatures = 0x40000009,
+    HvCpuidFunctionMsHvNestedVirtFeatures = 0x4000000A,
+    HvCpuidFunctionMsHvIsolationConfiguration = 0x4000000C,
+    HvCpuIdFunctionMaxReserved = 0x4000000C
+} HV_CPUID_FUNCTION, *PHV_CPUID_FUNCTION;
+
+// Hypervisor Vendor Info - HvCpuIdFunctionHvVendorAndMaxFunction Leaf
+typedef struct _HV_VENDOR_AND_MAX_FUNCTION
+{
+    HV_UINT32 MaxFunction;
+    HV_UINT8 VendorName[12];
+} HV_VENDOR_AND_MAX_FUNCTION, *PHV_VENDOR_AND_MAX_FUNCTION;
+
+// Hypervisor Interface Info - HvCpuIdFunctionHvInterface Leaf
+typedef struct _HV_HYPERVISOR_INTERFACE_INFO
+{
+    HV_UINT32 Interface; // HV_HYPERVISOR_INTERFACE
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+    HV_UINT32 Reserved3;
+} HV_HYPERVISOR_INTERFACE_INFO, *PHV_HYPERVISOR_INTERFACE_INFO;
+
+// Hypervisor Feature Information - HvCpuIdFunctionMsHvFeatures Leaf
+#if defined(_M_AMD64)
+typedef struct _HV_X64_HYPERVISOR_FEATURES
+{
+    // Eax-Ebx
+
+    HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
+
+    // Ecx - this indicates the power configuration for the current VP.
+
+    HV_UINT32 MaxSupportedCState : 4;
+    HV_UINT32 HpetNeededForC3PowerState_Deprecated : 1;
+    HV_UINT32 Reserved : 27;
+
+    // Edx
+
+    HV_UINT32 MwaitAvailable_Deprecated : 1;
+    HV_UINT32 GuestDebuggingAvailable : 1;
+    HV_UINT32 PerformanceMonitorsAvailable : 1;
+    HV_UINT32 CpuDynamicPartitioningAvailable : 1;
+    HV_UINT32 XmmRegistersForFastHypercallAvailable : 1;
+    HV_UINT32 GuestIdleAvailable : 1;
+    HV_UINT32 HypervisorSleepStateSupportAvailable : 1;
+    HV_UINT32 NumaDistanceQueryAvailable : 1;
+    HV_UINT32 FrequencyRegsAvailable : 1;
+    HV_UINT32 SyntheticMachineCheckAvailable : 1;
+    HV_UINT32 GuestCrashRegsAvailable : 1;
+    HV_UINT32 DebugRegsAvailable : 1;
+    HV_UINT32 Npiep1Available : 1;
+    HV_UINT32 DisableHypervisorAvailable : 1;
+    HV_UINT32 ExtendedGvaRangesForFlushVirtualAddressListAvailable : 1;
+    HV_UINT32 FastHypercallOutputAvailable : 1;
+    HV_UINT32 PasidFeaturesAvailable : 1;
+    HV_UINT32 SintPollingModeAvailable : 1;
+    HV_UINT32 HypercallMsrLockAvailable : 1;
+    HV_UINT32 DirectSyntheticTimers : 1;
+    HV_UINT32 RegisterPatAvailable : 1;
+    HV_UINT32 RegisterBndcfgsAvailable : 1;
+    HV_UINT32 WatchdogTimerAvailable : 1;
+    HV_UINT32 SyntheticTimeUnhaltedTimerAvailable : 1;
+    HV_UINT32 DeviceDomainsAvailable : 1; // HDK only.
+    HV_UINT32 S1DeviceDomainsAvailable : 1; // HDK only.
+    HV_UINT32 Reserved1 : 6;
+} HV_X64_HYPERVISOR_FEATURES, *PHV_X64_HYPERVISOR_FEATURES;
+typedef _HV_X64_HYPERVISOR_FEATURES _HV_HYPERVISOR_FEATURES;
+typedef HV_X64_HYPERVISOR_FEATURES HV_HYPERVISOR_FEATURES;
+typedef PHV_X64_HYPERVISOR_FEATURES PHV_HYPERVISOR_FEATURES;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_FEATURES
+{
+    HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
+
+    HV_UINT32 GuestDebuggingAvailable : 1;
+    HV_UINT32 PerformanceMonitorsAvailable : 1;
+    HV_UINT32 CpuDynamicPartitioningAvailable : 1;
+    HV_UINT32 GuestIdleAvailable : 1;
+    HV_UINT32 HypervisorSleepStateSupportAvailable : 1;
+    HV_UINT32 NumaDistanceQueryAvailable : 1;
+    HV_UINT32 FrequencyRegsAvailable : 1;
+    HV_UINT32 SyntheticMachineCheckAvailable : 1;
+    HV_UINT32 GuestCrashRegsAvailable : 1;
+    HV_UINT32 DebugRegsAvailable : 1;
+    HV_UINT32 DisableHypervisorAvailable : 1;
+    HV_UINT32 ExtendedGvaRangesForFlushVirtualAddressListAvailable : 1;
+    HV_UINT32 SintPollingModeAvailable : 1;
+    HV_UINT32 DirectSyntheticTimers : 1;
+    HV_UINT32 DeviceDomainsAvailable : 1; // HDK only.
+    HV_UINT32 S1DeviceDomainsAvailable : 1; // HDK only.
+    HV_UINT32 Reserved1 : 16;
+} HV_ARM64_HYPERVISOR_FEATURES, *PHV_ARM64_HYPERVISOR_FEATURES;
+typedef _HV_ARM64_HYPERVISOR_FEATURES _HV_HYPERVISOR_FEATURES;
+typedef HV_ARM64_HYPERVISOR_FEATURES HV_HYPERVISOR_FEATURES;
+typedef PHV_ARM64_HYPERVISOR_FEATURES PHV_HYPERVISOR_FEATURES;
+#endif
+
+// Enlightenment Info - HvCpuIdFunctionMsHvEnlightenmentInformation Leaf
+#if defined(_M_AMD64)
+typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
+{
+    // Eax
+
+    HV_UINT32 UseHypercallForAddressSpaceSwitch : 1;
+    HV_UINT32 UseHypercallForLocalFlush : 1;
+    HV_UINT32 UseHypercallForRemoteFlushAndLocalFlushEntire : 1;
+    HV_UINT32 UseApicMsrs : 1;
+    HV_UINT32 UseHvRegisterForReset : 1;
+    HV_UINT32 UseRelaxedTiming : 1;
+    HV_UINT32 UseDmaRemapping_Deprecated : 1;
+    HV_UINT32 UseInterruptRemapping_Deprecated : 1;
+    HV_UINT32 UseX2ApicMsrs : 1;
+    HV_UINT32 DeprecateAutoEoi : 1;
+    HV_UINT32 UseSyntheticClusterIpi : 1;
+    HV_UINT32 UseExProcessorMasks : 1;
+    HV_UINT32 Nested : 1;
+    HV_UINT32 UseIntForMbecSystemCalls : 1;
+    HV_UINT32 UseVmcsEnlightenments : 1;
+    HV_UINT32 UseSyncedTimeline : 1;
+    // Was UseReferencePageForSyncedTimeline but never consumed.
+    HV_UINT32 Available : 1;
+    HV_UINT32 UseDirectLocalFlushEntire : 1;
+    HV_UINT32 Reserved : 14;
+
+    // Ebx
+
+    HV_UINT32 LongSpinWaitCount;
+
+    // Ecx
+
+    HV_UINT32 ReservedEcx;
+
+    // Edx
+
+    HV_UINT32 ReservedEdx;
+} HV_X64_ENLIGHTENMENT_INFORMATION, *PHV_X64_ENLIGHTENMENT_INFORMATION;
+typedef _HV_X64_ENLIGHTENMENT_INFORMATION _HV_ENLIGHTENMENT_INFORMATION;
+typedef HV_X64_ENLIGHTENMENT_INFORMATION HV_ENLIGHTENMENT_INFORMATION;
+typedef PHV_X64_ENLIGHTENMENT_INFORMATION PHV_ENLIGHTENMENT_INFORMATION;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_ENLIGHTENMENT_INFORMATION
+{
+    HV_UINT32 UseHvRegisterForReset : 1;
+    HV_UINT32 UseRelaxedTiming : 1;
+    HV_UINT32 UseSyntheticClusterIpi : 1;
+    HV_UINT32 UseExProcessorMasks : 1;
+    HV_UINT32 Nested : 1;
+    HV_UINT32 UseSyncedTimeline : 1;
+    HV_UINT32 Reserved : 26;
+
+    HV_UINT32 LongSpinWaitCount;
+
+    HV_UINT32 Reserved0;
+    HV_UINT32 Reserved1;
+} HV_ARM64_ENLIGHTENMENT_INFORMATION, *PHV_ARM64_ENLIGHTENMENT_INFORMATION;
+typedef _HV_ARM64_ENLIGHTENMENT_INFORMATION _HV_ENLIGHTENMENT_INFORMATION;
+typedef HV_ARM64_ENLIGHTENMENT_INFORMATION HV_ENLIGHTENMENT_INFORMATION;
+typedef PHV_ARM64_ENLIGHTENMENT_INFORMATION PHV_ENLIGHTENMENT_INFORMATION;
+#endif
+
+// Implementation Limits - HvCpuIdFunctionMsHvImplementationLimits Leaf
+typedef struct _HV_IMPLEMENTATION_LIMITS
+{
+    // Eax
+
+    HV_UINT32 MaxVirtualProcessorCount;
+
+    // Ebx
+
+    HV_UINT32 MaxLogicalProcessorCount;
+
+    // Ecx
+
+    HV_UINT32 MaxInterruptMappingCount;
+
+    // Edx
+
+    HV_UINT32 Reserved;
+} HV_IMPLEMENTATION_LIMITS, *PHV_IMPLEMENTATION_LIMITS;
+
+// Hypervisor Hardware Features Info - HvCpuIdFunctionMsHvHardwareFeatures Leaf
+#if defined(_M_AMD64)
+typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
+{
+    // Eax
+
+    HV_UINT32 ApicOverlayAssistInUse : 1;
+    HV_UINT32 MsrBitmapsInUse : 1;
+    HV_UINT32 ArchitecturalPerformanceCountersInUse : 1;
+    HV_UINT32 SecondLevelAddressTranslationInUse : 1;
+    HV_UINT32 DmaRemappingInUse : 1;
+    HV_UINT32 InterruptRemappingInUse : 1;
+    HV_UINT32 MemoryPatrolScrubberPresent : 1;
+    HV_UINT32 DmaProtectionInUse : 1;
+    HV_UINT32 HpetRequested : 1;
+    HV_UINT32 SyntheticTimersVolatile : 1;
+    HV_UINT32 HypervisorLevel : 4;
+    HV_UINT32 PhysicalDestinationModeRequired : 1;
+    HV_UINT32 UseVmfuncForAliasMapSwitch : 1;
+    HV_UINT32 HvRegisterForMemoryZeroingSupported : 1;
+    HV_UINT32 UnrestrictedGuestSupported : 1;
+    HV_UINT32 L3CachePartitioningSupported : 1;
+    HV_UINT32 L3CacheMonitoringSupported : 1;
+    HV_UINT32 Reserved : 12;
+
+    // Ebx
+
+    HV_UINT32 ReservedEbx;
+
+    // Ecx
+
+    HV_UINT32 ReservedEcx;
+
+    // Edx
+
+    HV_UINT32 ReservedEdx;
+} HV_X64_HYPERVISOR_HARDWARE_FEATURES, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES;
+typedef _HV_X64_HYPERVISOR_HARDWARE_FEATURES _HV_HYPERVISOR_HARDWARE_FEATURES;
+typedef HV_X64_HYPERVISOR_HARDWARE_FEATURES HV_HYPERVISOR_HARDWARE_FEATURES;
+typedef PHV_X64_HYPERVISOR_HARDWARE_FEATURES PHV_HYPERVISOR_HARDWARE_FEATURES;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_HARDWARE_FEATURES
+{
+    HV_UINT32 ArchitecturalPerformanceCountersInUse : 1;
+    HV_UINT32 SecondLevelAddressTranslationInUse : 1;
+    HV_UINT32 DmaRemappingInUse : 1;
+    HV_UINT32 InterruptRemappingInUse : 1;
+    HV_UINT32 MemoryPatrolScrubberPresent : 1;
+    HV_UINT32 DmaProtectionInUse : 1;
+    HV_UINT32 SyntheticTimersVolatile : 1;
+    HV_UINT32 HvRegisterForMemoryZeroingSupported : 1;
+    HV_UINT32 Reserved : 24;
+
+    HV_UINT32 Reserved0;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+} HV_ARM64_HYPERVISOR_HARDWARE_FEATURES, *PHV_ARM64_HYPERVISOR_HARDWARE_FEATURES;
+typedef _HV_ARM64_HYPERVISOR_HARDWARE_FEATURES _HV_HYPERVISOR_HARDWARE_FEATURES;
+typedef HV_ARM64_HYPERVISOR_HARDWARE_FEATURES HV_HYPERVISOR_HARDWARE_FEATURES;
+typedef PHV_ARM64_HYPERVISOR_HARDWARE_FEATURES PHV_HYPERVISOR_HARDWARE_FEATURES;
+#endif
+
+// Hypervisor Cpu Management features - HvCpuIdFunctionMsHvCpuManagementFeatures
+// leaf.
+#if defined(_M_AMD64)
+typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
+{
+    // Eax
+
+    HV_UINT32 StartLogicalProcessor : 1;
+    HV_UINT32 CreateRootVirtualProcessor : 1;
+    HV_UINT32 PerformanceCounterSync : 1;
+    HV_UINT32 Reserved0 : 28;
+    HV_UINT32 ReservedIdentityBit : 1;
+
+    // Ebx
+
+    HV_UINT32 ProcessorPowerManagement : 1;
+    HV_UINT32 MwaitIdleStates : 1;
+    HV_UINT32 LogicalProcessorIdling : 1;
+    HV_UINT32 Reserved1 : 29;
+
+    // Ecx
+
+    HV_UINT32 RemapGuestUncached : 1;
+    HV_UINT32 ReservedZ2 : 31;
+
+    // Edx
+
+    HV_UINT32 ReservedEdx;
+} HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES _HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES PHV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
+{
+    HV_UINT32 StartLogicalProcessor : 1;
+    HV_UINT32 CreateRootVirtualProcessor : 1;
+    HV_UINT32 PerformanceCounterSync : 1;
+    HV_UINT32 Reserved0 : 28;
+    HV_UINT32 ReservedIdentityBit : 1;
+
+    HV_UINT32 ProcessorPowerManagement : 1;
+    HV_UINT32 RootManagedIdleStates : 1;
+    HV_UINT32 Reserved1 : 30;
+
+    HV_UINT32 Reserved2;
+
+    HV_UINT32 Reserved3;
+} HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES, *PHV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef _HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES _HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+typedef PHV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES PHV_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+#endif
+
+// SVM features - HvCpuIdFunctionMsHvSvmFeatures leaf.
+typedef struct _HV_HYPERVISOR_SVM_FEATURES
+{
+    // Eax
+
+    HV_UINT32 SvmSupported : 1;
+    HV_UINT32 Reserved0 : 10;
+    HV_UINT32 MaxPasidSpacePasidCount : 21;
+
+    // Ebx
+
+    HV_UINT32 MaxPasidSpaceCount;
+
+    // Ecx
+
+    HV_UINT32 MaxDevicePrqSize;
+
+    // Edx
+
+    HV_UINT32 Reserved1;
+} HV_HYPERVISOR_SVM_FEATURES, *PHV_HYPERVISOR_SVM_FEATURES;
+
+// Nested virtualization features (Vmx) - HvCpuidFunctionMsHvNestedVirtFeatures
+// leaf.
+#if defined(_M_AMD64)
+typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
+{
+    // Eax
+
+    HV_UINT32 EnlightenedVmcsVersionLow : 8;
+    HV_UINT32 EnlightenedVmcsVersionHigh : 8;
+    HV_UINT32 FlushGuestPhysicalHypercall_Deprecated : 1;
+    HV_UINT32 NestedFlushVirtualHypercall : 1;
+    HV_UINT32 FlushGuestPhysicalHypercall : 1;
+    HV_UINT32 MsrBitmap : 1;
+    HV_UINT32 VirtualizationException : 1;
+    HV_UINT32 Reserved0 : 11;
+
+    // Ebx
+
+    HV_UINT32 ReservedEbx;
+
+    // Ecx
+
+    HV_UINT32 ReservedEcx;
+
+    // Edx
+
+    HV_UINT32 ReservedEdx;
+} HV_HYPERVISOR_NESTED_VIRT_FEATURES, *PHV_HYPERVISOR_NESTED_VIRT_FEATURES;
+#endif
+
+// Isolated VM configuration - HvCpuidFunctionMsHvIsolationConfiguration leaf.
+typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION
+{
+    // Eax
+
+    HV_UINT32 ParavisorPresent : 1;
+    HV_UINT32 Reserved0 : 31;
+
+    // Ebx
+
+    HV_UINT32 IsolationType : 4;
+    HV_UINT32 Reserved11 : 1;
+    HV_UINT32 SharedGpaBoundaryActive : 1;
+    HV_UINT32 SharedGpaBoundaryBits : 6;
+    HV_UINT32 Reserved12 : 20;
+
+    // Ecx
+
+    HV_UINT32 Reserved2;
+
+    // Edx
+
+    HV_UINT32 Reserved3;
+} HV_HYPERVISOR_ISOLATION_CONFIGURATION, *PHV_HYPERVISOR_ISOLATION_CONFIGURATION;
+
+#define HV_PARTITION_ISOLATION_TYPE_NONE 0
+#define HV_PARTITION_ISOLATION_TYPE_VBS 1
+#define HV_PARTITION_ISOLATION_TYPE_SNP 2
+#define HV_PARTITION_ISOLATION_TYPE_TDX 3
+
+//
+// Typedefs for CPUID leaves on HvMicrosoftHypercallInterface-supporting
+// hypervisors.
+//
+typedef union _HV_CPUID_RESULT
+{
+    HV_UINT32 AsUINT32[4];
+#if defined(_M_AMD64)
+    struct
+    {
+        HV_UINT32 Eax;
+        HV_UINT32 Ebx;
+        HV_UINT32 Ecx;
+        HV_UINT32 Edx;
+    };
+    struct
+    {
+        // Eax
+
+        HV_UINT32 ReservedEax;
+
+        // Ebx
+
+        HV_UINT32 ReservedEbx : 24;
+        HV_UINT32 InitialApicId : 8;
+
+        // Ecx
+
+        HV_UINT32 ReservedEcx : 31;
+        HV_UINT32 HypervisorPresent : 1;
+
+        // Edx
+
+        HV_UINT32 ReservedEdx;
+    } VersionAndFeatures;
+    HV_X64_PLATFORM_CAPABILITIES MsHvPlatformCapabilities;
+    HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
+#endif
+
+    // Eax-Edx on x86/x64
+
+    HV_VENDOR_AND_MAX_FUNCTION HvVendorAndMaxFunction;
+    HV_HYPERVISOR_INTERFACE_INFO HvInterface;
+    HV_HYPERVISOR_VERSION_INFO MsHvVersion;
+    HV_HYPERVISOR_FEATURES MsHvFeatures;
+    HV_ENLIGHTENMENT_INFORMATION MsHvEnlightenmentInformation;
+    HV_IMPLEMENTATION_LIMITS MsHvImplementationLimits;
+    HV_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
+    HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
+    HV_HYPERVISOR_SVM_FEATURES MsHvSvmFeatures;
+    HV_HYPERVISOR_ISOLATION_CONFIGURATION MsHvIsolationConfiguration;
+} HV_CPUID_RESULT, *PHV_CPUID_RESULT;
+
+#ifdef _MSC_VER
+#if (_MSC_VER >= 1200)
+#pragma warning(pop)
+#else
+#pragma warning(default:4201) // nameless struct/union
+#endif
+#endif
 
 #endif // !MILE_HYPERV_GUEST_INTERFACE

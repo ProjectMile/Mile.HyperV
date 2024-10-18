@@ -1608,53 +1608,17 @@ typedef HV_UINT32 HV_SAVE_RESTORE_STATE_FLAGS, *PHV_SAVE_RESTORE_STATE_FLAGS;
 #define HV_SAVE_RESTORE_STATE_START 0x00000001
 #define HV_SAVE_RESTORE_STATE_SUMMARY 0x00000002
 
-typedef union _HV_PARTITION_PRIVILEGE_MASK
+typedef union _HV_PARTITION_PRIVILEGE_MASK_PRIVATE
 {
     HV_UINT64 AsUINT64;
     struct
     {
-        HV_UINT64 AccessVpRunTimeReg : 1;
-        HV_UINT64 AccessPartitionReferenceCounter : 1;
-        HV_UINT64 AccessSynicRegs : 1;
-        HV_UINT64 AccessSyntheticTimerRegs : 1;
-        HV_UINT64 AccessIntrCtrlRegs : 1;
-        HV_UINT64 AccessHypercallMsrs : 1;
-        HV_UINT64 AccessVpIndex : 1;
-        HV_UINT64 AccessResetReg : 1;
-        HV_UINT64 AccessStatsReg : 1;
-        HV_UINT64 AccessPartitionReferenceTsc : 1;
-        HV_UINT64 AccessGuestIdleReg : 1;
-        HV_UINT64 AccessFrequencyRegs : 1;
-        HV_UINT64 AccessDebugRegs : 1;
-        HV_UINT64 AccessReenlightenmentControls : 1;
-        HV_UINT64 AccessRootSchedulerReg : 1;
+        HV_UINT64 Reserved0 : 15;
         HV_UINT64 AccessTscInvariantControls : 1;
         HV_UINT64 Reserved1 : 16;
-        HV_UINT64 CreatePartitions : 1;
-        HV_UINT64 AccessPartitionId : 1;
-        HV_UINT64 AccessMemoryPool : 1;
-        HV_UINT64 AdjustMessageBuffers : 1;
-        HV_UINT64 PostMessages : 1;
-        HV_UINT64 SignalEvents : 1;
-        HV_UINT64 CreatePort : 1;
-        HV_UINT64 ConnectPort : 1;
-        HV_UINT64 AccessStats : 1;
-        HV_UINT64 Reserved2 : 2;
-        HV_UINT64 Debugging : 1;
-        HV_UINT64 CpuManagement : 1;
-        HV_UINT64 ConfigureProfiler : 1;
-        HV_UINT64 AccessVpExitTracing : 1;
-        HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
-        HV_UINT64 AccessVsm : 1;
-        HV_UINT64 AccessVpRegisters : 1;
-        HV_UINT64 UnusedBit : 1;
-        HV_UINT64 FastHypercallOutput : 1;
-        HV_UINT64 EnableExtendedHypercalls : 1;
-        HV_UINT64 StartVirtualProcessor : 1;
-        HV_UINT64 Isolation : 1;
-        HV_UINT64 Reserved3 : 9;
+        HV_UINT64 Reserved2 : 32;
     };
-} HV_PARTITION_PRIVILEGE_MASK, *PHV_PARTITION_PRIVILEGE_MASK;
+} HV_PARTITION_PRIVILEGE_MASK_PRIVATE, *PHV_PARTITION_PRIVILEGE_MASK_PRIVATE;
 
 typedef enum _HV_PROCESSOR_VENDOR
 {
@@ -6280,52 +6244,24 @@ typedef struct _HV_DEVICE_PRQ_HEADER
 
 // The below CPUID leaves are present if VersionAndFeatures.HypervisorPresent is
 // set by CPUID(HvCpuIdFunctionVersionAndFeatures).
-
-typedef enum _HV_CPUID_FUNCTION
+typedef enum _HV_CPUID_FUNCTION_PRIVATE
 {
-    HvCpuIdFunctionVersionAndFeatures = 0x00000001,
-    HvCpuIdFunctionHvVendorAndMaxFunction = 0x40000000,
-    HvCpuIdFunctionHvInterface = 0x40000001,
-
     // The remaining functions depend on the value of HvCpuIdFunctionInterface
 
-    HvCpuIdFunctionMsHvVersion = 0x40000002,
-    HvCpuIdFunctionMsHvFeatures = 0x40000003,
-    HvCpuIdFunctionMsHvEnlightenmentInformation = 0x40000004,
-    HvCpuIdFunctionMsHvImplementationLimits = 0x40000005,
-    HvCpuIdFunctionMsHvHardwareFeatures = 0x40000006,
-    HvCpuIdFunctionMsHvCpuManagementFeatures = 0x40000007,
     HvCpuIdFunctionMsHvPasidFeatures = 0x40000008,
     HvCpuIdFunctionMsHvIsolationConfiguration = 0x40000009,
-    HvCpuidFunctionMsHvNestedVirtFeatures = 0x4000000A,
-    HvCpuidFunctionMsHvIptFeatures = 0x4000000B,
-    HvCpuIdFunctionMaxReserved = 0x4000000B
-} HV_CPUID_FUNCTION, *PHV_CPUID_FUNCTION;
+    HvCpuidFunctionMsHvIptFeatures = 0x4000000B
+} HV_CPUID_FUNCTION_PRIVATE, *PHV_CPUID_FUNCTION_PRIVATE;
 
 #define HV_CPUID_HV_VENDOR_MICROSOFT "Microsoft Hv"
 #define HV_CPUID_HV_VENDOR_MICROSOFT_EBX 'rciM'
 #define HV_CPUID_HV_VENDOR_MICROSOFT_ECX 'foso'
 #define HV_CPUID_HV_VENDOR_MICROSOFT_EDX 'vH t'
 
-typedef struct _HV_VENDOR_AND_MAX_FUNCTION
+typedef enum _HV_HYPERVISOR_INTERFACE_PRIVATE
 {
-    HV_UINT32 MaxFunction;
-    HV_UINT8 VendorName[12];
-} HV_VENDOR_AND_MAX_FUNCTION, *PHV_VENDOR_AND_MAX_FUNCTION;
-
-typedef enum _HV_HYPERVISOR_INTERFACE
-{
-    HvMicrosoftHypervisorInterface = '1#vH',
     HvMicrosoftXboxNanovisor = 'vnbX'
-} HV_HYPERVISOR_INTERFACE, *PHV_HYPERVISOR_INTERFACE;
-
-typedef struct _HV_HYPERVISOR_INTERFACE_INFO
-{
-    HV_UINT32 Interface;
-    HV_UINT32 Reserved1;
-    HV_UINT32 Reserved2;
-    HV_UINT32 Reserved3;
-} HV_HYPERVISOR_INTERFACE_INFO, *PHV_HYPERVISOR_INTERFACE_INFO;
+} HV_HYPERVISOR_INTERFACE_PRIVATE, *PHV_HYPERVISOR_INTERFACE_PRIVATE;
 
 // Version info reported by both guest OS's and hypervisors
 typedef enum _HV_SERVICE_BRANCH
@@ -6344,80 +6280,29 @@ typedef enum _HV_SERVICE_BRANCH
     HvServiceBranchQfe = 0x00000001
 } HV_SERVICE_BRANCH, *PHV_SERVICE_BRANCH;
 
-typedef struct _HV_HYPERVISOR_VERSION_INFO
+typedef struct _HV_X64_HYPERVISOR_FEATURES_PRIVATE
 {
-    HV_UINT32 BuildNumber;
-    HV_UINT32 MinorVersion : 16;
-    HV_UINT32 MajorVersion : 16;
-    HV_UINT32 ServicePack;
-    HV_UINT32 ServiceNumber : 24;
-    HV_UINT32 ServiceBranch : 8; // Type is HV_SERVICE_BRANCH
-} HV_HYPERVISOR_VERSION_INFO, *PHV_HYPERVISOR_VERSION_INFO;
-
-typedef struct _HV_X64_HYPERVISOR_FEATURES
-{
-    HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
-    HV_UINT32 MaxSupportedCState : 4;
-    HV_UINT32 HpetNeededForC3PowerState_Deprecated : 1;
+    HV_PARTITION_PRIVILEGE_MASK_PRIVATE PartitionPrivileges;
+    HV_UINT32 Reserved0 : 5;
     HV_UINT32 InvariantMperfAvailable : 1;
     HV_UINT32 SupervisorShadowStackAvailable : 1;
     HV_UINT32 ArchPmuAvailable : 1;
     HV_UINT32 ExceptionTrapInterceptAvailable : 1;
-    HV_UINT32 Reserved : 23;
-    HV_UINT32 MwaitAvailable_Deprecated : 1;
-    HV_UINT32 GuestDebuggingAvailable : 1;
-    HV_UINT32 PerformanceMonitorsAvailable : 1;
-    HV_UINT32 CpuDynamicPartitioningAvailable : 1;
-    HV_UINT32 XmmRegistersForFastHypercallAvailable : 1;
-    HV_UINT32 GuestIdleAvailable : 1;
-    HV_UINT32 HypervisorSleepStateSupportAvailable : 1;
-    HV_UINT32 NumaDistanceQueryAvailable : 1;
-    HV_UINT32 FrequencyRegsAvailable : 1;
-    HV_UINT32 SyntheticMachineCheckAvailable : 1;
-    HV_UINT32 GuestCrashRegsAvailable : 1;
-    HV_UINT32 DebugRegsAvailable : 1;
-    HV_UINT32 Npiep1Available : 1;
-    HV_UINT32 DisableHypervisorAvailable : 1;
-    HV_UINT32 ExtendedGvaRangesForFlushVirtualAddressListAvailable : 1;
-    HV_UINT32 FastHypercallOutputAvailable : 1;
-    HV_UINT32 PasidFeaturesAvailable : 1;
-    HV_UINT32 SintPollingModeAvailable : 1;
-    HV_UINT32 HypercallMsrLockAvailable : 1;
-    HV_UINT32 DirectSyntheticTimers : 1;
-    HV_UINT32 RegisterPatAvailable : 1;
-    HV_UINT32 RegisterBndcfgsAvailable : 1;
-    HV_UINT32 WatchdogTimerAvailable : 1;
-    HV_UINT32 SyntheticTimeUnhaltedTimerAvailable : 1;
-    HV_UINT32 DeviceDomainsAvailable : 1; // HDK only.
-    HV_UINT32 S1DeviceDomainsAvailable : 1; // HDK only.
+    HV_UINT32 Reserved1 : 23;
+    HV_UINT32 Reserved2 : 26;
     HV_UINT32 LbrAvailable : 1;
     HV_UINT32 IptAvailable : 1;
     HV_UINT32 CrossVtlFlushAvailable : 1;
     HV_UINT32 IdleSpecCtrlAvailable : 1;
     HV_UINT32 TranslateGvaFlagsAvailable : 1;
     HV_UINT32 ApicEoiInterceptAvailable : 1;
-} HV_X64_HYPERVISOR_FEATURES, *PHV_X64_HYPERVISOR_FEATURES;
+} HV_X64_HYPERVISOR_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_FEATURES_PRIVATE;
 
-typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
+typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE
 {
-    HV_UINT32 UseHypercallForAddressSpaceSwitch : 1;
-    HV_UINT32 UseHypercallForLocalFlush : 1;
-    HV_UINT32 UseHypercallForRemoteFlushAndLocalFlushEntire : 1;
-    HV_UINT32 UseApicMsrs : 1;
-    HV_UINT32 UseHvRegisterForReset : 1;
-    HV_UINT32 UseRelaxedTiming : 1;
-    HV_UINT32 UseDmaRemapping_Deprecated : 1;
-    HV_UINT32 UseInterruptRemapping_Deprecated : 1;
-    HV_UINT32 UseX2ApicMsrs : 1;
-    HV_UINT32 DeprecateAutoEoi : 1;
-    HV_UINT32 UseSyntheticClusterIpi : 1;
-    HV_UINT32 UseExProcessorMasks : 1;
-    HV_UINT32 Nested : 1;
-    HV_UINT32 UseIntForMbecSystemCalls : 1;
-    HV_UINT32 UseVmcsEnlightenments : 1;
-    HV_UINT32 UseSyncedTimeline : 1;
+    HV_UINT32 Reserved0 : 16;
     HV_UINT32 CoreSchedulerRequested : 1;
-    HV_UINT32 UseDirectLocalFlushEntire : 1;
+    HV_UINT32 Reserved1 : 1;
     HV_UINT32 NoNonArchitecturalCoreSharing : 1;
     HV_UINT32 UseX2Apic : 1;
     HV_UINT32 RestoreTimeOnResume : 1;
@@ -6425,37 +6310,15 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
     HV_UINT32 UseGpaPinningHypercall : 1;
     HV_UINT32 WakeVps : 1;
     HV_UINT32 Reserved : 8;
-    HV_UINT32 LongSpinWaitCount;
+    HV_UINT32 Reserved2;
     HV_UINT32 ImplementedPhysicalAddressBits : 7;
     HV_UINT32 ReservedEcx : 25;
     HV_UINT32 ReservedEdx;
-} HV_X64_ENLIGHTENMENT_INFORMATION, *PHV_X64_ENLIGHTENMENT_INFORMATION;
+} HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE, *PHV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE;
 
-typedef struct _HV_IMPLEMENTATION_LIMITS
+typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
 {
-    HV_UINT32 MaxVirtualProcessorCount;
-    HV_UINT32 MaxLogicalProcessorCount;
-    HV_UINT32 MaxInterruptMappingCount;
-    HV_UINT32 Reserved;
-} HV_IMPLEMENTATION_LIMITS, *PHV_IMPLEMENTATION_LIMITS;
-
-typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
-{
-    HV_UINT32 ApicOverlayAssistInUse : 1;
-    HV_UINT32 MsrBitmapsInUse : 1;
-    HV_UINT32 ArchitecturalPerformanceCountersInUse : 1;
-    HV_UINT32 SecondLevelAddressTranslationInUse : 1;
-    HV_UINT32 DmaRemappingInUse : 1;
-    HV_UINT32 InterruptRemappingInUse : 1;
-    HV_UINT32 MemoryPatrolScrubberPresent : 1;
-    HV_UINT32 DmaProtectionInUse : 1;
-    HV_UINT32 HpetRequested : 1;
-    HV_UINT32 SyntheticTimersVolatile : 1;
-    HV_UINT32 HypervisorLevel : 4;
-    HV_UINT32 PhysicalDestinationModeRequired : 1;
-    HV_UINT32 UseVmfuncForAliasMapSwitch : 1;
-    HV_UINT32 HvRegisterForMemoryZeroingSupported : 1;
-    HV_UINT32 UnrestrictedGuestSupported : 1;
+    HV_UINT32 Reserved0 : 15;
     HV_UINT32 RdtAFeaturesSupported : 1;
     HV_UINT32 RdtMFeaturesSupported : 1;
     HV_UINT32 ChildPerfmonPmuSupported : 1;
@@ -6466,89 +6329,71 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
     HV_UINT32 HardwareWatchdogReserved : 1;
     HV_UINT32 DeviceAccessTrackingSupported : 1;
     HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
-    HV_UINT32 Reserved : 4;
+    HV_UINT32 Reserved1 : 4;
     HV_UINT32 DeviceDomainInputWidth : 8;
     HV_UINT32 ReservedEbx : 24;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
-} HV_X64_HYPERVISOR_HARDWARE_FEATURES, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES;
+} HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
 
-typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
+typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE
 {
-    HV_UINT32 StartLogicalProcessor : 1;
-    HV_UINT32 CreateRootVirtualProcessor : 1;
-    HV_UINT32 PerformanceCounterSync : 1;
-    HV_UINT32 Reserved0 : 28;
-    HV_UINT32 ReservedIdentityBit : 1;
-    HV_UINT32 ProcessorPowerManagement : 1;
-    HV_UINT32 MwaitIdleStates : 1;
-    HV_UINT32 LogicalProcessorIdling : 1;
+    HV_UINT32 ReservedEax;
+    HV_UINT32 Reserved0 : 3;
     HV_UINT32 DriveIdleTransitions : 1;
     HV_UINT32 Reserved1 : 28;
-    HV_UINT32 RemapGuestUncached : 1;
-    HV_UINT32 ReservedZ2 : 31;
+    HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
-} HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES;
+} HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
 
 typedef struct _HV_HYPERVISOR_PASID_FEATURES
 {
-    HV_UINT32 SvmSupported : 1;
+    HV_UINT32 Reserved0 : 1;
     HV_UINT32 PasidSupported : 1;
-    HV_UINT32 Reserved0 : 9;
-    HV_UINT32 MaxPasidSpacePasidCount : 21;
+    HV_UINT32 Reserved1 : 30;
     HV_UINT32 MaxDevicePrqSize;
-    HV_UINT32 Reserved1;
     HV_UINT32 Reserved2;
+    HV_UINT32 Reserved3;
 } HV_HYPERVISOR_PASID_FEATURES, *PHV_HYPERVISOR_PASID_FEATURES;
 
 // Merged definitions from Hypervisor Top Level Functional Specification 6.0b
 // and Build 26063 kdhv.lib debug symbol from Microsoft
-typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION
+typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE
 {
-    HV_UINT32 ParavisorPresent : 1; // Symbol
-    HV_UINT32 Reserved0 : 1; // Merged Result
+    HV_UINT32 Reserved00 : 1;
+    HV_UINT32 Reserved01 : 1; // Merged Result
     HV_UINT32 AccessSynicRegs : 1; // TLFS
-    HV_UINT32 Reserved1 : 1; // TLFS
+    HV_UINT32 Reserved02 : 1; // TLFS
     HV_UINT32 AccessIntrCtrlRegs : 1; // TLFS
     HV_UINT32 AccessHypercallMsrs : 1; // TLFS
     HV_UINT32 AccessVpIndex : 1; // TLFS
-    HV_UINT32 Reserved2 : 5; // TLFS
+    HV_UINT32 Reserved03 : 5; // TLFS
     HV_UINT32 AccessReenlightenmentControls : 1; // TLFS
-    HV_UINT32 Reserved3 : 19; // TLFS
-    HV_UINT32 IsolationType : 4; // Symbol
-    HV_UINT32 Reserved4 : 1; // Symbol (Renamed)
-    HV_UINT32 SharedGpaBoundaryActive : 1; // Symbol
-    HV_UINT32 SharedGpaBoundaryBits : 6; // Symbol
-    HV_UINT32 Reserved5 : 20; // Symbol (Renamed)
-    HV_UINT32 Reserved6; // Symbol (Renamed)
-    HV_UINT32 Reserved7 : 4; // TLFS
+    HV_UINT32 Reserved04 : 19; // TLFS
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2; // Symbol (Renamed)
+    HV_UINT32 Reserved30 : 4; // TLFS
     HV_UINT32 XmmRegistersForFastHypercallAvailable : 1; // TLFS
-    HV_UINT32 Reserved8 : 10; // TLFS
+    HV_UINT32 Reserved31 : 10; // TLFS
     HV_UINT32 FastHypercallOutputAvailable : 1; // TLFS
-    HV_UINT32 Reserved9 : 1; // TLFS
+    HV_UINT32 Reserved32 : 1; // TLFS
     HV_UINT32 SintPollingModeAvailable : 1; // TLFS
-    HV_UINT32 Reserved10 : 14; // TLFS
-} HV_HYPERVISOR_ISOLATION_CONFIGURATION, *PHV_HYPERVISOR_ISOLATION_CONFIGURATION;
+    HV_UINT32 Reserved33 : 14; // TLFS
+} HV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE, *PHV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE;
 
-typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
+typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE
 {
-    HV_UINT32 EnlightenedVmcsVersionLow : 8;
-    HV_UINT32 EnlightenedVmcsVersionHigh : 8;
-    HV_UINT32 FlushGuestPhysicalHypercall_Deprecated : 1;
-    HV_UINT32 NestedFlushVirtualHypercall : 1;
-    HV_UINT32 FlushGuestPhysicalHypercall : 1;
-    HV_UINT32 MsrBitmap : 1;
-    HV_UINT32 VirtualizationException : 1;
+    HV_UINT32 Reserved0 : 21;
     HV_UINT32 DebugCtl : 1;
     HV_UINT32 EnlightenedNptTlb : 1;
     HV_UINT32 NoRmpTableRequired : 1;
     HV_UINT32 EnlightenedSevSwap : 1;
-    HV_UINT32 Reserved0 : 7;
+    HV_UINT32 Reserved1 : 7;
     HV_UINT32 PerfGlobalCtrl : 1;
-    HV_UINT32 Reserved1 : 31;
+    HV_UINT32 Reserved2 : 31;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
-} HV_HYPERVISOR_NESTED_VIRT_FEATURES, *PHV_HYPERVISOR_NESTED_VIRT_FEATURES;
+} HV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE, *PHV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE;
 
 typedef struct _HV_HYPERVISOR_IPT_FEATURES
 {
@@ -6562,37 +6407,17 @@ typedef struct _HV_HYPERVISOR_IPT_FEATURES
     HV_UINT32 Reserved3 : 31;
 } HV_HYPERVISOR_IPT_FEATURES, *PHV_HYPERVISOR_IPT_FEATURES;
 
-typedef union _HV_CPUID_RESULT
+typedef union _HV_CPUID_RESULT_PRIVATE
 {
-    struct
-    {
-        HV_UINT32 Eax;
-        HV_UINT32 Ebx;
-        HV_UINT32 Ecx;
-        HV_UINT32 Edx;
-    };
-    HV_UINT32 AsUINT32[4];
-    struct {
-        HV_UINT32 ReservedEax;
-        HV_UINT32 ReservedEbx : 24;
-        HV_UINT32 InitialApicId : 8;
-        HV_UINT32 ReservedEcx : 31;
-        HV_UINT32 HypervisorPresent : 1;
-        HV_UINT32 ReservedEdx;
-    } VersionAndFeatures;
-    HV_VENDOR_AND_MAX_FUNCTION HvVendorAndMaxFunction;
-    HV_HYPERVISOR_INTERFACE_INFO HvInterface;
-    HV_HYPERVISOR_VERSION_INFO MsHvVersion;
-    HV_X64_HYPERVISOR_FEATURES MsHvFeatures;
-    HV_X64_ENLIGHTENMENT_INFORMATION MsHvEnlightenmentInformation;
-    HV_IMPLEMENTATION_LIMITS MsHvImplementationLimits;
-    HV_X64_HYPERVISOR_HARDWARE_FEATURES MsHvHardwareFeatures;
-    HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES MsHvCpuManagementFeatures;
+    HV_X64_HYPERVISOR_FEATURES_PRIVATE MsHvFeatures;
+    HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE MsHvEnlightenmentInformation;
+    HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE MsHvHardwareFeatures;
+    HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE MsHvCpuManagementFeatures;
     HV_HYPERVISOR_PASID_FEATURES MsHvPasidFeatures;
-    HV_HYPERVISOR_ISOLATION_CONFIGURATION MsHvIsolationConfiguration;
-    HV_HYPERVISOR_NESTED_VIRT_FEATURES MsHvNestedVirtFeatures;
+    HV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE MsHvIsolationConfiguration;
+    HV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE MsHvNestedVirtFeatures;
     HV_HYPERVISOR_IPT_FEATURES MsHvIptFeatures;
-} HV_CPUID_RESULT, *PHV_CPUID_RESULT;
+} HV_CPUID_RESULT_PRIVATE, *PHV_CPUID_RESULT_PRIVATE;
 
 typedef union _HV_LOGICAL_PROCESSOR_REGISTER_VALUE
 {
