@@ -49,6 +49,10 @@ Here is the extracted reference from the mentioned patch created by Microsoft.
 - [MSHV/hvhdk.h](MSHV/hvhdk.h)
 - [MSHV/hvhdk_mini.h](MSHV/hvhdk_mini.h)
 
+Here is also the newer version for MIT licensed headers from Microsoft.
+
+https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv
+
 ## Archive of Hypervisor (Windows Drivers) documentation from Microsoft in 2013
 
 https://gerhart01.github.io/
@@ -63,8 +67,9 @@ HV_CPUID_FUNCTION.
 
 ## Windows symbols
 
-- Build 26063
-  - [Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib](Symbols/26063/kdhv.lib)
+- Build 26100
+  - [Debuggers\ddk\samples\kdserial\lib\arm64\kdhv.lib](Symbols/26100/arm64/kdhv.lib)
+  - [Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib](Symbols/26100/x64/kdhv.lib)
 - Build 14393
   - [urlmon.dll](Symbols/14393/urlmon.dll), [urlmon.pdb](Symbols/14393/urlmon.pdb)
 - Build 14347
