@@ -18,6 +18,8 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\Include\Hv\HvGuest.h
     - MsvmPkg\Include\Hv\HvGuestCpuid.h
     - MsvmPkg\Include\Hv\HvGuestMsr.h
+    - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
+    - MsvmPkg\Include\Hv\HvGuestHypercall.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

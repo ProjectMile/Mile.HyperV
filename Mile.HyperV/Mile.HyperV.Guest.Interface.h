@@ -14,6 +14,8 @@
 //   - MsvmPkg\Include\Hv\HvGuest.h
 //   - MsvmPkg\Include\Hv\HvGuestCpuid.h
 //   - MsvmPkg\Include\Hv\HvGuestMsr.h
+//   - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
+//   - MsvmPkg\Include\Hv\HvGuestHypercall.h
 
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
@@ -30,6 +32,14 @@
 #pragma warning(push)
 #endif
 #pragma warning(disable:4201) // nameless struct/union
+#endif
+
+#ifndef DECLSPEC_ALIGN
+#if (_MSC_VER >= 1300) && !defined(MIDL_PASS)
+#define DECLSPEC_ALIGN(x) __declspec(align(x))
+#else
+#define DECLSPEC_ALIGN(x)
+#endif
 #endif
 
 #include <stdint.h>
@@ -349,7 +359,6 @@ typedef struct _HV_X64_TABLE_REGISTER
 typedef struct _HV_INITIAL_VP_CONTEXT
 {
 #if defined(_M_ARM64)
-
     HV_UINT64 Pc;
     HV_UINT64 Sp_ELh;
     HV_UINT64 SCTLR_EL1;
@@ -359,9 +368,7 @@ typedef struct _HV_INITIAL_VP_CONTEXT
     HV_UINT64 TTBR0_EL1;
     HV_UINT64 TTBR1_EL1;
     HV_UINT64 X18;
-
 #elif defined(_M_AMD64)
-
     HV_UINT64 Rip;
     HV_UINT64 Rsp;
     HV_UINT64 Rflags;
@@ -389,7 +396,6 @@ typedef struct _HV_INITIAL_VP_CONTEXT
     HV_UINT64 Cr3;
     HV_UINT64 Cr4;
     HV_UINT64 MsrCrPat;
-
 #endif
 } HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
 
@@ -1203,6 +1209,315 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
         HV_UINT64 CrashNotify : 1;
     };
 } HV_CRASH_CTL_REG_CONTENTS, *PHV_CRASH_CTL_REG_CONTENTS;
+
+// Define synthetic interrupt source.
+typedef union _HV_SYNIC_SINT
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+#if defined(_M_ARM64)
+        HV_UINT64 Vector : 10;
+        HV_UINT64 ReservedP1 : 6;
+#else
+        HV_UINT64 Vector : 8;
+        HV_UINT64 ReservedP1 : 8;
+#endif
+        HV_UINT64 Masked : 1;
+        HV_UINT64 AutoEoi : 1;
+        HV_UINT64 Polling : 1;
+        HV_UINT64 AsIntercept : 1;
+        HV_UINT64 Proxy : 1;
+        HV_UINT64 ReservedP2 : 43;
+    };
+} HV_SYNIC_SINT, *PHV_SYNIC_SINT;
+
+// Define the number of synthetic timers.
+#define HV_SYNIC_STIMER_COUNT (4)
+
+// Define port identifier type.
+typedef union _HV_PORT_ID
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        HV_UINT32 Id : 24;
+        HV_UINT32 Reserved : 8;
+    };
+} HV_PORT_ID, *PHV_PORT_ID;
+
+// Define the synthetic interrupt source index type.
+typedef HV_UINT32 HV_SYNIC_SINT_INDEX, *PHV_SYNIC_SINT_INDEX;
+
+// Define the number of synthetic interrupt sources.
+#define HV_SYNIC_SINT_COUNT (16)
+
+// Define synthetic interrupt controller message constants.
+
+#define HV_MESSAGE_SIZE (256)
+#define HV_MESSAGE_PAYLOAD_BYTE_COUNT (240)
+#define HV_MESSAGE_PAYLOAD_QWORD_COUNT (30)
+
+//
+// Define hypervisor message types.
+//
+typedef enum _HV_MESSAGE_TYPE
+{
+    HvMessageTypeNone = 0x00000000,
+
+    // Memory access messages
+
+    HvMessageTypeUnmappedGpa = 0x80000000,
+    HvMessageTypeGpaIntercept = 0x80000001,
+#if defined(_M_ARM64)
+    HvMessageTypeMmioIntercept = 0x80000002,
+#endif
+    HvMessageTypeUnacceptedGpa = 0x80000003,
+    HvMessageTypeGpaAttributeIntercept = 0x80000004,
+
+    // Timer notifications messages
+
+    HvMessageTimerExpired = 0x80000010,
+
+    // Error messages
+
+    HvMessageTypeInvalidVpRegisterValue = 0x80000020,
+    HvMessageTypeUnrecoverableException = 0x80000021,
+    HvMessageTypeUnsupportedFeature = 0x80000022,
+    HvMessageTypeTlbPageSizeMismatch = 0x80000023,
+    HvMessageTypeIommuFault = 0x80000024,
+
+    // Trace buffer complete messages
+
+    HvMessageTypeEventLogBufferComplete = 0x80000040,
+
+    // Hypercall intercept
+
+    HvMessageTypeHypercallIntercept = 0x80000050,
+
+    // SynIC intercepts
+
+    HvMessageTypeSynicEventIntercept = 0x80000060,
+
+    // Integrated (root) scheduler signal VP-backing thread(s) messages.
+    // N.B. Message id range [0x80000100, 0x800001FF] inclusively is reserved
+    //      for the integrated (root) scheduler messages.
+
+    HvMessageTypeSchedulerIdRangeStart = 0x80000100,
+    HvMessageTypeSchedulerVpSignalBitset = 0x80000100,
+    HvMessageTypeSchedulerVpSignalPair = 0x80000101,
+    HvMessageTypeSchedulerIdRangeEnd = 0x800001FF,
+
+    // Platform-specific processor intercept messages.
+
+    HvMessageTypeMsrIntercept = 0x80010001,
+    HvMessageTypeExceptionIntercept = 0x80010003,
+    HvMessageTypeRegisterIntercept = 0x80010006,
+#if defined(_M_AMD64)
+    HvMessageTypeX64IoPortIntercept = 0x80010000,
+    HvMessageTypeX64CpuidIntercept = 0x80010002,
+    HvMessageTypeX64ApicEoi = 0x80010004,
+    HvMessageTypeX64IommuPrq = 0x80010006,
+    HvMessageTypeX64Halt = 0x80010007,
+    HvMessageTypeX64InterruptionDeliverable = 0x80010008,
+    HvMessageTypeX64SipiIntercept = 0x80010009,
+#endif
+#if defined(_M_ARM64)
+    HvMessageTypeArm64ResetIntercept = 0x80010000,
+#endif
+} HV_MESSAGE_TYPE, *PHV_MESSAGE_TYPE;
+
+// Define synthetic interrupt controller message flags.
+typedef union _HV_MESSAGE_FLAGS
+{
+    HV_UINT8 AsUINT8;
+    struct
+    {
+        HV_UINT8 MessagePending : 1;
+        HV_UINT8 Reserved : 7;
+    };
+} HV_MESSAGE_FLAGS, *PHV_MESSAGE_FLAGS;
+
+// Define synthetic interrupt controller message header.
+typedef struct _HV_MESSAGE_HEADER
+{
+    HV_MESSAGE_TYPE MessageType;
+    HV_UINT8 PayloadSize;
+    HV_MESSAGE_FLAGS MessageFlags;
+    HV_UINT8 Reserved[2];
+    union
+    {
+        HV_PARTITION_ID Sender;
+        HV_PORT_ID Port;
+    };
+} HV_MESSAGE_HEADER, *PHV_MESSAGE_HEADER;
+
+// Define synthetic interrupt controller flag constants.
+
+#define HV_EVENT_FLAGS_COUNT (256 * 8)
+#define HV_EVENT_FLAGS_BYTE_COUNT (256)
+#define HV_EVENT_FLAGS_DWORD_COUNT (256 / sizeof(HV_UINT32))
+
+// Define the synthetic interrupt controller event flags format.
+typedef union
+{
+    HV_UINT8 Flags8[HV_EVENT_FLAGS_BYTE_COUNT];
+    HV_UINT32 Flags32[HV_EVENT_FLAGS_DWORD_COUNT];
+} HV_SYNIC_EVENT_FLAGS;
+
+// Define the synthetic interrupt flags page layout.
+typedef struct _HV_SYNIC_EVENT_FLAGS_PAGE
+{
+    volatile HV_SYNIC_EVENT_FLAGS SintEventFlags[HV_SYNIC_SINT_COUNT];
+} HV_SYNIC_EVENT_FLAGS_PAGE, *PHV_SYNIC_EVENT_FLAGS_PAGE;
+
+// Define the synthetic timer configuration structure
+typedef struct _HV_X64_MSR_STIMER_CONFIG_CONTENTS
+{
+    union
+    {
+        HV_UINT64 AsUINT64;
+        struct
+        {
+            HV_UINT64 Enable : 1;
+            HV_UINT64 Periodic : 1;
+            HV_UINT64 Lazy : 1;
+            HV_UINT64 AutoEnable : 1;
+            HV_UINT64 ApicVector : 8;
+            HV_UINT64 DirectMode : 1;
+            HV_UINT64 ReservedZ1 : 3;
+            HV_UINT64 SINTx : 4;
+            HV_UINT64 ReservedZ2 : 44;
+        };
+    };
+} HV_X64_MSR_STIMER_CONFIG_CONTENTS, *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
+
+// Define the format of the SIMP register
+typedef union _HV_SYNIC_SIMP
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 SimpEnabled : 1;
+        HV_UINT64 Preserved : 11;
+        HV_UINT64 BaseSimpGpa : 52;
+    };
+} HV_SYNIC_SIMP, *PHV_SYNIC_SIMP;
+
+// Define the trace buffer index type.
+typedef HV_UINT32 HV_EVENTLOG_BUFFER_INDEX, *PHV_EVENTLOG_BUFFER_INDEX;
+
+// Define all the trace buffer types.
+typedef enum
+{
+    HvEventLogTypeGlobalSystemEvents = 0x00000000,
+    HvEventLogTypeLocalDiagnostics = 0x00000001,
+    HvEventLogTypeMaximum = 0x00000001,
+} HV_EVENTLOG_TYPE;
+
+// Define trace message header structure.
+typedef struct _HV_EVENTLOG_MESSAGE_PAYLOAD
+{
+    HV_EVENTLOG_TYPE EventLogType;
+    HV_EVENTLOG_BUFFER_INDEX BufferIndex;
+} HV_EVENTLOG_MESSAGE_PAYLOAD, *PHV_EVENTLOG_MESSAGE_PAYLOAD;
+
+// Define timer message payload structure.
+typedef struct _HV_TIMER_MESSAGE_PAYLOAD
+{
+    HV_UINT32 TimerIndex;
+    HV_UINT32 Reserved;
+    HV_NANO100_TIME ExpirationTime; // When the timer expired
+    HV_NANO100_TIME DeliveryTime; // When the message was delivered
+} HV_TIMER_MESSAGE_PAYLOAD, *PHV_TIMER_MESSAGE_PAYLOAD;
+
+// Define IOMMU PRQ message payload structure.
+typedef struct _HV_IOMMU_PRQ_MESSAGE_PAYLOAD
+{
+    HV_IOMMU_ID IommuId;
+} HV_IOMMU_PRQ_MESSAGE_PAYLOAD, *PHV_IOMMU_PRQ_MESSAGE_PAYLOAD;
+
+// Define IOMMU fault message payload structure.
+typedef enum _HV_IOMMU_FAULT_TYPE
+{
+    // The IOMMU did not obtain a translation for a DMA transaction.
+    HvIommuTranslationFault,
+    // Translation request, translated request or untranslated request
+    // explicitly blocked.
+    HvIommuTranslationBlocked,
+    // Hardware blocked an interrupt request.
+    HvIommuInterruptFault,
+#if defined(_M_ARM64)
+    // The IOMMU retrieved a transation for a DMA transaction, but the
+    // transaction has insufficient privileges.
+    HvIommuPermissionFault,
+    // An output address contained an unexpected number of bits.
+    HvIommuAddressSizeFault,
+    // A TLB match conflict was detected.
+    HvIommuTlbMatchConflict,
+
+    // An external abort / unsupported upstream transaction was reported to
+    // the IOMMU during transaction processing.
+
+    HvIommuExternalFault,
+    HvIommuUnsupportedUpstreamTransaction,
+#endif
+} HV_IOMMU_FAULT_TYPE, *PHV_IOMMU_FAULT_TYPE;
+
+typedef struct _HV_IOMMU_FAULT_MESSAGE_PAYLOAD
+{
+    // Indicates the type of the fault.
+    HV_IOMMU_FAULT_TYPE Type;
+    // Access type of the DMA transaction.
+    HV_INTERCEPT_ACCESS_TYPE AccessType;
+    // Fault flags.
+    struct
+    {
+        // Indicates that the fault address is valid.
+        HV_UINT32 FaultAddressValid : 1;
+        // Indicates that the logical device ID is valid.
+        HV_UINT32 DeviceIdValid : 1;
+    } Flags;
+    // Logical ID of the device that caused the fault.
+    HV_UINT64 LogicalDeviceId;
+    // Device virtual address that caused the fault (if known).
+    HV_GVA FaultAddress;
+} HV_IOMMU_FAULT_MESSAGE_PAYLOAD, *PHV_IOMMU_FAULT_MESSAGE_PAYLOAD;
+
+// Define synthetic interrupt controller message format.
+// N.B. The Payload may contain XMM registers that the compiler might expect to
+// to be aligned. Therefore, this structure must be 16-byte aligned. The header
+// is 16B already.
+typedef struct DECLSPEC_ALIGN(16) _HV_MESSAGE
+{
+    HV_MESSAGE_HEADER Header;
+    union
+    {
+        HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
+        HV_TIMER_MESSAGE_PAYLOAD TimerPayload;
+        HV_EVENTLOG_MESSAGE_PAYLOAD TracePayload;
+        HV_IOMMU_PRQ_MESSAGE_PAYLOAD IommuPrqPayload;
+        HV_IOMMU_FAULT_MESSAGE_PAYLOAD IommuFaultPayload;
+    };
+} HV_MESSAGE, *PHV_MESSAGE;
+
+// Define the synthetic interrupt message page layout.
+typedef struct _HV_MESSAGE_PAGE
+{
+    volatile HV_MESSAGE SintMessage[HV_SYNIC_SINT_COUNT];
+} HV_MESSAGE_PAGE, *PHV_MESSAGE_PAGE;
+
+// Define the format of the SIEFP register
+typedef union _HV_SYNIC_SIEFP
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 SiefpEnabled : 1;
+        HV_UINT64 ReservedP : 11;
+        HV_UINT64 BaseSiefpGpa : 52;
+    };
+} HV_SYNIC_SIEFP, *PHV_SYNIC_SIEFP;
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
