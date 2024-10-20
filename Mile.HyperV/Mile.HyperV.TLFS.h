@@ -53,17 +53,6 @@ typedef int16_t HV_INT16, *PHV_INT16;
 typedef int32_t HV_INT32, *PHV_INT32;
 typedef int64_t HV_INT64, *PHV_INT64;
 
-// Define a 128bit type.
-typedef struct DECLSPEC_ALIGN(16) _HV_UINT128
-{
-    union
-    {
-        HV_UINT64 Low64;
-        HV_UINT64 High64;
-    };
-    HV_UINT32 Dword[4];
-} HV_UINT128, *PHV_UINT128;
-
 // Define a 256bit type.
 typedef struct DECLSPEC_ALIGN(32) _HV_UINT256
 {
@@ -85,10 +74,6 @@ typedef wchar_t HV_WCHAR;
 typedef HV_UINT16 HV_WCHAR;
 #endif // WCHAR_MAX == 0xFFFF
 
-// Define an alignment for structures passed via hypercall.
-#define HV_CALL_ALIGNMENT 8
-
-#define HV_CALL_ATTRIBUTES DECLSPEC_ALIGN(HV_CALL_ALIGNMENT)
 #define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) DECLSPEC_ALIGN(__alignment__)
 
 // Memory Types
@@ -1903,13 +1888,8 @@ typedef union _HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT
     };
 } HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT, *PHV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT;
 
-typedef union _HV_REGISTER_VALUE
+typedef union _HV_REGISTER_VALUE_PRIVATE
 {
-    HV_UINT128 Reg128;
-    HV_UINT64 Reg64;
-    HV_UINT32 Reg32;
-    HV_UINT16 Reg16;
-    HV_UINT8 Reg8;
     HV_X64_FP_REGISTER Fp;
     HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
     HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
@@ -1923,7 +1903,7 @@ typedef union _HV_REGISTER_VALUE
     HV_X64_MSR_NPIEP_CONFIG_CONTENTS NpiepConfig;
     HV_X64_PENDING_EXCEPTION_EVENT PendingExceptionEvent;
     HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT PendingVirtualizationFaultEvent;
-} HV_REGISTER_VALUE, *PHV_REGISTER_VALUE;
+} HV_REGISTER_VALUE_PRIVATE, *PHV_REGISTER_VALUE_PRIVATE;
 typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 
 // Define the intercept access types.
@@ -1992,9 +1972,6 @@ typedef struct _HV_INTERCEPT_DESCRIPTOR
 typedef const HV_INTERCEPT_DESCRIPTOR* PCHV_INTERCEPT_DESCRIPTOR;
 
 #define HV_MAX_VP_INDEX (HV_MAXIMUM_PROCESSORS - 1)
-
-// Address spaces presented by the guest.
-typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
 
 // Address space flush flags.
 typedef HV_UINT64 HV_FLUSH_FLAGS, *PHV_FLUSH_FLAGS;
@@ -2207,18 +2184,6 @@ typedef struct _HV_X64_APIC_EOI_MESSAGE
     HV_VP_INDEX VpIndex;
     HV_UINT32 InterruptVector;
 } HV_X64_APIC_EOI_MESSAGE, *PHV_X64_APIC_EOI_MESSAGE;
-
-// Define connection identifier type.
-typedef union _HV_CONNECTION_ID
-{
-    HV_UINT32 AsUINT32;
-
-    struct
-    {
-        HV_UINT32 Id : 24;
-        HV_UINT32 Reserved : 8;
-    };
-} HV_CONNECTION_ID, *PHV_CONNECTION_ID;
 
 // Define port type.
 typedef enum _HV_PORT_TYPE
@@ -3045,190 +3010,15 @@ typedef enum _HV_PARTITION_PROPERTY_CODE
 #define HvPartitionPropertyMaximumCpuWeight 10000
 
 // External names used to manupulate registers
-typedef enum _HV_REGISTER_NAME
+typedef enum _HV_REGISTER_NAME_PRIVATE
 {
     // Suspend Registers
 
-    HvRegisterExplicitSuspend = 0x00000000,
-    HvRegisterInterceptSuspend = 0x00000001,
-    HvRegisterInstructionEmulationHints = 0x00000002,
-    HvRegisterDispatchSuspend = 0x00000003,
     HvRegisterInternalActivityState = 0x00000004,
-
-    // Version
-
-    // 128-bit result same as CPUID 0x40000002
-    HvRegisterHypervisorVersion = 0x00000100,
-
-    // Feature Access (registers are 128 bits)
-
-    // 128-bit result same as CPUID 0x40000003
-    HvRegisterPrivilegesAndFeaturesInfo = 0x00000200,
-    // 128-bit result same as CPUID 0x40000004
-    HvRegisterFeaturesInfo = 0x00000201,
-    // 128-bit result same as CPUID 0x40000005
-    HvRegisterImplementationLimitsInfo = 0x00000202,
-    // 128-bit result same as CPUID 0x40000006
-    HvRegisterHardwareFeaturesInfo = 0x00000203,
-    // 128-bit result same as CPUID 0x40000007
-    HvRegisterCpuManagementFeaturesInfo = 0x00000204,
-    // 128-bit result same as CPUID 0x40000008
-    HvRegisterSvmFeaturesInfo = 0x00000205,
-    // 128-bit result same as CPUID 0x40000009
-    HvRegisterSkipLevelFeaturesInfo = 0x00000206,
-    // 128-bit result same as CPUID 0x4000000A
-    HvRegisterNestedVirtFeaturesInfo = 0x00000207,
-
-    // Guest Crash Registers
-
-    HvRegisterGuestCrashP0 = 0x00000210,
-    HvRegisterGuestCrashP1 = 0x00000211,
-    HvRegisterGuestCrashP2 = 0x00000212,
-    HvRegisterGuestCrashP3 = 0x00000213,
-    HvRegisterGuestCrashP4 = 0x00000214,
-    HvRegisterGuestCrashCtl = 0x00000215,
-
-    // Power State Configuration
-
-    HvRegisterPowerStateConfigC1 = 0x00000220,
-    HvRegisterPowerStateTriggerC1 = 0x00000221,
-    HvRegisterPowerStateConfigC2 = 0x00000222,
-    HvRegisterPowerStateTriggerC2 = 0x00000223,
-    HvRegisterPowerStateConfigC3 = 0x00000224,
-    HvRegisterPowerStateTriggerC3 = 0x00000225,
 
     // System Reset
 
     HvRegisterSystemReset = 0x00000230,
-
-    // Frequency Registers
-
-    HvRegisterProcessorClockFrequency = 0x00000240,
-    HvRegisterInterruptClockFrequency = 0x00000241,
-
-    // Idle Register
-
-    HvRegisterGuestIdle = 0x00000250,
-
-    // Guest Debug
-
-    HvRegisterDebugDeviceOptions = 0x00000260,
-
-    // Pending Interruption Register
-
-    HvRegisterPendingInterruption = 0x00010002,
-
-    // Interrupt State register
-
-    HvRegisterInterruptState = 0x00010003,
-
-    // Pending Event Register
-
-    HvRegisterPendingEvent0 = 0x00010004,
-    HvRegisterPendingEvent1 = 0x00010005,
-
-    // Interruptible notification register
-
-    HvX64RegisterDeliverabilityNotifications = 0x00010006,
-
-    // X64 User-Mode Registers
-
-    HvX64RegisterRax = 0x00020000,
-    HvX64RegisterRcx = 0x00020001,
-    HvX64RegisterRdx = 0x00020002,
-    HvX64RegisterRbx = 0x00020003,
-    HvX64RegisterRsp = 0x00020004,
-    HvX64RegisterRbp = 0x00020005,
-    HvX64RegisterRsi = 0x00020006,
-    HvX64RegisterRdi = 0x00020007,
-    HvX64RegisterR8 = 0x00020008,
-    HvX64RegisterR9 = 0x00020009,
-    HvX64RegisterR10 = 0x0002000A,
-    HvX64RegisterR11 = 0x0002000B,
-    HvX64RegisterR12 = 0x0002000C,
-    HvX64RegisterR13 = 0x0002000D,
-    HvX64RegisterR14 = 0x0002000E,
-    HvX64RegisterR15 = 0x0002000F,
-    HvX64RegisterRip = 0x00020010,
-    HvX64RegisterRflags = 0x00020011,
-
-    // Arm64 User-Mode Registers
-
-    HvArm64RegisterX0 = 0x00020000,
-    HvArm64RegisterX1 = 0x00020001,
-    HvArm64RegisterX2 = 0x00020002,
-    HvArm64RegisterX3 = 0x00020003,
-    HvArm64RegisterX4 = 0x00020004,
-    HvArm64RegisterX5 = 0x00020005,
-    HvArm64RegisterX6 = 0x00020006,
-    HvArm64RegisterX7 = 0x00020007,
-    HvArm64RegisterX8 = 0x00020008,
-    HvArm64RegisterX9 = 0x00020009,
-    HvArm64RegisterX10 = 0x0002000A,
-    HvArm64RegisterX11 = 0x0002000B,
-    HvArm64RegisterX12 = 0x0002000C,
-    HvArm64RegisterX13 = 0x0002000D,
-    HvArm64RegisterX14 = 0x0002000E,
-    HvArm64RegisterX15 = 0x0002000F,
-    HvArm64RegisterX16 = 0x00020010,
-    HvArm64RegisterX17 = 0x00020011,
-    HvArm64RegisterX18 = 0x00020012,
-    HvArm64RegisterX19 = 0x00020013,
-    HvArm64RegisterX20 = 0x00020014,
-    HvArm64RegisterX21 = 0x00020015,
-    HvArm64RegisterX22 = 0x00020016,
-    HvArm64RegisterX23 = 0x00020017,
-    HvArm64RegisterX24 = 0x00020018,
-    HvArm64RegisterX25 = 0x00020019,
-    HvArm64RegisterX26 = 0x0002001A,
-    HvArm64RegisterX27 = 0x0002001B,
-    HvArm64RegisterX28 = 0x0002001C,
-    HvArm64RegisterXFp = 0x0002001D,
-    HvArm64RegisterXLr = 0x0002001E,
-    // alias for either El0/x depending on Cpsr.SPSel
-    HvArm64RegisterXSp = 0x0002001F,
-    HvArm64RegisterXSpEl0 = 0x00020020,
-    HvArm64RegisterXSpElx = 0x00020021,
-    HvArm64RegisterXPc = 0x00020022,
-    HvArm64RegisterCpsr = 0x00020023,
-
-    // X64 Floating Point and Vector Registers
-
-    HvX64RegisterXmm0 = 0x00030000,
-    HvX64RegisterXmm1 = 0x00030001,
-    HvX64RegisterXmm2 = 0x00030002,
-    HvX64RegisterXmm3 = 0x00030003,
-    HvX64RegisterXmm4 = 0x00030004,
-    HvX64RegisterXmm5 = 0x00030005,
-    HvX64RegisterXmm6 = 0x00030006,
-    HvX64RegisterXmm7 = 0x00030007,
-    HvX64RegisterXmm8 = 0x00030008,
-    HvX64RegisterXmm9 = 0x00030009,
-    HvX64RegisterXmm10 = 0x0003000A,
-    HvX64RegisterXmm11 = 0x0003000B,
-    HvX64RegisterXmm12 = 0x0003000C,
-    HvX64RegisterXmm13 = 0x0003000D,
-    HvX64RegisterXmm14 = 0x0003000E,
-    HvX64RegisterXmm15 = 0x0003000F,
-    HvX64RegisterFpMmx0 = 0x00030010,
-    HvX64RegisterFpMmx1 = 0x00030011,
-    HvX64RegisterFpMmx2 = 0x00030012,
-    HvX64RegisterFpMmx3 = 0x00030013,
-    HvX64RegisterFpMmx4 = 0x00030014,
-    HvX64RegisterFpMmx5 = 0x00030015,
-    HvX64RegisterFpMmx6 = 0x00030016,
-    HvX64RegisterFpMmx7 = 0x00030017,
-    HvX64RegisterFpControlStatus = 0x00030018,
-    HvX64RegisterXmmControlStatus = 0x00030019,
-
-    // X64 Control Registers
-
-    HvX64RegisterCr0 = 0x00040000,
-    HvX64RegisterCr2 = 0x00040001,
-    HvX64RegisterCr3 = 0x00040002,
-    HvX64RegisterCr4 = 0x00040003,
-    HvX64RegisterCr8 = 0x00040004,
-    HvX64RegisterXfem = 0x00040005,
 
     // Arm64 Control Registers
 
@@ -3236,58 +3026,8 @@ typedef enum _HV_REGISTER_NAME
     HvArm64RegisterTtbr0El1 = 0x00040005,
     HvArm64RegisterTtbr1El1 = 0x00040006,
     HvArm64RegisterTcrEl1 = 0x00040007,
-    HvArm64RegisterEsrEl1 = 0x00040008,
-    HvArm64RegisterFarEl1 = 0x00040009,
-    HvArm64RegisterElrEl1 = 0x00040015,
     HvArm64RegisterMairEl1 = 0x0004000B,
     HvArm64RegisterVbarEl1 = 0x0004000C,
-
-    // X64 Intermediate Control Registers
-
-    HvX64RegisterIntermediateCr0 = 0x00041000,
-    HvX64RegisterIntermediateCr4 = 0x00041003,
-    HvX64RegisterIntermediateCr8 = 0x00041004,
-
-    // X64 Debug Registers
-
-    HvX64RegisterDr0 = 0x00050000,
-    HvX64RegisterDr1 = 0x00050001,
-    HvX64RegisterDr2 = 0x00050002,
-    HvX64RegisterDr3 = 0x00050003,
-    HvX64RegisterDr6 = 0x00050004,
-    HvX64RegisterDr7 = 0x00050005,
-
-    // X64 Segment Registers
-
-    HvX64RegisterEs = 0x00060000,
-    HvX64RegisterCs = 0x00060001,
-    HvX64RegisterSs = 0x00060002,
-    HvX64RegisterDs = 0x00060003,
-    HvX64RegisterFs = 0x00060004,
-    HvX64RegisterGs = 0x00060005,
-    HvX64RegisterLdtr = 0x00060006,
-    HvX64RegisterTr = 0x00060007,
-
-    // X64 Table Registers
-
-    HvX64RegisterIdtr = 0x00070000,
-    HvX64RegisterGdtr = 0x00070001,
-
-    // X64 Virtualized MSRs
-
-    HvX64RegisterTsc = 0x00080000,
-    HvX64RegisterEfer = 0x00080001,
-    HvX64RegisterKernelGsBase = 0x00080002,
-    HvX64RegisterApicBase = 0x00080003,
-    HvX64RegisterPat = 0x00080004,
-    HvX64RegisterSysenterCs = 0x00080005,
-    HvX64RegisterSysenterEip = 0x00080006,
-    HvX64RegisterSysenterEsp = 0x00080007,
-    HvX64RegisterStar = 0x00080008,
-    HvX64RegisterLstar = 0x00080009,
-    HvX64RegisterCstar = 0x0008000A,
-    HvX64RegisterSfmask = 0x0008000B,
-    HvX64RegisterInitialApicId = 0x0008000C,
 
     // X64 Cache control MSRs
 
@@ -3336,17 +3076,8 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterMtrrFix4kE8000 = 0x00080078,
     HvX64RegisterMtrrFix4kF0000 = 0x00080079,
     HvX64RegisterMtrrFix4kF8000 = 0x0008007A,
-    HvX64RegisterTscAux= 0x0008007B,
-    HvX64RegisterBndcfgs = 0x0008007C,
-    HvX64RegisterDebugCtl = 0x0008007D,
     HvX64RegisterMCount = 0x0008007E,
     HvX64RegisterACount = 0x0008007F,
-    HvX64RegisterSgxLaunchControl0 = 0x00080080,
-    HvX64RegisterSgxLaunchControl1 = 0x00080081,
-    HvX64RegisterSgxLaunchControl2 = 0x00080082,
-    HvX64RegisterSgxLaunchControl3 = 0x00080083,
-    HvX64RegisterSpecCtrl = 0x00080084,
-    HvX64RegisterPredCmd = 0x00080085,
     HvX64RegisterVirtSpecCtrl = 0x00080086,
     HvX64RegisterTscVirtualOffset = 0x00080087,
     HvX64RegisterTsxCtrl = 0x00080088,
@@ -3369,152 +3100,18 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterXfd = 0x00080099,
     HvX64RegisterXfdErr = 0x0008009A,
 
-    // Other MSRs
-
-    HvX64RegisterMsrIa32MiscEnable = 0x000800A0,
-    HvX64RegisterIa32FeatureControl = 0x000800A1,
-    HvX64RegisterIa32VmxBasic = 0x000800A2,
-    HvX64RegisterIa32VmxPinbasedCtls = 0x000800A3,
-    HvX64RegisterIa32VmxProcbasedCtls = 0x000800A4,
-    HvX64RegisterIa32VmxExitCtls = 0x000800A5,
-    HvX64RegisterIa32VmxEntryCtls = 0x000800A6,
-    HvX64RegisterIa32VmxMisc = 0x000800A7,
-    HvX64RegisterIa32VmxCr0Fixed0 = 0x000800A8,
-    HvX64RegisterIa32VmxCr0Fixed1 = 0x000800A9,
-    HvX64RegisterIa32VmxCr4Fixed0 = 0x000800AA,
-    HvX64RegisterIa32VmxCr4Fixed1 = 0x000800AB,
-    HvX64RegisterIa32VmxVmcsEnum = 0x000800AC,
-    HvX64RegisterIa32VmxProcbasedCtls2 = 0x000800AD,
-    HvX64RegisterIa32VmxEptVpidCap = 0x000800AE,
-    HvX64RegisterIa32VmxTruePinbasedCtls = 0x000800AF,
-    HvX64RegisterIa32VmxTrueProcbasedCtls = 0x000800B0,
-    HvX64RegisterIa32VmxTrueExitCtls = 0x000800B1,
-    HvX64RegisterIa32VmxTrueEntryCtls = 0x000800B2,
-
-    // Performance monitoring MSRs
-
-    HvX64RegisterPerfGlobalCtrl = 0x00081000,
-    HvX64RegisterPerfGlobalStatus = 0x00081001,
-    HvX64RegisterPerfGlobalInUse = 0x00081002,
-    HvX64RegisterFixedCtrCtrl = 0x00081003,
-    HvX64RegisterDsArea = 0x00081004,
-    HvX64RegisterPebsEnable = 0x00081005,
-    HvX64RegisterPebsLdLat = 0x00081006,
-    HvX64RegisterPebsFrontend = 0x00081007,
-    HvX64RegisterPerfEvtSel0 = 0x00081100,
-    HvX64RegisterPmc0 = 0x00081200,
-    HvX64RegisterFixedCtr0 = 0x00081300,
-    HvX64RegisterLbrTos = 0x00082000,
-    HvX64RegisterLbrSelect = 0x00082001,
-    HvX64RegisterLerFromLip = 0x00082002,
-    HvX64RegisterLerToLip = 0x00082003,
-    HvX64RegisterLbrFrom0 = 0x00082100,
-    HvX64RegisterLbrTo0 = 0x00082200,
-    HvX64RegisterLbrInfo0 = 0x00083300,
-
     // Hypervisor-defined MSRs (Misc)
 
     HvX64RegisterVpRuntime = 0x00090000,
-    HvX64RegisterHypercall = 0x00090001,
-    HvRegisterGuestOsId = 0x00090002,
-    HvRegisterVpIndex = 0x00090003,
-    HvRegisterTimeRefCount = 0x00090004,
-    HvRegisterCpuManagementVersion = 0x00090007,
 
     // Virtual APIC registers MSRs
 
-    HvX64RegisterEoi = 0x00090010,
-    HvX64RegisterIcr = 0x00090011,
-    HvX64RegisterTpr = 0x00090012,
-    HvRegisterVpAssistPage = 0x00090013,
-    HvRegisterVpRootSignalCount = 0x00090014,
     HvRegisterReferenceTsc = 0x00090017,
     HvRegisterVpConfig = 0x00090018,
     HvRegisterGhcb = 0x00090019,
     HvRegisterReferenceTscSequence = 0x0009001A,
     HvRegisterGuestSchedulerEvent = 0x0009001B,
     HvX64RegisterRegPage = 0x0009001C,
-
-    // Performance statistics MSRs
-
-    HvRegisterStatsPartitionRetail = 0x00090020,
-    HvRegisterStatsPartitionInternal = 0x00090021,
-    HvRegisterStatsVpRetail = 0x00090022,
-    HvRegisterStatsVpInternal = 0x00090023,
-
-    // Nested Hypervisor-defined MSRs (Misc)
-
-    HvRegisterNestedVpIndex = 0x00091003,
-
-    // Partition Timer Assist Registers
-
-    HvX64RegisterEmulatedTimerPeriod = 0x00090030,
-    HvX64RegisterEmulatedTimerControl = 0x00090031,
-    HvX64RegisterPmTimerAssist = 0x00090032,
-
-    // Hypervisor-defined MSRs (Synic)
-
-    HvRegisterSint0 = 0x000A0000,
-    HvRegisterSint1 = 0x000A0001,
-    HvRegisterSint2 = 0x000A0002,
-    HvRegisterSint3 = 0x000A0003,
-    HvRegisterSint4 = 0x000A0004,
-    HvRegisterSint5 = 0x000A0005,
-    HvRegisterSint6 = 0x000A0006,
-    HvRegisterSint7 = 0x000A0007,
-    HvRegisterSint8 = 0x000A0008,
-    HvRegisterSint9 = 0x000A0009,
-    HvRegisterSint10 = 0x000A000A,
-    HvRegisterSint11 = 0x000A000B,
-    HvRegisterSint12 = 0x000A000C,
-    HvRegisterSint13 = 0x000A000D,
-    HvRegisterSint14 = 0x000A000E,
-    HvRegisterSint15 = 0x000A000F,
-    HvRegisterScontrol = 0x000A0010,
-    HvRegisterSversion = 0x000A0011,
-    HvRegisterSifp = 0x000A0012,
-    HvRegisterSipp = 0x000A0013,
-    HvRegisterEom = 0x000A0014,
-    HvRegisterSirbp = 0x000A0015,
-
-    // Nested Hypervisor-defined MSRs (Synic)
-
-    HvRegisterNestedSint0 = 0x000A1000,
-    HvRegisterNestedSint1 = 0x000A1001,
-    HvRegisterNestedSint2 = 0x000A1002,
-    HvRegisterNestedSint3 = 0x000A1003,
-    HvRegisterNestedSint4 = 0x000A1004,
-    HvRegisterNestedSint5 = 0x000A1005,
-    HvRegisterNestedSint6 = 0x000A1006,
-    HvRegisterNestedSint7 = 0x000A1007,
-    HvRegisterNestedSint8 = 0x000A1008,
-    HvRegisterNestedSint9 = 0x000A1009,
-    HvRegisterNestedSint10 = 0x000A100A,
-    HvRegisterNestedSint11 = 0x000A100B,
-    HvRegisterNestedSint12 = 0x000A100C,
-    HvRegisterNestedSint13 = 0x000A100D,
-    HvRegisterNestedSint14 = 0x000A100E,
-    HvRegisterNestedSint15 = 0x000A100F,
-    HvRegisterNestedScontrol = 0x000A1010,
-    HvRegisterNestedSversion = 0x000A1011,
-    HvRegisterNestedSifp = 0x000A1012,
-    HvRegisterNestedSipp = 0x000A1013,
-    HvRegisterNestedEom = 0x000A1014,
-    HvRegisterNestedSirbp = 0x000A1015,
-
-    // Hypervisor-defined MSRs (Synthetic Timers)
-
-    HvRegisterStimer0Config = 0x000B0000,
-    HvRegisterStimer0Count = 0x000B0001,
-    HvRegisterStimer1Config = 0x000B0002,
-    HvRegisterStimer1Count = 0x000B0003,
-    HvRegisterStimer2Config = 0x000B0004,
-    HvRegisterStimer2Count = 0x000B0005,
-    HvRegisterStimer3Config = 0x000B0006,
-    HvRegisterStimer3Count = 0x000B0007,
-    HvRegisterStimeUnhaltedTimerConfig = 0x000B0100,
-    HvRegisterStimeUnhaltedTimerCount = 0x000B0101,
-
 
     // XSAVE/XRSTOR register names.
 
@@ -3555,38 +3152,9 @@ typedef enum _HV_REGISTER_NAME
 
     // Synthetic VSM registers
 
-    HvRegisterVsmVpVtlControl = 0x000D0000,
-    HvRegisterVsmCodePageOffsets = 0x000D0002,
-    HvRegisterVsmVpStatus = 0x000D0003,
-    HvRegisterVsmPartitionStatus = 0x000D0004,
-    HvRegisterVsmVina = 0x000D0005,
-    HvRegisterVsmCapabilities = 0x000D0006,
-    HvRegisterVsmPartitionConfig = 0x000D0007,
+    HvRegisterVsmVpVtlControl = 0x000D0000,  
     HvRegisterGuestVsmPartitionConfig = 0x000D0008,
-    HvRegisterVsmVpSecureConfigVtl0 = 0x000D0010,
-    HvRegisterVsmVpSecureConfigVtl1 = 0x000D0011,
-    HvRegisterVsmVpSecureConfigVtl2 = 0x000D0012,
-    HvRegisterVsmVpSecureConfigVtl3 = 0x000D0013,
-    HvRegisterVsmVpSecureConfigVtl4 = 0x000D0014,
-    HvRegisterVsmVpSecureConfigVtl5 = 0x000D0015,
-    HvRegisterVsmVpSecureConfigVtl6 = 0x000D0016,
-    HvRegisterVsmVpSecureConfigVtl7 = 0x000D0017,
-    HvRegisterVsmVpSecureConfigVtl8 = 0x000D0018,
-    HvRegisterVsmVpSecureConfigVtl9 = 0x000D0019,
-    HvRegisterVsmVpSecureConfigVtl10 = 0x000D001A,
-    HvRegisterVsmVpSecureConfigVtl11 = 0x000D001B,
-    HvRegisterVsmVpSecureConfigVtl12 = 0x000D001C,
-    HvRegisterVsmVpSecureConfigVtl13 = 0x000D001D,
-    HvRegisterVsmVpSecureConfigVtl14 = 0x000D001E,
-    HvRegisterVsmVpWaitForTlbLock = 0x000D0020,
-
-    // Mask Registers
-
-    HvX64RegisterCrInterceptControl = 0x000E0000,
-    HvX64RegisterCrInterceptCr0Mask = 0x000E0001,
-    HvX64RegisterCrInterceptCr4Mask = 0x000E0002,
-    HvX64RegisterCrInterceptIa32MiscEnableMask = 0x000E0003
-} HV_REGISTER_NAME, *PHV_REGISTER_NAME;
+} HV_REGISTER_NAME_PRIVATE, *PHV_REGISTER_NAME_PRIVATE;
 typedef const HV_REGISTER_NAME* PCHV_REGISTER_NAME;
 
 // Flags used for specifying the stats object when making mapping/unmapping
@@ -6822,27 +6390,6 @@ typedef union _HV_TSC_EMULATION_STATUS
 // Hypervisor Hypercall Definitions
 //
 
-// Declare constants and structures for submitting hypercalls.
-#define HV_X64_MAX_HYPERCALL_ELEMENTS ((1 << 12) - 1)
-
-// Input: The call code, argument sizes and calling convention
-typedef union _HV_HYPERCALL_INPUT
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT32 CallCode : 16; // Least significant bits
-        HV_UINT32 IsFast : 1; // Uses the register based form
-        HV_UINT32 VariableHeaderSize : 9;
-        HV_UINT32 Reserved1 : 5;
-        HV_UINT32 IsNested : 1;
-        HV_UINT32 CountOfElements : 12;
-        HV_UINT32 Reserved2 : 4;
-        HV_UINT32 RepStartIndex : 12;
-        HV_UINT32 Reserved3 : 4; // Most significant bits
-    };
-} HV_HYPERCALL_INPUT, *PHV_HYPERCALL_INPUT;
-
 typedef union _HV_HYPERCALL_INPUT_PRIVATE
 {
     HV_UINT64 AsUINT64;
@@ -6861,19 +6408,6 @@ typedef union _HV_HYPERCALL_INPUT_PRIVATE
     };
 } HV_HYPERCALL_INPUT_PRIVATE, *PHV_HYPERCALL_INPUT_PRIVATE;
 
-// Output: The result and returned data size
-typedef union _HV_HYPERCALL_OUTPUT
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT16 CallStatus; // Least significant bits
-        HV_UINT16 Reserved1;
-        HV_UINT32 ElementsProcessed : 12;
-        HV_UINT32 Reserved2 : 20; // Most significant bits
-    };
-} HV_HYPERCALL_OUTPUT, *PHV_HYPERCALL_OUTPUT;
-
 // Declare the various hypercall operations
 // Public: Have prototype definition in TLFS document
 // Fast: Need to use Fast Hypercall calling convention
@@ -6881,232 +6415,19 @@ typedef union _HV_HYPERCALL_OUTPUT
 // Reserved: Have mentioned reserved in TLFS document
 // Undocumented: Undocumented but found in Microsoft documents and sources
 // Symbols: Undocumented and only found in Windows Kit symbols
-typedef enum _HV_CALL_CODE
+// Read References\HvCallList.xlsx in https://github.com/ProjectMile/Mile.HyperV
+// for more information.
+typedef enum _HV_CALL_CODE_PRIVATE
 {
-    HvCallReserved0000 = 0x0000, // Undocumented
-    HvCallSwitchVirtualAddressSpace = 0x0001, // Public | Fast
-    HvCallFlushVirtualAddressSpace = 0x0002, // Public
-    HvCallFlushVirtualAddressList = 0x0003, // Public | Rep
-    HvCallGetLogicalProcessorRunTime = 0x0004,
-    HvCallUpdateHvProcessorFeatures = 0x0005, // Symbols
-    HvCallSwitchAliasMap = 0x0006, // Symbols
-    HvCallUpdateMicrocode = 0x0007, // Symbols
-    HvCallNotifyLongSpinWait = 0x0008, // Public | Fast
-    HvCallParkedVirtualProcessors = 0x0009,
-    HvCallInvokeHypervisorDebugger = 0x000A, // Undocumented
-    HvCallSendSyntheticClusterIpi = 0x000B, // Public
-    HvCallModifyVtlProtectionMask = 0x000C, // Public | Rep
-    HvCallEnablePartitionVtl = 0x000D, // Public
-    HvCallDisablePartitionVtl = 0x000E,
-    HvCallEnableVpVtl = 0x000F, // Public
-    HvCallDisableVpVtl = 0x0010,
-    HvCallVtlCall = 0x0011, // Public
-    HvCallVtlReturn = 0x0012, // Public
-    HvCallFlushVirtualAddressSpaceEx = 0x0013, // Public
-    HvCallFlushVirtualAddressListEx = 0x0014, // Public
-    HvCallSendSyntheticClusterIpiEx = 0x0015, // Public
-    HvCallQueryImageInfo = 0x0016, // Symbols
-    HvCallMapImagePages = 0x0017, // Symbols
-    HvCallCommitPatch = 0x0018, // Symbols
     HvCallSyncContext = 0x0019, // Symbols
     HvCallSyncContextEx = 0x001A, // Symbols
     HvCallSetPerfRegister = 0x001B, // Symbols
     HvCallGetPerfRegister = 0x001C, // Symbols
     HvCallFlushCache = 0x001D, // Symbols
-    HvCallReserved001e = 0x001E, // Reserved
-    HvCallReserved001f = 0x001F, // Reserved
-    HvCallReserved0020 = 0x0020, // Reserved
-    HvCallReserved0021 = 0x0021, // Reserved
-    HvCallReserved0022 = 0x0022, // Reserved
-    HvCallReserved0023 = 0x0023, // Reserved
-    HvCallReserved0024 = 0x0024, // Reserved
-    HvCallReserved0025 = 0x0025, // Reserved
-    HvCallReserved0026 = 0x0026, // Reserved
-    HvCallReserved0027 = 0x0027, // Reserved
-    HvCallReserved0028 = 0x0028, // Reserved
-    HvCallReserved0029 = 0x0029, // Reserved
-    HvCallReserved002a = 0x002A, // Reserved
-    HvCallReserved002b = 0x002B, // Reserved
-    HvCallReserved002c = 0x002C, // Reserved
-    HvCallReserved002d = 0x002D, // Reserved
-    HvCallReserved002e = 0x002E, // Reserved
-    HvCallReserved002f = 0x002F, // Reserved
-    HvCallReserved0030 = 0x0030, // Reserved
-    HvCallReserved0031 = 0x0031, // Reserved
-    HvCallReserved0032 = 0x0032, // Reserved
-    HvCallReserved0033 = 0x0033, // Reserved
-    HvCallReserved0034 = 0x0034, // Reserved
-    HvCallReserved0035 = 0x0035, // Reserved
-    HvCallReserved0036 = 0x0036, // Reserved
-    HvCallReserved0037 = 0x0037, // Reserved
-    HvCallReserved0038 = 0x0038, // Reserved
-    HvCallReserved0039 = 0x0039, // Reserved
-    HvCallReserved003a = 0x003A, // Reserved
-    HvCallReserved003b = 0x003B, // Reserved
-    HvCallReserved003c = 0x003C, // Reserved
-    HvCallReserved003d = 0x003D, // Reserved
-    HvCallReserved003e = 0x003E, // Reserved
-    HvCallReserved003f = 0x003F, // Reserved
-    HvCallCreatePartition = 0x0040,
-    HvCallInitializePartition = 0x0041, // Parent | Fast
-    HvCallFinalizePartition = 0x0042, // Parent | Fast
-    HvCallDeletePartition = 0x0043, // Parent | Fast
-    HvCallGetPartitionProperty = 0x0044, // Parent | Root
-    HvCallSetPartitionProperty = 0x0045, // Parent | Root
-    HvCallGetPartitionId = 0x0046,
-    HvCallGetNextChildPartition = 0x0047, // Parent
-    HvCallDepositMemory = 0x0048, // Parent | Root | Rep
-    HvCallWithdrawMemory = 0x0049, // Parent | Root | Rep
-    HvCallGetMemoryBalance = 0x004A, // Parent | Root
-    HvCallMapGpaPages = 0x004B, // Parent | Root | Rep
-    HvCallUnmapGpaPages = 0x004C, // Parent | Rep
-    HvCallInstallIntercept = 0x004D, // Parent
-    HvCallCreateVp = 0x004E, // Parent
-    HvCallDeleteVp = 0x004F, // Parent | Fast
-    HvCallGetVpRegisters = 0x0050, // Public | Rep
-    HvCallSetVpRegisters = 0x0051, // Public | Rep
-    HvCallTranslateVirtualAddress = 0x0052, // Public
-    HvCallReadGpa = 0x0053, // Parent
-    HvCallWriteGpa = 0x0054, // Parent
-    HvCallAssertVirtualInterruptDeprecated = 0x0055, // Parent
-    HvCallClearVirtualInterrupt = 0x0056, // Parent | Fast
-    HvCallCreatePortDeprecated = 0x0057, // Parent | Root
-    HvCallDeletePort = 0x0058, // Parent | Root | Fast
-    HvCallConnectPortDeprecated = 0x0059, // Parent | Root
-    HvCallGetPortProperty = 0x005A, // Parent | Root
-    HvCallDisconnectPort = 0x005B, // Parent | Root | Fast
-    HvCallPostMessage = 0x005C, // Public
-    HvCallSignalEvent = 0x005D, // Public | Fast
-    HvCallSavePartitionState = 0x005E, // Parent | Root
-    HvCallRestorePartitionState = 0x005F, // Parent | Root
-    HvCallInitializeEventLogBufferGroup = 0x0060, // Root
-    HvCallFinalizeEventLogBufferGroup = 0x0061, // Root | Fast
-    HvCallCreateEventLogBuffer = 0x0062, // Root | Fast
-    HvCallDeleteEventLogBuffer = 0x0063, // Root | Fast
-    HvCallMapEventLogBuffer = 0x0064, // Root
-    HvCallUnmapEventLogBuffer = 0x0065, // Root | Fast
-    HvCallSetEventLogGroupSources = 0x0066, // Root | Fast
-    HvCallReleaseEventLogBuffer = 0x0067, // Root | Fast
-    HvCallFlushEventLogBuffer = 0x0068, // Root | Fast
-    HvCallPostDebugData = 0x0069,
-    HvCallRetrieveDebugData = 0x006A,
-    HvCallResetDebugSession = 0x006B, // Fast
-    HvCallMapStatsPage = 0x006C, // Parent
-    HvCallUnmapStatsPage = 0x006D, // Parent
-    HvCallMapSparseGpaPages = 0x006E, // Parent | Root | Rep
-    HvCallSetSystemProperty = 0x006F, // Root
-    HvCallSetPortProperty = 0x0070, // Parent | Root
-    HvCallOutputDebugCharacter = 0x0071, // Undocumented
-    HvCallEchoIncrement = 0x0072, // Undocumented
-    HvCallPerfNop = 0x0073, // Undocumented
-    HvCallPerfNopInput = 0x0074, // Undocumented
-    HvCallPerfNopOutput = 0x0075, // Undocumented
-    HvCallAddLogicalProcessor = 0x0076, // Root
-    HvCallRemoveLogicalProcessor = 0x0077, // Root
-    HvCallQueryNumaDistance = 0x0078, // Root
-    HvCallSetLogicalProcessorProperty = 0x0079, // Root
-    HvCallGetLogicalProcessorProperty = 0x007A, // Root
-    HvCallGetSystemProperty = 0x007B,
-    HvCallMapDeviceInterrupt = 0x007C, // Root
-    HvCallUnmapDeviceInterrupt = 0x007D, // Root
-    HvCallRetargetDeviceInterrupt = 0x007E, // Public
-    HvCallRetargetRootDeviceInterrupt = 0x007F, // Symbols | Root
-    HvCallAssertDeviceInterrupt = 0x0080, // Symbols | Root
-    HvCallReserved0081 = 0x0081, // Symbols | Root
-    HvCallAttachDevice = 0x0082, // Root
-    HvCallDetachDevice = 0x0083, // Root
-    HvCallEnterSleepState = 0x0084, // Symbols | Root
-    HvCallNotifyStandbyTransition = 0x0085, // Symbols | Root
-    HvCallPrepareForHibernate = 0x0086, // Root
-    HvCallNotifyPartitionEvent = 0x0087, // Root
-    HvCallGetLogicalProcessorRegisters = 0x0088, // Root
-    HvCallSetLogicalProcessorRegisters = 0x0089, // Root
-    HvCallQueryAssociatedLpsforMca = 0x008A, // Root
-    HvCallNotifyRingEmpty = 0x008B, // Root
-    HvCallInjectSyntheticMachineCheck = 0x008C, // Root
-    HvCallScrubPartition = 0x008D, // Root
-    HvCallCollectLivedump = 0x008E, // Root
-    HvCallDisableHypervisor = 0x008F, // Root
-    HvCallModifySparseGpaPages = 0x0090, // Root
-    HvCallRegisterInterceptResult = 0x0091, // Root
-    HvCallUnregisterInterceptResult = 0x0092, // Root
-    HvCallGetCoverageData = 0x0093, // Symbols
-    HvCallAssertVirtualInterrupt = 0x0094, // Public
-    HvCallCreatePort = 0x0095, // Root
-    HvCallConnectPort = 0x0096, // Root
-    HvCallGetSpaPageList = 0x0097, // Root
     HvCallReserved0098 = 0x0098, // Reserved
-    HvCallStartVirtualProcessor = 0x0099, // Public
-    HvCallGetVpIndexFromApicId = 0x009A, // Public | Rep
-    HvCallGetPowerProperty = 0x009B, // Symbols
-    HvCallSetPowerProperty = 0x009C, // Symbols
-    HvCallCreatePasidSpace = 0x009D, // Symbols
-    HvCallDeletePasidSpace = 0x009E, // Symbols
-    HvCallSetPasidAddressSpace = 0x009F, // Symbols
-    HvCallFlushPasidAddressSpace = 0x00A0, // Symbols
-    HvCallFlushPasidAddressList = 0x00A1, // Symbols
-    HvCallAttachPasidSpace = 0x00A2, // Symbols
-    HvCallDetachPasidSpace = 0x00A3, // Symbols
-    HvCallEnablePasid = 0x00A4, // Symbols
-    HvCallDisablePasid = 0x00A5, // Symbols
-    HvCallAcknowledgeDevicePageRequest = 0x00A6, // Symbols
-    HvCallCreateDevicePrQueue = 0x00A7, // Symbols
-    HvCallDeleteDevicePrQueue = 0x00A8, // Symbols
-    HvCallSetDevicePrqProperty = 0x00A9, // Symbols
-    HvCallGetPhysicalDeviceProperty = 0x00AA, // Symbols
-    HvCallSetPhysicalDeviceProperty = 0x00AB, // Symbols
-    HvCallTranslateVirtualAddressEx = 0x00AC, // Symbols
-    HvCallCheckForIoIntercept = 0x00AD, // Symbols
-    HvCallSetGpaPageAttributes = 0x00AE, // Symbols
-    HvCallFlushGuestPhysicalAddressSpace = 0x00AF, // Public | Nested
-    HvCallFlushGuestPhysicalAddressList = 0x00B0, // Public | Rep | Nested
-    HvCallCreateDeviceDomain = 0x00B1, // Symbols
-    HvCallAttachDeviceDomain = 0x00B2, // Symbols
-    HvCallMapDeviceGpaPages = 0x00B3, // Symbols
-    HvCallUnmapDeviceGpaPages = 0x00B4, // Symbols
-    HvCallCreateCpuGroup = 0x00B5, // Symbols
-    HvCallDeleteCpuGroup = 0x00B6, // Symbols
-    HvCallGetCpuGroupProperty = 0x00B7, // Symbols
-    HvCallSetCpuGroupProperty = 0x00B8, // Symbols
-    HvCallGetCpuGroupAffinity = 0x00B9, // Symbols
-    HvCallGetNextCpuGroup = 0x00BA, // Symbols
-    HvCallGetNextCpuGroupPartition = 0x00BB, // Symbols
-    HvCallAddPhysicalMemory = 0x00BC, // Symbols
-    HvCallCompleteIntercept = 0x00BD, // Symbols
-    HvCallPrecommitGpaPages = 0x00BE, // Symbols
-    HvCallUncommitGpaPages = 0x00BF, // Symbols
     HvCallSignalEventDirect = 0x00C0, // Undocumented
     HvCallPostMessageDirect = 0x00C1, // Undocumented
-    HvCallDispatchVp = 0x00C2, // Undocumented
-    HvCallProcessIommuPrq = 0x00C3, // Symbols
-    HvCallDetachDeviceDomain = 0x00C4, // Symbols
-    HvCallDeleteDeviceDomain = 0x00C5, // Symbols
-    HvCallQueryDeviceDomain = 0x00C6, // Symbols
-    HvCallMapSparseDeviceGpaPages = 0x00C7, // Symbols
-    HvCallUnmapSparseDeviceGpaPages = 0x00C8, // Symbols
-    HvCallGetGpaPagesAccessState = 0x00C9, // Undocumented
-    HvCallGetSparseGpaPagesAccessState = 0x00CA, // Symbols
-    HvCallInvokeTestFramework = 0x00CB, // Symbols
-    HvCallQueryVtlProtectionMaskRange = 0x00CC, // Symbols
-    HvCallModifyVtlProtectionMaskRange = 0x00CD, // Symbols
-    HvCallConfigureDeviceDomain = 0x00CE, // Symbols
-    HvCallQueryDeviceDomainProperties = 0x00CF, // Symbols
-    HvCallFlushDeviceDomain = 0x00D0, // Symbols
-    HvCallFlushDeviceDomainList = 0x00D1, // Symbols
-    HvCallAcquireSparseGpaPageHostAccess = 0x00D2, // Symbols
-    HvCallReleaseSparseGpaPageHostAccess = 0x00D3, // Symbols
-    HvCallCheckSparseGpaPageVtlAccess = 0x00D4, // Symbols
     HvCallReserved00d5 = 0x00D5, // Symbols
-    HvCallFlushTlb = 0x00D6, // Symbols
-    HvCallAcquireSparseSpaPageHostAccess = 0x00D7, // Symbols
-    HvCallReleaseSparseSpaPageHostAccess = 0x00D8, // Symbols
-    HvCallAcceptGpaPages = 0x00D9, // Symbols
-    HvCallUnacceptGpaPages = 0x00DA, // Symbols
-    HvCallModifySparseGpaPageHostVisibility = 0x00DB, // Symbols
-    HvCallLockSparseGpaPageMapping = 0x00DC, // Symbols
-    HvCallUnlockSparseGpaPageMapping = 0x00DD, // Symbols
-    HvCallRequestProcessorHalt = 0x00DE, // Symbols
-    HvCallGetInterceptData = 0x00DF, // Symbols
     HvCallQueryDeviceInterruptTarget = 0x00E0, // Symbols
     HvCallMapVpStatePage = 0x00E1, // Undocumented
     HvCallUnmapVpStatePage = 0x00E2, // Undocumented
@@ -7162,8 +6483,8 @@ typedef enum _HV_CALL_CODE
     HvCallWakeVps = 0x0114, // Symbols
     HvCallSetCpuGroupAffinity = 0x0115, // Symbols
     HvCallMapPartitionEventLogBuffer = 0x0116, // Symbols
-    HvCallCount
-} HV_CALL_CODE, *PHV_CALL_CODE;
+    HvCallPrivateCount
+} HV_CALL_CODE_PRIVATE, *PHV_CALL_CODE_PRIVATE;
 
 // Type of Normal Hypercall and Fast Hypercall calling convention.
 // - Normal Hypercall
@@ -7193,10 +6514,7 @@ typedef HV_HYPERCALL_OUTPUT(*PHVCALL_HYPERCALL_ROUTINE)(
 
 // HvCallSwitchVirtualAddressSpace | 0x0001
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE
-{
-    HV_ADDRESS_SPACE_ID AddressSpace;
-} HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallFlushVirtualAddressSpace | 0x0002
 
@@ -7797,23 +7115,11 @@ typedef union HV_CALL_ATTRIBUTES _HV_INPUT_DISCONNECT_PORT
 
 // HvCallPostMessage | 0x005C
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE
-{
-    HV_CONNECTION_ID ConnectionId;
-    HV_UINT32 Reserved;
-    HV_MESSAGE_TYPE MessageType;
-    HV_UINT32 PayloadSize;
-    HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
-} HV_INPUT_POST_MESSAGE, *PHV_INPUT_POST_MESSAGE;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallSignalEvent | 0x005D
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
-{
-    HV_CONNECTION_ID ConnectionId;
-    HV_UINT16 FlagNumber;
-    HV_UINT16 ReservedZ;
-} HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallSavePartitionState | 0x005E
 
@@ -8400,15 +7706,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_SPA_PAGE_LIST
 
 // HvCallStartVirtualProcessor | 0x0099
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
-{
-    HV_PARTITION_ID PartitionId;
-    HV_VP_INDEX VpIndex;
-    HV_VTL TargetVtl;
-    HV_UINT8 ReservedZ0;
-    HV_UINT16 ReservedZ1;
-    HV_INITIAL_VP_CONTEXT VpContext;
-} HV_INPUT_START_VIRTUAL_PROCESSOR, *PHV_INPUT_START_VIRTUAL_PROCESSOR;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallGetVpIndexFromApicId | 0x009A
 
@@ -8786,7 +8084,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_GPA_PAGES_ACCESS_STATE
 // HvCallReleaseSparseSpaPageHostAccess | 0x00D8
 // HvCallAcceptGpaPages | 0x00D9
 // HvCallUnacceptGpaPages | 0x00DA
+
 // HvCallModifySparseGpaPageHostVisibility | 0x00DB
+
+// Already defined in Mile.HyperV.Guest.Interface.h.
+
 // HvCallLockSparseGpaPageMapping | 0x00DC
 // HvCallUnlockSparseGpaPageMapping | 0x00DD
 // HvCallRequestProcessorHalt | 0x00DE
