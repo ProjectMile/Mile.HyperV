@@ -19,6 +19,9 @@
 // - Hypervisor Top Level Functional Specification 6.0b
 // - hvgdk.h from Windows Driver Kit version 7.1.0
 // - MIT-licensed Hyper-V headers from Microsoft mshv Linux kernel module
+//   - https://github.com/microsoft/OHCL-Linux-Kernel
+//     /tree/e9017243ba9b424f6516c4b206f454a1c2585fd2
+//     /include/uapi/hyperv
 // - gerhart01's archive of Hypervisor (Windows Drivers) documentation from
 //   Microsoft in 2013
 // - https://github.com/rust-vmm/mshv
@@ -813,6 +816,13 @@ typedef enum _HV_X64_PPM_IDLE_STATE_CHANGE_METHOD
 // Define interrupt types.
 typedef enum _HV_INTERRUPT_TYPE
 {
+#if defined(_M_ARM64)
+    // Explicit interrupt types.
+    HvArm64InterruptTypeFixed = 0x0000,
+
+    // Maximum (exclusive) value of interrupt type.
+    HvArm64InterruptTypeMaximum = 0x0008,
+#elif defined(_M_AMD64)
     // Explicit interrupt types.
 
     HvX64InterruptTypeFixed = 0x0000,
@@ -827,7 +837,8 @@ typedef enum _HV_INTERRUPT_TYPE
     HvX64InterruptTypeLocalInt1 = 0x0009,
 
     // Maximum (exclusive) value of interrupt type.
-    HvX64InterruptTypeMaximum = 0x000A
+    HvX64InterruptTypeMaximum = 0x000A,
+#endif
 } HV_INTERRUPT_TYPE, *PHV_INTERRUPT_TYPE;
 
 // Define interrupt vector type.
@@ -1588,13 +1599,70 @@ typedef enum _HV_PROCESSOR_VENDOR
     HvProcessorVendorIntel = 0x0001
 } HV_PROCESSOR_VENDOR, *PHV_PROCESSOR_VENDOR;
 
+#if defined(_M_ARM64)
+#define HV_PARTITION_PROCESSOR_FEATURES_BANKS 1
+#elif defined(_M_AMD64)
 #define HV_PARTITION_PROCESSOR_FEATURES_BANKS 2
+#endif
 
 // Define the structure defining the processor related features that may be
 // de-featured.
 typedef union _HV_PARTITION_PROCESSOR_FEATURES
 {
     HV_UINT64 AsUINT64[HV_PARTITION_PROCESSOR_FEATURES_BANKS];
+#if defined(_M_ARM64)
+    struct
+    {
+        HV_UINT64 Asid16 : 1;
+        HV_UINT64 Tgran16 : 1;
+        HV_UINT64 Tgran64 : 1;
+        HV_UINT64 Haf : 1;
+        HV_UINT64 Hdbs : 1;
+        HV_UINT64 Pan : 1;
+        HV_UINT64 Ats1e1 : 1;
+        HV_UINT64 Uao : 1;
+        HV_UINT64 El0aarch32 : 1;
+        HV_UINT64 Fp : 1;
+        HV_UINT64 Fphp : 1;
+        HV_UINT64 Advsimd : 1;
+        HV_UINT64 Advsimdhp : 1;
+        HV_UINT64 Gicv3v4 : 1;
+        HV_UINT64 Gicv41 : 1;
+        HV_UINT64 Ras : 1;
+        HV_UINT64 Pmuv3 : 1;
+        HV_UINT64 Pmuv3armv81 : 1;
+        HV_UINT64 Pmuv3armv84 : 1;
+        HV_UINT64 Pmuv3armv85 : 1;
+        HV_UINT64 Aes : 1;
+        HV_UINT64 Polymul : 1;
+        HV_UINT64 Sha1 : 1;
+        HV_UINT64 Sha256 : 1;
+        HV_UINT64 Sha512 : 1;
+        HV_UINT64 Crc32 : 1;
+        HV_UINT64 Atomic : 1;
+        HV_UINT64 Rdm : 1;
+        HV_UINT64 Sha3 : 1;
+        HV_UINT64 Sm3 : 1;
+        HV_UINT64 Sm4 : 1;
+        HV_UINT64 Dp : 1;
+        HV_UINT64 Fhm : 1;
+        HV_UINT64 Dccvap : 1;
+        HV_UINT64 Dccvadp : 1;
+        HV_UINT64 Apabase : 1;
+        HV_UINT64 Apaep : 1;
+        HV_UINT64 Apaep2 : 1;
+        HV_UINT64 Apaep2fp : 1;
+        HV_UINT64 Apaep2fpc : 1;
+        HV_UINT64 Jscvt : 1;
+        HV_UINT64 Fcma : 1;
+        HV_UINT64 Rcpcv83 : 1;
+        HV_UINT64 Rcpcv84 : 1;
+        HV_UINT64 Gpa : 1;
+        HV_UINT64 L1ippipt : 1;
+        HV_UINT64 Dzpermitted : 1;
+        HV_UINT64 Reserved : 17;
+    };
+#elif defined(_M_AMD64)
     struct
     {
         HV_UINT64 Sse3Support : 1;
@@ -1689,6 +1757,7 @@ typedef union _HV_PARTITION_PROCESSOR_FEATURES
         HV_UINT64 FsrepCmpsb : 1;
         HV_UINT64 ReservedBank1 : 42;
     };
+#endif
 } HV_PARTITION_PROCESSOR_FEATURES, *PHV_PARTITION_PROCESSOR_FEATURES;
 
 // Define the processor features avaialble in Intel and AMD compatibility mode.
@@ -1888,8 +1957,54 @@ typedef union _HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT
     };
 } HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT, *PHV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT;
 
+typedef union _HV_ARM64_PENDING_SYNTHETIC_EXCEPTION_EVENT
+{
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        HV_UINT8 EventPending : 1;
+        HV_UINT8 EventType : 3;
+        HV_UINT8 Reserved : 4;
+        HV_UINT32 ExceptionType;
+        HV_UINT64 Context;
+    };
+} HV_ARM64_PENDING_SYNTHETIC_EXCEPTION_EVENT, *PHV_ARM64_PENDING_SYNTHETIC_EXCEPTION_EVENT;
+
+typedef union _HV_ARM64_INTERRUPT_STATE_REGISTER
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 InterruptShadow : 1;
+        HV_UINT64 Reserved : 63;
+    };
+} HV_ARM64_INTERRUPT_STATE_REGISTER, *PHV_ARM64_INTERRUPT_STATE_REGISTER;
+
+typedef enum _HV_ARM64_PENDING_INTERRUPTION_TYPE
+{
+    HvArm64PendingInterrupt = 0,
+    HvArm64PendingException = 1
+} HV_ARM64_PENDING_INTERRUPTION_TYPE, *PHV_ARM64_PENDING_INTERRUPTION_TYPE;
+
+typedef union _HV_ARM64_PENDING_INTERRUPTION_REGISTER
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 InterruptionPending : 1;
+        HV_UINT64 InterruptionType : 1;
+        HV_UINT64 Reserved : 30;
+        HV_UINT64 ErrorCode : 32;
+    };
+} HV_ARM64_PENDING_INTERRUPTION_REGISTER, *PHV_ARM64_PENDING_INTERRUPTION_REGISTER*;
+
 typedef union _HV_REGISTER_VALUE_PRIVATE
 {
+#if defined(_M_ARM64)
+    HV_ARM64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
+    HV_ARM64_INTERRUPT_STATE_REGISTER InterruptState;
+    HV_ARM64_PENDING_SYNTHETIC_EXCEPTION_EVENT PendingSyntheticExceptionEvent;
+#elif defined(_M_AMD64)
     HV_X64_FP_REGISTER Fp;
     HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
     HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
@@ -1897,12 +2012,13 @@ typedef union _HV_REGISTER_VALUE_PRIVATE
     HV_X64_TABLE_REGISTER Table;
     HV_EXPLICIT_SUSPEND_REGISTER ExplicitSuspend;
     HV_INTERCEPT_SUSPEND_REGISTER InterceptSuspend;
-    HV_DISPATCH_SUSPEND_REGISTER SispatchSuspend;
+    HV_DISPATCH_SUSPEND_REGISTER DispatchSuspend;
     HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
     HV_X64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
     HV_X64_MSR_NPIEP_CONFIG_CONTENTS NpiepConfig;
     HV_X64_PENDING_EXCEPTION_EVENT PendingExceptionEvent;
     HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT PendingVirtualizationFaultEvent;
+#endif
 } HV_REGISTER_VALUE_PRIVATE, *PHV_REGISTER_VALUE_PRIVATE;
 typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 
@@ -2174,6 +2290,7 @@ typedef enum _HV_MESSAGE_TYPE_PRIVATE
     // Platform-specific processor intercept messages
 
     HvMessageTypeX64LegacyFpError = 0x80010005,
+    HvMessageTypeX64ProxyInterruptIntercept = 0x8001000f,
 } HV_MESSAGE_TYPE_PRIVATE, *PHV_MESSAGE_TYPE_PRIVATE;
 
 #define HV_MESSAGE_TYPE_HYPERVISOR_MASK (0x80000000)
@@ -2328,7 +2445,12 @@ typedef struct _HV_INTERRUPT_CONTROL
         HV_INTERRUPT_TYPE InterruptType;
         HV_UINT32 LevelTriggered : 1;
         HV_UINT32 LogicalDestinationMode : 1;
+#if defined(_M_ARM64)
+        HV_UINT32 Asserted : 1;
+        HV_UINT32 Reserved : 29;
+#elif defined(_M_AMD64)
         HV_UINT32 Reserved : 30;
+#endif
     };
 } HV_INTERRUPT_CONTROL, *PHV_INTERRUPT_CONTROL;
 
@@ -3113,6 +3235,9 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
     HvRegisterGuestSchedulerEvent = 0x0009001B,
     HvX64RegisterRegPage = 0x0009001C,
 
+    // AMD SEV SNP configuration register
+	HvX64RegisterSevControl = 0x00090040,
+
     // XSAVE/XRSTOR register names.
 
     // XSAVE AFX extended state registers.
@@ -3384,12 +3509,22 @@ typedef union _HV_MSI_DATA_REGISTER
 
 typedef union _HV_MSI_ENTRY
 {
+#if defined(_M_ARM64)
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        HV_UINT64 Address;
+        HV_MSI_DATA_REGISTER Data;
+        HV_UINT32 Reserved;
+    };
+#elif defined(_M_AMD64)
     HV_UINT64 AsUINT64;
     struct
     {
         HV_MSI_ADDRESS_REGISTER Address;
         HV_MSI_DATA_REGISTER Data;
     };
+#endif
 } HV_MSI_ENTRY, *PHV_MSI_ENTRY;
 
 typedef union _HV_IOAPIC_RTE
@@ -3826,6 +3961,18 @@ typedef struct _HV_NOTIFICATION_MESSAGE_PAYLOAD
     HV_UINT32 SintIndex;
 } HV_NOTIFICATION_MESSAGE_PAYLOAD, *PHV_NOTIFICATION_MESSAGE_PAYLOAD;
 
+typedef struct _HV_X64_PROXY_INTERRUPT_MESSAGE_PAYLOAD
+{
+    HV_UINT8 InterruptVtl;
+    HV_UINT8 AssertMultiple;
+    HV_UINT8 Reserved[2];
+    union
+    {
+        HV_UINT32 AssertedVector;
+        HV_UINT32 AssertedIrr[8];
+    };
+} HV_X64_PROXY_INTERRUPT_MESSAGE_PAYLOAD, *PHV_X64_PROXY_INTERRUPT_MESSAGE_PAYLOAD;
+
 typedef enum _HV_UNIMPLEMENTED_MSR_ACTION
 {
     HvUnimplementedMsrActionFault = 0,
@@ -3907,6 +4054,7 @@ typedef union _HV_GPA_PAGE_ACCESS_STATE
 
 #define HV_VP_REGISTER_PAGE_VERSION_1 1u
 
+#if defined(_M_AMD64)
 typedef struct _HV_VP_REGISTER_PAGE
 {
     HV_UINT16 Version;
@@ -3987,6 +4135,7 @@ typedef struct _HV_VP_REGISTER_PAGE
     HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
     HV_UINT64 InstructionEmulationHints;
 } HV_VP_REGISTER_PAGE, *PHV_VP_REGISTER_PAGE;
+#endif
 
 typedef struct _HV_PARTITION_CREATION_PROPERTIES
 {
@@ -6188,6 +6337,22 @@ typedef union _HV_SYNIC_SCONTROL
 #define HV_X64_MSR_STIMER2_COUNT HvSyntheticMsrSTimer2Count
 #define HV_X64_MSR_STIMER3_CONFIG HvSyntheticMsrSTimer3Config
 #define HV_X64_MSR_STIMER3_COUNT HvSyntheticMsrSTimer3Count
+
+#if defined(_M_AMD64)
+#define HV_MSR_EOM HV_X64_MSR_EOM
+#define HV_MSR_TIME_REF_COUNT HV_X64_MSR_TIME_REF_COUNT
+#define HV_MSR_STIMER0_CONFIG HV_X64_MSR_STIMER0_CONFIG
+#define HV_MSR_STIMER0_COUNT HV_X64_MSR_STIMER0_COUNT
+#define HV_MSR_SIMP HV_X64_MSR_SIMP
+#define HV_MSR_SINT0 HV_X64_MSR_SINT0
+#elif defined(_M_ARM64)
+#define HV_MSR_SINT0 HvRegisterSint0
+#define HV_MSR_EOM HvRegisterEom
+#define HV_MSR_TIME_REF_COUNT HvRegisterTimeRefCount
+#define HV_MSR_STIMER0_CONFIG HvRegisterStimer0Config
+#define HV_MSR_STIMER0_COUNT HvRegisterStimer0Count
+#define HV_MSR_SIMP HvRegisterSipp
+#endif
 
 /* HvSyntheticMsrReserved400000C1 | 0x400000C1 */
 /* HvSyntheticMsrGuestSchedulerEvent | 0x400000C2 */

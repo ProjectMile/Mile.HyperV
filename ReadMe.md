@@ -20,6 +20,9 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\Include\Hv\HvGuestMsr.h
     - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
     - MsvmPkg\Include\Hv\HvGuestHypercall.h
+  - Include definitions from MIT-licensed Hyper-V headers from Microsoft mshv 
+    Linux kernel module
+    - https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

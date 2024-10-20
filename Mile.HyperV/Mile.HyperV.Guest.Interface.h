@@ -21,7 +21,7 @@
 #define MILE_HYPERV_GUEST_INTERFACE
 
 #if !defined(_M_AMD64) && !defined(_M_ARM64)
-#error [Mile.HyperV] Unknown/Unsupported architecture
+#error [Mile.HyperV] The architecture is not supported.
 #endif
 
 #ifdef _MSC_VER
