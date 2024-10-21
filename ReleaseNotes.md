@@ -1,5 +1,32 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.xxx.0**
+
+- Introduce Mile.HyperV.Guest.Interface.h and Mile.HyperV.Guest.Protocols.h for
+  including Hyper-V guest publicized interface and protocols definitions from
+  https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
+  - Microsoft's original comments for interface and protocols.
+  - More Hyper-V ARM64 guest definitions.
+  - Introduce the definition of HvCallModifySparseGpaPageHostVisibility.
+  - More VMBus protocol definitions which replaced all definitions dumped from
+    Windows 10 Build 14347's vmbus.sys.
+- Revise all Mile.HyperV definitions via the following files from
+  https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
+  - MsvmPkg\Include\Hv\HvStatus.h
+  - MsvmPkg\Include\Hv\HvGuest.h
+  - MsvmPkg\Include\Hv\HvGuestCpuid.h
+  - MsvmPkg\Include\Hv\HvGuestMsr.h
+  - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
+  - MsvmPkg\Include\Hv\HvGuestHypercall.h
+  - MsvmPkg\MsvmPkg.dec
+  - MsvmPkg\Include\Vmbus\NtStatus.h
+  - MsvmPkg\VmbusDxe\VmbusP.h
+  - MsvmPkg\VmbusDxe\ChannelMessages.h
+  - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
+  - MsvmPkg\VideoDxe\SynthVidProtocol.h
+- Migrate from Mile.Project.Windows to Mile.Project.Configurations for
+  streamlining the build toolchain of this package.
+
 **Mile.HyperV 1.0.327.0**
 
 - Fix definition typos for resolving issues in pure C projects.
