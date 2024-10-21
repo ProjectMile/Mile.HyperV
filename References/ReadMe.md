@@ -122,13 +122,15 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
 - MsvmPkg\Include\Hv\HvGuestHypercall.h
 - MsvmPkg\MsvmPkg.dec
+- MsvmPkg\Include\Vmbus\NtStatus.h
+- MsvmPkg\VmbusDxe\VmbusP.h
+- MsvmPkg\VmbusDxe\ChannelMessages.h
 
 - MsvmPkg\Include\Protocol\EfiHv.h
 - MsvmPkg\Include\Protocol\Emcl.h
 - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 - MsvmPkg\Include\Protocol\Vmbus.h
 - MsvmPkg\Include\Protocol\VmbusFileSystem.h
-- MsvmPkg\Include\Vmbus\NtStatus.h
 - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
 - MsvmPkg\Include\Vmbus\VmbusPacketInterface.h
 - MsvmPkg\Include\MsvmBase.h
@@ -138,6 +140,5 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\StorvscDxe\VstorageProtocol.h
 - MsvmPkg\VideoDxe\SynthVidProtocol.h
 - MsvmPkg\VideoDxe\VramSize.h
-- MsvmPkg\VmbusDxe\ChannelMessages.h
 - MsvmPkg\VpcivscDxe\VpciProtocol.h
 - MsvmPkg\VpcivscDxe\wdm.h

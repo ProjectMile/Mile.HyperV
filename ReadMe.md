@@ -26,7 +26,10 @@ folder which you actually needed to your C/C++ projects.
 - Mile.HyperV.Guest.Protocols.h
   - Include Hyper-V related definitions from
     https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
-    - MsvmPkg\MsvmPkg.dec 
+    - MsvmPkg\MsvmPkg.dec
+    - MsvmPkg\Include\Vmbus\NtStatus.h
+    - MsvmPkg\VmbusDxe\VmbusP.h
+    - MsvmPkg\VmbusDxe\ChannelMessages.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

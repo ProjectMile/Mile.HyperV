@@ -24,6 +24,8 @@
 #error [Mile.HyperV] The architecture is not supported.
 #endif
 
+#include <stdint.h>
+
 #ifdef _MSC_VER
 #if _MSC_VER > 1000
 #pragma once
@@ -41,8 +43,6 @@
 #define DECLSPEC_ALIGN(x)
 #endif
 #endif
-
-#include <stdint.h>
 
 typedef uint8_t HV_UINT8, *PHV_UINT8;
 typedef uint16_t HV_UINT16, *PHV_UINT16;
