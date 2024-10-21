@@ -24,6 +24,7 @@
 #ifndef MILE_HYPERV_VMBUS
 #define MILE_HYPERV_VMBUS
 
+#include "Mile.HyperV.Guest.Protocols.h"
 #include "Mile.HyperV.TLFS.h"
 
 #ifdef _MSC_VER

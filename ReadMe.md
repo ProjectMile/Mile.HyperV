@@ -23,6 +23,9 @@ folder which you actually needed to your C/C++ projects.
   - Include definitions from MIT-licensed Hyper-V headers from Microsoft mshv 
     Linux kernel module
     - https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv
+- Mile.HyperV.Guest.Protocols.h
+  - Include Hyper-V related definitions from
+    https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

@@ -115,12 +115,13 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 
 ### Referenced by Mile.HyperV:
 
+- MsvmPkg\Include\Hv\HvStatus.h
 - MsvmPkg\Include\Hv\HvGuest.h
 - MsvmPkg\Include\Hv\HvGuestCpuid.h
-- MsvmPkg\Include\Hv\HvGuestHypercall.h
 - MsvmPkg\Include\Hv\HvGuestMsr.h
 - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
-- MsvmPkg\Include\Hv\HvStatus.h
+- MsvmPkg\Include\Hv\HvGuestHypercall.h
+
 - MsvmPkg\Include\Protocol\EfiHv.h
 - MsvmPkg\Include\Protocol\Emcl.h
 - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
