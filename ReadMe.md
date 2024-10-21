@@ -31,6 +31,7 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\VmbusDxe\VmbusP.h
     - MsvmPkg\VmbusDxe\ChannelMessages.h
     - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
+    - MsvmPkg\VideoDxe\SynthVidProtocol.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

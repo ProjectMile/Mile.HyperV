@@ -15,6 +15,7 @@
 //   - MsvmPkg\VmbusDxe\VmbusP.h
 //   - MsvmPkg\VmbusDxe\ChannelMessages.h
 //   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
+//   - MsvmPkg\VideoDxe\SynthVidProtocol.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -30,6 +31,12 @@
 #endif
 #pragma warning(disable:4201) // nameless struct/union
 #endif
+
+#ifndef TRUE
+// Boolean true value. Most of cases define this value to be 1, but this form is
+// more portable.
+#define TRUE ((HV_UINT8)(1==1))
+#endif // !TRUE
 
 #ifndef _NTDEF_
 typedef long NTSTATUS;
@@ -651,7 +658,7 @@ typedef struct _VMTRANSFER_PAGE_RANGES
 //
 
 // {DA0A7802-E377-4AAC-8E77-0558EB1073F8}
-const HV_GUID SYNTHVID_CONTROL_CLASS_ID =
+const GUID SYNTHVID_CONTROL_CLASS_ID =
 {
     0xDA0A7802,
     0xE377,
@@ -659,12 +666,141 @@ const HV_GUID SYNTHVID_CONTROL_CLASS_ID =
     { 0x8E, 0x77, 0x05, 0x58, 0xEB, 0x10, 0x73, 0xF8 }
 };
 
+// Latest version of the SynthVid protocol.
+#define SYNTHVID_VERSION_MAJOR 3
+#define SYNTHVID_VERSION_MINOR 5
+
+#define SYNTHVID_VERSION_CURRENT \
+    ((SYNTHVID_VERSION_MINOR << 16) | (SYNTHVID_VERSION_MAJOR))
+#define TRUE_WITH_VERSION_EXCHANGE (TRUE + 1)
+
+#pragma pack(push, 1)
+
+// SynthVid Message Types
+typedef enum
+{
+    SynthvidError = 0,
+    SynthvidVersionRequest = 1,
+    SynthvidVersionResponse = 2,
+    SynthvidVramLocation = 3,
+    SynthvidVramLocationAck = 4,
+    SynthvidSituationUpdate = 5,
+    SynthvidSituationUpdateAck = 6,
+    SynthvidPointerPosition = 7,
+    SynthvidPointerShape = 8,
+    SynthvidFeatureChange = 9,
+    SynthvidDirt = 10,
+    SynthvidBiosInfoRequest = 11,
+    SynthvidBiosInfoResponse = 12,
+    SynthvidMax = 13
+} SYNTHVID_MESSAGE_TYPE;
+
+// Basic message structures.
+typedef struct
+{
+    // Type of the enclosed message
+    SYNTHVID_MESSAGE_TYPE Type;
+    // Size of the enclosed message (size of the data payload)
+    HV_UINT32 Size;
+} SYNTHVID_MESSAGE_HEADER, *PSYNTHVID_MESSAGE_HEADER;
+
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    // Enclosed message
+    HV_UINT8 Data[ANYSIZE_ARRAY];
+} SYNTHVID_MESSAGE, *PSYNTHVID_MESSAGE;
+
+typedef union
+{
+    struct
+    {
+        HV_UINT16 MajorVersion;
+        HV_UINT16 MinorVersion;
+    };
+    HV_UINT32 AsDWORD;
+} SYNTHVID_VERSION, *PSYNTHVID_VERSION;
+
+// The following messages are listed in order of occurance during startup and
+// handshaking.
+
+// VSC to VSP
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    SYNTHVID_VERSION Version;
+} SYNTHVID_VERSION_REQUEST_MESSAGE, *PSYNTHVID_VERSION_REQUEST_MESSAGE;
+
+// VSP to VSC
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    SYNTHVID_VERSION Version;
+    // BOOLEAN
+    HV_UINT8 IsAccepted;
+    // 1 in Veridian 1.0
+    HV_UINT8 MaxVideoOutputs;
+} SYNTHVID_VERSION_RESPONSE_MESSAGE, *PSYNTHVID_VERSION_RESPONSE_MESSAGE;
+
+// VSC to VSP
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+    // BOOLEAN
+    HV_UINT8 IsVramGpaAddressSpecified;
+    HV_UINT64 VramGpaAddress;
+} SYNTHVID_VRAM_LOCATION_MESSAGE, *PSYNTHVID_VRAM_LOCATION_MESSAGE;
+
+// VSP to VSC
+// This is called "acknowledge", but in addition, it indicates to the VSC
+// that the new physical address location is backed with a memory block
+// that the guest can safely write to, knowing that the writes will actually
+// be reflected in the VRAM memory block.
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+} SYNTHVID_VRAM_LOCATION_ACK_MESSAGE, *PSYNTHVID_VRAM_LOCATION_ACK_MESSAGE;
+
+// These messages are used to communicate "situation updates" or changes in the
+// layout of the primary surface.
+typedef struct
+{
+    // BOOLEAN
+    HV_UINT8 Active;
+    HV_UINT32 PrimarySurfaceVramOffset;
+    HV_UINT8 DepthBits;
+    HV_UINT32 WidthPixels;
+    HV_UINT32 HeightPixels;
+    HV_UINT32 PitchBytes;
+} VIDEO_OUTPUT_SITUATION, *PVIDEO_OUTPUT_SITUATION;
+
+// VSC to VSP
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+    // 1 in Veridian 1.0
+    HV_UINT8 VideoOutputCount;
+    VIDEO_OUTPUT_SITUATION VideoOutput[ANYSIZE_ARRAY];
+} SYNTHVID_SITUATION_UPDATE_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
+
+// VSP to VSC
+typedef struct
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT64 UserContext;
+} SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
+
+#pragma pack(pop)
+
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Keyboard
 //
 
 // {F912AD6D-2B17-48EA-BD65-F927A61C7684}
-const HV_GUID HK_CONTROL_CLASS_ID =
+const GUID HK_CONTROL_CLASS_ID =
 {
     0xF912AD6D,
     0x2B17,
@@ -677,7 +813,7 @@ const HV_GUID HK_CONTROL_CLASS_ID =
 //
 
 // {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
-const HV_GUID VSTOR_SCSI_CONTROL_CLASS_ID =
+const GUID VSTOR_SCSI_CONTROL_CLASS_ID =
 {
     0xBA6163D9,
     0x04A1,
@@ -690,7 +826,7 @@ const HV_GUID VSTOR_SCSI_CONTROL_CLASS_ID =
 //
 
 // {F8615163-DF3E-46C5-913F-F2D2F965ED0E}
-const HV_GUID NVSP_CONTROL_CLASS_ID =
+const GUID NVSP_CONTROL_CLASS_ID =
 {
     0xF8615163,
     0xDF3E,
@@ -703,7 +839,7 @@ const HV_GUID NVSP_CONTROL_CLASS_ID =
 //
 
 // {44C4F61D-4444-4400-9D52-802E27EDE19F}
-const HV_GUID VPCI_CONTROL_CLASS_ID =
+const GUID VPCI_CONTROL_CLASS_ID =
 {
     0x44C4F61D,
     0x4444,
@@ -716,7 +852,7 @@ const HV_GUID VPCI_CONTROL_CLASS_ID =
 //
 
 // {C376C1C3-D276-48D2-90A9-C04748072C60}
-const HV_GUID VMBFS_CONTROL_CLASS_ID =
+const GUID VMBFS_CONTROL_CLASS_ID =
 {
     0xC376C1C3,
     0xD276,

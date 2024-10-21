@@ -52,33 +52,19 @@ typedef struct _HV_RECT
 // Microsoft Hyper-V Video
 //
 
-typedef enum _SYNTHVID_MESSAGE_TYPE
+typedef SYNTHVID_MESSAGE_TYPE _SYNTHVID_MESSAGE_TYPE;
+typedef SYNTHVID_MESSAGE_TYPE *PSYNTHVID_MESSAGE_TYPE;
+
+typedef enum _SYNTHVID_MESSAGE_TYPE_PRIVATE
 {
-    SynthvidError = 0,
-    SynthvidVersionRequest = 1,
-    SynthvidVersionResponse = 2,
-    SynthvidVramLocation = 3,
-    SynthvidVramLocationAck = 4,
-    SynthvidSituationUpdate = 5,
-    SynthvidSituationUpdateAck = 6,
-    SynthvidPointerPosition = 7,
-    SynthvidPointerShape = 8,
-    SynthvidFeatureChange = 9,
-    SynthvidDirt = 10,
-    SynthvidBiosInfoRequest = 11,
-    SynthvidBiosInfoResponse = 12,
     SynthvidSupportedResolutionsRequest = 13,
     SynthvidSupportedResolutionsResponse = 14,
     SynthvidCapabilityRequest = 15,
     SynthvidCapabilityResponse = 16,
-    SynthvidMax = 17,
-} SYNTHVID_MESSAGE_TYPE, *PSYNTHVID_MESSAGE_TYPE;
+    SynthvidPrivateMax = 17,
+} SYNTHVID_MESSAGE_TYPE_PRIVATE, *PSYNTHVID_MESSAGE_TYPE_PRIVATE;
 
-typedef struct _SYNTHVID_MESSAGE_HEADER
-{
-    SYNTHVID_MESSAGE_TYPE Type;
-    HV_UINT32 Size;
-} SYNTHVID_MESSAGE_HEADER, *PSYNTHVID_MESSAGE_HEADER;
+typedef SYNTHVID_MESSAGE_HEADER _SYNTHVID_MESSAGE_HEADER;
 
 #define SYNTHVID_MAKE_VERSION(Major, Minor) ((Minor) << 16 | (Major))
 #define SYNTHVID_VERSION_MAJOR(Version) ((Version) & 0x0000FFFF)
@@ -120,27 +106,9 @@ typedef enum _SYNTHVID_FEATURE
     SynthVidFeatureLockOnDisconnect = SynthVidFeatureWinThresholdM2,
 } SYNTHVID_FEATURE, *PSYNTHVID_FEATURE;
 
-typedef union _SYNTHVID_VERSION
-{
-    HV_UINT32 AsDWORD;
-    struct
-    {
-        HV_UINT16 MajorVersion;
-        HV_UINT16 MinorVersion;
-    };
-} SYNTHVID_VERSION, *PSYNTHVID_VERSION;
+typedef SYNTHVID_VERSION _SYNTHVID_VERSION;
 
-#pragma pack(1)
-typedef struct _VIDEO_OUTPUT_SITUATION
-{
-    HV_UINT8 Active;
-    HV_UINT32 PrimarySurfaceVramOffset;
-    HV_UINT8 DepthBits;
-    HV_UINT32 WidthPixels;
-    HV_UINT32 HeightPixels;
-    HV_UINT32 PitchBytes;
-} VIDEO_OUTPUT_SITUATION, *PVIDEO_OUTPUT_SITUATION;
-#pragma pack()
+typedef VIDEO_OUTPUT_SITUATION _VIDEO_OUTPUT_SITUATION;
 
 typedef struct _HVD_SCREEN_INFO
 {
@@ -152,63 +120,27 @@ typedef struct _HVD_SCREEN_INFO
 
 // SynthvidVersionRequest | 1
 
-typedef struct _SYNTHVID_VERSION_REQUEST_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    SYNTHVID_VERSION Version;
-} SYNTHVID_VERSION_REQUEST_MESSAGE, *PSYNTHVID_VERSION_REQUEST_MESSAGE;
+typedef SYNTHVID_VERSION_REQUEST_MESSAGE _SYNTHVID_VERSION_REQUEST_MESSAGE;
 
 // SynthvidVersionResponse | 2
 
-#pragma pack(1)
-typedef struct _SYNTHVID_VERSION_RESPONSE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    SYNTHVID_VERSION Version;
-    HV_UINT8 IsAccepted;
-    HV_UINT8 MaxVideoOutputs;
-} SYNTHVID_VERSION_RESPONSE_MESSAGE, *PSYNTHVID_VERSION_RESPONSE_MESSAGE;
-#pragma pack()
+typedef SYNTHVID_VERSION_RESPONSE_MESSAGE _SYNTHVID_VERSION_RESPONSE_MESSAGE;
 
 // SynthvidVramLocation | 3
 
-#pragma pack(1)
-typedef struct _SYNTHVID_VRAM_LOCATION_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT64 UserContext;
-    HV_UINT8 IsVramGpaAddressSpecified;
-    HV_UINT64 VramGpaAddress;
-} SYNTHVID_VRAM_LOCATION_MESSAGE, *PSYNTHVID_VRAM_LOCATION_MESSAGE;
-#pragma pack()
+typedef SYNTHVID_VRAM_LOCATION_MESSAGE _SYNTHVID_VRAM_LOCATION_MESSAGE;
 
 // SynthvidVramLocationAck | 4
 
-typedef struct _SYNTHVID_VRAM_LOCATION_ACK_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT64 UserContext;
-} SYNTHVID_VRAM_LOCATION_ACK_MESSAGE, *PSYNTHVID_VRAM_LOCATION_ACK_MESSAGE;
+typedef SYNTHVID_VRAM_LOCATION_ACK_MESSAGE _SYNTHVID_VRAM_LOCATION_ACK_MESSAGE;
 
 // SynthvidSituationUpdate | 5
 
-#pragma pack(1)
-typedef struct _SYNTHVID_SITUATION_UPDATE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT64 UserContext;
-    HV_UINT8 VideoOutputCount;
-    VIDEO_OUTPUT_SITUATION VideoOutput[ANYSIZE_ARRAY];
-} SYNTHVID_SITUATION_UPDATE_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
-#pragma pack()
+typedef SYNTHVID_SITUATION_UPDATE_MESSAGE _SYNTHVID_SITUATION_UPDATE_MESSAGE;
 
 // SynthvidSituationUpdateAck | 6
 
-typedef struct _SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT64 UserContext;
-} SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
+typedef SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE _SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
 
 // SynthvidPointerPosition | 7
 
@@ -1985,7 +1917,7 @@ typedef struct _SYNTHRDP_VERSION_REQUEST_MESSAGE
 
 // SynthrdpVersionResponse | 2
 
-#define SYNTHRDP_TRUE_WITH_VERSION_EXCHANGE 2
+#define SYNTHRDP_TRUE_WITH_VERSION_EXCHANGE TRUE_WITH_VERSION_EXCHANGE
 
 #pragma pack(1)
 typedef struct _SYNTHRDP_VERSION_RESPONSE_MESSAGE
