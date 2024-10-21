@@ -421,15 +421,6 @@ typedef struct _VMDATA_GPA_DIRECT
 // Microsoft Hyper-V Video
 //
 
-// {DA0A7802-E377-4AAC-8E77-0558EB1073F8}
-const HV_GUID SYNTHVID_CONTROL_CLASS_ID =
-{
-    0xDA0A7802,
-    0xE377,
-    0x4AAC,
-    { 0x8E, 0x77, 0x05, 0x58, 0xEB, 0x10, 0x73, 0xF8 }
-};
-
 typedef enum _SYNTHVID_MESSAGE_TYPE
 {
     SynthvidError = 0,
@@ -703,15 +694,6 @@ typedef struct _SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
 // Microsoft Hyper-V Virtual Keyboard
 //
 
-// {F912AD6D-2B17-48EA-BD65-F927A61C7684}
-const HV_GUID HK_CONTROL_CLASS_ID =
-{
-    0xF912AD6D,
-    0x2B17,
-    0x48EA,
-    { 0xBD, 0x65, 0xF9, 0x27, 0xA6, 0x1C, 0x76, 0x84 }
-};
-
 typedef enum _HK_MESSAGE_TYPE
 {
     HkMessageProtocolRequest = 1,
@@ -910,15 +892,6 @@ typedef struct _SYNTHHID_MESSAGE
 // Microsoft Hyper-V Fibre Channel HBA
 //
 
-// {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
-const HV_GUID VSTOR_SCSI_CONTROL_CLASS_ID =
-{
-    0xBA6163D9,
-    0x04A1,
-    0x4D29,
-    { 0xB6, 0x05, 0x72, 0xE2, 0xFF, 0xB1, 0xDC, 0x7F }
-};
-
 // {2F9BCC4A-0069-4AF3-B76B-6FD0BE528CDA}
 const HV_GUID VSTOR_FC_CONTROL_CLASS_ID =
 {
@@ -1077,15 +1050,6 @@ typedef struct _VSTOR_PACKET
 // *****************************************************************************
 // Microsoft Hyper-V Network Adapter
 //
-
-// {F8615163-DF3E-46C5-913F-F2D2F965ED0E}
-const HV_GUID NVSP_CONTROL_CLASS_ID =
-{
-    0xF8615163,
-    0xDF3E,
-    0x46C5,
-    { 0x91, 0x3F, 0xF2, 0xD2, 0xF9, 0x65, 0xED, 0x0E }
-};
 
 typedef enum _NVSP_MESSAGE_TYPE
 {

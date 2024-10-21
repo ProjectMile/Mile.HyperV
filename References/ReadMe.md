@@ -121,6 +121,7 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\Include\Hv\HvGuestMsr.h
 - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
 - MsvmPkg\Include\Hv\HvGuestHypercall.h
+- MsvmPkg\MsvmPkg.dec
 
 - MsvmPkg\Include\Protocol\EfiHv.h
 - MsvmPkg\Include\Protocol\Emcl.h
