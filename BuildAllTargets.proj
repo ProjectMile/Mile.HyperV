@@ -4,9 +4,9 @@
   xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="Packaging">
     <MSBuild
-      Projects="$(MSBuildThisFileDirectory)Mile.Project.Windows\Mile.Project.NuGetPackaging.proj"
+      Projects="$(MSBuildThisFileDirectory)Mile.HyperV.NuGet\Mile.HyperV.proj"
       Targets="Restore;Build"
       StopOnFirstFailure="True"
-      Properties="PreferredToolArchitecture=x64;NuspecFile=$(MSBuildThisFileDirectory)Mile.HyperV.NuGet\Mile.HyperV.nuspec" />
+      Properties="PreferredToolArchitecture=x64" />
   </Target>
 </Project>
