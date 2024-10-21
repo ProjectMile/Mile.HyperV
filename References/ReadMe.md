@@ -125,14 +125,13 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\Include\Vmbus\NtStatus.h
 - MsvmPkg\VmbusDxe\VmbusP.h
 - MsvmPkg\VmbusDxe\ChannelMessages.h
+- MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
 
 - MsvmPkg\Include\Protocol\EfiHv.h
 - MsvmPkg\Include\Protocol\Emcl.h
 - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 - MsvmPkg\Include\Protocol\Vmbus.h
 - MsvmPkg\Include\Protocol\VmbusFileSystem.h
-- MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
-- MsvmPkg\Include\Vmbus\VmbusPacketInterface.h
 - MsvmPkg\Include\MsvmBase.h
 - MsvmPkg\Include\VirtualDeviceId.h
 - MsvmPkg\Library\HvHypercallLib\HvHypercallLib.c

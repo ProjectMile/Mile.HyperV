@@ -14,6 +14,7 @@
 //   - MsvmPkg\Include\Vmbus\NtStatus.h
 //   - MsvmPkg\VmbusDxe\VmbusP.h
 //   - MsvmPkg\VmbusDxe\ChannelMessages.h
+//   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -58,6 +59,11 @@ typedef struct _GUID
 } GUID;
 #endif // !GUID_DEFINED
 
+#ifndef OFFSET_OF
+// Macro that returns the byte offset of a field in a data structure.
+#define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
+#endif // !OFFSET_OF
+
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus
 //
@@ -65,14 +71,18 @@ typedef struct _GUID
 #define MAXIMUM_SYNIC_MESSAGE_BYTES 240
 #define MAX_USER_DEFINED_BYTES 120
 
+// This structure defines a range in guest physical space that can be made to
+// look virtually contiguous.
 typedef struct _GPA_RANGE
 {
     HV_UINT32 ByteCount;
     HV_UINT32 ByteOffset;
     HV_UINT64 PfnArray[ANYSIZE_ARRAY];
-} GPA_RANGE;
+} GPA_RANGE, *PGPA_RANGE;
 
-#pragma pack(push,1)
+#define GPA_RANGE_MAX_PFN_COUNT 0xfffff
+
+#pragma pack(push, 1)
 
 // A revision number of vmbus that is used for ensuring both ends on a partition
 // are using compatible versions.
@@ -168,18 +178,19 @@ typedef struct _VMBUS_CHANNEL_MESSAGE_HEADER
 // available, since bits that were not defined are masked out when using an
 // older protocol version.
 
-#define VMBUS_OFFER_FLAG_ENUMERATE_DEVICE_INTERFACE     0x1
+#define VMBUS_OFFER_FLAG_ENUMERATE_DEVICE_INTERFACE 0x1
 // This flag indicates that the channel is offered by the paravisor, and may
 // use encrypted memory for the channel ring buffer.
-#define VMBUS_OFFER_FLAG_CONFIDENTIAL_CHANNEL           0x2
-#define VMBUS_OFFER_FLAG_NAMED_PIPE_MODE                0x10
-#define VMBUS_OFFER_FLAG_TLNPI_PROVIDER                 0x2000
+#define VMBUS_OFFER_FLAG_CONFIDENTIAL_CHANNEL 0x2
+#define VMBUS_OFFER_FLAG_NAMED_PIPE_MODE 0x10
+#define VMBUS_OFFER_FLAG_TLNPI_PROVIDER 0x2000
 
-#define VMBUS_OFFER_FLAGS_WIN6 (VMBUS_OFFER_FLAG_ENUMERATE_DEVICE_INTERFACE | \
-                                VMBUS_OFFER_FLAG_NAMED_PIPE_MODE)
+#define VMBUS_OFFER_FLAGS_WIN6 ( \
+    VMBUS_OFFER_FLAG_ENUMERATE_DEVICE_INTERFACE | \
+    VMBUS_OFFER_FLAG_NAMED_PIPE_MODE)
 
-#define VMBUS_OFFER_FLAGS_WIN10 (VMBUS_OFFER_FLAGS_WIN6 | \
-                                VMBUS_OFFER_FLAG_TLNPI_PROVIDER)
+#define VMBUS_OFFER_FLAGS_WIN10 \
+    (VMBUS_OFFER_FLAGS_WIN6 | VMBUS_OFFER_FLAG_TLNPI_PROVIDER)
 
 #define VMBUS_VP_INDEX_DISABLE_INTERRUPT ((HV_UINT32)-1)
 
@@ -223,7 +234,8 @@ static_assert(
     sizeof(VMBUS_CHANNEL_OFFER_CHANNEL) <= MAXIMUM_SYNIC_MESSAGE_BYTES,
     "Offer message too large");
 
-#define VMBUS_CHANNEL_OFFER_CHANNEL_SIZE_PRE_WIN7 182
+#define VMBUS_CHANNEL_OFFER_CHANNEL_SIZE_PRE_WIN7 \
+    (HV_UINT32)OFFSET_OF(VMBUS_CHANNEL_OFFER_CHANNEL, Windows6Offset)
 
 // Rescind Offer parameters
 typedef struct _VMBUS_CHANNEL_RESCIND_OFFER
@@ -267,7 +279,8 @@ typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
     HV_UINT16 Flags;
 } VMBUS_CHANNEL_OPEN_CHANNEL, *PVMBUS_CHANNEL_OPEN_CHANNEL;
 
-#define VMBUS_CHANNEL_OPEN_CHANNEL_MIN_SIZE 140
+#define VMBUS_CHANNEL_OPEN_CHANNEL_MIN_SIZE \
+    OFFSET_OF(VMBUS_CHANNEL_OPEN_CHANNEL, ConnectionId)
 
 // Open Channel Result parameters
 typedef struct _VMBUS_CHANNEL_OPEN_RESULT
@@ -375,7 +388,8 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
     GUID ClientId;
 } VMBUS_CHANNEL_INITIATE_CONTACT, *PVMBUS_CHANNEL_INITIATE_CONTACT;
 
-#define VMBUS_CHANNEL_INITIATE_CONTACT_MIN_SIZE 32
+#define VMBUS_CHANNEL_INITIATE_CONTACT_MIN_SIZE \
+    OFFSET_OF(VMBUS_CHANNEL_INITIATE_CONTACT, ClientId)
 
 typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
 {
@@ -393,7 +407,8 @@ typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
     HV_UINT32 SupportedFeatures;
 } VMBUS_CHANNEL_VERSION_RESPONSE, *PVMBUS_CHANNEL_VERSION_RESPONSE;
 
-#define VMBUS_CHANNEL_VERSION_RESPONSE_MIN_SIZE 8
+#define VMBUS_CHANNEL_VERSION_RESPONSE_MIN_SIZE \
+    OFFSET_OF(VMBUS_CHANNEL_VERSION_RESPONSE, SupportedFeatures)
 
 // Status codes for the ConnectionState field of VMBUS_CHANNEL_VERSION_RESPONSE.
 // N.B. If VersionSupported is FALSE, do not consult this value. If the
@@ -453,7 +468,8 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
     };
 } VMBUS_CHANNEL_TL_CONNECT_REQUEST, *PVMBUS_CHANNEL_TL_CONNECT_REQUEST;
 
-#define VMBUS_CHANNEL_TL_CONNECT_REQUEST_PRE_RS5_SIZE 32
+#define VMBUS_CHANNEL_TL_CONNECT_REQUEST_PRE_RS5_SIZE \
+    (HV_UINT32)OFFSET_OF(VMBUS_CHANNEL_TL_CONNECT_REQUEST, WindowsRS1Offset)
 
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 {
@@ -483,6 +499,152 @@ typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE
 #define VMBUS_MESSAGE_TYPE 1
 #define VMBUS_MAX_GPADLS 256
 #define VMBUS_MAX_CHANNELS HV_EVENT_FLAGS_COUNT
+
+typedef enum _ENDPOINT_TYPE {
+    VmbusServerEndpoint = 0,
+    VmbusClientEndpoint,
+    VmbusEndpointMaximum
+} ENDPOINT_TYPE, *PENDPOINT_TYPE;
+
+#pragma pack(push, 1)
+
+// The VM ring control block is the control region for one direction of an
+// endpoint. It is always page aligned.
+typedef struct _VMRCB
+{
+    // Offset in bytes from the ring base
+    HV_UINT32 In;
+    // Offset in bytes from the ring base
+    HV_UINT32 Out;
+    // If the receiving endpoint sets this to some non-zero value, the sending
+    // endpoint should not send any interrupts.
+    HV_UINT32 InterruptMask;
+    // If the sending endpoint sets this to a non-zero value, the receiving
+    // endpoint should send an interrupt when the free byte count is greater
+    // than this value.
+    HV_UINT32 PendingSendSize;
+    HV_UINT32 Reserved[12];
+    union
+    {
+        struct
+        {
+            HV_UINT32 SupportsPendingSendSize : 1;
+        };
+        HV_UINT32 Value;
+    } FeatureBits;
+} VMRCB, *PVMRCB;
+
+static_assert(OFFSET_OF(VMRCB, FeatureBits) == 64);
+
+typedef struct _VMPACKET_DESCRIPTOR
+{
+    HV_UINT16 Type;
+    HV_UINT16 DataOffset8;
+    HV_UINT16 Length8;
+    HV_UINT16 Flags;
+    HV_UINT64 TransactionId;
+} VMPACKET_DESCRIPTOR, *PVMPACKET_DESCRIPTOR;
+
+typedef union _PREVIOUS_PACKET_OFFSET
+{
+    struct
+    {
+        HV_UINT32 Reserved;
+        HV_UINT32 Offset;
+    };
+    HV_UINT64 AsUINT64;
+} PREVIOUS_PACKET_OFFSET, *PPREVIOUS_PACKET_OFFSET;
+
+typedef struct _VMTRANSFER_PAGE_RANGE
+{
+    HV_UINT32 ByteCount;
+    HV_UINT32 ByteOffset;
+} VMTRANSFER_PAGE_RANGE, *PVMTRANSFER_PAGE_RANGE;
+
+typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
+{
+    VMPACKET_DESCRIPTOR Descriptor;
+    HV_UINT16 TransferPageSetId;
+    HV_UINT8 SenderOwnsSet;
+    HV_UINT8 Reserved;
+    HV_UINT32 RangeCount;
+    VMTRANSFER_PAGE_RANGE Ranges[ANYSIZE_ARRAY];
+} VMTRANSFER_PAGE_PACKET_HEADER, *PVMTRANSFER_PAGE_PACKET_HEADER;
+
+// This is the format for a GPA-Direct packet, which contains a set of GPA
+// ranges, in addition to commands and/or data.
+typedef struct _VMDATA_GPA_DIRECT
+{
+    VMPACKET_DESCRIPTOR Descriptor;
+    HV_UINT32 Reserved;
+    HV_UINT32 RangeCount;
+    GPA_RANGE Range[ANYSIZE_ARRAY];
+} VMDATA_GPA_DIRECT, *PVMDATA_GPA_DIRECT;
+
+typedef enum _VMPIPE_PROTOCOL_MESSAGE_TYPE
+{
+    VmPipeMessageInvalid = 0,
+    VmPipeMessageData = 1,
+    VmPipeMessagePartial = 2,
+    VmPipeMessageSetupGpaDirect = 3,
+    VmPipeMessageTeardownGpaDirect = 4,
+    VmPipeMessageIndicationComplete = 5,
+} VMPIPE_PROTOCOL_MESSAGE_TYPE, *PVMPIPE_PROTOCOL_MESSAGE_TYPE;
+
+typedef struct _VMPIPE_PROTOCOL_HEADER
+{
+    VMPIPE_PROTOCOL_MESSAGE_TYPE PacketType;
+    union
+    {
+        HV_UINT32 DataSize;
+        struct
+        {
+            HV_UINT16 DataSize;
+            HV_UINT16 Offset;
+        } Partial;
+    };
+} VMPIPE_PROTOCOL_HEADER, *PVMPIPE_PROTOCOL_HEADER;
+
+typedef struct _VMPIPE_SETUP_GPA_DIRECT_BODY
+{
+    HV_UINT32 Handle;
+    // BOOLEAN
+    HV_UINT8 IsWritable;
+    HV_UINT32 RangeCount;
+    GPA_RANGE Range[ANYSIZE_ARRAY];
+} VMPIPE_SETUP_GPA_DIRECT_BODY, *PVMPIPE_SETUP_GPA_DIRECT_BODY;
+
+typedef struct _VMPIPE_TEARDOWN_GPA_DIRECT_BODY
+{
+    HV_UINT32 Handle;
+} VMPIPE_TEARDOWN_GPA_DIRECT_BODY, *PVMPIPE_TEARDOWN_GPA_DIRECT_BODY;
+
+typedef enum _VMBUS_PACKET_TYPE
+{
+    VmbusPacketTypeInvalid = 0x0,
+
+    // 1 through 5 are reserved.
+
+    VmbusPacketTypeDataInBand = 0x6,
+    VmbusPacketTypeDataUsingTransferPages = 0x7,
+
+    // 8 is reserved.
+
+    VmbusPacketTypeDataUsingGpaDirect = 0x9,
+    VmbusPacketTypeCancelRequest = 0xa,
+    VmbusPacketTypeCompletion = 0xb,
+} VMBUS_PACKET_TYPE, *PVMBUS_PACKET_TYPE;
+
+#define VMBUS_DATA_PACKET_FLAG_COMPLETION_REQUESTED 1
+
+#pragma pack(pop)
+
+typedef struct _VMTRANSFER_PAGE_RANGES
+{
+    struct _VMTRANSFER_PAGE_RANGES* Next;
+    HV_UINT32 RangeCount;
+    VMTRANSFER_PAGE_RANGE Range[ANYSIZE_ARRAY];
+} VMTRANSFER_PAGE_RANGES, *PVMTRANSFER_PAGE_RANGES;
 
 // *****************************************************************************
 // Microsoft Hyper-V Video

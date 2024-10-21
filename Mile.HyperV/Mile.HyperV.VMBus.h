@@ -9,7 +9,6 @@
  */
 
 // References
-// - Symbols in Windows version 10.0.14347.0's vmbus.sys
 // - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
 // - Symbols in Windows version 10.0.14347.0's hyperkbd.sys
 // - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
@@ -48,95 +47,6 @@ typedef struct _HV_RECT
     HV_INT32 Right;
     HV_INT32 Bottom;
 } HV_RECT, *PHV_RECT;
-
-// *****************************************************************************
-// Microsoft Hyper-V Virtual Machine Bus
-//
-
-typedef enum _VMPIPE_PROTOCOL_MESSAGE_TYPE
-{
-    VmPipeMessageInvalid = 0,
-    VmPipeMessageData = 1,
-    VmPipeMessagePartial = 2,
-    VmPipeMessageSetupGpaDirect = 3,
-    VmPipeMessageTeardownGpaDirect = 4,
-} VMPIPE_PROTOCOL_MESSAGE_TYPE, *PVMPIPE_PROTOCOL_MESSAGE_TYPE;
-
-typedef struct _VMPIPE_PROTOCOL_HEADER
-{
-    VMPIPE_PROTOCOL_MESSAGE_TYPE PacketType;
-    union
-    {
-        HV_UINT32 DataSize;
-        struct
-        {
-            HV_UINT16 DataSize;
-            HV_UINT16 Offset;
-        } Partial;
-    };
-} VMPIPE_PROTOCOL_HEADER, *PVMPIPE_PROTOCOL_HEADER;
-
-typedef GPA_RANGE *PGPA_RANGE;
-
-typedef struct _VMRCB
-{
-    HV_UINT32 In;
-    HV_UINT32 Out;
-    HV_UINT32 InterruptMask;
-    HV_UINT32 PendingSendSize;
-    HV_UINT32 Reserved[12];
-    union
-    {
-        HV_UINT32 Value;
-        struct
-        {
-            HV_UINT32 SupportsPendingSendSize : 1;
-        };
-    } FeatureBits;
-} VMRCB, *PVMRCB;
-
-typedef enum _VMBUS_PACKET_TYPE
-{
-    VmbusPacketTypeInvalid = 0,
-    VmbusPacketTypeDataInBand = 6,
-    VmbusPacketTypeDataUsingTransferPages = 7,
-    VmbusPacketTypeDataUsingGpaDirect = 9,
-    VmbusPacketTypeCancelRequest = 10,
-    VmbusPacketTypeCompletion = 11,
-} VMBUS_PACKET_TYPE, *PVMBUS_PACKET_TYPE;
-
-typedef struct _VMPACKET_DESCRIPTOR
-{
-    HV_UINT16 Type; // VMBUS_PACKET_TYPE
-    HV_UINT16 DataOffset8;
-    HV_UINT16 Length8;
-    HV_UINT16 Flags;
-    HV_UINT64 TransactionId;
-} VMPACKET_DESCRIPTOR, *PVMPACKET_DESCRIPTOR;
-
-typedef struct _VMTRANSFER_PAGE_RANGE
-{
-    HV_UINT32 ByteCount;
-    HV_UINT32 ByteOffset;
-} VMTRANSFER_PAGE_RANGE, *PVMTRANSFER_PAGE_RANGE;
-
-typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
-{
-    VMPACKET_DESCRIPTOR Descriptor;
-    HV_UINT16 TransferPageSetId;
-    HV_UINT8 SenderOwnsSet;
-    HV_UINT8 Reserved;
-    HV_UINT32 RangeCount;
-    VMTRANSFER_PAGE_RANGE Ranges[ANYSIZE_ARRAY];
-} VMTRANSFER_PAGE_PACKET_HEADER, *PVMTRANSFER_PAGE_PACKET_HEADER;
-
-typedef struct _VMDATA_GPA_DIRECT
-{
-    VMPACKET_DESCRIPTOR Descriptor;
-    HV_UINT32 Reserved;
-    HV_UINT32 RangeCount;
-    GPA_RANGE Range[ANYSIZE_ARRAY];
-} VMDATA_GPA_DIRECT, *PVMDATA_GPA_DIRECT;
 
 // *****************************************************************************
 // Microsoft Hyper-V Video
