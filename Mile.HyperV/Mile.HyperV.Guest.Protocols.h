@@ -68,7 +68,7 @@ typedef struct _GUID
 
 #ifndef OFFSET_OF
 // Macro that returns the byte offset of a field in a data structure.
-#define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
+#define OFFSET_OF(TYPE, Field) ((HV_UINT64) &(((TYPE *)0)->Field))
 #endif // !OFFSET_OF
 
 // *****************************************************************************
