@@ -24,6 +24,8 @@
   - MsvmPkg\VmbusDxe\ChannelMessages.h
   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
   - MsvmPkg\VideoDxe\SynthVidProtocol.h
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv.
 - Migrate from Mile.Project.Windows to Mile.Project.Configurations for
   streamlining the build toolchain of this package.
 
