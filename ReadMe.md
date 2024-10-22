@@ -32,6 +32,7 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\VmbusDxe\ChannelMessages.h
     - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
     - MsvmPkg\VideoDxe\SynthVidProtocol.h
+    - MsvmPkg\VideoDxe\VramSize.h
     - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b

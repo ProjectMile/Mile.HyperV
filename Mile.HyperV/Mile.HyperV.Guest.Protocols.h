@@ -16,6 +16,7 @@
 //   - MsvmPkg\VmbusDxe\ChannelMessages.h
 //   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
 //   - MsvmPkg\VideoDxe\SynthVidProtocol.h
+//   - MsvmPkg\VideoDxe\VramSize.h
 //   - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
@@ -795,6 +796,12 @@ typedef struct
 } SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
 
 #pragma pack(pop)
+
+#define DEFAULT_VRAM_SIZE_WIN7 (4 * 1024 * 1024)
+
+// In Win8 the synthetic video device upgraded the color depth capabilty from 16
+// to 32 bits per pixel.
+#define DEFAULT_VRAM_SIZE_WIN8 (2 * DEFAULT_VRAM_SIZE_WIN7)
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Keyboard

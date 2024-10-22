@@ -127,6 +127,7 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\VmbusDxe\ChannelMessages.h
 - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
 - MsvmPkg\VideoDxe\SynthVidProtocol.h
+- MsvmPkg\VideoDxe\VramSize.h
 - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 
 - MsvmPkg\Include\Protocol\EfiHv.h
@@ -138,6 +139,5 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\Library\HvHypercallLib\HvHypercallLib.c
 - MsvmPkg\NetvscDxe\nvspprotocol.h
 - MsvmPkg\StorvscDxe\VstorageProtocol.h
-- MsvmPkg\VideoDxe\VramSize.h
 - MsvmPkg\VpcivscDxe\VpciProtocol.h
 - MsvmPkg\VpcivscDxe\wdm.h
