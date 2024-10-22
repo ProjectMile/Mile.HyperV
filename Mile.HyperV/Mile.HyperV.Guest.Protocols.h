@@ -12,6 +12,7 @@
 // - Hyper-V Generation 2 Virtual Machine UEFI Firmware
 //   - MsvmPkg\MsvmPkg.dec
 //   - MsvmPkg\Include\Vmbus\NtStatus.h
+//   - MsvmPkg\Include\MsvmBase.h
 //   - MsvmPkg\VmbusDxe\VmbusP.h
 //   - MsvmPkg\VmbusDxe\ChannelMessages.h
 //   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
@@ -70,8 +71,28 @@ typedef struct _GUID
 
 #ifndef OFFSET_OF
 // Macro that returns the byte offset of a field in a data structure.
-#define OFFSET_OF(TYPE, Field) ((HV_UINT64) &(((TYPE *)0)->Field))
+#define OFFSET_OF(TYPE, Field) ((HV_UINT64)&(((TYPE *)0)->Field))
 #endif // !OFFSET_OF
+
+#ifndef FIELD_SIZE
+#define FIELD_SIZE(TYPE, Field) (sizeof(((TYPE *)0)->Field))
+#endif // !FIELD_SIZE
+
+#ifndef SIZEOF_THROUGH_FIELD
+#define SIZEOF_THROUGH_FIELD(TYPE, Field) \
+    (OFFSET_OF(TYPE, Field) + FIELD_SIZE(TYPE, Field))
+#endif // !SIZEOF_THROUGH_FIELD
+
+//CONTAINS_FIELD usage:
+//  if (CONTAINS_FIELD(pBlock, pBlock->cbSize, dwMumble))
+//  {
+//      // safe to use pBlock->dwMumble
+//  }
+#ifndef CONTAINS_FIELD
+#define CONTAINS_FIELD(Struct, Size, Field) ( \
+    (((PHV_UINT8)(&(Struct)->Field)) + sizeof((Struct)->Field)) \
+    <= (((PHV_UINT8)(Struct))+(Size)))
+#endif // !CONTAINS_FIELD
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus

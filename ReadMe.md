@@ -28,6 +28,7 @@ folder which you actually needed to your C/C++ projects.
     https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
     - MsvmPkg\MsvmPkg.dec
     - MsvmPkg\Include\Vmbus\NtStatus.h
+    - MsvmPkg\Include\MsvmBase.h
     - MsvmPkg\VmbusDxe\VmbusP.h
     - MsvmPkg\VmbusDxe\ChannelMessages.h
     - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h

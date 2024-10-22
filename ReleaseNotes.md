@@ -24,6 +24,7 @@
   - MsvmPkg\Include\Hv\HvGuestHypercall.h
   - MsvmPkg\MsvmPkg.dec
   - MsvmPkg\Include\Vmbus\NtStatus.h
+  - MsvmPkg\Include\MsvmBase.h
   - MsvmPkg\VmbusDxe\VmbusP.h
   - MsvmPkg\VmbusDxe\ChannelMessages.h
   - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
