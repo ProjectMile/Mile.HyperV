@@ -19,6 +19,7 @@
 //   - MsvmPkg\VideoDxe\SynthVidProtocol.h
 //   - MsvmPkg\VideoDxe\VramSize.h
 //   - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
+//   - MsvmPkg\StorvscDxe\VstorageProtocol.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -71,11 +72,11 @@ typedef struct _GUID
 
 #ifndef OFFSET_OF
 // Macro that returns the byte offset of a field in a data structure.
-#define OFFSET_OF(TYPE, Field) ((HV_UINT64)&(((TYPE *)0)->Field))
+#define OFFSET_OF(TYPE, Field) ((HV_UINT64)&(((TYPE*)0)->Field))
 #endif // !OFFSET_OF
 
 #ifndef FIELD_SIZE
-#define FIELD_SIZE(TYPE, Field) (sizeof(((TYPE *)0)->Field))
+#define FIELD_SIZE(TYPE, Field) (sizeof(((TYPE*)0)->Field))
 #endif // !FIELD_SIZE
 
 #ifndef SIZEOF_THROUGH_FIELD
@@ -891,13 +892,321 @@ typedef struct _HK_MESSAGE_KEYSTROKE
 //
 
 // {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
-const GUID VSTOR_SCSI_CONTROL_CLASS_ID =
+const GUID VMSCSI_CONTROL_CLASS_ID =
 {
     0xBA6163D9,
     0x04A1,
     0x4D29,
     { 0xB6, 0x05, 0x72, 0xE2, 0xFF, 0xB1, 0xDC, 0x7F }
 };
+
+// Public interface to the server
+
+// Protocol versions.
+
+// Major/minor macros.  Minor version is in LSB, meaning that earlier flat
+// version numbers will be interpreted as "0.x" (i.e., 1 becomes 0.1).
+
+#define VMSTOR_PROTOCOL_MAJOR(VERSION_) (((VERSION_) >> 8) & 0xff)
+#define VMSTOR_PROTOCOL_MINOR(VERSION_) (((VERSION_)) & 0xff)
+#define VMSTOR_PROTOCOL_VERSION(MAJOR_, MINOR_) \
+    ((((MAJOR_) & 0xff) << 8) | (((MINOR_) & 0xff)))
+
+// Invalid version.
+#define VMSTOR_INVALID_PROTOCOL_VERSION -1
+
+// Version history:
+//
+// V1 (Win2k8 Server)
+//   Beta              0.1
+//   RC < 2008/1/31    1.0
+//   RC > 2008/1/31    2.0
+//   Servicing         3.0 (reserved)
+// Win7
+//   M3                3.0 (deprecated)
+//   Beta              4.0
+//   Release           4.2
+// Win8
+//   M3                5.0
+//   Beta              5.1
+//   RC                5.1 (added multi-channel support flag)
+// Win Blue
+//   MQ                6.0 (added Asynchronous Notification)
+
+#define VMSTOR_PROTOCOL_VERSION_WIN6 VMSTOR_PROTOCOL_VERSION(2, 0)
+#define VMSTOR_PROTOCOL_VERSION_WIN7 VMSTOR_PROTOCOL_VERSION(4, 2)
+#define VMSTOR_PROTOCOL_VERSION_WIN8 VMSTOR_PROTOCOL_VERSION(5, 1)
+#define VMSTOR_PROTOCOL_VERSION_BLUE VMSTOR_PROTOCOL_VERSION(6, 0)
+#define VMSTOR_PROTOCOL_VERSION_CURRENT VMSTOR_PROTOCOL_VERSION_BLUE
+
+// The max transfer length will be published when we offer a vmbus channel.
+// Max transfer bytes - this determines the reserved MDL size and how large
+// requests can be that the clients will forward.
+#define MAX_TRANSFER_LENGTH (8*1024*1024)
+
+// Indicates that the device supports Asynchronous Notifications (AN)
+#define VMSTOR_PROPERTY_AN_CAPABLE 0x1
+
+// Packet structure describing virtual storage requests.
+typedef enum
+{
+    VStorOperationCompleteIo = 1,
+    VStorOperationRemoveDevice = 2,
+    VStorOperationExecuteSRB = 3,
+    VStorOperationResetLun = 4,
+    VStorOperationResetAdapter = 5,
+    VStorOperationResetBus = 6,
+    VStorOperationBeginInitialization = 7,
+    VStorOperationEndInitialization = 8,
+    VStorOperationQueryProtocolVersion = 9,
+    VStorOperationQueryProperties = 10,
+    VStorOperationEnumerateBus = 11,
+    VStorOperationFcHbaData = 12,
+    VStorOperationCreateSubChannels = 13,
+    VStorOperationEventNotification = 14,
+    VStorOperationMaximum = 14,
+} VSTOR_PACKET_OPERATION;
+
+// Platform neutral description of a SCSI request
+
+#pragma pack(push, 1)
+
+#define CDB16GENERIC_LENGTH 0x10
+
+#define MAX_DATA_BUFFER_LENGTH_WITH_PADDING 0x14
+
+#define VMSCSI_SENSE_BUFFER_SIZE_REVISION_1 0x12
+#define VMSCSI_SENSE_BUFFER_SIZE 0x14
+
+typedef struct _VMSCSI_REQUEST
+{
+    HV_UINT16 Length;
+    HV_UINT8 SrbStatus;
+    HV_UINT8 ScsiStatus;
+    HV_UINT8 Reserved1;
+    HV_UINT8 PathId;
+    HV_UINT8 TargetId;
+    HV_UINT8 Lun;
+    HV_UINT8 CdbLength;
+    HV_UINT8 SenseInfoExLength;
+    HV_UINT8 DataIn;
+    HV_UINT8 Properties;
+    HV_UINT32 DataTransferLength;
+    union
+    {
+        HV_UINT8 Cdb[CDB16GENERIC_LENGTH];
+        HV_UINT8 SenseDataEx[VMSCSI_SENSE_BUFFER_SIZE];
+        HV_UINT8 ReservedArray[MAX_DATA_BUFFER_LENGTH_WITH_PADDING];
+    };
+
+    // The following were added in Windows 8
+
+    HV_UINT16 Reserve;
+    HV_UINT8 QueueTag;
+    HV_UINT8 QueueAction;
+    HV_UINT32 SrbFlags;
+    HV_UINT32 TimeOutValue;
+    HV_UINT32 QueueSortKey;
+} VMSCSI_REQUEST, *PVMSCSI_REQUEST;
+
+static_assert((sizeof(VMSCSI_REQUEST) % 4) == 0);
+
+#define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 \
+    OFFSET_OF(VMSCSI_REQUEST, Reserve)
+
+static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 == 0x24);
+
+#define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 \
+    SIZEOF_THROUGH_FIELD(VMSCSI_REQUEST, QueueSortKey)
+
+static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 == 0x34);
+
+// This structure is sent during the intialization phase to get the different
+// properties of the channel.
+// The reserved properties are not guaranteed to be zero before protocol version
+// 5.1.
+typedef struct _VMSTORAGE_CHANNEL_PROPERTIES
+{
+    HV_UINT32 Reserved;
+    HV_UINT16 MaximumSubChannelCount;
+    HV_UINT16 Reserved2;
+    HV_UINT32 Flags;
+    HV_UINT32 MaxTransferBytes;
+    HV_UINT64 Reserved3;
+} VMSTORAGE_CHANNEL_PROPERTIES, *PVMSTORAGE_CHANNEL_PROPERTIES;
+
+// Channel Property Flags
+
+#define STORAGE_CHANNEL_SUPPORTS_MULTI_CHANNEL 0x1
+
+static_assert((sizeof(VMSTORAGE_CHANNEL_PROPERTIES) % 4) == 0);
+
+// This structure is sent as part of the channel offer. It exists for old
+// versions of the VSC that used this to determine the IDE channel that matched
+// up with the VMBus channel.
+// The reserved properties are not guaranteed to be zero.
+typedef struct _VMSTORAGE_OFFER_PROPERTIES
+{
+    HV_UINT16 Reserved;
+    HV_UINT8 PathId;
+    HV_UINT8 TargetId;
+    HV_UINT32 Reserved2;
+    HV_UINT32 Flags;
+    HV_UINT32 Reserved3[3];
+} VMSTORAGE_OFFER_PROPERTIES, *PVMSTORAGE_OFFER_PROPERTIES;
+
+#define STORAGE_OFFER_EMULATED_IDE_FLAG 0x2
+
+// This structure is sent during the storage protocol negotiations.
+typedef struct _VMSTORAGE_PROTOCOL_VERSION
+{
+    // Major (MSW) and minor (LSW) version numbers.
+    HV_UINT16 MajorMinor;
+    // Windows build number. Purely informative.
+    HV_UINT16 Build;
+} VMSTORAGE_PROTOCOL_VERSION, *PVMSTORAGE_PROTOCOL_VERSION;
+
+static_assert((sizeof(VMSTORAGE_PROTOCOL_VERSION) % 4) == 0);
+
+// This structure is for fibre channel Wwn Packets.
+typedef struct _VMFC_WWN_PACKET
+{
+    // BOOLEAN
+    HV_UINT8 PrimaryWwnActive;
+    HV_UINT8 Reserved1;
+    HV_UINT16 Reserved2;
+    HV_UINT8 PrimaryPortWwn[8];
+    HV_UINT8 PrimaryNodeWwn[8];
+    HV_UINT8 SecondaryPortWwn[8];
+    HV_UINT8 SecondaryNodeWwn[8];
+} VMFC_WWN_PACKET, *PVMFC_WWN_PACKET;
+
+static_assert((sizeof(VMFC_WWN_PACKET) % 4) == 0);
+
+// Used to register or unregister Asynchronous Media Event Notification to the
+// client
+typedef struct _VSTOR_CLIENT_PROPERTIES
+{
+    HV_UINT32 AsyncNotifyCapable : 1;
+    HV_UINT32 Reserved : 31;
+} VSTOR_CLIENT_PROPERTIES, *PVSTOR_CLIENT_PROPERTIES;
+
+static_assert((sizeof(VSTOR_CLIENT_PROPERTIES) % 4) == 0);
+
+typedef struct _VSTOR_ASYNC_REGISTER_PACKET
+{
+    HV_UINT8 Lun;
+    HV_UINT8 Target;
+    HV_UINT8 Path;
+    // BOOLEAN
+    HV_UINT8 Register;
+} VSTOR_ASYNC_REGISTER_PACKET, *PVSTOR_ASYNC_REGISTER_PACKET;
+
+static_assert((sizeof(VSTOR_ASYNC_REGISTER_PACKET) % 4) == 0);
+
+// Used to send notifications to StorVsc about media change events
+typedef struct _VSTOR_NOTIFICATION_PACKET
+{
+    HV_UINT8 Lun;
+    HV_UINT8 Target;
+    HV_UINT8 Path;
+    HV_UINT8 Flags;
+} VSTOR_NOTIFICATION_PACKET, *PVSTOR_NOTIFICATION_PACKET;
+
+static_assert((sizeof(VSTOR_NOTIFICATION_PACKET) % 4) == 0);
+
+typedef struct _VSTOR_PACKET
+{
+    // Requested operation type
+    VSTOR_PACKET_OPERATION Operation;
+    // Flags - see below for values
+    HV_UINT32 Flags;
+    // Status of the request returned from the server side.
+    HV_UINT32 Status;
+    // Data payload area
+    union
+    {
+        // Structure used to forward SCSI commands from the client to the
+        // server. (0x34 bytes)
+        VMSCSI_REQUEST VmSrb;
+        // Structure used to query channel properties.
+        VMSTORAGE_CHANNEL_PROPERTIES StorageChannelProperties;
+        // Used during version negotiations.
+        VMSTORAGE_PROTOCOL_VERSION Version;
+        // Used for fibre Channel address packet.
+        VMFC_WWN_PACKET FcWwnPacket;
+        // Number of subchannels to create via VStorOperationCreateSubChannel.
+        HV_UINT16 SubChannelCount;
+
+        // Used to perform Asynchronous Event Notifications
+
+        VSTOR_CLIENT_PROPERTIES ClientProperties;
+        VSTOR_NOTIFICATION_PACKET NotificationPacket;
+
+        // Buffer. The buffer size will be the maximun of union members. It is
+        // used to transfer data.
+        HV_UINT8 Buffer[0x34];
+    };
+} VSTOR_PACKET, *PVSTOR_PACKET;
+
+static_assert((sizeof(VSTOR_PACKET) % 8) == 0);
+
+#define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 ( \
+    SIZEOF_THROUGH_FIELD(VSTOR_PACKET, Status) \
+    + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1)
+
+static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 == 0x30);
+
+#define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 ( \
+    SIZEOF_THROUGH_FIELD(VSTOR_PACKET, Status) \
+    + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2)
+
+static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 == 0x40);
+
+// Packet flags
+
+// This flag indicates that the server should send back a completion for this
+// packet.
+#define REQUEST_COMPLETION_FLAG 0x1
+
+// This is the set of flags that the VSC can set in any packets it sends
+#define VSC_LEGAL_FLAGS (REQUEST_COMPLETION_FLAG)
+
+#pragma pack(pop)
+
+typedef struct _ADAPTER_ADDRESS
+{
+    HV_UINT64 PartitionId;
+    GUID ChannelInstanceGUID;
+
+    // SCSI address
+
+    HV_UINT8 Reserved;
+    HV_UINT8 PathId;
+    HV_UINT8 TargetId;
+    HV_UINT8 Lun;
+
+    // Flags
+
+    HV_UINT32 Flags;
+
+    // World wide names for SynthFc
+
+    // BOOLEAN
+    HV_UINT8 PrimaryWwnActive;
+    HV_UINT8 PrimaryPortWwn[8];
+    HV_UINT8 PrimaryNodeWwn[8];
+    HV_UINT8 SecondaryPortWwn[8];
+    HV_UINT8 SecondaryNodeWwn[8];
+} ADAPTER_ADDRESS, *PADAPTER_ADDRESS;
+
+// Flags for ADAPTER_ADDRESS
+
+#define ADAPTER_ADDRESS_EMULATED_DEVICE 0x1
+#define ADAPTER_ADDRESS_SYNTHFC_DEVICE 0x2
+
+// Alignment information
+#define VSTORAGE_ALIGNMENT_MASK 0x01
 
 // *****************************************************************************
 // Microsoft Hyper-V Network Adapter

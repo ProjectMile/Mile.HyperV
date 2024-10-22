@@ -8,12 +8,16 @@
   - Microsoft's original comments for interface and protocols.
   - More Hyper-V ARM64 guest definitions.
   - Introduce the definition of HvCallModifySparseGpaPageHostVisibility.
-  - More VMBus protocol definitions which replaced all definitions dumped from
-    Windows 10 Build 14347's vmbus.sys.
-  - More VMBus protocol definitions than all definitions dumped from Windows 10
-    Build 14347's HyperVideo.sys.
-  - More VMBus protocol definitions which replaced all definitions dumped from
-    Windows 10 Build 14347's hyperkbd.sys.
+  - More VMBus protocol definitions for Microsoft Hyper-V Virtual Machine Bus
+    device which replaced all definitions dumped from Windows 10 Build 14347's
+    vmbus.sys.
+  - More VMBus protocol definitions for Microsoft Hyper-V Video device.
+  - More VMBus protocol definitions for Microsoft Hyper-V Virtual Keyboard
+    device which replaced all definitions dumped from Windows 10 Build 14347's
+    hyperkbd.sys.
+  - More VMBus protocol definitions for Microsoft Hyper-V SCSI Controller device
+    and Microsoft Hyper-V Fibre Channel HBA device which replaced all
+    definitions dumped from Windows 10 Build 14347's storvsc.sys.
 - Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
   - MsvmPkg\Include\Hv\HvStatus.h
@@ -31,6 +35,7 @@
   - MsvmPkg\VideoDxe\SynthVidProtocol.h
   - MsvmPkg\VideoDxe\VramSize.h
   - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
+  - MsvmPkg\StorvscDxe\VstorageProtocol.h
   https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv.
 - Migrate from Mile.Project.Windows to Mile.Project.Configurations for
   streamlining the build toolchain of this package.

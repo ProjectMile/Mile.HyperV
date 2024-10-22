@@ -11,7 +11,6 @@
 // References
 // - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
 // - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
-// - Symbols in Windows version 10.0.14347.0's storvsc.sys
 // - Symbols in Windows version 10.0.14347.0's netvsc.sys
 // - Symbols in Windows version 10.0.14347.0's fcvsc.sys
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
@@ -406,7 +405,7 @@ typedef struct _SYNTHHID_MESSAGE
 //
 
 // {2F9BCC4A-0069-4AF3-B76B-6FD0BE528CDA}
-const HV_GUID VSTOR_FC_CONTROL_CLASS_ID =
+const HV_GUID VMFC_CONTROL_CLASS_ID =
 {
     0x2F9BCC4A,
     0x0069,
@@ -414,151 +413,21 @@ const HV_GUID VSTOR_FC_CONTROL_CLASS_ID =
     { 0xB7, 0x6B, 0x6F, 0xD0, 0xBE, 0x52, 0x8C, 0xDA }
 };
 
-typedef enum _VSTOR_PACKET_OPERATION
-{
-    VStorOperationCompleteIo = 1,
-    VStorOperationRemoveDevice = 2,
-    VStorOperationExecuteSRB = 3,
-    VStorOperationResetLun = 4,
-    VStorOperationResetAdapter = 5,
-    VStorOperationResetBus = 6,
-    VStorOperationBeginInitialization = 7,
-    VStorOperationEndInitialization = 8,
-    VStorOperationQueryProtocolVersion = 9,
-    VStorOperationQueryProperties = 10,
-    VStorOperationEnumerateBus = 11,
-    VStorOperationFcHbaData = 12,
-    VStorOperationCreateSubChannels = 13,
-    VStorOperationEventNotification = 14,
-    VStorOperationMaximum = 15,
-} VSTOR_PACKET_OPERATION, *PVSTOR_PACKET_OPERATION;
+#define VSTOR_SCSI_CONTROL_CLASS_ID VMSCSI_CONTROL_CLASS_ID
+#define VSTOR_FC_CONTROL_CLASS_ID VMFC_CONTROL_CLASS_ID
 
-typedef struct _VMSCSI_REQUEST
-{
-    HV_UINT16 Length;
-    HV_UINT8 SrbStatus;
-    HV_UINT8 ScsiStatus;
-    HV_UINT8 Reserved1;
-    HV_UINT8 PathId;
-    HV_UINT8 TargetId;
-    HV_UINT8 Lun;
-    HV_UINT8 CdbLength;
-    HV_UINT8 SenseInfoExLength;
-    HV_UINT8 DataIn;
-    HV_UINT8 Properties;
-    HV_UINT32 DataTransferLength;
-    union
-    {
-        HV_UINT8 Cdb[16];
-        HV_UINT8 SenseDataEx[20];
-        HV_UINT8 ReservedArray[20];
-    };
-    HV_UINT16 Reserve;
-    HV_UINT8 QueueTag;
-    HV_UINT8 QueueAction;
-    HV_UINT32 SrbFlags;
-    HV_UINT32 TimeOutValue;
-    HV_UINT32 QueueSortKey;
-} VMSCSI_REQUEST, *PVMSCSI_REQUEST;
+typedef VSTOR_PACKET_OPERATION _VSTOR_PACKET_OPERATION;
+typedef VSTOR_PACKET_OPERATION *PVSTOR_PACKET_OPERATION;
 
-typedef struct _VMSTORAGE_CHANNEL_PROPERTIES
-{
-    HV_UINT32 Reserved;
-    HV_UINT16 MaximumSubChannelCount;
-    HV_UINT16 Reserved2;
-    HV_UINT32 Flags;
-    HV_UINT32 MaxTransferBytes;
-    HV_UINT64 Reserved3;
-} VMSTORAGE_CHANNEL_PROPERTIES, *PVMSTORAGE_CHANNEL_PROPERTIES;
+#define VMSTORAGE_MAKE_VERSION VMSTOR_PROTOCOL_VERSION
+#define VMSTORAGE_VERSION_MAJOR VMSTOR_PROTOCOL_MAJOR
+#define VMSTORAGE_VERSION_MINOR VMSTOR_PROTOCOL_MINOR
 
-#define VMSTORAGE_MAKE_VERSION(Major, Minor) ((Major) << 8 | (Minor))
-#define VMSTORAGE_VERSION_MAJOR(Version) (((Version) & 0xFF00) >> 8)
-#define VMSTORAGE_VERSION_MINOR(Version) ((Version) & 0x00FF)
-
-#define VMSTORAGE_VERSION_WIN6 VMSTORAGE_MAKE_VERSION(2, 0)
-#define VMSTORAGE_VERSION_WIN7 VMSTORAGE_MAKE_VERSION(4, 2)
-#define VMSTORAGE_VERSION_WIN8 VMSTORAGE_MAKE_VERSION(5, 1)
-#define VMSTORAGE_VERSION_WINBLUE VMSTORAGE_MAKE_VERSION(6, 0)
-#define VMSTORAGE_VERSION_WIN10 VMSTORAGE_MAKE_VERSION(6, 2)
-
-typedef struct _VMSTORAGE_PROTOCOL_VERSION
-{
-    HV_UINT16 MajorMinor;
-    HV_UINT16 Reserved;
-} VMSTORAGE_PROTOCOL_VERSION, *PVMSTORAGE_PROTOCOL_VERSION;
-
-typedef struct _VMFC_WWN_PACKET
-{
-    HV_UINT8 PrimaryWwnActive;
-    char Reserved1;
-    HV_UINT16 Reserved2;
-    char PrimaryPortWwn[8];
-    char PrimaryNodeWwn[8];
-    char SecondaryPortWwn[8];
-    char SecondaryNodeWwn[8];
-} VMFC_WWN_PACKET, *PVMFC_WWN_PACKET;
-
-typedef struct _VSTOR_CLIENT_PROPERTIES
-{
-    HV_UINT32 AsyncNotifyCapable : 1;
-    HV_UINT32 Reserved : 31;
-} VSTOR_CLIENT_PROPERTIES, *PVSTOR_CLIENT_PROPERTIES;
-
-typedef struct _VSTOR_NOTIFICATION_PACKET
-{
-    HV_UINT8 Lun;
-    HV_UINT8 Target;
-    HV_UINT8 Path;
-    HV_UINT8 Flags;
-} VSTOR_NOTIFICATION_PACKET, *PVSTOR_NOTIFICATION_PACKET;
-
-#pragma pack(1)
-typedef struct _VSTOR_PACKET
-{
-    VSTOR_PACKET_OPERATION Operation;
-    HV_UINT32 Flags;
-    HV_UINT32 Status;
-    union
-    {
-        VMSCSI_REQUEST VmSrb;
-        VMSTORAGE_CHANNEL_PROPERTIES StorageChannelProperties;
-        VMSTORAGE_PROTOCOL_VERSION Version;
-        VMFC_WWN_PACKET FcWwnPacket;
-        HV_UINT16 SubChannelCount;
-        VSTOR_CLIENT_PROPERTIES ClientProperties;
-        VSTOR_NOTIFICATION_PACKET NotificationPacket;
-        HV_UINT8 Buffer[52];
-    };
-} VSTOR_PACKET, *PVSTOR_PACKET;
-#pragma pack()
-
-// VStorOperationCompleteIo | 1
-
-// VStorOperationRemoveDevice | 2
-
-// VStorOperationExecuteSRB | 3
-
-// VStorOperationResetLun | 4
-
-// VStorOperationResetAdapter | 5
-
-// VStorOperationResetBus | 6
-
-// VStorOperationBeginInitialization | 7
-
-// VStorOperationEndInitialization | 8
-
-// VStorOperationQueryProtocolVersion | 9
-
-// VStorOperationQueryProperties | 10
-
-// VStorOperationEnumerateBus | 11
-
-// VStorOperationFcHbaData | 12
-
-// VStorOperationCreateSubChannels | 13
-
-// VStorOperationEventNotification | 14
+#define VMSTORAGE_VERSION_WIN6 VMSTOR_PROTOCOL_VERSION_WIN6
+#define VMSTORAGE_VERSION_WIN7 VMSTOR_PROTOCOL_VERSION_WIN7
+#define VMSTORAGE_VERSION_WIN8 VMSTOR_PROTOCOL_VERSION_WIN8
+#define VMSTORAGE_VERSION_WINBLUE VMSTOR_PROTOCOL_VERSION_BLUE
+#define VMSTORAGE_VERSION_WIN10 VMSTOR_PROTOCOL_VERSION(6, 2)
 
 // *****************************************************************************
 // Microsoft Hyper-V Network Adapter
