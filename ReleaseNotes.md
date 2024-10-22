@@ -10,6 +10,8 @@
   - Introduce the definition of HvCallModifySparseGpaPageHostVisibility.
   - More VMBus protocol definitions which replaced all definitions dumped from
     Windows 10 Build 14347's vmbus.sys.
+  - More VMBus protocol definitions which replaced all definitions dumped from
+    Windows 10 Build 14347's hyperkbd.sys.
 - Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
   - MsvmPkg\Include\Hv\HvStatus.h

@@ -10,7 +10,6 @@
 
 // References
 // - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
-// - Symbols in Windows version 10.0.14347.0's hyperkbd.sys
 // - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
 // - Symbols in Windows version 10.0.14347.0's storvsc.sys
 // - Symbols in Windows version 10.0.14347.0's netvsc.sys
@@ -258,62 +257,12 @@ typedef struct _SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
 // Microsoft Hyper-V Virtual Keyboard
 //
 
-typedef enum _HK_MESSAGE_TYPE
-{
-    HkMessageProtocolRequest = 1,
-    HkMessageProtocolResponse = 2,
-    HkMessageEvent = 3,
-    HkMessageSetLedIndicators = 4,
-} HK_MESSAGE_TYPE, *PHK_MESSAGE_TYPE;
+typedef HK_MESSAGE_TYPE *PHK_MESSAGE_TYPE;
 
-typedef struct _HK_MESSAGE_HEADER
-{
-    HK_MESSAGE_TYPE MessageType;
-} HK_MESSAGE_HEADER, *PHK_MESSAGE_HEADER;
-
-// HkMessageProtocolRequest | 1
-
-#define HK_MAKE_VERSION(Major, Minor) ((Major) << 16 | (Minor))
 #define HK_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
 #define HK_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
 
-#define HK_VERSION_CURRENT HK_MAKE_VERSION(1, 0)
-
-typedef struct _HK_MESSAGE_PROTOCOL_REQUEST
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT32 Version;
-} HK_MESSAGE_PROTOCOL_REQUEST, *PHK_MESSAGE_PROTOCOL_REQUEST;
-
-// HkMessageProtocolResponse | 2
-
-typedef struct _HK_MESSAGE_PROTOCOL_RESPONSE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT32 Accepted : 1;
-    HV_UINT32 Reserved : 31;
-} HK_MESSAGE_PROTOCOL_RESPONSE, *PHK_MESSAGE_PROTOCOL_RESPONSE;
-
-// HkMessageEvent | 3
-
-typedef struct _HK_MESSAGE_KEYSTROKE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT16 MakeCode;
-    HV_UINT32 IsUnicode : 1;
-    HV_UINT32 IsBreak : 1;
-    HV_UINT32 IsE0 : 1;
-    HV_UINT32 IsE1 : 1;
-    HV_UINT32 Reserved : 28;
-} HK_MESSAGE_KEYSTROKE, *PHK_MESSAGE_KEYSTROKE;
-
-// HkMessageSetLedIndicators | 4
-
-typedef struct _HK_MESSAGE_LED_INDICATORS_STATE
-{
-    HK_MESSAGE_HEADER Header;
-    HV_UINT16 LedFlags;
-} HK_MESSAGE_LED_INDICATORS_STATE, *PHK_MESSAGE_LED_INDICATORS_STATE;
+#define HK_VERSION_CURRENT HK_VERSION_WIN8
 
 // *****************************************************************************
 // Microsoft Hyper-V Input

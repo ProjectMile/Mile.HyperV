@@ -32,6 +32,7 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\VmbusDxe\ChannelMessages.h
     - MsvmPkg\Include\Vmbus\VmbusPacketFormat.h
     - MsvmPkg\VideoDxe\SynthVidProtocol.h
+    - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0
@@ -53,7 +54,6 @@ folder which you actually needed to your C/C++ projects.
     10.0.14347.0's vmbuspipe.dll
 - Mile.HyperV.VMBus.h
   - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
-  - Definitions conform with Windows 10 Build 14347's hyperkbd.sys
   - Definitions conform with Windows 10 Build 14347's VMBusHID.sys
   - Definitions conform with Windows 10 Build 14347's storvsc.sys
   - Definitions conform with Windows 10 Build 14347's netvsc.sys
