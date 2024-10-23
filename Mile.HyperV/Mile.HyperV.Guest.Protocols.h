@@ -20,6 +20,8 @@
 //   - MsvmPkg\VideoDxe\VramSize.h
 //   - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
 //   - MsvmPkg\StorvscDxe\VstorageProtocol.h
+//   - MsvmPkg\NetvscDxe\nvspprotocol.h
+//   - MsvmPkg\NetvscDxe\rndis.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -1220,6 +1222,896 @@ const GUID NVSP_CONTROL_CLASS_ID =
     0x46C5,
     { 0x91, 0x3F, 0xF2, 0xD2, 0xF9, 0x65, 0xED, 0x0E }
 };
+
+#define NVSP_INVALID_PROTOCOL_VERSION ((HV_UINT32)0xFFFFFFFF)
+
+#define NVSP_PROTOCOL_MAJOR(VERSION_) (((VERSION_) >> 16) & 0xFFFF)
+#define NVSP_PROTOCOL_MINOR(VERSION_) (((VERSION_)) & 0xFFFF)
+
+#define NVSP_PROTOCOL_VERSION(MAJOR_, MINOR_) \
+    ((((MAJOR_) & 0xFFFF) << 16) | (((MINOR_) & 0xFFFF)))
+
+#define NVSP_PROTOCOL_VERSION_1 NVSP_PROTOCOL_VERSION(0, 2)
+#define NVSP_PROTOCOL_VERSION_2 NVSP_PROTOCOL_VERSION(3, 2)
+#define NVSP_PROTOCOL_VERSION_4 NVSP_PROTOCOL_VERSION(4, 0)
+#define NVSP_PROTOCOL_VERSION_5 NVSP_PROTOCOL_VERSION(5, 0)
+#define NVSP_PROTOCOL_VERSION_CURRENT NVSP_PROTOCOL_VERSION_5
+
+#define NVSP_PROTOCOL_VERSION_IS_VALID(_Version_) ( \
+    (_Version_) == NVSP_PROTOCOL_VERSION_5 || \
+    (_Version_) == NVSP_PROTOCOL_VERSION_4 || \
+    (_Version_) == NVSP_PROTOCOL_VERSION_2 || \
+    (_Version_) == NVSP_PROTOCOL_VERSION_1)
+
+#define NVSP_OPERATIONAL_STATUS_OK ((HV_UINT32)0x00000000)
+#define NVSP_OPERATIONAL_STATUS_DEGRADED ((HV_UINT32)0x00000001)
+#define NVSP_OPERATIONAL_STATUS_NONRECOVERABLE ((HV_UINT32)0x00000002)
+#define NVSP_OPERATIONAL_STATUS_NO_CONTACT ((HV_UINT32)0x00000003)
+#define NVSP_OPERATIONAL_STATUS_LOST_COMMUNICATION ((HV_UINT32)0x00000004)
+
+// The maximum number of transfer pages (packets) the VSP will use on on a
+// receive
+#define NVSP_MAX_PACKETS_PER_RECEIVE 375
+
+// Defines the maximum number of processors that can be used by a single VMQ's
+// traffic. We are storing this value here because both the VM and host needs it
+// to manage the vRSS indirection table (VM needs it for send and host needs it
+// for receive).
+#define VMS_SWITCH_RSS_MAX_RSS_PROC_COUNT 16
+
+typedef enum _NVSP_MESSAGE_TYPE
+{
+    NvspMessageTypeNone = 0,
+
+    // Init Messages
+
+    NvspMessageTypeInit = 1,
+    NvspMessageTypeInitComplete = 2,
+
+    NvspVersionMessageStart = 100,
+
+    // Version 1 Messages
+
+    NvspMessage1TypeSendNdisVersion = NvspVersionMessageStart,
+    NvspMessage1TypeSendReceiveBuffer,
+    NvspMessage1TypeSendReceiveBufferComplete,
+    NvspMessage1TypeRevokeReceiveBuffer,
+    NvspMessage1TypeSendSendBuffer,
+    NvspMessage1TypeSendSendBufferComplete,
+    NvspMessage1TypeRevokeSendBuffer,
+    NvspMessage1TypeSendRNDISPacket,
+    NvspMessage1TypeSendRNDISPacketComplete,
+    // The maximum allowed message ID for the v1 protocol.
+    NvspMessage1Max = NvspMessage1TypeSendRNDISPacketComplete,
+
+    // Version 2 messages
+
+    NvspMessage2TypeSendChimneyDelegatedBuffer,
+    NvspMessage2TypeSendChimneyDelegatedBufferComplete,
+    NvspMessage2TypeRevokeChimneyDelegatedBuffer,
+    NvspMessage2TypeResumeChimneyRXIndication,
+    NvspMessage2TypeTerminateChimney,
+    NvspMessage2TypeTerminateChimneyComplete,
+    NvspMessage2TypeIndicateChimneyEvent,
+    NvspMessage2TypeSendChimneyPacket,
+    NvspMessage2TypeSendChimneyPacketComplete,
+    NvspMessage2TypePostChimneyRecvRequest,
+    NvspMessage2TypePostChimneyRecvRequestComplete,
+    NvspMessage2TypeAllocateReceiveBufferDeprecated,
+    NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated,
+    NvspMessage2TypeFreeReceiveBufferDeprecated,
+    NvspMessage2SendVmqRndisPacketDeprecated,
+    NvspMessage2SendVmqRndisPacketCompleteDeprecated,
+    NvspMessage2TypeSendNdisConfig,
+    NvspMessage2TypeAllocateChimneyHandle,
+    NvspMessage2TypeAllocateChimneyHandleComplete,
+    // The maximum allowed message ID for the v2 protocol.
+    NvspMessage2Max = NvspMessage2TypeAllocateChimneyHandleComplete,
+
+    // Version 4 messages
+
+    NvspMessage4TypeSendVFAssociation,
+    NvspMessage4TypeSwitchDataPath,
+    // Needed so that Win8 RC+ VMs don't AV when running on a Win8 Beta Host
+    NvspMessage4TypeUplinkConnectStateDeprecated,
+    // The maximum allowed message ID for the v4 protocol.
+    NvspMessage4Max = NvspMessage4TypeUplinkConnectStateDeprecated,
+
+    // Version 5 messages
+
+    NvspMessage5TypeOidQueryEx,
+    NvspMessage5TypeOidQueryExComplete,
+    NvspMessage5TypeSubChannel,
+    NvspMessage5TypeSendIndirectionTable,
+    // The maximum allowed message ID for the v5 protocol.
+    NvspMessage5Max = NvspMessage5TypeSendIndirectionTable
+} NVSP_MESSAGE_TYPE, *PNVSP_MESSAGE_TYPE;
+
+#define NVSP_PROTOCOL_VERSION_1_HANDLER_COUNT \
+    ((NvspMessage1Max - NvspVersionMessageStart) + 1)
+
+#define NVSP_PROTOCOL_VERSION_2_HANDLER_COUNT \
+    ((NvspMessage2Max - NvspVersionMessageStart) + 1)
+
+#define NVSP_PROTOCOL_VERSION_4_HANDLER_COUNT \
+    ((NvspMessage4Max - NvspVersionMessageStart) + 1)
+
+#define NVSP_PROTOCOL_VERSION_5_HANDLER_COUNT \
+    ((NvspMessage5Max - NvspVersionMessageStart) + 1)
+
+typedef enum _NVSP_STATUS
+{
+    NvspStatusNone = 0,
+    NvspStatusSuccess,
+    NvspStatusFailure,
+    // was NvspStatusProtocolVersionRangeTooNew,
+    NvspStatusDeprecated1,
+    // was NvspStatusProtocolVersionRangeTooOld,
+    NvspStatusDeprecated2,
+    NvspStatusInvalidRndisPacket,
+    NvspStatusBusy,
+    NvspStatusProtocolVersionUnsupported,
+    NvspStatusMax,
+} NVSP_STATUS, *PNVSP_STATUS;
+
+#pragma pack(push, 1)
+
+typedef struct _NVSP_MESSAGE_HEADER
+{
+    // NVSP_MESSAGE_TYPE
+    HV_UINT32 MessageType;
+} NVSP_MESSAGE_HEADER, *PNVSP_MESSAGE_HEADER;
+
+// The following base NDIS type is referenced by nvspprotocol.h. See
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/objectheader/ns-objectheader-ndis_object_header
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_NDIS_OBJECT_HEADER
+{
+    HV_UINT8 Type;
+    HV_UINT8 Revision;
+    HV_UINT16 Size;
+} HV_NDIS_OBJECT_HEADER, *PHV_NDIS_OBJECT_HEADER;
+
+// Init Messages
+// This message is used by the VSC to initialize the channel after the channels
+// has been opened. This message should never include anything other then
+// versioning (i.e. this message will be the same for ever).
+// For ever is a long time.  The values have been redefined in Win7 to indicate
+// major and minor protocol version number.
+typedef struct _NVSP_MESSAGE_INIT
+{
+    union
+    {
+        struct
+        {
+            HV_UINT16 MinorProtocolVersion;
+            HV_UINT16 MajorProtocolVersion;
+        };
+        // was MinProtocolVersion
+        HV_UINT32 ProtocolVersion;
+    };
+    // was MaxProtocolVersion
+    HV_UINT32 ProtocolVersion2;
+} NVSP_MESSAGE_INIT, *PNVSP_MESSAGE_INIT;
+
+// This message is used by the VSP to complete the initialization of the
+// channel. This message should never include anything other then versioning
+// (i.e. this message will be the same for ever).
+typedef struct _NVSP_MESSAGE_INIT_COMPLETE
+{
+    // was NegotiatedProtocolVersion (2) in Win6
+    HV_UINT32 Deprecated;
+    HV_UINT32 MaximumMdlChainLength;
+    // NVSP_STATUS
+    HV_UINT32 Status;
+} NVSP_MESSAGE_INIT_COMPLETE, *PNVSP_MESSAGE_INIT_COMPLETE;
+
+typedef union _NVSP_MESSAGE_INIT_UBER
+{
+    NVSP_MESSAGE_INIT Init;
+    NVSP_MESSAGE_INIT_COMPLETE InitComplete;
+} NVSP_MESSAGE_INIT_UBER;
+
+// Version 1 Messages
+
+// This message is used by the VSC to send the NDIS version to the VSP. The VSP
+// can use this information when handling OIDs sent by the VSC.
+typedef struct _NVSP_1_MESSAGE_SEND_NDIS_VERSION
+{
+    HV_UINT32 NdisMajorVersion;
+    HV_UINT32 NdisMinorVersion;
+} NVSP_1_MESSAGE_SEND_NDIS_VERSION, *PNVSP_1_MESSAGE_SEND_NDIS_VERSION;
+
+// This message is used by the VSC to send a receive buffer to the VSP. The VSP
+// can then use the receive buffer to send data to the VSC.
+typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER
+{
+    // GPADL_HANDLE
+    HV_UINT32 GpadlHandle;
+    HV_UINT16 Id;
+} NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER, *PNVSP_1_MESSAGE_SEND_RECEIVE_BUFFER;
+
+typedef struct _NVSP_1_RECEIVE_BUFFER_SECTION
+{
+    HV_UINT32 Offset;
+    HV_UINT32 SubAllocationSize;
+    HV_UINT32 NumSubAllocations;
+    HV_UINT32 EndOffset;
+} NVSP_1_RECEIVE_BUFFER_SECTION, *PNVSP_1_RECEIVE_BUFFER_SECTION;
+
+// This message is used by the VSP to acknowledge a receive buffer send by the
+// VSC. This message must be sent by the VSP before the VSP uses the receive
+// buffer.
+typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE
+{
+    // NVSP_STATUS
+    HV_UINT32 Status;
+    HV_UINT32 NumSections;
+    // The receive buffer is split into two parts, a large suballocation section
+    // and a small suballocation section. These sections are then suballocated
+    // by a certain size.
+    // For example, the following break up of the receive buffer has 6 large
+    // suballocations and 10 small suballocations.
+    //
+    // |            Large Section          |  |   Small Section   |
+    // ------------------------------------------------------------
+    // |     |     |     |     |     |     |  | | | | | | | | | | |
+    // |                                      |
+    // LargeOffset                            SmallOffset
+    NVSP_1_RECEIVE_BUFFER_SECTION Sections[ANYSIZE_ARRAY];
+} NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE, *PNVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE;
+
+// This message is sent by the VSC to revoke the receive buffer. After the VSP
+// completes this transaction, the vsp should never use the receive buffer again.
+typedef struct _NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER
+{
+    HV_UINT16 Id;
+} NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER, *PNVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER;
+
+// This message is used by the VSC to send a send buffer to the VSP. The VSC can
+// then use the send buffer to send data to the VSP.
+typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER
+{
+    // GPADL_HANDLE
+    HV_UINT32 GpadlHandle;
+    HV_UINT16 Id;
+} NVSP_1_MESSAGE_SEND_SEND_BUFFER, *PNVSP_1_MESSAGE_SEND_SEND_BUFFER;
+
+// This message is used by the VSP to acknowledge a send buffer sent by the VSC.
+// This message must be sent by the VSP before the VSP uses the sent buffer.
+typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE
+{
+    // NVSP_STATUS
+    HV_UINT32 Status;
+    // The VSC gets to choose the size of the send buffer and the VSP gets to
+    // choose the sections size of the buffer. This was done to enable dynamic
+    // reconfigurations when the cost of GPA-direct buffers decreases.
+    HV_UINT32 SectionSize;
+} NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE, *PNVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE;
+
+// This message is sent by the VSC to revoke the send buffer. After the VSP
+// completes this transaction, the vsp should never use the send buffer again.
+typedef struct _NVSP_1_MESSAGE_REVOKE_SEND_BUFFER
+{
+    HV_UINT16 Id;
+} NVSP_1_MESSAGE_REVOKE_SEND_BUFFER, *PNVSP_1_MESSAGE_REVOKE_SEND_BUFFER;
+
+// This message is used by both the VSP and the VSC to send a RNDIS message to
+// the opposite channel endpoint.
+typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET
+{
+    // This field is specified by RNIDS. They assume there's two different
+    // channels of communication. However, the Network VSP only has one.
+    // Therefore, the channel travels with the RNDIS packet.
+    HV_UINT32 ChannelType;
+    // This field is used to send part or all of the data through a send buffer.
+    // This values specifies an index into the send buffer. If the index is
+    // 0xFFFFFFFF, then the send buffer is not being used and all of the data
+    // was sent through other VMBus mechanisms.
+    HV_UINT32 SendBufferSectionIndex;
+    HV_UINT32 SendBufferSectionSize;
+} NVSP_1_MESSAGE_SEND_RNDIS_PACKET, *PNVSP_1_MESSAGE_SEND_RNDIS_PACKET;
+
+// This message is used by both the VSP and the VSC to complete a RNDIS message
+// to the opposite channel endpoint. At this point, the initiator of this
+// message cannot use any resources associated with the original RNDIS packet.
+typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE
+{
+    // NVSP_STATUS
+    HV_UINT32 Status;
+} NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE, *PNVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE;
+
+// This message is used by the VSC to send the NDIS version to the VSP. The VSP
+// can use this information when handling OIDs sent by the VSC.
+typedef struct _NVSP_2_NETVSC_CAPABILITIES
+{
+    union
+    {
+        HV_UINT64 AsUINT64;
+        struct
+        {
+            HV_UINT64 VMQ : 1;
+            HV_UINT64 Chimney : 1;
+            HV_UINT64 SRIOV : 1;
+            HV_UINT64 Ieee8021q : 1;
+            HV_UINT64 CorrelationId : 1;
+            HV_UINT64 Teaming : 1;
+            HV_UINT64 VirtualSubnetId : 1;
+        };
+    };
+} NVSP_2_NETVSC_CAPABILITIES, *PNVSP_2_NETVSC_CAPABILITIES;
+
+typedef struct _NVSP_2_MESSAGE_SEND_NDIS_CONFIG
+{
+    HV_UINT32 MTU;
+    HV_UINT32 Reserved;
+    NVSP_2_NETVSC_CAPABILITIES Capabilities;
+} NVSP_2_MESSAGE_SEND_NDIS_CONFIG, *PNVSP_2_MESSAGE_SEND_NDIS_CONFIG;
+
+// This structure is used in defining the buffers in
+// NVSP_2_MESSAGE_SEND_VMQ_RNDIS_PACKET structure
+typedef struct _NVSP_TRANSFER_PAGE_RANGE
+{
+    // Specifies the ID of the receive buffer that has the buffer. This ID can
+    // be the general receive buffer ID specified in
+    // NvspMessage1TypeSendReceiveBuffer or it can be the shared memory receive
+    // buffer ID allocated by the VSC and specified in
+    // NvspMessage2TypeAllocateReceiveBufferComplete message
+    HV_UINT64 TransferPageSetId;
+    // Number of bytes
+    HV_UINT32 ByteCount;
+    // Offset in bytes from the beginning of the buffer
+    HV_UINT32 ByteOffset;
+} NVSP_TRANSFER_PAGE_RANGE, *PNVSP_TRANSFER_PAGE_RANGE;
+
+// NvspMessage4TypeSendVFAssociation
+typedef struct _NVSP_4_MESSAGE_SEND_VF_ASSOCIATION
+{
+    // Specifies whether VF is allocated for this channel
+    // If 1, SerialNumber of the VF is specified.
+    // If 0, ignore SerialNumber
+    HV_UINT32 VFAllocated;
+    // Serial number of the VF to team with
+    HV_UINT32 SerialNumber;
+} NVSP_4_MESSAGE_SEND_VF_ASSOCIATION, *PNVSP_4_MESSAGE_SEND_VF_ASSOCIATION;
+
+// This enum is used in specifying the active data path in
+// NVSP_4_MESSAGE_SWITCH_DATA_PATH structure
+typedef enum _NVSP_VM_DATA_PATH
+{
+    NvspDataPathSynthetic = 0,
+    NvspDataPathVF,
+    NvspDataPathMax
+} NVSP_VM_DATA_PATH, *PNVSP_VM_DATA_PATH;
+
+// NvspMessage4TypeSwitchDataPath
+typedef struct _NVSP_4_MESSAGE_SWITCH_DATA_PATH
+{
+    // Specifies the current data path that is active in the VM
+    NVSP_VM_DATA_PATH ActiveDataPath;
+} NVSP_4_MESSAGE_SWITCH_DATA_PATH, *PNVSP_4_MESSAGE_SWITCH_DATA_PATH;
+
+// NvspMessage5TypeOidQueryEx
+typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX
+{
+    // Header information for the Query OID
+    HV_NDIS_OBJECT_HEADER Header;
+    // OID being queried
+    // NDIS_OID
+    HV_UINT32 Oid;
+} NVSP_5_MESSAGE_OID_QUERY_EX, *PNVSP_5_MESSAGE_OID_QUERY_EX;
+
+// NvspMessage5TypeOidQueryExComplete
+typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE
+{
+    // Result of the query.
+    // NDIS_STATUS
+    HV_UINT32 Status;
+    union
+    {
+        // Bytes written to the buffer if query is successful
+        HV_UINT32 BytesWritten;
+        // Bytes needed if Status if NDIS_STATUS_BUFFER_TOO_SHORT;
+        HV_UINT32 BytesNeeded;
+    };
+} NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE, *PNVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE;
+
+// This defines the subchannel requests we can send to the host. We don't need
+// the deallocate operation here as when the primary channel closes, the
+// subchannels will be closed and we are cleaning up them based on their primary
+// channel's channel close callback.
+typedef enum _NVSP_SUBCHANNEL_OPERATION
+{
+    NvspSubchannelNone = 0,
+    NvspSubchannelAllocate,
+    NvspSubchannelMax,
+} NVSP_SUBCHANNEL_OPERATION, *PNVSP_SUBCHANNEL_OPERATION;
+
+// NvspMessage5TypeSubChannel
+
+typedef struct _NVSP_5_MESSAGE_SUBCHANNEL_REQUEST
+{
+    // The subchannel operation
+    NVSP_SUBCHANNEL_OPERATION Operation;
+    // The number of subchannels to create, if it is a NvspSubchannelAllocate
+    // operation.
+    HV_UINT32 NumSubChannels;
+} NVSP_5_MESSAGE_SUBCHANNEL_REQUEST, *PNVSP_5_MESSAGE_SUBCHANNEL_REQUEST;
+
+typedef struct _NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE
+{
+    // The status of the subchannel operation in NT STATUS code
+    HV_UINT32 Status;
+    // The actual number of subchannels allocated.
+    HV_UINT32 NumSubChannels;
+} NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE, *PNVSP_5_MESSAGE_SUBCHANNEL_COMPLETE;
+
+// NvspMessage5TypeSendIndirectionTable
+typedef struct _NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE
+{
+    // The number of entries in the send indirection table.
+    HV_UINT32 TableEntryCount;
+    // The offset of the send indireciton table.
+    // The send indirection table tells which channel to put the send traffic
+    // on. Each entry is a channel number.
+    HV_UINT32 TableOffset;
+} NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE, *PNVSP_5_MESSAGE_SEND_INDIRECTION_TABLE;
+
+// NVSP Messages
+
+typedef union _NVSP_MESSAGE_1_UBER
+{
+    NVSP_1_MESSAGE_SEND_NDIS_VERSION SendNdisVersion;
+    NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER SendReceiveBuffer;
+    NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE SendReceiveBufferComplete;
+    NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER RevokeReceiveBuffer;
+    NVSP_1_MESSAGE_SEND_SEND_BUFFER SendSendBuffer;
+    NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE SendSendBufferComplete;
+    NVSP_1_MESSAGE_REVOKE_SEND_BUFFER RevokeSendBuffer;
+    NVSP_1_MESSAGE_SEND_RNDIS_PACKET SendRNDISPacket;
+    NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE SendRNDISPacketComplete;
+} NVSP_1_MESSAGE_UBER;
+
+typedef union _NVSP_MESSAGE_2_UBER
+{
+    NVSP_2_MESSAGE_SEND_NDIS_CONFIG SendNdisConfig;
+} NVSP_2_MESSAGE_UBER;
+
+typedef union _NVSP_MESSAGE_4_UBER
+{
+    NVSP_4_MESSAGE_SEND_VF_ASSOCIATION VFAssociation;
+    NVSP_4_MESSAGE_SWITCH_DATA_PATH SwitchDataPath;
+} NVSP_4_MESSAGE_UBER;
+
+typedef union _NVSP_MESSAGE_5_UBER
+{
+    NVSP_5_MESSAGE_OID_QUERY_EX OidQueryEx;
+    NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE OidQueryExComplete;
+    NVSP_5_MESSAGE_SUBCHANNEL_REQUEST SubChannelRequest;
+    NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE SubChannelRequestComplete;
+    NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE SendTable;
+} NVSP_5_MESSAGE_UBER;
+
+typedef union _NVSP_ALL_MESSAGES
+{
+    NVSP_MESSAGE_INIT_UBER InitMessages;
+    NVSP_1_MESSAGE_UBER Version1Messages;
+    NVSP_2_MESSAGE_UBER Version2Messages;
+    NVSP_4_MESSAGE_UBER Version4Messages;
+    NVSP_5_MESSAGE_UBER Version5Messages;
+} NVSP_ALL_MESSAGES;
+
+// ALL Messages
+typedef struct _NVSP_MESSAGE
+{
+    NVSP_MESSAGE_HEADER Header;
+    NVSP_ALL_MESSAGES Messages;
+    HV_UINT32 Padding;
+} NVSP_MESSAGE, *PNVSP_MESSAGE;
+
+static_assert(sizeof(NVSP_MESSAGE) % 8 == 0);
+
+#pragma pack(pop)
+
+// Basic types
+
+typedef HV_UINT32 RNDIS_REQUEST_ID;
+typedef HV_UINT32 RNDIS_HANDLE;
+typedef HV_UINT32 RNDIS_STATUS;
+typedef HV_UINT32 RNDIS_REQUEST_TYPE;
+typedef HV_UINT32 RNDIS_OID;
+typedef HV_UINT32 RNDIS_CLASS_ID;
+typedef HV_UINT32 RNDIS_MEDIUM;
+typedef HV_UINT32 *PRNDIS_REQUEST_ID;
+typedef HV_UINT32 *PRNDIS_HANDLE;
+typedef HV_UINT32 *PRNDIS_STATUS;
+typedef HV_UINT32 *PRNDIS_REQUEST_TYPE;
+typedef HV_UINT32 *PRNDIS_OID;
+typedef HV_UINT32 *PRNDIS_CLASS_ID;
+typedef HV_UINT32 *PRNDIS_MEDIUM;
+
+// Status codes
+
+#define RNDIS_STATUS_SUCCESS ((RNDIS_STATUS)0x00000000L)
+#define RNDIS_STATUS_MEDIA_CONNECT ((RNDIS_STATUS)0x4001000BL)
+#define RNDIS_STATUS_MEDIA_DISCONNECT ((RNDIS_STATUS)0x4001000CL)
+// NDIS Status value for REMOTE_NDIS_INDICATE_STATUS_MSG messages (NDIS_STATUS)
+#define NDIS_STATUS_NETWORK_CHANGE ((HV_UINT32)0x40010018L)
+
+// General Objects
+
+#define RNDIS_OID_GEN_CURRENT_PACKET_FILTER 0x0001010E
+
+// 802.3 Objects (Ethernet)
+
+#define RNDIS_OID_802_3_CURRENT_ADDRESS 0x01010102
+
+// Remote NDIS message types
+
+#define REMOTE_NDIS_PACKET_MSG 0x00000001
+#define REMOTE_NDIS_INITIALIZE_MSG 0x00000002
+#define REMOTE_NDIS_HALT_MSG 0x00000003
+#define REMOTE_NDIS_QUERY_MSG 0x00000004
+#define REMOTE_NDIS_SET_MSG 0x00000005
+#define REMOTE_NDIS_RESET_MSG 0x00000006
+#define REMOTE_NDIS_INDICATE_STATUS_MSG 0x00000007
+#define REMOTE_NDIS_KEEPALIVE_MSG 0x00000008
+#define REMOTE_NDIS_SET_EX_MSG 0x00000009
+#define REMOTE_CONDIS_MP_CREATE_VC_MSG 0x00008001
+#define REMOTE_CONDIS_MP_DELETE_VC_MSG 0x00008002
+#define REMOTE_CONDIS_MP_ACTIVATE_VC_MSG 0x00008005
+#define REMOTE_CONDIS_MP_DEACTIVATE_VC_MSG 0x00008006
+#define REMOTE_CONDIS_INDICATE_STATUS_MSG 0x00008007
+
+// Remote NDIS message completion types
+
+#define REMOTE_NDIS_INITIALIZE_CMPLT 0x80000002
+#define REMOTE_NDIS_QUERY_CMPLT 0x80000004
+#define REMOTE_NDIS_SET_CMPLT 0x80000005
+
+// Reserved message type for private communication between lower-layer host
+// driver and remote device, if necessary.
+#define REMOTE_NDIS_BUS_MSG 0xff000001
+
+// Remote NDIS version numbers
+
+#define RNDIS_MAJOR_VERSION 0x00000001
+#define RNDIS_MINOR_VERSION 0x00000000
+
+// NdisInitialize message
+typedef struct _RNDIS_INITIALIZE_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    HV_UINT32 MajorVersion;
+    HV_UINT32 MinorVersion;
+    HV_UINT32 MaxTransferSize;
+} RNDIS_INITIALIZE_REQUEST, *PRNDIS_INITIALIZE_REQUEST;
+
+// Response to NdisInitialize
+typedef struct _RNDIS_INITIALIZE_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+    HV_UINT32 MajorVersion;
+    HV_UINT32 MinorVersion;
+    HV_UINT32 DeviceFlags;
+    RNDIS_MEDIUM Medium;
+    HV_UINT32 MaxPacketsPerMessage;
+    HV_UINT32 MaxTransferSize;
+    HV_UINT32 PacketAlignmentFactor;
+    HV_UINT32 AFListOffset;
+    HV_UINT32 AFListSize;
+} RNDIS_INITIALIZE_COMPLETE, *PRNDIS_INITIALIZE_COMPLETE;
+
+// NdisHalt message
+typedef struct _RNDIS_HALT_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+} RNDIS_HALT_REQUEST, *PRNDIS_HALT_REQUEST;
+
+// NdisQueryRequest message
+typedef struct _RNDIS_QUERY_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_OID Oid;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+    RNDIS_HANDLE DeviceVcHandle;
+} RNDIS_QUERY_REQUEST, *PRNDIS_QUERY_REQUEST;
+
+// Response to NdisQueryRequest
+typedef struct _RNDIS_QUERY_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+} RNDIS_QUERY_COMPLETE, *PRNDIS_QUERY_COMPLETE;
+
+// NdisSetRequest message
+typedef struct _RNDIS_SET_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_OID Oid;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+    RNDIS_HANDLE DeviceVcHandle;
+} RNDIS_SET_REQUEST, *PRNDIS_SET_REQUEST;
+
+// Response to NdisSetRequest
+typedef struct _RNDIS_SET_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+} RNDIS_SET_COMPLETE, *PRNDIS_SET_COMPLETE;
+
+// NdisSetExRequest message
+typedef struct _RNDIS_SET_EX_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_OID Oid;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+    RNDIS_HANDLE DeviceVcHandle;
+} RNDIS_SET_EX_REQUEST, *PRNDIS_SET_EX_REQUEST;
+
+// Response to NdisSetExRequest
+typedef struct _RNDIS_SET_EX_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+} RNDIS_SET_EX_COMPLETE, *PRNDIS_SET_EX_COMPLETE;
+
+// NdisReset message
+typedef struct _RNDIS_RESET_REQUEST
+{
+    HV_UINT32 Reserved;
+} RNDIS_RESET_REQUEST, *PRNDIS_RESET_REQUEST;
+
+// Response to NdisReset
+typedef struct _RNDIS_RESET_COMPLETE
+{
+    RNDIS_STATUS Status;
+    HV_UINT32 AddressingReset;
+} RNDIS_RESET_COMPLETE, *PRNDIS_RESET_COMPLETE;
+
+// NdisMIndicateStatus message
+typedef struct _RNDIS_INDICATE_STATUS
+{
+    RNDIS_STATUS Status;
+    HV_UINT32 StatusBufferLength;
+    HV_UINT32 StatusBufferOffset;
+} RNDIS_INDICATE_STATUS, *PRNDIS_INDICATE_STATUS;
+
+// Diagnostic information passed as the status buffer in RNDIS_INDICATE_STATUS
+// messages signifying error conditions.
+typedef struct _RNDIS_DIAGNOSTIC_INFO
+{
+    RNDIS_STATUS DiagStatus;
+    HV_UINT32 ErrorOffset;
+} RNDIS_DIAGNOSTIC_INFO, *PRNDIS_DIAGNOSTIC_INFO;
+
+// NdisKeepAlive message
+typedef struct _RNDIS_KEEPALIVE_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+} RNDIS_KEEPALIVE_REQUEST, *PRNDIS_KEEPALIVE_REQUEST;
+
+// Response to NdisKeepAlive
+typedef struct _RNDIS_KEEPALIVE_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+} RNDIS_KEEPALIVE_COMPLETE, *PRNDIS_KEEPALIVE_COMPLETE;
+
+// Data message. All Offset fields contain byte offsets from the beginning of
+// the RNDIS_PACKET structure. All Length fields are in bytes. VcHandle is set
+// to 0 for connectionless data, otherwise it contains the VC handle.
+typedef struct _RNDIS_PACKET
+{
+    HV_UINT32 DataOffset;
+    HV_UINT32 DataLength;
+    HV_UINT32 OOBDataOffset;
+    HV_UINT32 OOBDataLength;
+    HV_UINT32 NumOOBDataElements;
+    HV_UINT32 PerPacketInfoOffset;
+    HV_UINT32 PerPacketInfoLength;
+    RNDIS_HANDLE VcHandle;
+    HV_UINT32 Reserved;
+} RNDIS_PACKET, *PRNDIS_PACKET;
+
+// Format of Information buffer passed in a SetRequest for the OID
+// OID_GEN_RNDIS_CONFIG_PARAMETER.
+typedef struct _RNDIS_CONFIG_PARAMETER_INFO
+{
+    HV_UINT32 ParameterNameOffset;
+    HV_UINT32 ParameterNameLength;
+    HV_UINT32 ParameterType;
+    HV_UINT32 ParameterValueOffset;
+    HV_UINT32 ParameterValueLength;
+} RNDIS_CONFIG_PARAMETER_INFO, *PRNDIS_CONFIG_PARAMETER_INFO;
+
+// CONDIS Miniport messages for connection oriented devices that do not
+// implement a call manager.
+
+// CoNdisMiniportCreateVc message
+typedef struct _RCONDIS_MP_CREATE_VC
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_HANDLE NdisVcHandle;
+} RCONDIS_MP_CREATE_VC, *PRCONDIS_MP_CREATE_VC;
+
+// Response to CoNdisMiniportCreateVc
+typedef struct _RCONDIS_MP_CREATE_VC_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_HANDLE DeviceVcHandle;
+    RNDIS_STATUS Status;
+} RCONDIS_MP_CREATE_VC_COMPLETE, *PRCONDIS_MP_CREATE_VC_COMPLETE;
+
+// CoNdisMiniportDeleteVc message
+typedef struct _RCONDIS_MP_DELETE_VC
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_HANDLE DeviceVcHandle;
+} RCONDIS_MP_DELETE_VC, *PRCONDIS_MP_DELETE_VC;
+
+// Response to CoNdisMiniportDeleteVc
+typedef struct _RCONDIS_MP_DELETE_VC_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+} RCONDIS_MP_DELETE_VC_COMPLETE, *PRCONDIS_MP_DELETE_VC_COMPLETE;
+
+// CoNdisMiniportQueryRequest message
+typedef struct _RCONDIS_MP_QUERY_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_REQUEST_TYPE RequestType;
+    RNDIS_OID Oid;
+    RNDIS_HANDLE DeviceVcHandle;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+} RCONDIS_MP_QUERY_REQUEST, *PRCONDIS_MP_QUERY_REQUEST;
+
+// CoNdisMiniportSetRequest message
+typedef struct _RCONDIS_MP_SET_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_REQUEST_TYPE RequestType;
+    RNDIS_OID Oid;
+    RNDIS_HANDLE DeviceVcHandle;
+    HV_UINT32 InformationBufferLength;
+    HV_UINT32 InformationBufferOffset;
+} RCONDIS_MP_SET_REQUEST, *PRCONDIS_MP_SET_REQUEST;
+
+// CoNdisIndicateStatus message
+typedef struct _RCONDIS_INDICATE_STATUS
+{
+    RNDIS_HANDLE NdisVcHandle;
+    RNDIS_STATUS Status;
+    HV_UINT32 StatusBufferLength;
+    HV_UINT32 StatusBufferOffset;
+} RCONDIS_INDICATE_STATUS, *PRCONDIS_INDICATE_STATUS;
+
+// CONDIS Call/VC parameters
+
+typedef struct _RCONDIS_SPECIFIC_PARAMETERS
+{
+    HV_UINT32 ParameterType;
+    HV_UINT32 ParameterLength;
+    HV_UINT32 ParameterOffset;
+} RCONDIS_SPECIFIC_PARAMETERS, *PRCONDIS_SPECIFIC_PARAMETERS;
+
+typedef struct _RCONDIS_MEDIA_PARAMETERS
+{
+    HV_UINT32 Flags;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+    RCONDIS_SPECIFIC_PARAMETERS MediaSpecific;
+} RCONDIS_MEDIA_PARAMETERS, *PRCONDIS_MEDIA_PARAMETERS;
+
+typedef struct _RNDIS_FLOWSPEC
+{
+    HV_UINT32 TokenRate;
+    HV_UINT32 TokenBucketSize;
+    HV_UINT32 PeakBandwidth;
+    HV_UINT32 Latency;
+    HV_UINT32 DelayVariation;
+    HV_UINT32 ServiceType;
+    HV_UINT32 MaxSduSize;
+    HV_UINT32 MinimumPolicedSize;
+} RNDIS_FLOWSPEC, *PRNDIS_FLOWSPEC;
+
+typedef struct _RCONDIS_CALL_MANAGER_PARAMETERS
+{
+    RNDIS_FLOWSPEC Transmit;
+    RNDIS_FLOWSPEC Receive;
+    RCONDIS_SPECIFIC_PARAMETERS CallMgrSpecific;
+} RCONDIS_CALL_MANAGER_PARAMETERS, *PRCONDIS_CALL_MANAGER_PARAMETERS;
+
+// CoNdisMiniportActivateVc message
+typedef struct _RCONDIS_MP_ACTIVATE_VC_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    HV_UINT32 Flags;
+    RNDIS_HANDLE DeviceVcHandle;
+    HV_UINT32 MediaParamsOffset;
+    HV_UINT32 MediaParamsLength;
+    HV_UINT32 CallMgrParamsOffset;
+    HV_UINT32 CallMgrParamsLength;
+} RCONDIS_MP_ACTIVATE_VC_REQUEST, *PRCONDIS_MP_ACTIVATE_VC_REQUEST;
+
+// Response to CoNdisMiniportActivateVc
+typedef struct _RCONDIS_MP_ACTIVATE_VC_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+} RCONDIS_MP_ACTIVATE_VC_COMPLETE, *PRCONDIS_MP_ACTIVATE_VC_COMPLETE;
+
+// CoNdisMiniportDeactivateVc message
+typedef struct _RCONDIS_MP_DEACTIVATE_VC_REQUEST
+{
+    RNDIS_REQUEST_ID RequestId;
+    HV_UINT32 Flags;
+    RNDIS_HANDLE DeviceVcHandle;
+} RCONDIS_MP_DEACTIVATE_VC_REQUEST, *PRCONDIS_MP_DEACTIVATE_VC_REQUEST;
+
+// Response to CoNdisMiniportDeactivateVc
+typedef struct _RCONDIS_MP_DEACTIVATE_VC_COMPLETE
+{
+    RNDIS_REQUEST_ID RequestId;
+    RNDIS_STATUS Status;
+} RCONDIS_MP_DEACTIVATE_VC_COMPLETE, *PRCONDIS_MP_DEACTIVATE_VC_COMPLETE;
+
+// union with all of the RNDIS messages
+typedef union _RNDIS_MESSAGE_CONTAINER
+{
+    RNDIS_PACKET Packet;
+    RNDIS_INITIALIZE_REQUEST InitializeRequest;
+    RNDIS_HALT_REQUEST HaltRequest;
+    RNDIS_QUERY_REQUEST QueryRequest;
+    RNDIS_SET_REQUEST SetRequest;
+    RNDIS_SET_EX_REQUEST SetExRequest;
+    RNDIS_RESET_REQUEST ResetRequest;
+    RNDIS_KEEPALIVE_REQUEST KeepaliveRequest;
+    RNDIS_INDICATE_STATUS IndicateStatus;
+    RNDIS_INITIALIZE_COMPLETE InitializeComplete;
+    RNDIS_QUERY_COMPLETE QueryComplete;
+    RNDIS_SET_COMPLETE SetComplete;
+    RNDIS_SET_EX_COMPLETE SetExComplete;
+    RNDIS_RESET_COMPLETE ResetComplete;
+    RNDIS_KEEPALIVE_COMPLETE KeepaliveComplete;
+    RCONDIS_MP_CREATE_VC CoMiniportCreateVc;
+    RCONDIS_MP_DELETE_VC CoMiniportDeleteVc;
+    RCONDIS_INDICATE_STATUS CoIndicateStatus;
+    RCONDIS_MP_ACTIVATE_VC_REQUEST CoMiniportActivateVc;
+    RCONDIS_MP_DEACTIVATE_VC_REQUEST CoMiniportDeactivateVc;
+    RCONDIS_MP_CREATE_VC_COMPLETE CoMiniportCreateVcComplete;
+    RCONDIS_MP_DELETE_VC_COMPLETE CoMiniportDeleteVcComplete;
+    RCONDIS_MP_ACTIVATE_VC_COMPLETE CoMiniportActivateVcComplete;
+    RCONDIS_MP_DEACTIVATE_VC_COMPLETE CoMiniportDeactivateVcComplete;
+} RNDIS_MESSAGE_CONTAINER, *PRNDIS_MESSAGE_CONTAINER;
+
+// Remote NDIS message format
+typedef struct _RNDIS_MESSAGE
+{
+    HV_UINT32 NdisMessageType;
+    // Total length of this message, from the beginning of the RNDIS_MESSAGE
+    // struct, in bytes.
+    HV_UINT32 MessageLength;
+    // Actual message
+    RNDIS_MESSAGE_CONTAINER Message;
+} RNDIS_MESSAGE, *PRNDIS_MESSAGE;
+
+// Handy macros
+
+// get the size of an RNDIS message. Pass in the message type,
+// RNDIS_SET_REQUEST, RNDIS_PACKET for example
+#define RNDIS_MESSAGE_SIZE(Message) ( \
+    sizeof(Message) + (sizeof(RNDIS_MESSAGE) - sizeof(RNDIS_MESSAGE_CONTAINER)))
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual PCI Bus

@@ -433,122 +433,12 @@ typedef VSTOR_PACKET_OPERATION *PVSTOR_PACKET_OPERATION;
 // Microsoft Hyper-V Network Adapter
 //
 
-typedef enum _NVSP_MESSAGE_TYPE
+typedef enum _NVSP_MESSAGE_TYPE_PRIVATE
 {
-    NvspMessageTypeNone = 0,
-    NvspMessageTypeInit = 1,
-    NvspMessageTypeInitComplete = 2,
-    NvspVersionMessageStart = 100,
-    NvspMessage1TypeSendNdisVersion = 100,
-    NvspMessage1TypeSendReceiveBuffer = 101,
-    NvspMessage1TypeSendReceiveBufferComplete = 102,
-    NvspMessage1TypeRevokeReceiveBuffer = 103,
-    NvspMessage1TypeSendSendBuffer = 104,
-    NvspMessage1TypeSendSendBufferComplete = 105,
-    NvspMessage1TypeRevokeSendBuffer = 106,
-    NvspMessage1TypeSendRNDISPacket = 107,
-    NvspMessage1TypeSendRNDISPacketComplete = 108,
-    NvspMessage1Max = 108,
-    NvspMessage2TypeSendChimneyDelegatedBuffer = 109,
-    NvspMessage2TypeSendChimneyDelegatedBufferComplete = 110,
-    NvspMessage2TypeRevokeChimneyDelegatedBuffer = 111,
-    NvspMessage2TypeResumeChimneyRXIndication = 112,
-    NvspMessage2TypeTerminateChimney = 113,
-    NvspMessage2TypeTerminateChimneyComplete = 114,
-    NvspMessage2TypeIndicateChimneyEvent = 115,
-    NvspMessage2TypeSendChimneyPacket = 116,
-    NvspMessage2TypeSendChimneyPacketComplete = 117,
-    NvspMessage2TypePostChimneyRecvRequest = 118,
-    NvspMessage2TypePostChimneyRecvRequestComplete = 119,
-    NvspMessage2TypeAllocateReceiveBufferDeprecated = 120,
-    NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated = 121,
-    NvspMessage2TypeFreeReceiveBufferDeprecated = 122,
-    NvspMessage2SendVmqRndisPacketDeprecated = 123,
-    NvspMessage2SendVmqRndisPacketCompleteDeprecated = 124,
-    NvspMessage2TypeSendNdisConfig = 125,
-    NvspMessage2TypeAllocateChimneyHandle = 126,
-    NvspMessage2TypeAllocateChimneyHandleComplete = 127,
-    NvspMessage2Max = 127,
-    NvspMessage4TypeSendVFAssociation = 128,
-    NvspMessage4TypeSwitchDataPath = 129,
-    NvspMessage4TypeUplinkConnectStateDeprecated = 130,
-    NvspMessage4Max = 130,
-    NvspMessage5TypeOidQueryEx = 131,
-    NvspMessage5TypeOidQueryExComplete = 132,
-    NvspMessage5TypeSubChannel = 133,
-    NvspMessage5TypeSendIndirectionTable = 134,
-    NvspMessage5Max = 134,
     NvspMessage6TypePdApi = 135,
     NvspMessage6TypePdPostBatch = 136,
     NvspMessage6Max = 136,
-} NVSP_MESSAGE_TYPE, *PNVSP_MESSAGE_TYPE;
-
-typedef struct _NVSP_MESSAGE_HEADER
-{
-    NVSP_MESSAGE_TYPE MessageType;
-} NVSP_MESSAGE_HEADER, *PNVSP_MESSAGE_HEADER;
-
-typedef enum _NVSP_STATUS
-{
-    NvspStatusNone = 0,
-    NvspStatusSuccess = 1,
-    NvspStatusFailure = 2,
-    NvspStatusDeprecated1 = 3,
-    NvspStatusDeprecated2 = 4,
-    NvspStatusInvalidRndisPacket = 5,
-    NvspStatusBusy = 6,
-    NvspStatusProtocolVersionUnsupported = 7,
-    NvspStatusMax = 8,
-} NVSP_STATUS, *PNVSP_STATUS;
-
-typedef struct _NVSP_1_RECEIVE_BUFFER_SECTION
-{
-    HV_UINT32 Offset;
-    HV_UINT32 SubAllocationSize;
-    HV_UINT32 NumSubAllocations;
-    HV_UINT32 EndOffset;
-} NVSP_1_RECEIVE_BUFFER_SECTION, *PNVSP_1_RECEIVE_BUFFER_SECTION;
-
-typedef struct _NVSP_2_NETVSC_CAPABILITIES
-{
-    union
-    {
-        HV_UINT64 AsUINT64;
-        struct
-        {
-            HV_UINT64 VMQ : 1;
-            HV_UINT64 Chimney : 1;
-            HV_UINT64 SRIOV : 1;
-            HV_UINT64 Ieee8021q : 1;
-            HV_UINT64 CorrelationId : 1;
-            HV_UINT64 Teaming : 1;
-            HV_UINT64 VirtualSubnetId : 1;
-        };
-    };
-} NVSP_2_NETVSC_CAPABILITIES, *PNVSP_2_NETVSC_CAPABILITIES;
-
-typedef enum _NVSP_VM_DATA_PATH
-{
-    NvspDataPathSynthetic = 0,
-    NvspDataPathVF = 1,
-    NvspDataPathMax = 2,
-} NVSP_VM_DATA_PATH, *PNVSP_VM_DATA_PATH;
-
-// Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_NDIS_OBJECT_HEADER
-{
-    HV_UINT8 Type;
-    HV_UINT8 Revision;
-    HV_UINT16 Size;
-} HV_NDIS_OBJECT_HEADER, *PHV_NDIS_OBJECT_HEADER;
-
-typedef enum _NVSP_SUBCHANNEL_OPERATION
-{
-    NvspSubchannelNone = 0,
-    NvspSubchannelAllocate = 1,
-    NvspSubchannelMax = 2,
-} NVSP_SUBCHANNEL_OPERATION, *PNVSP_SUBCHANNEL_OPERATION;
+} NVSP_MESSAGE_TYPE_PRIVATE, *PNVSP_MESSAGE_TYPE_PRIVATE;
 
 typedef enum _NVSP_6_MESSAGE_PD_API_OPERATION
 {
@@ -581,222 +471,16 @@ typedef struct _NVSP_6_PD_BUFFER
     HV_UINT16 ReservedMbz : 15;
 } NVSP_6_PD_BUFFER, *PNVSP_6_PD_BUFFER;
 
-// NvspMessageTypeNone | 0
+#define NVSP_MAKE_VERSION NVSP_PROTOCOL_VERSION
+#define NVSP_VERSION_MAJOR NVSP_PROTOCOL_MAJOR
+#define NVSP_VERSION_MINOR NVSP_PROTOCOL_MINOR
 
-// NvspMessageTypeInit | 1
-
-#define NVSP_MAKE_VERSION(Major, Minor) ((Major) << 16 | (Minor))
-#define NVSP_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
-#define NVSP_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
-
-#define NVSP_VERSION_1 NVSP_MAKE_VERSION(0, 2)
-#define NVSP_VERSION_2 NVSP_MAKE_VERSION(3, 2)
-#define NVSP_VERSION_4 NVSP_MAKE_VERSION(4, 0)
-#define NVSP_VERSION_5 NVSP_MAKE_VERSION(5, 0)
-#define NVSP_VERSION_6 NVSP_MAKE_VERSION(6, 0)
-#define NVSP_VERSION_61 NVSP_MAKE_VERSION(6, 1)
-
-typedef struct _NVSP_MESSAGE_INIT
-{
-    union
-    {
-        HV_UINT32 ProtocolVersion;
-        struct
-        {
-            HV_UINT16 MinorProtocolVersion;
-            HV_UINT16 MajorProtocolVersion;
-        };
-    };
-    HV_UINT32 ProtocolVersion2;
-} NVSP_MESSAGE_INIT, *PNVSP_MESSAGE_INIT;
-
-// NvspMessageTypeInitComplete | 2
-
-typedef struct _NVSP_MESSAGE_INIT_COMPLETE
-{
-    HV_UINT32 Deprecated;
-    HV_UINT32 MaximumMdlChainLength;
-    NVSP_STATUS Status;
-} NVSP_MESSAGE_INIT_COMPLETE, *PNVSP_MESSAGE_INIT_COMPLETE;
-
-// NvspMessage1TypeSendNdisVersion | 100
-
-typedef struct _NVSP_1_MESSAGE_SEND_NDIS_VERSION
-{
-    HV_UINT32 NdisMajorVersion;
-    HV_UINT32 NdisMinorVersion;
-} NVSP_1_MESSAGE_SEND_NDIS_VERSION, *PNVSP_1_MESSAGE_SEND_NDIS_VERSION;
-
-// NvspMessage1TypeSendReceiveBuffer | 101
-
-#pragma pack(1)
-typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER
-{
-    HV_UINT32 GpadlHandle;
-    HV_UINT16 Id;
-} NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER, *PNVSP_1_MESSAGE_SEND_RECEIVE_BUFFER;
-#pragma pack()
-
-// NvspMessage1TypeSendReceiveBufferComplete | 102
-
-typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE
-{
-    NVSP_STATUS Status;
-    HV_UINT32 NumSections;
-    NVSP_1_RECEIVE_BUFFER_SECTION Sections[ANYSIZE_ARRAY];
-} NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE, *PNVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE;
-
-// NvspMessage1TypeRevokeReceiveBuffer | 103
-
-typedef struct _NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER
-{
-    HV_UINT16 Id;
-} NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER, *PNVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER;
-
-// NvspMessage1TypeSendSendBuffer | 104
-
-#pragma pack(1)
-typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER
-{
-    HV_UINT32 GpadlHandle;
-    HV_UINT16 Id;
-} NVSP_1_MESSAGE_SEND_SEND_BUFFER, *PNVSP_1_MESSAGE_SEND_SEND_BUFFER;
-#pragma pack()
-
-// NvspMessage1TypeSendSendBufferComplete | 105
-
-typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE
-{
-    NVSP_STATUS Status;
-    HV_UINT32 SectionSize;
-} NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE, *PNVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE;
-
-// NvspMessage1TypeRevokeSendBuffer | 106
-
-typedef struct _NVSP_1_MESSAGE_REVOKE_SEND_BUFFER
-{
-    HV_UINT16 Id;
-} NVSP_1_MESSAGE_REVOKE_SEND_BUFFER, *PNVSP_1_MESSAGE_REVOKE_SEND_BUFFER;
-
-// NvspMessage1TypeSendRNDISPacket | 107
-
-typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET
-{
-    HV_UINT32 ChannelType;
-    HV_UINT32 SendBufferSectionIndex;
-    HV_UINT32 SendBufferSectionSize;
-} NVSP_1_MESSAGE_SEND_RNDIS_PACKET, *PNVSP_1_MESSAGE_SEND_RNDIS_PACKET;
-
-// NvspMessage1TypeSendRNDISPacketComplete | 108
-
-typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE
-{
-    NVSP_STATUS Status;
-} NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE, *PNVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE;
-
-// NvspMessage2TypeSendChimneyDelegatedBuffer | 109
-
-// NvspMessage2TypeSendChimneyDelegatedBufferComplete | 110
-
-// NvspMessage2TypeRevokeChimneyDelegatedBuffer | 111
-
-// NvspMessage2TypeResumeChimneyRXIndication | 112
-
-// NvspMessage2TypeTerminateChimney | 113
-
-// NvspMessage2TypeTerminateChimneyComplete | 114
-
-// NvspMessage2TypeIndicateChimneyEvent | 115
-
-// NvspMessage2TypeSendChimneyPacket | 116
-
-// NvspMessage2TypeSendChimneyPacketComplete | 117
-
-// NvspMessage2TypePostChimneyRecvRequest | 118
-
-// NvspMessage2TypePostChimneyRecvRequestComplete | 119
-
-// NvspMessage2TypeAllocateReceiveBufferDeprecated | 120
-
-// NvspMessage2TypeAllocateReceiveBufferCompleteDeprecated | 121
-
-// NvspMessage2TypeFreeReceiveBufferDeprecated | 122
-
-// NvspMessage2SendVmqRndisPacketDeprecated | 123
-
-// NvspMessage2SendVmqRndisPacketCompleteDeprecated | 124
-
-// NvspMessage2TypeSendNdisConfig | 125
-
-typedef struct _NVSP_2_MESSAGE_SEND_NDIS_CONFIG
-{
-    HV_UINT32 MTU;
-    HV_UINT32 Reserved;
-    NVSP_2_NETVSC_CAPABILITIES Capabilities;
-} NVSP_2_MESSAGE_SEND_NDIS_CONFIG, *PNVSP_2_MESSAGE_SEND_NDIS_CONFIG;
-
-// NvspMessage2TypeAllocateChimneyHandle | 126
-
-// NvspMessage2TypeAllocateChimneyHandleComplete | 127
-
-// NvspMessage4TypeSendVFAssociation | 128
-
-typedef struct _NVSP_4_MESSAGE_SEND_VF_ASSOCIATION
-{
-    HV_UINT32 VFAllocated;
-    HV_UINT32 SerialNumber;
-} NVSP_4_MESSAGE_SEND_VF_ASSOCIATION, *PNVSP_4_MESSAGE_SEND_VF_ASSOCIATION;
-
-// NvspMessage4TypeSwitchDataPath | 129
-
-typedef struct _NVSP_4_MESSAGE_SWITCH_DATA_PATH
-{
-    NVSP_VM_DATA_PATH ActiveDataPath;
-} NVSP_4_MESSAGE_SWITCH_DATA_PATH, *PNVSP_4_MESSAGE_SWITCH_DATA_PATH;
-
-// NvspMessage4TypeUplinkConnectStateDeprecated | 130
-
-// NvspMessage5TypeOidQueryEx | 131
-
-typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX
-{
-    HV_NDIS_OBJECT_HEADER Header;
-    HV_UINT32 Oid;
-} NVSP_5_MESSAGE_OID_QUERY_EX, *PNVSP_5_MESSAGE_OID_QUERY_EX;
-
-// NvspMessage5TypeOidQueryExComplete | 132
-
-typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE
-{
-    NVSP_STATUS Status;
-    union
-    {
-        HV_UINT32 BytesWritten;
-        HV_UINT32 BytesNeeded;
-    };
-} NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE, *PNVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE;
-
-// NvspMessage5TypeSubChannel | 133
-
-typedef struct _NVSP_5_MESSAGE_SUBCHANNEL_REQUEST
-{
-    NVSP_SUBCHANNEL_OPERATION Operation;
-    HV_UINT32 NumSubChannels;
-} NVSP_5_MESSAGE_SUBCHANNEL_REQUEST, *PNVSP_5_MESSAGE_SUBCHANNEL_REQUEST;
-
-typedef struct _NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE
-{
-    NVSP_STATUS Status;
-    HV_UINT32 NumSubChannels;
-} NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE, *PNVSP_5_MESSAGE_SUBCHANNEL_COMPLETE;
-
-// NvspMessage5TypeSendIndirectionTable | 134
-
-typedef struct _NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE
-{
-    HV_UINT32 TableEntryCount;
-    HV_UINT32 TableOffset;
-} NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE, *PNVSP_5_MESSAGE_SEND_INDIRECTION_TABLE;
+#define NVSP_VERSION_1 NVSP_PROTOCOL_VERSION_1
+#define NVSP_VERSION_2 NVSP_PROTOCOL_VERSION_2
+#define NVSP_VERSION_4 NVSP_PROTOCOL_VERSION_4
+#define NVSP_VERSION_5 NVSP_PROTOCOL_VERSION_5
+#define NVSP_VERSION_6 NVSP_PROTOCOL_VERSION(6, 0)
+#define NVSP_VERSION_61 NVSP_PROTOCOL_VERSION(6, 1)
 
 // NvspMessage6TypePdApi | 135
 
@@ -914,44 +598,15 @@ typedef struct _NVSP_6_MESSAGE_PD_BATCH_MESSAGE
     NVSP_6_PD_BUFFER PdBuffer[];
 } NVSP_6_MESSAGE_PD_BATCH_MESSAGE, *PNVSP_6_MESSAGE_PD_BATCH_MESSAGE;
 
-typedef union _NVSP_MESSAGE_INIT_UBER
-{
-    NVSP_MESSAGE_INIT Init;
-    NVSP_MESSAGE_INIT_COMPLETE InitComplete;
-} NVSP_MESSAGE_INIT_UBER, *PNVSP_MESSAGE_INIT_UBER;
+typedef NVSP_MESSAGE_INIT_UBER *PNVSP_MESSAGE_INIT_UBER;
 
-typedef union _NVSP_MESSAGE_1_UBER
-{
-    NVSP_1_MESSAGE_SEND_NDIS_VERSION SendNdisVersion;
-    NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER SendReceiveBuffer;
-    NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE SendReceiveBufferComplete;
-    NVSP_1_MESSAGE_REVOKE_RECEIVE_BUFFER RevokeReceiveBuffer;
-    NVSP_1_MESSAGE_SEND_SEND_BUFFER SendSendBuffer;
-    NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE SendSendBufferComplete;
-    NVSP_1_MESSAGE_REVOKE_SEND_BUFFER RevokeSendBuffer;
-    NVSP_1_MESSAGE_SEND_RNDIS_PACKET SendRNDISPacket;
-    NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE SendRNDISPacketComplete;
-} NVSP_MESSAGE_1_UBER, *PNVSP_MESSAGE_1_UBER;
+typedef NVSP_1_MESSAGE_UBER NVSP_MESSAGE_1_UBER, *PNVSP_MESSAGE_1_UBER;
 
-typedef union _NVSP_MESSAGE_2_UBER
-{
-    NVSP_2_MESSAGE_SEND_NDIS_CONFIG SendNdisConfig;
-} NVSP_MESSAGE_2_UBER, *PNVSP_MESSAGE_2_UBER;
+typedef NVSP_2_MESSAGE_UBER NVSP_MESSAGE_2_UBER, *PNVSP_MESSAGE_2_UBER;
 
-typedef union _NVSP_MESSAGE_4_UBER
-{
-    NVSP_4_MESSAGE_SEND_VF_ASSOCIATION VFAssociation;
-    NVSP_4_MESSAGE_SWITCH_DATA_PATH SwitchDataPath;
-} NVSP_MESSAGE_4_UBER, *PNVSP_MESSAGE_4_UBER;
+typedef NVSP_4_MESSAGE_UBER NVSP_MESSAGE_4_UBER, *PNVSP_MESSAGE_4_UBER;
 
-typedef union _NVSP_MESSAGE_5_UBER
-{
-    NVSP_5_MESSAGE_OID_QUERY_EX OidQueryEx;
-    NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE OidQueryExComplete;
-    NVSP_5_MESSAGE_SUBCHANNEL_REQUEST SubChannelRequest;
-    NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE SubChannelRequestComplete;
-    NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE SendTable;
-} NVSP_MESSAGE_5_UBER, *PNVSP_MESSAGE_5_UBER;
+typedef NVSP_5_MESSAGE_UBER NVSP_MESSAGE_5_UBER, *PNVSP_MESSAGE_5_UBER;
 
 typedef union _NVSP_MESSAGE_6_UBER
 {
@@ -959,21 +614,18 @@ typedef union _NVSP_MESSAGE_6_UBER
     NVSP_6_MESSAGE_PD_API_COMPLETE PdApiComplete;
 } NVSP_MESSAGE_6_UBER, *PNVSP_MESSAGE_6_UBER;
 
-typedef union _NVSP_ALL_MESSAGES
-{
-    NVSP_MESSAGE_INIT_UBER InitMessages;
-    NVSP_MESSAGE_1_UBER Version1Messages;
-    NVSP_MESSAGE_2_UBER Version2Messages;
-    NVSP_MESSAGE_4_UBER Version4Messages;
-    NVSP_MESSAGE_5_UBER Version5Messages;
-    NVSP_MESSAGE_6_UBER Version6Messages;
-} NVSP_ALL_MESSAGES, *PNVSP_ALL_MESSAGES;
+typedef NVSP_ALL_MESSAGES *PNVSP_ALL_MESSAGES;
 
-typedef struct _NVSP_MESSAGE
+typedef union _NVSP_ALL_MESSAGES_PRIVATE
+{
+    NVSP_MESSAGE_6_UBER Version6Messages;
+} NVSP_ALL_MESSAGES_PRIVATE, *PNVSP_ALL_MESSAGES_PRIVATE;
+
+typedef struct _NVSP_MESSAGE_PRIVATE
 {
     NVSP_MESSAGE_HEADER Header;
-    NVSP_ALL_MESSAGES Messages;
-} NVSP_MESSAGE, *PNVSP_MESSAGE;
+    NVSP_ALL_MESSAGES_PRIVATE Messages;
+} NVSP_MESSAGE_PRIVATE, *PNVSP_MESSAGE_PRIVATE;
 
 // *****************************************************************************
 // Microsoft Hyper-V Integration Components

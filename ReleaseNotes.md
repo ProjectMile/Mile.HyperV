@@ -18,6 +18,7 @@
   - More VMBus protocol definitions for Microsoft Hyper-V SCSI Controller device
     and Microsoft Hyper-V Fibre Channel HBA device which replaced all
     definitions dumped from Windows 10 Build 14347's storvsc.sys.
+  - More VMBus protocol definitions for Microsoft Hyper-V Network Adapter device.
 - Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
   - MsvmPkg\Include\Hv\HvStatus.h
@@ -36,6 +37,9 @@
   - MsvmPkg\VideoDxe\VramSize.h
   - MsvmPkg\Include\Protocol\SynthKeyProtocol.h
   - MsvmPkg\StorvscDxe\VstorageProtocol.h
+  - MsvmPkg\NetvscDxe\nvspprotocol.h
+  - MsvmPkg\NetvscDxe\rndis.h
+- Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv.
 - Migrate from Mile.Project.Windows to Mile.Project.Configurations for
   streamlining the build toolchain of this package.
