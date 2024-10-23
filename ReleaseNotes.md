@@ -19,6 +19,9 @@
     and Microsoft Hyper-V Fibre Channel HBA device which replaced all
     definitions dumped from Windows 10 Build 14347's storvsc.sys.
   - More VMBus protocol definitions for Microsoft Hyper-V Network Adapter device.
+  - Add protocol definitions for Microsoft Hyper-V Virtual PCI Bus device.
+  - Add protocol definitions for Microsoft Hyper-V Virtual Machine Bus File
+    System device.
 - Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4.
   - MsvmPkg\Include\Hv\HvStatus.h
