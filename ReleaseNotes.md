@@ -1,6 +1,6 @@
 ﻿# Mile.HyperV Release Notes
 
-**Mile.HyperV 1.1.xxx.0**
+**Mile.HyperV 1.1.399.0**
 
 - Introduce Mile.HyperV.Guest.Interface.h and Mile.HyperV.Guest.Protocols.h for
   including Hyper-V guest publicized interface and protocols definitions from
