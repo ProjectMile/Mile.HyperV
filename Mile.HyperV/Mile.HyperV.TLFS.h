@@ -80,7 +80,7 @@ typedef struct DECLSPEC_ALIGN(32) _HV_UINT512
 
 typedef HV_UINT64 HV_SPA, *PHV_SPA;
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 
 // Number of bytes in a page for X64.
 #ifndef X64_PAGE_SIZE
@@ -145,6 +145,7 @@ typedef struct _HV_LOADER_BLOCK *PHV_LOADER_BLOCK;
 #define HV_STATUS_CALL_PENDING ((HV_STATUS)0x0079)
 #define HV_STATUS_VTL_ALREADY_ENABLED ((HV_STATUS)0x0086)
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef union _HV_X64_FP_REGISTER
 {
     HV_UINT128 AsUINT128;
@@ -198,6 +199,7 @@ typedef union _HV_X64_XMM_CONTROL_STATUS_REGISTER
         HV_UINT32 XmmStatusControlMask;
     };
 } HV_X64_XMM_CONTROL_STATUS_REGISTER, *PHV_X64_XMM_CONTROL_STATUS_REGISTER;
+#endif
 
 // An architecture is a set of processor instruction sets and operating modes
 typedef enum _HV_ARCHITECTURE
@@ -208,6 +210,7 @@ typedef enum _HV_ARCHITECTURE
     HvArchitectureMaximum
 } HV_ARCHITECTURE, *PHV_ARCHITECTURE;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef union _HV_X64_FP_MMX_REGISTER
 {
     HV_UINT128 AsUINT128;
@@ -451,7 +454,9 @@ typedef struct _HV_X64_CONTEXT
         HV_X64_X_REGISTERS XRegisters;
     };
 } HV_X64_CONTEXT, *PHV_X64_CONTEXT;
+#endif
 
+#if defined(_M_ARM64)
 typedef struct _HV_ARM64_CONTEXT
 {
     HV_UINT64 X0;
@@ -541,6 +546,7 @@ typedef struct _HV_ARM64_CONTEXT
     HV_UINT64 AFSR1_EL1;
     HV_UINT64 AMAIR_EL1;
 } HV_ARM64_CONTEXT, *PHV_ARM64_CONTEXT;
+#endif
 
 #define HV_VIRTUAL_PROCESSOR_REGISTERS_VERSION 1
 
@@ -552,8 +558,12 @@ typedef struct _HV_VP_CONTEXT
     HV_ARCHITECTURE Architecture;
     union
     {
+#if defined(_M_AMD64) || defined(_M_IX86)
         HV_X64_CONTEXT x64;
+#endif
+#if defined(_M_ARM64)
         HV_ARM64_CONTEXT aa64;
+#endif
     };
 } HV_VP_CONTEXT, *PHV_VP_CONTEXT;
 
@@ -815,7 +825,7 @@ typedef enum _HV_INTERRUPT_TYPE
 
     // Maximum (exclusive) value of interrupt type.
     HvArm64InterruptTypeMaximum = 0x0008,
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
     // Explicit interrupt types.
 
     HvX64InterruptTypeFixed = 0x0000,
@@ -1594,7 +1604,7 @@ typedef enum _HV_PROCESSOR_VENDOR
 
 #if defined(_M_ARM64)
 #define HV_PARTITION_PROCESSOR_FEATURES_BANKS 1
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
 #define HV_PARTITION_PROCESSOR_FEATURES_BANKS 2
 #endif
 
@@ -1655,7 +1665,7 @@ typedef union _HV_PARTITION_PROCESSOR_FEATURES
         HV_UINT64 Dzpermitted : 1;
         HV_UINT64 Reserved : 17;
     };
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
     struct
     {
         HV_UINT64 Sse3Support : 1;
@@ -1997,7 +2007,7 @@ typedef union _HV_REGISTER_VALUE_PRIVATE
     HV_ARM64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
     HV_ARM64_INTERRUPT_STATE_REGISTER InterruptState;
     HV_ARM64_PENDING_SYNTHETIC_EXCEPTION_EVENT PendingSyntheticExceptionEvent;
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
     HV_X64_FP_REGISTER Fp;
     HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
     HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
@@ -2441,7 +2451,7 @@ typedef struct _HV_INTERRUPT_CONTROL
 #if defined(_M_ARM64)
         HV_UINT32 Asserted : 1;
         HV_UINT32 Reserved : 29;
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
         HV_UINT32 Reserved : 30;
 #endif
     };
@@ -2816,6 +2826,8 @@ typedef struct _HV_CRASHDUMP_AREA
 
 } HV_CRASHDUMP_AREA, *PHV_CRASHDUMP_AREA;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
+
 // Define virtual processor execution state bitfield.
 typedef union _HV_X64_VP_EXECUTION_STATE
 {
@@ -3031,6 +3043,8 @@ typedef struct _HV_X64_UNSUPPORTED_FEATURE_MESSAGE
     HV_X64_UNSUPPORTED_FEATURE_CODE FeatureCode;
     HV_UINT64 FeatureParameter;
 } HV_X64_UNSUPPORTED_FEATURE_MESSAGE, *PHV_X64_UNSUPPORTED_FEATURE_MESSAGE;
+
+#endif
 
 // Unknown hypercall code but the hvgdk.h in WDK have that
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_REGISTER_CODE
@@ -3270,7 +3284,7 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
 
     // Synthetic VSM registers
 
-    HvRegisterVsmVpVtlControl = 0x000D0000,  
+    HvRegisterVsmVpVtlControl = 0x000D0000,
     HvRegisterGuestVsmPartitionConfig = 0x000D0008,
 } HV_REGISTER_NAME_PRIVATE, *PHV_REGISTER_NAME_PRIVATE;
 typedef const HV_REGISTER_NAME* PCHV_REGISTER_NAME;
@@ -3510,7 +3524,7 @@ typedef union _HV_MSI_ENTRY
         HV_MSI_DATA_REGISTER Data;
         HV_UINT32 Reserved;
     };
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
     HV_UINT64 AsUINT64;
     struct
     {
@@ -4047,7 +4061,7 @@ typedef union _HV_GPA_PAGE_ACCESS_STATE
 
 #define HV_VP_REGISTER_PAGE_VERSION_1 1u
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_VP_REGISTER_PAGE
 {
     HV_UINT16 Version;
@@ -4458,6 +4472,8 @@ typedef struct _HV_SYNTHETIC_TIMERS_STATE
 
 #define HV_HYPERCALL_INTERCEPT_MAX_XMM_REGISTERS 6
 
+#if defined(_M_AMD64) || defined(_M_IX86)
+
 typedef struct _HV_X64_HYPERCALL_INTERCEPT_MESSAGE
 {
     HV_X64_INTERCEPT_MESSAGE_HEADER Header;
@@ -4563,6 +4579,8 @@ typedef union _HV_REGISTER_INTERCEPT_RESULT_PARAMETERS
     HV_REGISTER_X64_MSR_RESULT_PARAMETERS Msr;
 } HV_REGISTER_INTERCEPT_RESULT_PARAMETERS, *PHV_REGISTER_INTERCEPT_RESULT_PARAMETERS;
 
+#endif
+
 typedef struct _HV_ASYNC_COMPLETION_MESSAGE_PAYLOAD
 {
     HV_PARTITION_ID PartitionId;
@@ -4580,6 +4598,7 @@ typedef struct _HV_GUEST_MAPPING_FLUSH_LIST
     HV_GPA_PAGE_RANGE GpaList[];
 } HV_GUEST_MAPPING_FLUSH_LIST, *PHV_GUEST_MAPPING_FLUSH_LIST;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_VP_STATE_DATA_XSAVE
 {
     HV_UINT64 Flags;
@@ -4616,6 +4635,8 @@ typedef struct _HV_VP_STATE_DATA
     HV_UINT32 Rsvd;
     HV_VP_STATE_DATA_XSAVE Xsave;
 } HV_VP_STATE_DATA, *PHV_VP_STATE_DATA;
+
+#endif
 
 // Dispatch state for the VP communicated by the hypervisor to the
 // VP-dispatching thread in the root on return from HVCALL_DISPATCH_VP.
@@ -5564,11 +5585,13 @@ typedef union _HV_REGISTER_VSM_VP_VTL_CONTROL
     };
 } HV_REGISTER_VSM_VP_VTL_CONTROL, *PHV_REGISTER_VSM_VP_VTL_CONTROL;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef union _HV_X64_XSAVE_AREA
 {
     HV_X64_FX_REGISTERS LegacyFxRegisters;
     HV_X64_X_REGISTERS XRegisters;
 } HV_X64_XSAVE_AREA, *PHV_X64_XSAVE_AREA;
+#endif
 
 typedef union _HV_REGISTER_VSM_CAPABILITIES
 {
@@ -6331,7 +6354,7 @@ typedef union _HV_SYNIC_SCONTROL
 #define HV_X64_MSR_STIMER3_CONFIG HvSyntheticMsrSTimer3Config
 #define HV_X64_MSR_STIMER3_COUNT HvSyntheticMsrSTimer3Count
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 #define HV_MSR_EOM HV_X64_MSR_EOM
 #define HV_MSR_TIME_REF_COUNT HV_X64_MSR_TIME_REF_COUNT
 #define HV_MSR_STIMER0_CONFIG HV_X64_MSR_STIMER0_CONFIG
@@ -7778,6 +7801,7 @@ typedef union HV_CALL_ATTRIBUTES _HV_X64_INPUT_DISABLE_HYPERVISOR
 
 // HvCallRegisterInterceptResult | 0x0091
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT
 {
     HV_PARTITION_ID PartitionId;
@@ -7785,6 +7809,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT
     HV_INTERCEPT_TYPE InterceptType;
     HV_REGISTER_INTERCEPT_RESULT_PARAMETERS Parameters;
 } HV_INPUT_REGISTER_INTERCEPT_RESULT, *PHV_INPUT_REGISTER_INTERCEPT_RESULT;
+#endif
 
 // HvCallUnregisterInterceptResult | 0x0092
 
@@ -8278,6 +8303,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_VP_STATE_PAGE
 
 // HvCallGetVpState | 0x00E3
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_STATE
 {
     HV_PARTITION_ID PartitionId;
@@ -8287,6 +8313,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_STATE
     HV_VP_STATE_DATA StateData;
     HV_UINT64 OutputDataPfns[];
 } HV_INPUT_GET_VP_STATE, *PHV_INPUT_GET_VP_STATE;
+#endif
 
 typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_STATE
 {
@@ -8302,6 +8329,7 @@ typedef union _HV_INPUT_SET_VP_STATE_DATA
     HV_UINT8 Bytes;
 } HV_INPUT_SET_VP_STATE_DATA, *PHV_INPUT_SET_VP_STATE_DATA;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_VP_STATE
 {
     HV_PARTITION_ID PartitionId;
@@ -8311,6 +8339,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_VP_STATE
     HV_VP_STATE_DATA StateData;
     HV_INPUT_SET_VP_STATE_DATA Data[];
 } HV_INPUT_SET_VP_STATE, *PHV_INPUT_SET_VP_STATE;
+#endif
 
 // HvCallGetVpSetFromMda | 0x00E5
 // HvCallReserved00e6 | 0x00E6

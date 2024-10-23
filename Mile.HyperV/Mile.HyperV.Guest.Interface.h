@@ -20,7 +20,7 @@
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
 
-#if !defined(_M_AMD64) && !defined(_M_ARM64)
+#if !defined(_M_AMD64) && !defined(_M_ARM64) && !defined(_M_IX86)
 #error [Mile.HyperV] The architecture is not supported.
 #endif
 
@@ -55,6 +55,10 @@ typedef wchar_t HV_WCHAR;
 #else
 typedef HV_UINT16 HV_WCHAR;
 #endif // WCHAR_MAX == 0xFFFF
+
+#ifndef ANYSIZE_ARRAY
+#define ANYSIZE_ARRAY 1
+#endif // !ANYSIZE_ARRAY
 
 // *****************************************************************************
 // HV_STATUS Definitions
@@ -285,7 +289,7 @@ typedef HV_UINT64 HV_GVA, *PHV_GVA;
 // The HVC immediate below is handled by the Microvisor for GICv3 support in the
 // absence of the full Hypervisor.
 #define HV_ARM64_ENABLE_SRE 2
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
 #define HV_X64_PAGE_SIZE 4096
 #define HV_X64_LARGE_PAGE_SIZE 0x200000
 #define HV_X64_LARGE_PAGE_SIZE_1GB 0x40000000
@@ -324,7 +328,7 @@ typedef HV_UINT8 HV_VTL, *PHV_VTL;
 // Flags to describe the access a partition has to a GPA page.
 typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_SEGMENT_REGISTER
 {
     HV_UINT64 Base;
@@ -349,7 +353,7 @@ typedef struct _HV_X64_SEGMENT_REGISTER
 } HV_X64_SEGMENT_REGISTER, *PHV_X64_SEGMENT_REGISTER;
 #endif
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_TABLE_REGISTER
 {
     HV_UINT16 Pad[3];
@@ -371,7 +375,7 @@ typedef struct _HV_INITIAL_VP_CONTEXT
     HV_UINT64 TTBR0_EL1;
     HV_UINT64 TTBR1_EL1;
     HV_UINT64 X18;
-#elif defined(_M_AMD64)
+#elif defined(_M_AMD64) || defined(_M_IX86)
     HV_UINT64 Rip;
     HV_UINT64 Rsp;
     HV_UINT64 Rflags;
@@ -489,7 +493,7 @@ typedef union _HV_PARTITION_PRIVILEGE_MASK
     };
 } HV_PARTITION_PRIVILEGE_MASK, *PHV_PARTITION_PRIVILEGE_MASK;
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef union _HV_X64_PLATFORM_CAPABILITIES
 {
     HV_UINT64 AsUINT64[2];
@@ -605,7 +609,7 @@ typedef struct _HV_HYPERVISOR_INTERFACE_INFO
 } HV_HYPERVISOR_INTERFACE_INFO, *PHV_HYPERVISOR_INTERFACE_INFO;
 
 // Hypervisor Feature Information - HvCpuIdFunctionMsHvFeatures Leaf
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_FEATURES
 {
     // Eax-Ebx
@@ -679,7 +683,7 @@ typedef PHV_ARM64_HYPERVISOR_FEATURES PHV_HYPERVISOR_FEATURES;
 #endif
 
 // Enlightenment Info - HvCpuIdFunctionMsHvEnlightenmentInformation Leaf
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
 {
     // Eax
@@ -759,7 +763,7 @@ typedef struct _HV_IMPLEMENTATION_LIMITS
 } HV_IMPLEMENTATION_LIMITS, *PHV_IMPLEMENTATION_LIMITS;
 
 // Hypervisor Hardware Features Info - HvCpuIdFunctionMsHvHardwareFeatures Leaf
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
 {
     // Eax
@@ -819,7 +823,7 @@ typedef PHV_ARM64_HYPERVISOR_HARDWARE_FEATURES PHV_HYPERVISOR_HARDWARE_FEATURES;
 
 // Hypervisor Cpu Management features - HvCpuIdFunctionMsHvCpuManagementFeatures
 // leaf.
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES
 {
     // Eax
@@ -891,7 +895,7 @@ typedef struct _HV_HYPERVISOR_SVM_FEATURES
 
 // Nested virtualization features (Vmx) - HvCpuidFunctionMsHvNestedVirtFeatures
 // leaf.
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
 {
     // Eax
@@ -949,7 +953,7 @@ typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION
 typedef union _HV_CPUID_RESULT
 {
     HV_UINT32 AsUINT32[4];
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
     struct
     {
         HV_UINT32 Eax;
@@ -1014,7 +1018,7 @@ typedef enum _HV_GUEST_OS_MICROSOFT_IDS
 } HV_GUEST_OS_MICROSOFT_IDS, *PHV_GUEST_OS_MICROSOFT_IDS;
 
 // This enumeration collates MSR indices for ease of maintainability.
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef enum _HV_X64_SYNTHETIC_MSR
 {
     HvSyntheticMsrGuestOsId = 0x40000000,
@@ -1291,7 +1295,7 @@ typedef enum _HV_MESSAGE_TYPE
     HvMessageTypeMsrIntercept = 0x80010001,
     HvMessageTypeExceptionIntercept = 0x80010003,
     HvMessageTypeRegisterIntercept = 0x80010006,
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
     HvMessageTypeX64IoPortIntercept = 0x80010000,
     HvMessageTypeX64CpuidIntercept = 0x80010002,
     HvMessageTypeX64ApicEoi = 0x80010004,
@@ -2018,7 +2022,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
 {
     HV_CONNECTION_ID ConnectionId;
     HV_UINT16 FlagNumber;
-    HV_UINT16 RsvdZ;
+    HV_UINT16 RsvdZ[7];
 } HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
 
 // Hypervisor register names for accessing a virtual processor's registers.
@@ -2204,7 +2208,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterVsmVpWaitForTlbLock = 0x000D0020,
     HvRegisterIsolationCapabilities = 0x000D0100,
 
-#if defined(_M_AMD64)
+#if defined(_M_AMD64) || defined(_M_IX86)
     // Interruptible notification register
     HvX64RegisterDeliverabilityNotifications = 0x00010006,
 
@@ -2691,7 +2695,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
     HV_UINT32 Reserved0 : 30;
     HV_UINT32 Reserved1;
     // Supplies an array of GPA page numbers to modify.
-    HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[];
+    HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[ANYSIZE_ARRAY];
 } HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
 
 #ifdef _MSC_VER

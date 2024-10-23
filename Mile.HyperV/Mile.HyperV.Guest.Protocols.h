@@ -61,20 +61,17 @@ typedef long NTSTATUS;
 #define STATUS_REVISION_MISMATCH ((NTSTATUS)0xC0000059L)
 #endif // !STATUS_REVISION_MISMATCH
 
-#ifndef ANYSIZE_ARRAY
-#define ANYSIZE_ARRAY 1
-#endif // !ANYSIZE_ARRAY
-
-#ifndef GUID_DEFINED
-#define GUID_DEFINED
-typedef struct _GUID
+#ifdef GUID_DEFINED
+typedef GUID HV_GUID, *PHV_GUID;
+#else
+typedef struct _HV_GUID
 {
     HV_UINT32 Data1;
     HV_UINT16 Data2;
     HV_UINT16 Data3;
     HV_UINT8 Data4[8];
-} GUID;
-#endif // !GUID_DEFINED
+} HV_GUID, *PHV_GUID;
+#endif // GUID_DEFINED
 
 #ifndef OFFSET_OF
 // Macro that returns the byte offset of a field in a data structure.
@@ -234,7 +231,7 @@ typedef struct _VMBUS_CHANNEL_MESSAGE_HEADER
 // Offer Channel parameters
 typedef struct _VMBUS_CHANNEL_OFFER_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     GUID InterfaceType;
     GUID InterfaceInstance;
 
@@ -277,7 +274,7 @@ static_assert(
 // Rescind Offer parameters
 typedef struct _VMBUS_CHANNEL_RESCIND_OFFER
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
 } VMBUS_CHANNEL_RESCIND_OFFER, *PVMBUS_CHANNEL_RESCIND_OFFER;
 
@@ -289,7 +286,7 @@ typedef struct _VMBUS_CHANNEL_RESCIND_OFFER
 // Open Channel parameters
 typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
 
     // Identifies the specific VMBus channel that is being opened.
     HV_UINT32 ChildRelId;
@@ -322,7 +319,7 @@ typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
 // Open Channel Result parameters
 typedef struct _VMBUS_CHANNEL_OPEN_RESULT
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     HV_UINT32 OpenId;
     HV_UINT32 Status;
@@ -331,13 +328,13 @@ typedef struct _VMBUS_CHANNEL_OPEN_RESULT
 // Close channel parameters;
 typedef struct _VMBUS_CHANNEL_CLOSE_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
 } VMBUS_CHANNEL_CLOSE_CHANNEL, *PVMBUS_CHANNEL_CLOSE_CHANNEL;
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     // Target VP index for the server-to-client interrupt.
     HV_UINT32 TargetVp;
@@ -345,7 +342,7 @@ typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL_RESPONSE
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     NTSTATUS Status;
 } VMBUS_CHANNEL_MODIFY_CHANNEL_RESPONSE, *PVMBUS_CHANNEL_MODIFY_CHANNEL_RESPONSE;
@@ -356,7 +353,7 @@ typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL_RESPONSE
 // more.
 typedef struct _VMBUS_CHANNEL_GPADL_HEADER
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     HV_UINT32 Gpadl;
     HV_UINT16 RangeBufLen;
@@ -367,7 +364,7 @@ typedef struct _VMBUS_CHANNEL_GPADL_HEADER
 // This is the followup packet that contains more PFNs.
 typedef struct _VMBUS_CHANNEL_GPADL_BODY
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 MessageNumber;
     HV_UINT32 Gpadl;
     HV_UINT64 Pfn[ANYSIZE_ARRAY];
@@ -375,7 +372,7 @@ typedef struct _VMBUS_CHANNEL_GPADL_BODY
 
 typedef struct _VMBUS_CHANNEL_GPADL_CREATED
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     HV_UINT32 Gpadl;
     HV_UINT32 CreationStatus;
@@ -383,26 +380,26 @@ typedef struct _VMBUS_CHANNEL_GPADL_CREATED
 
 typedef struct _VMBUS_CHANNEL_GPADL_TEARDOWN
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     HV_UINT32 Gpadl;
 } VMBUS_CHANNEL_GPADL_TEARDOWN, *PVMBUS_CHANNEL_GPADL_TEARDOWN;
 
 typedef struct _VMBUS_CHANNEL_GPADL_TORNDOWN
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 Gpadl;
 } VMBUS_CHANNEL_GPADL_TORNDOWN, *PVMBUS_CHANNEL_GPADL_TORNDOWN;
 
 typedef struct _VMBUS_CHANNEL_RELID_RELEASED
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
 } VMBUS_CHANNEL_RELID_RELEASED, *PVMBUS_CHANNEL_RELID_RELEASED;
 
 typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 VMBusVersionRequested;
     HV_UINT32 TargetMessageVp;
     union
@@ -430,7 +427,7 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
 
 typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     // BOOLEAN
     HV_UINT8 VersionSupported;
     HV_UINT8 ConnectionState;
@@ -470,7 +467,7 @@ VMBUS_CHANNEL_UNLOAD_COMPLETE, *PVMBUS_CHANNEL_UNLOAD_COMPLETE;
 
 typedef struct _VMBUS_CHANNEL_OPEN_RESERVED_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChannelId;
     HV_UINT32 TargetVp;
     HV_UINT32 TargetSint;
@@ -480,7 +477,7 @@ typedef struct _VMBUS_CHANNEL_OPEN_RESERVED_CHANNEL
 
 typedef struct _VMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChannelId;
     HV_UINT32 TargetVp;
     HV_UINT32 TargetSint;
@@ -488,13 +485,13 @@ typedef struct _VMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL
 
 typedef struct _VMBUS_CHANNEL_CLOSE_RESERVED_RESPONSE
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChannelId;
 } VMBUS_CHANNEL_CLOSE_RESERVED_RESPONSE, *PVMBUS_CHANNEL_CLOSE_RESERVED_RESPONSE;
 
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     GUID EndpointId;
     GUID ServiceId;
     // The SiloId is available with the RS5 vmbus protocol version.
@@ -510,7 +507,7 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
 
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     GUID EndpointId;
     GUID ServiceId;
     NTSTATUS Status;
@@ -518,14 +515,14 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT64 ParentToChildMonitorPageGpa;
     HV_UINT64 ChildToParentMonitorPageGpa;
 } VMBUS_CHANNEL_MODIFY_CONNECTION, *PVMBUS_CHANNEL_MODIFY_CONNECTION;
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE
 {
-    VMBUS_CHANNEL_MESSAGE_HEADER;
+    VMBUS_CHANNEL_MESSAGE_HEADER Header;
     // This accepts the same values as in VMBUS_CHANNEL_VERSION_RESPONSE.
     HV_UINT8 ConnectionState;
 } VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE, *PVMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE;
@@ -688,7 +685,7 @@ typedef struct _VMTRANSFER_PAGE_RANGES
 //
 
 // {DA0A7802-E377-4AAC-8E77-0558EB1073F8}
-const GUID SYNTHVID_CONTROL_CLASS_ID =
+const HV_GUID SYNTHVID_CONTROL_CLASS_ID =
 {
     0xDA0A7802,
     0xE377,
@@ -836,7 +833,7 @@ typedef struct
 //
 
 // {F912AD6D-2B17-48EA-BD65-F927A61C7684}
-const GUID HK_CONTROL_CLASS_ID =
+const HV_GUID HK_CONTROL_CLASS_ID =
 {
     0xF912AD6D,
     0x2B17,
@@ -898,7 +895,7 @@ typedef struct _HK_MESSAGE_KEYSTROKE
 //
 
 // {BA6163D9-04A1-4D29-B605-72E2FFB1DC7F}
-const GUID VMSCSI_CONTROL_CLASS_ID =
+const HV_GUID VMSCSI_CONTROL_CLASS_ID =
 {
     0xBA6163D9,
     0x04A1,
@@ -1219,7 +1216,7 @@ typedef struct _ADAPTER_ADDRESS
 //
 
 // {F8615163-DF3E-46C5-913F-F2D2F965ED0E}
-const GUID NVSP_CONTROL_CLASS_ID =
+const HV_GUID NVSP_CONTROL_CLASS_ID =
 {
     0xF8615163,
     0xDF3E,
@@ -2122,7 +2119,7 @@ typedef struct _RNDIS_MESSAGE
 //
 
 // {44C4F61D-4444-4400-9D52-802E27EDE19F}
-const GUID VPCI_CONTROL_CLASS_ID =
+const HV_GUID VPCI_CONTROL_CLASS_ID =
 {
     0x44C4F61D,
     0x4444,
@@ -2171,6 +2168,31 @@ typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR
 #pragma pack()
 
 static_assert(sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) == 0x14);
+
+#ifndef _WINNT_
+typedef enum _DEVICE_POWER_STATE {
+    PowerDeviceUnspecified = 0,
+    PowerDeviceD0,
+    PowerDeviceD1,
+    PowerDeviceD2,
+    PowerDeviceD3,
+    PowerDeviceMaximum
+} DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
+#endif // !_WINNT_
+
+typedef struct _PCI_SLOT_NUMBER
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 DeviceNumber : 5;
+            HV_UINT32 FunctionNumber : 3;
+            HV_UINT32 Reserved : 24;
+        } bits;
+        HV_UINT32 AsULONG;
+    } u;
+} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 #endif // !_WDMDDK_
 
 #ifndef ALIGN_VALUE
@@ -2197,15 +2219,6 @@ typedef struct _VPCI_PNP_ID
     HV_UINT16 SubVendorID;
     HV_UINT16 SubSystemID;
 } VPCI_PNP_ID, *PVPCI_PNP_ID;
-
-typedef enum _DEVICE_POWER_STATE {
-    PowerDeviceUnspecified = 0,
-    PowerDeviceD0,
-    PowerDeviceD1,
-    PowerDeviceD2,
-    PowerDeviceD3,
-    PowerDeviceMaximum
-} DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
 
 #define VPCI_PROTOCOL_VERSION_RS1 0x00010002
 #define VPCI_PROTOCOL_VERSION_CURRENT VPCI_PROTOCOL_VERSION_RS1
@@ -2270,20 +2283,6 @@ typedef struct _VPCI_QUERY_BUS_RELATIONS
 } VPCI_QUERY_BUS_RELATIONS, *PVPCI_QUERY_BUS_RELATIONS;
 
 #define VPCI_MAX_DEVICES_PER_BUS 255
-
-typedef struct _PCI_SLOT_NUMBER
-{
-    union
-    {
-        struct
-        {
-            HV_UINT32 DeviceNumber : 5;
-            HV_UINT32 FunctionNumber : 3;
-            HV_UINT32 Reserved : 24;
-        } bits;
-        HV_UINT32 AsULONG;
-    } u;
-} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 
 #define VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT 32
 
@@ -2420,7 +2419,7 @@ typedef struct _PCI_BAR_FORMAT
 //
 
 // {C376C1C3-D276-48D2-90A9-C04748072C60}
-const GUID VMBFS_CONTROL_CLASS_ID =
+const HV_GUID VMBFS_CONTROL_CLASS_ID =
 {
     0xC376C1C3,
     0xD276,

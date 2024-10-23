@@ -36,8 +36,6 @@
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
-typedef GUID HV_GUID, *PHV_GUID;
-
 typedef struct _HV_RECT
 {
     HV_INT32 Left;
