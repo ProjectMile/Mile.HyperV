@@ -49,6 +49,13 @@ typedef uint16_t HV_UINT16, *PHV_UINT16;
 typedef uint32_t HV_UINT32, *PHV_UINT32;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
 
+// Define a wide character type.
+#if WCHAR_MAX == 0xFFFF
+typedef wchar_t HV_WCHAR;
+#else
+typedef HV_UINT16 HV_WCHAR;
+#endif // WCHAR_MAX == 0xFFFF
+
 // *****************************************************************************
 // HV_STATUS Definitions
 //

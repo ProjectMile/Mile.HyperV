@@ -133,7 +133,7 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\StorvscDxe\VstorageProtocol.h
 - MsvmPkg\NetvscDxe\nvspprotocol.h
 - MsvmPkg\NetvscDxe\rndis.h
-
-- MsvmPkg\VpcivscDxe\VpciProtocol.h
 - MsvmPkg\VpcivscDxe\wdm.h
+- MsvmPkg\VpcivscDxe\VpciProtocol.h
+- MsvmPkg\VpcivscDxe\PciBars.h
 - MsvmPkg\Include\Protocol\VmbusFileSystem.h

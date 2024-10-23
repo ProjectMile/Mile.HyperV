@@ -70,13 +70,6 @@ typedef struct DECLSPEC_ALIGN(32) _HV_UINT512
     HV_UINT256 High128;
 } HV_UINT512, *PHV_UINT512;
 
-// Define a wide character type.
-#if WCHAR_MAX == 0xFFFF
-typedef wchar_t HV_WCHAR;
-#else
-typedef HV_UINT16 HV_WCHAR;
-#endif // WCHAR_MAX == 0xFFFF
-
 #define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) DECLSPEC_ALIGN(__alignment__)
 
 // Memory Types

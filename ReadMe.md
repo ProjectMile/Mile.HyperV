@@ -38,6 +38,10 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\StorvscDxe\VstorageProtocol.h
     - MsvmPkg\NetvscDxe\nvspprotocol.h
     - MsvmPkg\NetvscDxe\rndis.h
+    - MsvmPkg\VpcivscDxe\wdm.h
+    - MsvmPkg\VpcivscDxe\VpciProtocol.h
+    - MsvmPkg\VpcivscDxe\PciBars.h
+    - MsvmPkg\Include\Protocol\VmbusFileSystem.h
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

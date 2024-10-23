@@ -22,6 +22,10 @@
 //   - MsvmPkg\StorvscDxe\VstorageProtocol.h
 //   - MsvmPkg\NetvscDxe\nvspprotocol.h
 //   - MsvmPkg\NetvscDxe\rndis.h
+//   - MsvmPkg\VpcivscDxe\wdm.h
+//   - MsvmPkg\VpcivscDxe\VpciProtocol.h
+//   - MsvmPkg\VpcivscDxe\PciBars.h
+//   - MsvmPkg\Include\Protocol\VmbusFileSystem.h
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -2126,6 +2130,291 @@ const GUID VPCI_CONTROL_CLASS_ID =
     { 0x9D, 0x52, 0x80, 0x2E, 0x27, 0xED, 0xE1, 0x9F }
 };
 
+#ifndef _WDMDDK_
+#define CmResourceTypeNull 0
+#define CmResourceTypeMemory 3
+
+// Define the bit masks exclusive to type CmResourceTypeMemoryLarge.
+
+#define CM_RESOURCE_MEMORY_LARGE_40 0x0200
+#define CM_RESOURCE_MEMORY_LARGE_48 0x0400
+#define CM_RESOURCE_MEMORY_LARGE_64 0x0800
+
+// Define limits for large memory resources
+
+#define CM_RESOURCE_MEMORY_LARGE_40_MAXLEN 0x000000FFFFFFFF00
+#define CM_RESOURCE_MEMORY_LARGE_48_MAXLEN 0x0000FFFFFFFF0000
+#define CM_RESOURCE_MEMORY_LARGE_64_MAXLEN 0xFFFFFFFF00000000
+
+// Make sure alignment is made properly by compiler
+#pragma pack(4)
+typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR
+{
+    HV_UINT8 Type;
+    HV_UINT8 ShareDisposition;
+    HV_UINT16 Flags;
+    union
+    {
+        struct
+        {
+            // PHYSICAL_ADDRESS
+            HV_UINT64 Start;
+            HV_UINT32 Length;
+        } Generic;
+        struct
+        {
+            HV_UINT64 First;
+            HV_UINT64 Second;
+        } ForSize;
+    } u;
+} CM_PARTIAL_RESOURCE_DESCRIPTOR, *PCM_PARTIAL_RESOURCE_DESCRIPTOR;
+#pragma pack()
+
+static_assert(sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) == 0x14);
+#endif // !_WDMDDK_
+
+#ifndef ALIGN_VALUE
+#define ALIGN_VALUE(Value, Alignment) \
+    ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)))
+#endif // !ALIGN_VALUE
+
+#ifndef ALIGN_UP
+#define ALIGN_UP(x, y) ALIGN_VALUE((x), sizeof(y))
+#endif // !ALIGN_UP
+
+#ifndef PCI_MAX_BAR
+#define PCI_MAX_BAR 0x0006
+#endif // !PCI_MAX_BAR
+
+typedef struct _VPCI_PNP_ID
+{
+    HV_UINT16 VendorID;
+    HV_UINT16 DeviceID;
+    HV_UINT8 RevisionID;
+    HV_UINT8 ProgIf;
+    HV_UINT8 SubClass;
+    HV_UINT8 BaseClass;
+    HV_UINT16 SubVendorID;
+    HV_UINT16 SubSystemID;
+} VPCI_PNP_ID, *PVPCI_PNP_ID;
+
+typedef enum _DEVICE_POWER_STATE {
+    PowerDeviceUnspecified = 0,
+    PowerDeviceD0,
+    PowerDeviceD1,
+    PowerDeviceD2,
+    PowerDeviceD3,
+    PowerDeviceMaximum
+} DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
+
+#define VPCI_PROTOCOL_VERSION_RS1 0x00010002
+#define VPCI_PROTOCOL_VERSION_CURRENT VPCI_PROTOCOL_VERSION_RS1
+
+static const HV_UINT32 VscSupportedVersions[] =
+{
+    VPCI_PROTOCOL_VERSION_RS1
+};
+
+// Messages between the Virtual PCI driver and its VSP
+typedef enum _VPCI_MESSAGE
+{
+    VpciMsgBusRelations = 0x42490000,
+    VpciMsgQueryBusRelations,
+    VpciMsgInvalidateDevice,
+    VpciMsgInvalidateBus,
+    VpciMsgDevicePowerStateChange,
+    VpciMsgCurrentResourceRequirements,
+    VpciMsgGetResources,
+    VpciMsgFdoD0Entry,
+    VpciMsgFdoD0Exit,
+    VpciMsgReadBlock,
+    VpciMsgWriteBlock,
+    VpciMsgEject,
+    VpciMsgQueryStop,
+    VpciMsgReEnable,
+    VpciMsgQueryStopFailed,
+    VpciMsgEjectComplete,
+    VpciMsgAssignedResources,
+    VpciMsgReleaseResources,
+    VpciMsgInvalidateBlock,
+    VpciMsgQueryProtocolVersion,
+    VpciMsgCreateInterruptMessage,
+    VpciMsgDeleteInterruptMessage,
+    VpciMsgAssignedResources2,
+    VpciMsgCreateInterruptMessage2,
+    VpciMsgDeleteInterruptMessage2
+} VPCI_MESSAGE, *PVPCI_MESSAGE;
+
+typedef struct _VPCI_PACKET_HEADER
+{
+    HV_UINT32 MessageType;
+} VPCI_PACKET_HEADER, *PVPCI_PACKET_HEADER;
+
+typedef struct _VPCI_REPLY_HEADER
+{
+    HV_UINT32 Status;
+} VPCI_REPLY_HEADER, *PVPCI_REPLY_HEADER;
+
+typedef struct _VPCI_DEVICE_DESCRIPTION
+{
+    VPCI_PNP_ID IDs;
+    HV_UINT32 Slot;
+    HV_UINT32 SerialNumber;
+} VPCI_DEVICE_DESCRIPTION, *PVPCI_DEVICE_DESCRIPTION;
+
+typedef struct _VPCI_QUERY_BUS_RELATIONS
+{
+    VPCI_PACKET_HEADER Header;
+    HV_UINT32 DeviceCount;
+    VPCI_DEVICE_DESCRIPTION Devices[ANYSIZE_ARRAY];
+} VPCI_QUERY_BUS_RELATIONS, *PVPCI_QUERY_BUS_RELATIONS;
+
+#define VPCI_MAX_DEVICES_PER_BUS 255
+
+typedef struct _PCI_SLOT_NUMBER
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 DeviceNumber : 5;
+            HV_UINT32 FunctionNumber : 3;
+            HV_UINT32 Reserved : 24;
+        } bits;
+        HV_UINT32 AsULONG;
+    } u;
+} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
+
+#define VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT 32
+
+typedef struct _VPCI_MESSAGE_RESOURCE_2
+{
+    union
+    {
+        struct
+        {
+            HV_UINT16 Reserved;
+            HV_UINT16 MessageCount;
+            HV_UINT32 DataPayload;
+            HV_UINT64 Address;
+            HV_UINT16 Reserved2[27];
+        } Remapped;
+        struct
+        {
+            HV_UINT8 Vector;
+            HV_UINT8 DeliveryMode;
+            HV_UINT16 VectorCount;
+            HV_UINT16 ProcessorCount;
+            HV_UINT16 ProcessorArray[VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT];
+        } Descriptor;
+    };
+} VPCI_MESSAGE_RESOURCE_2, *PVPCI_MESSAGE_RESOURCE_2;
+
+typedef struct _VPCI_QUERY_PROTOCOL_VERSION
+{
+    VPCI_PACKET_HEADER Header;
+    HV_UINT32 ProtocolVersion;
+} VPCI_QUERY_PROTOCOL_VERSION, *PVPCI_QUERY_PROTOCOL_VERSION;
+
+typedef struct _VPCI_PROTOCOL_VERSION_REPLY
+{
+    VPCI_REPLY_HEADER Header;
+    HV_UINT32 ProtocolVersion;
+} VPCI_PROTOCOL_VERSION_REPLY, *PVPCI_PROTOCOL_VERSION_REPLY;
+
+typedef struct _VPCI_QUERY_RESOURCE_REQUIREMENTS
+{
+    VPCI_PACKET_HEADER Header;
+    PCI_SLOT_NUMBER Slot;
+} VPCI_QUERY_RESOURCE_REQUIREMENTS, *PVPCI_QUERY_RESOURCE_REQUIREMENTS;
+
+typedef struct _VPCI_RESOURCE_REQUIREMENTS_REPLY
+{
+    VPCI_REPLY_HEADER Header;
+    HV_UINT32 Bars[PCI_MAX_BAR];
+} VPCI_RESOURCE_REQUIREMENTS_REPLY, *PVPCI_RESOURCE_REQUIREMENTS_REPLY;
+
+typedef struct _VPCI_DEVICE_POWER_CHANGE
+{
+    union
+    {
+        VPCI_PACKET_HEADER Header;
+        VPCI_REPLY_HEADER ReplyHeader;
+    };
+    PCI_SLOT_NUMBER Slot;
+    DEVICE_POWER_STATE TargetState;
+} VPCI_DEVICE_POWER_CHANGE, *PVPCI_DEVICE_POWER_CHANGE;
+
+// This message indicates which resources the device is "decoding" within the
+// child partition at the moment that it is sent. It is valid for the device to
+// be decoding no resources. Mmio resources are configured using Base Address
+// Registers which are limited to 6. Unused registers and registers that are
+// used at the high part of 64-bit addresses are encoded as CmResourceTypeNull.
+// The completion packet uses the same structure to return the translated MSI
+// resources.
+typedef struct _VPCI_DEVICE_TRANSLATE_2
+{
+    union
+    {
+        VPCI_PACKET_HEADER         Header;
+        VPCI_REPLY_HEADER          ReplyHeader;
+    };
+    PCI_SLOT_NUMBER                Slot;
+    CM_PARTIAL_RESOURCE_DESCRIPTOR MmioResources[PCI_MAX_BAR];
+    HV_UINT32                         MsiResourceCount;
+    VPCI_MESSAGE_RESOURCE_2        MsiResources[ANYSIZE_ARRAY];
+} VPCI_DEVICE_TRANSLATE_2, *PVPCI_DEVICE_TRANSLATE_2;
+
+// NOTE: This doesn't exist in the windows header. Normally we'd use the the
+// same packet as above for the response as it gives us the remapped MSI
+// interrupts, but in UEFI we don't care about interrupts. Thus we only care
+// about the status, so this is a nice partial packet for that.
+typedef struct _VPCI_DEVICE_TRANSLATE_2_REPLY
+{
+    VPCI_REPLY_HEADER Header;
+    PCI_SLOT_NUMBER Slot;
+}  VPCI_DEVICE_TRANSLATE_2_REPLY, *PVPCI_DEVICE_TRANSLATE_2_REPLY;
+
+typedef struct _VPCI_FDO_D0_ENTRY
+{
+    VPCI_PACKET_HEADER Header;
+    HV_UINT32 Padding;
+    HV_UINT64 MmioStart;
+} VPCI_FDO_D0_ENTRY, *PVPCI_FDO_D0_ENTRY;
+
+// NOTE: This doesn't exist in the corresponding windows header. But it's nicer
+// to have this way, as this is what the response is.
+typedef struct _VPCI_FDO_D0_ENTRY_REPLY
+{
+    HV_UINT32 NtStatus;
+    HV_UINT32 Pad;
+} VPCI_FDO_D0_ENTRY_REPLY, *PVPCI_FDO_D0_ENTRY_REPLY;
+
+// Attribute types for BARs. See PCI Local Bus Specification Revision 3.0, section
+// 6.2.5.1
+typedef struct _PCI_BAR_FORMAT
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 MemorySpaceIndicator : 1;
+            HV_UINT32 MemoryType : 2;
+            HV_UINT32 Prefetchable : 1;
+            HV_UINT32 Address : 28;
+        } Memory;
+        struct
+        {
+            HV_UINT32 IoSpaceIndicator : 1;
+            HV_UINT32 Reserved : 1;
+            HV_UINT32 Address : 30;
+        };
+        HV_UINT32 AsUINT32;
+    };
+} PCI_BAR_FORMAT;
+
+#define PCI_BAR_MEMORY_TYPE_64BIT 0x2
+
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus File System
 //
@@ -2138,6 +2427,117 @@ const GUID VMBFS_CONTROL_CLASS_ID =
     0x48D2,
     { 0x90, 0xA9, 0xC0, 0x47, 0x48, 0x07, 0x2C, 0x60 }
 };
+
+#define VMBFS_MAXIMUM_MESSAGE_SIZE 12288
+#define VMBFS_MAXIMUM_PAYLOAD_SIZE(_Header_) \
+    (VMBFS_MAXIMUM_MESSAGE_SIZE - sizeof(_Header_))
+
+#define VMBFS_MAKE_VERSION(Major, Minor) ((HV_UINT32)((Major) << 16) | (Minor))
+
+#define VMBFS_VERSION_WIN10 VMBFS_MAKE_VERSION(1, 0)
+
+typedef enum _VMBFS_MESSAGE_TYPE
+{
+    VmbfsMessageTypeInvalid = 0,
+    VmbfsMessageTypeVersionRequest,
+    VmbfsMessageTypeVersionResponse,
+    VmbfsMessageTypeGetFileInfo,
+    VmbfsMessageTypeGetFileInfoResponse,
+    VmbfsMessageTypeReadFile,
+    VmbfsMessageTypeReadFileResponse,
+    VmbfsMessageTypeReadFileRdma,
+    VmbfsMessageTypeReadFileRdmaResponse,
+    VmbfsMessageTypeMax
+} VMBFS_MESSAGE_TYPE, *PVMBFS_MESSAGE_TYPE;
+
+#define VMBFS_GET_FILE_INFO_FLAG_DIRECTORY 0x1
+#define VMBFS_GET_FILE_INFO_FLAG_RDMA_CAPABLE 0x2
+
+#define VMBFS_GET_FILE_INFO_FLAGS \
+    (VMBFS_GET_FILE_INFO_FLAG_DIRECTORY | VMBFS_GET_FILE_INFO_FLAG_RDMA_CAPABLE)
+
+#pragma pack(push)
+#pragma pack(1)
+
+typedef struct _VMBFS_MESSAGE_HEADER
+{
+    VMBFS_MESSAGE_TYPE Type;
+    HV_UINT32 Reserved;
+} VMBFS_MESSAGE_HEADER, *PVMBFS_MESSAGE_HEADER;
+
+typedef struct _VMBFS_MESSAGE_VERSION_REQUEST
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 RequestedVersion;
+} VMBFS_MESSAGE_VERSION_REQUEST, *PVMBFS_MESSAGE_VERSION_REQUEST;
+
+typedef enum _VMBFS_STATUS_VERSION_RESPONSE
+{
+    VmbfsVersionSupported = 0,
+    VmbfsVersionUnsupported = 1
+} VMBFS_STATUS_VERSION_RESPONSE, *PVMBFS_STATUS_VERSION_RESPONSE;
+
+typedef struct _VMBFS_MESSAGE_VERSION_RESPONSE
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 Status;
+} VMBFS_MESSAGE_VERSION_RESPONSE, *PVMBFS_MESSAGE_VERSION_RESPONSE;
+
+typedef struct _VMBFS_MESSAGE_GET_FILE_INFO
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+} VMBFS_MESSAGE_GET_FILE_INFO, *PVMBFS_MESSAGE_GET_FILE_INFO;
+
+typedef enum _VMBFS_STATUS_FILE_RESPONSE
+{
+    VmbfsFileSuccess = 0,
+    VmbfsFileNotFound = 1,
+    VmbfsFileEndOfFile = 2,
+    VmbfsFileError = 3
+} VMBFS_STATUS_FILE_RESPONSE, *PVMBFS_STATUS_FILE_RESPONSE;
+
+typedef struct _VMBFS_MESSAGE_GET_FILE_INFO_RESPONSE
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 Status;
+    HV_UINT32 Flags;
+    HV_UINT64 FileSize;
+} VMBFS_MESSAGE_GET_FILE_INFO_RESPONSE, *PVMBFS_MESSAGE_GET_FILE_INFO_RESPONSE;
+
+typedef struct _VMBFS_MESSAGE_READ_FILE
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 ByteCount;
+    HV_UINT64 Offset;
+    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+} VMBFS_MESSAGE_READ_FILE, *PVMBFS_MESSAGE_READ_FILE;
+
+typedef struct _VMBFS_MESSAGE_READ_FILE_RESPONSE
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 Status;
+    HV_UINT8 Payload[ANYSIZE_ARRAY];
+} VMBFS_MESSAGE_READ_FILE_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RESPONSE;
+
+typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 Handle;
+    HV_UINT32 ByteCount;
+    HV_UINT64 FileOffset;
+    HV_UINT64 TokenOffset;
+    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+} VMBFS_MESSAGE_READ_FILE_RDMA, *PVMBFS_MESSAGE_READ_FILE_RDMA;
+
+typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE
+{
+    VMBFS_MESSAGE_HEADER Header;
+    HV_UINT32 Status;
+    HV_UINT32 ByteCount;
+} VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE;
+
+#pragma pack(pop)
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)

@@ -39,6 +39,10 @@
   - MsvmPkg\StorvscDxe\VstorageProtocol.h
   - MsvmPkg\NetvscDxe\nvspprotocol.h
   - MsvmPkg\NetvscDxe\rndis.h
+  - MsvmPkg\VpcivscDxe\wdm.h
+  - MsvmPkg\VpcivscDxe\VpciProtocol.h
+  - MsvmPkg\VpcivscDxe\PciBars.h
+  - MsvmPkg\Include\Protocol\VmbusFileSystem.h
 - Revise all Mile.HyperV definitions via the following files from
   https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv.
 - Migrate from Mile.Project.Windows to Mile.Project.Configurations for
