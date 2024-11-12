@@ -1,5 +1,13 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.419.0**
+
+- Rename the definition names for VMBus Channel GUIDs.
+- More VMBus protocol definitions for Microsoft Hyper-V Virtual Machine Bus File
+  System device observed from the Device Manager.
+- More VMBus protocol definitions for Microsoft Hyper-V Virtual SMB device
+  dumped from Windows 10 Build 14347's ntoskrnl.exe.
+
 **Mile.HyperV 1.1.399.0**
 
 - Introduce Mile.HyperV.Guest.Interface.h and Mile.HyperV.Guest.Protocols.h for
