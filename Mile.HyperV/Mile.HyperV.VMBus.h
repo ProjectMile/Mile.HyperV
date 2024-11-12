@@ -17,6 +17,7 @@
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 // - Symbols in Windows version 10.0.19041.0's rdpcorets.dll
 // - Symbols in Windows version 10.0.19041.0's vmuidevices.dll
+// - Symbols in Windows version 10.0.19041.0's ntoskrnl.exe
 
 #ifndef MILE_HYPERV_VMBUS
 #define MILE_HYPERV_VMBUS
@@ -1438,6 +1439,28 @@ typedef struct _SYNTHRDP_VERSION_RESPONSE_MESSAGE
     HV_UINT8 IsAccepted;
 } SYNTHRDP_VERSION_RESPONSE_MESSAGE, *PSYNTHRDP_VERSION_RESPONSE_MESSAGE;
 #pragma pack()
+
+// *****************************************************************************
+// Microsoft Hyper-V Virtual SMB
+//
+
+// {4D12E519-17A0-4AE4-8EAA-5270FC6ABDB7}
+const HV_GUID VSMB_CLASS_ID =
+{
+    0x4D12E519,
+    0x17A0,
+    0x4AE4,
+    { 0x8E, 0xAA, 0x52, 0x70, 0xFC, 0x6A, 0xBD, 0xB7 }
+};
+
+// {DCC079AE-60BA-4D07-847C-3493609C0870}
+const HV_GUID VSMB_INSTANCE_ID =
+{
+    0xDCC079AE,
+    0x60BA,
+    0x4D07,
+    { 0x84, 0x7C, 0x34, 0x93, 0x60, 0x9C, 0x08, 0x70 }
+};
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)

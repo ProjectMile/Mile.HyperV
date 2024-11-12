@@ -70,6 +70,7 @@ folder which you actually needed to your C/C++ projects.
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
   - Definitions conform with Windows 10 Build 19041's rdpcorets.dll
   - Definitions conform with Windows 10 Build 19041's vmuidevices.dll
+  - Definitions conform with Windows 10 Build 14347's ntoskrnl.exe
 - Distributed under the MIT License
 - Provide NuGet package.
 
