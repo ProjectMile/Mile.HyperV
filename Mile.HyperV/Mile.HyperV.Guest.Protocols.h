@@ -232,8 +232,8 @@ typedef struct _VMBUS_CHANNEL_MESSAGE_HEADER
 typedef struct _VMBUS_CHANNEL_OFFER_CHANNEL
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
-    GUID InterfaceType;
-    GUID InterfaceInstance;
+    HV_GUID InterfaceType;
+    HV_GUID InterfaceInstance;
 
     // These reserved fields may be non-zero before Windows 8.
 
@@ -419,7 +419,7 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
     HV_UINT64 ParentToChildMonitorPageGpa;
     HV_UINT64 ChildToParentMonitorPageGpa;
     // VMBUS_FEATURE_FLAG_CLIENT_ID
-    GUID ClientId;
+    HV_GUID ClientId;
 } VMBUS_CHANNEL_INITIATE_CONTACT, *PVMBUS_CHANNEL_INITIATE_CONTACT;
 
 #define VMBUS_CHANNEL_INITIATE_CONTACT_MIN_SIZE \
@@ -492,12 +492,12 @@ typedef struct _VMBUS_CHANNEL_CLOSE_RESERVED_RESPONSE
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
-    GUID EndpointId;
-    GUID ServiceId;
+    HV_GUID EndpointId;
+    HV_GUID ServiceId;
     // The SiloId is available with the RS5 vmbus protocol version.
     union
     {
-        GUID SiloId;
+        HV_GUID SiloId;
         HV_UINT8 WindowsRS1Offset;
     };
 } VMBUS_CHANNEL_TL_CONNECT_REQUEST, *PVMBUS_CHANNEL_TL_CONNECT_REQUEST;
@@ -508,8 +508,8 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
-    GUID EndpointId;
-    GUID ServiceId;
+    HV_GUID EndpointId;
+    HV_GUID ServiceId;
     NTSTATUS Status;
 } VMBUS_CHANNEL_TL_CONNECT_RESULT, *PVMBUS_CHANNEL_TL_CONNECT_RESULT;
 
@@ -1180,7 +1180,7 @@ static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 == 0x40);
 typedef struct _ADAPTER_ADDRESS
 {
     HV_UINT64 PartitionId;
-    GUID ChannelInstanceGUID;
+    HV_GUID ChannelInstanceGUID;
 
     // SCSI address
 
