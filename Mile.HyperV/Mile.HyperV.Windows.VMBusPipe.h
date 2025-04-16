@@ -59,12 +59,12 @@ extern "C" {
     {
         union
         {
-            HV_GUID VmGuid;
+            GUID VmGuid;
             HANDLE VmbusHandle;
         };
         DWORD InterruptLatencyInMilliseconds;
-        HV_GUID InterfaceType;
-        HV_GUID InterfaceInstance;
+        GUID InterfaceType;
+        GUID InterfaceInstance;
         DWORD InterfaceRevision;
         USHORT MmioMegabytes;
         USHORT Flags;
@@ -77,12 +77,12 @@ extern "C" {
         DWORD Size;
         union
         {
-            HV_GUID VmGuid;
+            GUID VmGuid;
             HANDLE VmbusHandle;
         };
         DWORD InterruptLatencyInMilliseconds;
-        HV_GUID InterfaceType;
-        HV_GUID InterfaceInstance;
+        GUID InterfaceType;
+        GUID InterfaceInstance;
         DWORD InterfaceRevision;
         USHORT MmioMegabytes;
         USHORT Flags;
