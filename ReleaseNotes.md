@@ -1,5 +1,9 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.573.0**
+
+- Fix some GUID related definitions with HV_GUID.
+
 **Mile.HyperV 1.1.419.0**
 
 - Rename the definition names for VMBus Channel GUIDs.
