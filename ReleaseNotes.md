@@ -1,8 +1,8 @@
 ﻿# Mile.HyperV Release Notes
 
-**Mile.HyperV 1.1.573.0**
+**Mile.HyperV 1.1.575.0**
 
-- Fix some GUID related definitions with HV_GUID.
+- Use HV_GUID instead of GUID for Mile.HyperV.Guest.Protocols.
 
 **Mile.HyperV 1.1.419.0**
 
