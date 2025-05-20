@@ -16,6 +16,8 @@
 //   - MsvmPkg\Include\Hv\HvGuestMsr.h
 //   - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
 //   - MsvmPkg\Include\Hv\HvGuestHypercall.h
+// - Windows Subsystem for Linux
+//   - src\windows\inc\wdk.h
 
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
@@ -783,12 +785,20 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
     HV_UINT32 UseVmfuncForAliasMapSwitch : 1;
     HV_UINT32 HvRegisterForMemoryZeroingSupported : 1;
     HV_UINT32 UnrestrictedGuestSupported : 1;
-    HV_UINT32 L3CachePartitioningSupported : 1;
-    HV_UINT32 L3CacheMonitoringSupported : 1;
-    HV_UINT32 Reserved : 12;
+    HV_UINT32 RdtAFeaturesSupported : 1;
+    HV_UINT32 RdtMFeaturesSupported : 1;
+    HV_UINT32 ChildPerfmonPmuSupported : 1;
+    HV_UINT32 ChildPerfmonLbrSupported : 1;
+    HV_UINT32 ChildPerfmonIptSupported : 1;
+    HV_UINT32 ApicEmulationSupported : 1;
+    HV_UINT32 ChildX2ApicRecommended : 1;
+    HV_UINT32 HardwareWatchdogReserved : 1;
+    HV_UINT32 DeviceAccessTrackingSupported : 1;
+    HV_UINT32 Reserved : 5;
 
     // Ebx
-    HV_UINT32 ReservedEbx;
+    HV_UINT32 DeviceDomainInputWidth : 8;
+    HV_UINT32 ReservedEbx : 24;
 
     // Ecx
     HV_UINT32 ReservedEcx;

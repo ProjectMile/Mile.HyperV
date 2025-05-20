@@ -5896,20 +5896,13 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE
 
 typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
 {
-    HV_UINT32 Reserved0 : 15;
-    HV_UINT32 RdtAFeaturesSupported : 1;
-    HV_UINT32 RdtMFeaturesSupported : 1;
-    HV_UINT32 ChildPerfmonPmuSupported : 1;
-    HV_UINT32 ChildPerfmonLbrSupported : 1;
-    HV_UINT32 ChildPerfmonIptSupported : 1;
-    HV_UINT32 ApicEmulationSupported : 1;
-    HV_UINT32 ChildX2ApicRecommended : 1;
-    HV_UINT32 HardwareWatchdogReserved : 1;
-    HV_UINT32 DeviceAccessTrackingSupported : 1;
+    HV_UINT32 Reserved0 : 18;
+    HV_UINT32 L3CachePartitioningSupported : 1;
+    HV_UINT32 L3CacheMonitoringSupported : 1;
+    HV_UINT32 Reserved1 : 7;
     HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
-    HV_UINT32 Reserved1 : 4;
-    HV_UINT32 DeviceDomainInputWidth : 8;
-    HV_UINT32 ReservedEbx : 24;
+    HV_UINT32 Reserved2 : 4;
+    HV_UINT32 ReservedEbx;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;

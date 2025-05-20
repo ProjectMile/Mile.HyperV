@@ -137,3 +137,15 @@ https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8
 - MsvmPkg\VpcivscDxe\VpciProtocol.h
 - MsvmPkg\VpcivscDxe\PciBars.h
 - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+
+## Windows Subsystem for Linux
+
+https://github.com/microsoft/WSL
+
+### Referenced Version
+
+https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
+
+### Referenced by Mile.HyperV:
+
+- src\windows\inc\wdk.h
