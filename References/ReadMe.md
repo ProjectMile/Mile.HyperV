@@ -70,6 +70,7 @@ HV_CPUID_FUNCTION.
 - Build 26100
   - [Debuggers\ddk\samples\kdserial\lib\arm64\kdhv.lib](Symbols/26100/arm64/kdhv.lib)
   - [Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib](Symbols/26100/x64/kdhv.lib)
+  - [securekernel.exe (header dumped by Mezone)](Symbols/26100/securekernel.h)
 - Build 14393
   - [urlmon.dll](Symbols/14393/urlmon.dll), [urlmon.pdb](Symbols/14393/urlmon.pdb)
 - Build 14347
