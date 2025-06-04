@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      Mile.HyperV.Windows.VMBusPipe.h
- * PURPOSE:   Definition for Hyper-V Windows VMBus User Mode Pipe API
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       Mile.HyperV.Windows.VMBusPipe.h
+ * PURPOSE:    Definition for Hyper-V Windows VMBus User Mode Pipe API
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
