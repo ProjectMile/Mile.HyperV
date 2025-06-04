@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      Mile.HyperV.Guest.Protocols.h
- * PURPOSE:   Definition for Hyper-V Guest Publicized Protocols
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       Mile.HyperV.Guest.Protocols.h
+ * PURPOSE:    Definition for Hyper-V Guest Publicized Protocols
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
@@ -61,43 +61,6 @@ typedef long NTSTATUS;
 #define STATUS_REVISION_MISMATCH ((NTSTATUS)0xC0000059L)
 #endif // !STATUS_REVISION_MISMATCH
 
-#ifdef GUID_DEFINED
-typedef GUID HV_GUID, *PHV_GUID;
-#else
-typedef struct _HV_GUID
-{
-    HV_UINT32 Data1;
-    HV_UINT16 Data2;
-    HV_UINT16 Data3;
-    HV_UINT8 Data4[8];
-} HV_GUID, *PHV_GUID;
-#endif // GUID_DEFINED
-
-#ifndef OFFSET_OF
-// Macro that returns the byte offset of a field in a data structure.
-#define OFFSET_OF(TYPE, Field) ((HV_UINT64)&(((TYPE*)0)->Field))
-#endif // !OFFSET_OF
-
-#ifndef FIELD_SIZE
-#define FIELD_SIZE(TYPE, Field) (sizeof(((TYPE*)0)->Field))
-#endif // !FIELD_SIZE
-
-#ifndef SIZEOF_THROUGH_FIELD
-#define SIZEOF_THROUGH_FIELD(TYPE, Field) \
-    (OFFSET_OF(TYPE, Field) + FIELD_SIZE(TYPE, Field))
-#endif // !SIZEOF_THROUGH_FIELD
-
-//CONTAINS_FIELD usage:
-//  if (CONTAINS_FIELD(pBlock, pBlock->cbSize, dwMumble))
-//  {
-//      // safe to use pBlock->dwMumble
-//  }
-#ifndef CONTAINS_FIELD
-#define CONTAINS_FIELD(Struct, Size, Field) ( \
-    (((PHV_UINT8)(&(Struct)->Field)) + sizeof((Struct)->Field)) \
-    <= (((PHV_UINT8)(Struct))+(Size)))
-#endif // !CONTAINS_FIELD
-
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus
 //
@@ -111,7 +74,7 @@ typedef struct _GPA_RANGE
 {
     HV_UINT32 ByteCount;
     HV_UINT32 ByteOffset;
-    HV_UINT64 PfnArray[ANYSIZE_ARRAY];
+    HV_UINT64 PfnArray[HV_ANYSIZE_ARRAY];
 } GPA_RANGE, *PGPA_RANGE;
 
 #define GPA_RANGE_MAX_PFN_COUNT 0xfffff
@@ -269,7 +232,7 @@ static_assert(
     "Offer message too large");
 
 #define VMBUS_CHANNEL_OFFER_CHANNEL_SIZE_PRE_WIN7 \
-    (HV_UINT32)OFFSET_OF(VMBUS_CHANNEL_OFFER_CHANNEL, Windows6Offset)
+    (HV_UINT32)HV_FIELD_OFFSET(VMBUS_CHANNEL_OFFER_CHANNEL, Windows6Offset)
 
 // Rescind Offer parameters
 typedef struct _VMBUS_CHANNEL_RESCIND_OFFER
@@ -314,7 +277,7 @@ typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
 } VMBUS_CHANNEL_OPEN_CHANNEL, *PVMBUS_CHANNEL_OPEN_CHANNEL;
 
 #define VMBUS_CHANNEL_OPEN_CHANNEL_MIN_SIZE \
-    OFFSET_OF(VMBUS_CHANNEL_OPEN_CHANNEL, ConnectionId)
+    HV_FIELD_OFFSET(VMBUS_CHANNEL_OPEN_CHANNEL, ConnectionId)
 
 // Open Channel Result parameters
 typedef struct _VMBUS_CHANNEL_OPEN_RESULT
@@ -358,7 +321,7 @@ typedef struct _VMBUS_CHANNEL_GPADL_HEADER
     HV_UINT32 Gpadl;
     HV_UINT16 RangeBufLen;
     HV_UINT16 RangeCount;
-    GPA_RANGE Range[ANYSIZE_ARRAY];
+    GPA_RANGE Range[HV_ANYSIZE_ARRAY];
 } VMBUS_CHANNEL_GPADL_HEADER, *PVMBUS_CHANNEL_GPADL_HEADER;
 
 // This is the followup packet that contains more PFNs.
@@ -367,7 +330,7 @@ typedef struct _VMBUS_CHANNEL_GPADL_BODY
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 MessageNumber;
     HV_UINT32 Gpadl;
-    HV_UINT64 Pfn[ANYSIZE_ARRAY];
+    HV_UINT64 Pfn[HV_ANYSIZE_ARRAY];
 } VMBUS_CHANNEL_GPADL_BODY, *PVMBUS_CHANNEL_GPADL_BODY;
 
 typedef struct _VMBUS_CHANNEL_GPADL_CREATED
@@ -423,7 +386,7 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
 } VMBUS_CHANNEL_INITIATE_CONTACT, *PVMBUS_CHANNEL_INITIATE_CONTACT;
 
 #define VMBUS_CHANNEL_INITIATE_CONTACT_MIN_SIZE \
-    OFFSET_OF(VMBUS_CHANNEL_INITIATE_CONTACT, ClientId)
+    HV_FIELD_OFFSET(VMBUS_CHANNEL_INITIATE_CONTACT, ClientId)
 
 typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
 {
@@ -442,7 +405,7 @@ typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
 } VMBUS_CHANNEL_VERSION_RESPONSE, *PVMBUS_CHANNEL_VERSION_RESPONSE;
 
 #define VMBUS_CHANNEL_VERSION_RESPONSE_MIN_SIZE \
-    OFFSET_OF(VMBUS_CHANNEL_VERSION_RESPONSE, SupportedFeatures)
+    HV_FIELD_OFFSET(VMBUS_CHANNEL_VERSION_RESPONSE, SupportedFeatures)
 
 // Status codes for the ConnectionState field of VMBUS_CHANNEL_VERSION_RESPONSE.
 // N.B. If VersionSupported is FALSE, do not consult this value. If the
@@ -503,7 +466,7 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_REQUEST
 } VMBUS_CHANNEL_TL_CONNECT_REQUEST, *PVMBUS_CHANNEL_TL_CONNECT_REQUEST;
 
 #define VMBUS_CHANNEL_TL_CONNECT_REQUEST_PRE_RS5_SIZE \
-    (HV_UINT32)OFFSET_OF(VMBUS_CHANNEL_TL_CONNECT_REQUEST, WindowsRS1Offset)
+    (HV_UINT32)HV_FIELD_OFFSET(VMBUS_CHANNEL_TL_CONNECT_REQUEST, WindowsRS1Offset)
 
 typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 {
@@ -568,7 +531,7 @@ typedef struct _VMRCB
     } FeatureBits;
 } VMRCB, *PVMRCB;
 
-static_assert(OFFSET_OF(VMRCB, FeatureBits) == 64);
+static_assert(HV_FIELD_OFFSET(VMRCB, FeatureBits) == 64);
 
 typedef struct _VMPACKET_DESCRIPTOR
 {
@@ -602,7 +565,7 @@ typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
     HV_UINT8 SenderOwnsSet;
     HV_UINT8 Reserved;
     HV_UINT32 RangeCount;
-    VMTRANSFER_PAGE_RANGE Ranges[ANYSIZE_ARRAY];
+    VMTRANSFER_PAGE_RANGE Ranges[HV_ANYSIZE_ARRAY];
 } VMTRANSFER_PAGE_PACKET_HEADER, *PVMTRANSFER_PAGE_PACKET_HEADER;
 
 // This is the format for a GPA-Direct packet, which contains a set of GPA
@@ -612,7 +575,7 @@ typedef struct _VMDATA_GPA_DIRECT
     VMPACKET_DESCRIPTOR Descriptor;
     HV_UINT32 Reserved;
     HV_UINT32 RangeCount;
-    GPA_RANGE Range[ANYSIZE_ARRAY];
+    GPA_RANGE Range[HV_ANYSIZE_ARRAY];
 } VMDATA_GPA_DIRECT, *PVMDATA_GPA_DIRECT;
 
 typedef enum _VMPIPE_PROTOCOL_MESSAGE_TYPE
@@ -645,7 +608,7 @@ typedef struct _VMPIPE_SETUP_GPA_DIRECT_BODY
     // BOOLEAN
     HV_UINT8 IsWritable;
     HV_UINT32 RangeCount;
-    GPA_RANGE Range[ANYSIZE_ARRAY];
+    GPA_RANGE Range[HV_ANYSIZE_ARRAY];
 } VMPIPE_SETUP_GPA_DIRECT_BODY, *PVMPIPE_SETUP_GPA_DIRECT_BODY;
 
 typedef struct _VMPIPE_TEARDOWN_GPA_DIRECT_BODY
@@ -677,7 +640,7 @@ typedef struct _VMTRANSFER_PAGE_RANGES
 {
     struct _VMTRANSFER_PAGE_RANGES* Next;
     HV_UINT32 RangeCount;
-    VMTRANSFER_PAGE_RANGE Range[ANYSIZE_ARRAY];
+    VMTRANSFER_PAGE_RANGE Range[HV_ANYSIZE_ARRAY];
 } VMTRANSFER_PAGE_RANGES, *PVMTRANSFER_PAGE_RANGES;
 
 // *****************************************************************************
@@ -735,7 +698,7 @@ typedef struct
 {
     SYNTHVID_MESSAGE_HEADER Header;
     // Enclosed message
-    HV_UINT8 Data[ANYSIZE_ARRAY];
+    HV_UINT8 Data[HV_ANYSIZE_ARRAY];
 } SYNTHVID_MESSAGE, *PSYNTHVID_MESSAGE;
 
 typedef union
@@ -810,7 +773,7 @@ typedef struct
     HV_UINT64 UserContext;
     // 1 in Veridian 1.0
     HV_UINT8 VideoOutputCount;
-    VIDEO_OUTPUT_SITUATION VideoOutput[ANYSIZE_ARRAY];
+    VIDEO_OUTPUT_SITUATION VideoOutput[HV_ANYSIZE_ARRAY];
 } SYNTHVID_SITUATION_UPDATE_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
 
 // VSP to VSC
@@ -1015,12 +978,12 @@ typedef struct _VMSCSI_REQUEST
 static_assert((sizeof(VMSCSI_REQUEST) % 4) == 0);
 
 #define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 \
-    OFFSET_OF(VMSCSI_REQUEST, Reserve)
+    HV_FIELD_OFFSET(VMSCSI_REQUEST, Reserve)
 
 static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 == 0x24);
 
 #define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 \
-    SIZEOF_THROUGH_FIELD(VMSCSI_REQUEST, QueueSortKey)
+    HV_FIELD_SIZE_THROUGH(VMSCSI_REQUEST, QueueSortKey)
 
 static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 == 0x34);
 
@@ -1155,13 +1118,13 @@ typedef struct _VSTOR_PACKET
 static_assert((sizeof(VSTOR_PACKET) % 8) == 0);
 
 #define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 ( \
-    SIZEOF_THROUGH_FIELD(VSTOR_PACKET, Status) \
+    HV_FIELD_SIZE_THROUGH(VSTOR_PACKET, Status) \
     + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1)
 
 static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 == 0x30);
 
 #define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 ( \
-    SIZEOF_THROUGH_FIELD(VSTOR_PACKET, Status) \
+    HV_FIELD_SIZE_THROUGH(VSTOR_PACKET, Status) \
     + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2)
 
 static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 == 0x40);
@@ -1459,7 +1422,7 @@ typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE
     // |     |     |     |     |     |     |  | | | | | | | | | | |
     // |                                      |
     // LargeOffset                            SmallOffset
-    NVSP_1_RECEIVE_BUFFER_SECTION Sections[ANYSIZE_ARRAY];
+    NVSP_1_RECEIVE_BUFFER_SECTION Sections[HV_ANYSIZE_ARRAY];
 } NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE, *PNVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE;
 
 // This message is sent by the VSC to revoke the receive buffer. After the VSP
@@ -2279,7 +2242,7 @@ typedef struct _VPCI_QUERY_BUS_RELATIONS
 {
     VPCI_PACKET_HEADER Header;
     HV_UINT32 DeviceCount;
-    VPCI_DEVICE_DESCRIPTION Devices[ANYSIZE_ARRAY];
+    VPCI_DEVICE_DESCRIPTION Devices[HV_ANYSIZE_ARRAY];
 } VPCI_QUERY_BUS_RELATIONS, *PVPCI_QUERY_BUS_RELATIONS;
 
 #define VPCI_MAX_DEVICES_PER_BUS 255
@@ -2361,7 +2324,7 @@ typedef struct _VPCI_DEVICE_TRANSLATE_2
     PCI_SLOT_NUMBER                Slot;
     CM_PARTIAL_RESOURCE_DESCRIPTOR MmioResources[PCI_MAX_BAR];
     HV_UINT32                         MsiResourceCount;
-    VPCI_MESSAGE_RESOURCE_2        MsiResources[ANYSIZE_ARRAY];
+    VPCI_MESSAGE_RESOURCE_2        MsiResources[HV_ANYSIZE_ARRAY];
 } VPCI_DEVICE_TRANSLATE_2, *PVPCI_DEVICE_TRANSLATE_2;
 
 // NOTE: This doesn't exist in the windows header. Normally we'd use the the
@@ -2485,7 +2448,7 @@ typedef struct _VMBFS_MESSAGE_VERSION_RESPONSE
 typedef struct _VMBFS_MESSAGE_GET_FILE_INFO
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
 } VMBFS_MESSAGE_GET_FILE_INFO, *PVMBFS_MESSAGE_GET_FILE_INFO;
 
 typedef enum _VMBFS_STATUS_FILE_RESPONSE
@@ -2509,14 +2472,14 @@ typedef struct _VMBFS_MESSAGE_READ_FILE
     VMBFS_MESSAGE_HEADER Header;
     HV_UINT32 ByteCount;
     HV_UINT64 Offset;
-    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
 } VMBFS_MESSAGE_READ_FILE, *PVMBFS_MESSAGE_READ_FILE;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RESPONSE
 {
     VMBFS_MESSAGE_HEADER Header;
     HV_UINT32 Status;
-    HV_UINT8 Payload[ANYSIZE_ARRAY];
+    HV_UINT8 Payload[HV_ANYSIZE_ARRAY];
 } VMBFS_MESSAGE_READ_FILE_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RESPONSE;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA
@@ -2526,7 +2489,7 @@ typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA
     HV_UINT32 ByteCount;
     HV_UINT64 FileOffset;
     HV_UINT64 TokenOffset;
-    HV_WCHAR FilePath[ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
 } VMBFS_MESSAGE_READ_FILE_RDMA, *PVMBFS_MESSAGE_READ_FILE_RDMA;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE

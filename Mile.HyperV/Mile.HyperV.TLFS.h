@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      Mile.HyperV.TLFS.h
- * PURPOSE:   Definition for Hyper-V Top Level Functional Specification 6.0b
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       Mile.HyperV.TLFS.h
+ * PURPOSE:    Definition for Hyper-V Top Level Functional Specification 6.0b
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
@@ -51,26 +51,21 @@
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
-typedef int8_t HV_INT8, *PHV_INT8;
-typedef int16_t HV_INT16, *PHV_INT16;
-typedef int32_t HV_INT32, *PHV_INT32;
-typedef int64_t HV_INT64, *PHV_INT64;
-
 // Define a 256bit type.
-typedef struct DECLSPEC_ALIGN(32) _HV_UINT256
+typedef struct HV_DECLSPEC_ALIGN(32) _HV_UINT256
 {
     HV_UINT128 Low128;
     HV_UINT128 High128;
 } HV_UINT256, *PHV_UINT256;
 
 // Define a 512bit type.
-typedef struct DECLSPEC_ALIGN(32) _HV_UINT512
+typedef struct HV_DECLSPEC_ALIGN(32) _HV_UINT512
 {
     HV_UINT256 Low128;
     HV_UINT256 High128;
 } HV_UINT512, *PHV_UINT512;
 
-#define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) DECLSPEC_ALIGN(__alignment__)
+#define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) HV_DECLSPEC_ALIGN(__alignment__)
 
 // Memory Types
 //
@@ -223,7 +218,7 @@ typedef union _HV_X64_FP_MMX_REGISTER
 
 // FX registers are legacy extended state registers managed by the FXSAVE and
 // FXRSTOR instructions. This includes legacy FP and SSE registers.
-typedef union DECLSPEC_ALIGN(16) _HV_X64_FX_REGISTERS
+typedef union HV_DECLSPEC_ALIGN(16) _HV_X64_FX_REGISTERS
 {
     struct
     {
@@ -269,7 +264,7 @@ typedef union _HV_X64_XSAVE_XFEM_REGISTER
 
 // This structure represents the header area of an XSAVE area.
 // This must be alligned on a 64 byte boundary.
-typedef struct DECLSPEC_ALIGN(64) _HV_X64_XSAVE_HEADER
+typedef struct HV_DECLSPEC_ALIGN(64) _HV_X64_XSAVE_HEADER
 {
     // Bit vector indicating which features have state store in the XSAVE area.
     HV_X64_XSAVE_XFEM_REGISTER XstateBv; // Bit 63 MBZ
@@ -316,7 +311,7 @@ typedef struct DECLSPEC_ALIGN(64) _HV_X64_XSAVE_HEADER
 // FP and SSE state) by the XSAVE and XRSTOR instructions.
 // N.B. The XSAVE header must be aligned on a 64 byte boundary. Therefore this
 // structure must be 64 byte aligned.
-typedef union DECLSPEC_ALIGN(64) _HV_X64_X_REGISTERS
+typedef union HV_DECLSPEC_ALIGN(64) _HV_X64_X_REGISTERS
 {
     struct
     {
@@ -577,7 +572,7 @@ typedef struct _HV_STATISTICS_GROUP_VERSION
 } HV_STATISTICS_GROUP_VERSION;
 
 // Group header
-typedef struct DECLSPEC_ALIGN(2) _HV_STATISTICS_GROUP_HEADER
+typedef struct HV_DECLSPEC_ALIGN(2) _HV_STATISTICS_GROUP_HEADER
 {
     HV_STATISTICS_GROUP_TYPE Type;
     HV_STATISTICS_GROUP_VERSION Version;

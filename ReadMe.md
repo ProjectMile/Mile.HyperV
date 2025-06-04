@@ -11,6 +11,9 @@ folder which you actually needed to your C/C++ projects.
 
 ## Features
 
+- Mile.HyperV.Portable.Types.h
+  - Only depend on Mile.Mobility.Portable.Types.h if available.
+  - Only depend on stdint.h if Mile.Mobility.Portable.Types.h if not available.
 - Mile.HyperV.Guest.Interface.h
   - Include Hyper-V related definitions from
     https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4

@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      Mile.HyperV.VMBus.h
- * PURPOSE:   Definition for Hyper-V VMBus devices
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       Mile.HyperV.VMBus.h
+ * PURPOSE:    Definition for Hyper-V VMBus devices
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
@@ -167,7 +167,7 @@ typedef struct _SYNTHVID_POINTER_SHAPE_MESSAGE
     HV_UINT32 HeightPixels;
     HV_UINT32 HotspotX;
     HV_UINT32 HotspotY;
-    HV_UINT8 PixelData[ANYSIZE_ARRAY];
+    HV_UINT8 PixelData[HV_ANYSIZE_ARRAY];
 } SYNTHVID_POINTER_SHAPE_MESSAGE, *PSYNTHVID_POINTER_SHAPE_MESSAGE;
 #pragma pack()
 
@@ -191,7 +191,7 @@ typedef struct _SYNTHVID_DIRT_MESSAGE
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT8 VideoOutput;
     HV_UINT8 DirtCount;
-    HV_RECT Dirt[ANYSIZE_ARRAY];
+    HV_RECT Dirt[HV_ANYSIZE_ARRAY];
 } SYNTHVID_DIRT_MESSAGE, *PSYNTHVID_DIRT_MESSAGE;
 #pragma pack()
 
@@ -232,7 +232,7 @@ typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE
     HV_UINT8 ResolutionCount;
     HV_UINT8 DefaultResolutionIndex;
     HV_UINT8 IsStandard;
-    HVD_SCREEN_INFO SupportedResolution[ANYSIZE_ARRAY];
+    HVD_SCREEN_INFO SupportedResolution[HV_ANYSIZE_ARRAY];
 } SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
 #pragma pack()
 
@@ -350,7 +350,7 @@ typedef struct _HV_HID_DESCRIPTOR
     HV_UINT8 bCountry;
     HV_UINT8 bNumDescriptors;
     // An array of one OR MORE descriptors.
-    HV_HID_DESCRIPTOR_DESC_LIST DescriptorList[ANYSIZE_ARRAY];
+    HV_HID_DESCRIPTOR_DESC_LIST DescriptorList[HV_ANYSIZE_ARRAY];
 } HV_HID_DESCRIPTOR, *PHV_HID_DESCRIPTOR;
 #pragma pack()
 
@@ -380,7 +380,7 @@ typedef struct _SYNTHHID_DEVICE_INFO
 {
     SYNTHHID_MESSAGE_HEADER Header;
     HV_HID_DEVICE_ATTRIBUTES HidDeviceAttributes;
-    HV_UINT8 HidDescriptorInformation[ANYSIZE_ARRAY];
+    HV_UINT8 HidDescriptorInformation[HV_ANYSIZE_ARRAY];
 } SYNTHHID_DEVICE_INFO, *PSYNTHHID_DEVICE_INFO;
 #pragma pack()
 
@@ -400,7 +400,7 @@ typedef struct _SYNTHHID_DEVICE_INFO_ACK
 typedef struct _SYNTHHID_MESSAGE
 {
     SYNTHHID_MESSAGE_HEADER Header;
-    HV_UINT8 Data[ANYSIZE_ARRAY];
+    HV_UINT8 Data[HV_ANYSIZE_ARRAY];
 } SYNTHHID_MESSAGE, *PSYNTHHID_MESSAGE;
 #pragma pack()
 
@@ -1124,7 +1124,7 @@ typedef struct _IC_MSG_NEGOTIATE
     HV_UINT16 ICFrameworkVersionCount;
     HV_UINT16 ICMessageVersionCount;
     HV_UINT32 Reserved;
-    IC_VERSION ICVersionData[ANYSIZE_ARRAY];
+    IC_VERSION ICVersionData[HV_ANYSIZE_ARRAY];
 } IC_MSG_NEGOTIATE, *PIC_MSG_NEGOTIATE;
 
 /* ICFeatureIdxHeartbeat | 1 */

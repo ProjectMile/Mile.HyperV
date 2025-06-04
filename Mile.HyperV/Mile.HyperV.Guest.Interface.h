@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      Mile.HyperV.Guest.Interface.h
- * PURPOSE:   Definition for Hyper-V Guest Publicized Interface
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       Mile.HyperV.Guest.Interface.h
+ * PURPOSE:    Definition for Hyper-V Guest Publicized Interface
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
@@ -22,11 +22,7 @@
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
 
-#if !defined(_M_AMD64) && !defined(_M_ARM64) && !defined(_M_IX86)
-#error [Mile.HyperV] The architecture is not supported.
-#endif
-
-#include <stdint.h>
+#include "Mile.HyperV.Portable.Types.h"
 
 #ifdef _MSC_VER
 #if _MSC_VER > 1000
@@ -37,30 +33,6 @@
 #endif
 #pragma warning(disable:4201) // nameless struct/union
 #endif
-
-#ifndef DECLSPEC_ALIGN
-#if (_MSC_VER >= 1300) && !defined(MIDL_PASS)
-#define DECLSPEC_ALIGN(x) __declspec(align(x))
-#else
-#define DECLSPEC_ALIGN(x)
-#endif
-#endif
-
-typedef uint8_t HV_UINT8, *PHV_UINT8;
-typedef uint16_t HV_UINT16, *PHV_UINT16;
-typedef uint32_t HV_UINT32, *PHV_UINT32;
-typedef uint64_t HV_UINT64, *PHV_UINT64;
-
-// Define a wide character type.
-#if WCHAR_MAX == 0xFFFF
-typedef wchar_t HV_WCHAR;
-#else
-typedef HV_UINT16 HV_WCHAR;
-#endif // WCHAR_MAX == 0xFFFF
-
-#ifndef ANYSIZE_ARRAY
-#define ANYSIZE_ARRAY 1
-#endif // !ANYSIZE_ARRAY
 
 // *****************************************************************************
 // HV_STATUS Definitions
@@ -1480,7 +1452,7 @@ typedef struct _HV_IOMMU_FAULT_MESSAGE_PAYLOAD
 // N.B. The Payload may contain XMM registers that the compiler might expect to
 // to be aligned. Therefore, this structure must be 16-byte aligned. The header
 // is 16B already.
-typedef struct DECLSPEC_ALIGN(16) _HV_MESSAGE
+typedef struct HV_DECLSPEC_ALIGN(16) _HV_MESSAGE
 {
     HV_MESSAGE_HEADER Header;
     union
@@ -1516,7 +1488,7 @@ typedef union _HV_SYNIC_SIEFP
 //
 
 // Define a 128bit type.
-typedef union DECLSPEC_ALIGN(16) _HV_UINT128
+typedef union HV_DECLSPEC_ALIGN(16) _HV_UINT128
 {
     struct
     {
@@ -1529,7 +1501,7 @@ typedef union DECLSPEC_ALIGN(16) _HV_UINT128
 
 // Define an alignment for structures passed via hypercall.
 #define HV_CALL_ALIGNMENT 8
-#define HV_CALL_ATTRIBUTES DECLSPEC_ALIGN(HV_CALL_ALIGNMENT)
+#define HV_CALL_ATTRIBUTES HV_DECLSPEC_ALIGN(HV_CALL_ALIGNMENT)
 
 // Address spaces presented by the guest.
 typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
@@ -2705,7 +2677,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
     HV_UINT32 Reserved0 : 30;
     HV_UINT32 Reserved1;
     // Supplies an array of GPA page numbers to modify.
-    HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[ANYSIZE_ARRAY];
+    HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
 } HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
 
 #ifdef _MSC_VER
