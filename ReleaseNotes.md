@@ -1,5 +1,16 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.622.0**
+
+- Introduce Mile.HyperV.Portable.Types.h for making Mile.HyperV more portable.
+- Update HV_X64_HYPERVISOR_HARDWARE_FEATURES definition from Windows Subsystem
+  for Linux source code.
+- Make version to dummy value because the build project will generate that
+  automatically.
+- Update Mile.Project.Configurations to 1.0.1622.
+- Update Definition References.
+- Fix comments for Mile.HyperV header and source files.
+
 **Mile.HyperV 1.1.575.0**
 
 - Use HV_GUID instead of GUID for Mile.HyperV.Guest.Protocols.
