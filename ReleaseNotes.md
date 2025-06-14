@@ -1,5 +1,10 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.633.0**
+
+- Introduce HV_STATIC_ASSERT to replace static_assert to improve the
+  portability.
+
 **Mile.HyperV 1.1.622.0**
 
 - Introduce Mile.HyperV.Portable.Types.h for making Mile.HyperV more portable.
