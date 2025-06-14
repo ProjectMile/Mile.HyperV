@@ -56,6 +56,10 @@ typedef MO_GUID HV_GUID, *PHV_GUID;
 #define HV_ANYSIZE_ARRAY MO_ANYSIZE_ARRAY
 #endif // !HV_ANYSIZE_ARRAY
 
+#ifndef HV_STATIC_ASSERT
+#define HV_STATIC_ASSERT(Expression) MO_C_STATIC_ASSERT(Expression)
+#endif // !HV_STATIC_ASSERT
+
 #else
 
 #include <stdint.h>
@@ -118,6 +122,11 @@ typedef struct _HV_GUID
 #ifndef HV_ANYSIZE_ARRAY
 #define HV_ANYSIZE_ARRAY 1
 #endif // !HV_ANYSIZE_ARRAY
+
+#ifndef HV_STATIC_ASSERT
+#define HV_STATIC_ASSERT(Expression) \
+    typedef char __HV_STATIC_ASSERT__[(Expression) ? 1 : -1]
+#endif // !HV_STATIC_ASSERT
 
 #endif
 

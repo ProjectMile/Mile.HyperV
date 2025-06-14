@@ -227,9 +227,8 @@ typedef struct _VMBUS_CHANNEL_OFFER_CHANNEL
     };
 } VMBUS_CHANNEL_OFFER_CHANNEL, *PVMBUS_CHANNEL_OFFER_CHANNEL;
 
-static_assert(
-    sizeof(VMBUS_CHANNEL_OFFER_CHANNEL) <= MAXIMUM_SYNIC_MESSAGE_BYTES,
-    "Offer message too large");
+HV_STATIC_ASSERT(
+    sizeof(VMBUS_CHANNEL_OFFER_CHANNEL) <= MAXIMUM_SYNIC_MESSAGE_BYTES);
 
 #define VMBUS_CHANNEL_OFFER_CHANNEL_SIZE_PRE_WIN7 \
     (HV_UINT32)HV_FIELD_OFFSET(VMBUS_CHANNEL_OFFER_CHANNEL, Windows6Offset)
@@ -531,7 +530,7 @@ typedef struct _VMRCB
     } FeatureBits;
 } VMRCB, *PVMRCB;
 
-static_assert(HV_FIELD_OFFSET(VMRCB, FeatureBits) == 64);
+HV_STATIC_ASSERT(HV_FIELD_OFFSET(VMRCB, FeatureBits) == 64);
 
 typedef struct _VMPACKET_DESCRIPTOR
 {
@@ -975,17 +974,17 @@ typedef struct _VMSCSI_REQUEST
     HV_UINT32 QueueSortKey;
 } VMSCSI_REQUEST, *PVMSCSI_REQUEST;
 
-static_assert((sizeof(VMSCSI_REQUEST) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VMSCSI_REQUEST) % 4) == 0);
 
 #define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 \
     HV_FIELD_OFFSET(VMSCSI_REQUEST, Reserve)
 
-static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 == 0x24);
+HV_STATIC_ASSERT(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1 == 0x24);
 
 #define VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 \
     HV_FIELD_SIZE_THROUGH(VMSCSI_REQUEST, QueueSortKey)
 
-static_assert(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 == 0x34);
+HV_STATIC_ASSERT(VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2 == 0x34);
 
 // This structure is sent during the intialization phase to get the different
 // properties of the channel.
@@ -1005,7 +1004,7 @@ typedef struct _VMSTORAGE_CHANNEL_PROPERTIES
 
 #define STORAGE_CHANNEL_SUPPORTS_MULTI_CHANNEL 0x1
 
-static_assert((sizeof(VMSTORAGE_CHANNEL_PROPERTIES) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VMSTORAGE_CHANNEL_PROPERTIES) % 4) == 0);
 
 // This structure is sent as part of the channel offer. It exists for old
 // versions of the VSC that used this to determine the IDE channel that matched
@@ -1032,7 +1031,7 @@ typedef struct _VMSTORAGE_PROTOCOL_VERSION
     HV_UINT16 Build;
 } VMSTORAGE_PROTOCOL_VERSION, *PVMSTORAGE_PROTOCOL_VERSION;
 
-static_assert((sizeof(VMSTORAGE_PROTOCOL_VERSION) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VMSTORAGE_PROTOCOL_VERSION) % 4) == 0);
 
 // This structure is for fibre channel Wwn Packets.
 typedef struct _VMFC_WWN_PACKET
@@ -1047,7 +1046,7 @@ typedef struct _VMFC_WWN_PACKET
     HV_UINT8 SecondaryNodeWwn[8];
 } VMFC_WWN_PACKET, *PVMFC_WWN_PACKET;
 
-static_assert((sizeof(VMFC_WWN_PACKET) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VMFC_WWN_PACKET) % 4) == 0);
 
 // Used to register or unregister Asynchronous Media Event Notification to the
 // client
@@ -1057,7 +1056,7 @@ typedef struct _VSTOR_CLIENT_PROPERTIES
     HV_UINT32 Reserved : 31;
 } VSTOR_CLIENT_PROPERTIES, *PVSTOR_CLIENT_PROPERTIES;
 
-static_assert((sizeof(VSTOR_CLIENT_PROPERTIES) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VSTOR_CLIENT_PROPERTIES) % 4) == 0);
 
 typedef struct _VSTOR_ASYNC_REGISTER_PACKET
 {
@@ -1068,7 +1067,7 @@ typedef struct _VSTOR_ASYNC_REGISTER_PACKET
     HV_UINT8 Register;
 } VSTOR_ASYNC_REGISTER_PACKET, *PVSTOR_ASYNC_REGISTER_PACKET;
 
-static_assert((sizeof(VSTOR_ASYNC_REGISTER_PACKET) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VSTOR_ASYNC_REGISTER_PACKET) % 4) == 0);
 
 // Used to send notifications to StorVsc about media change events
 typedef struct _VSTOR_NOTIFICATION_PACKET
@@ -1079,7 +1078,7 @@ typedef struct _VSTOR_NOTIFICATION_PACKET
     HV_UINT8 Flags;
 } VSTOR_NOTIFICATION_PACKET, *PVSTOR_NOTIFICATION_PACKET;
 
-static_assert((sizeof(VSTOR_NOTIFICATION_PACKET) % 4) == 0);
+HV_STATIC_ASSERT((sizeof(VSTOR_NOTIFICATION_PACKET) % 4) == 0);
 
 typedef struct _VSTOR_PACKET
 {
@@ -1115,19 +1114,19 @@ typedef struct _VSTOR_PACKET
     };
 } VSTOR_PACKET, *PVSTOR_PACKET;
 
-static_assert((sizeof(VSTOR_PACKET) % 8) == 0);
+HV_STATIC_ASSERT((sizeof(VSTOR_PACKET) % 8) == 0);
 
 #define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 ( \
     HV_FIELD_SIZE_THROUGH(VSTOR_PACKET, Status) \
     + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_1)
 
-static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 == 0x30);
+HV_STATIC_ASSERT(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_1 == 0x30);
 
 #define VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 ( \
     HV_FIELD_SIZE_THROUGH(VSTOR_PACKET, Status) \
     + VMSTORAGE_SIZEOF_VMSCSI_REQUEST_REVISION_2)
 
-static_assert(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 == 0x40);
+HV_STATIC_ASSERT(VMSTORAGE_SIZEOF_VSTOR_PACKET_REVISION_2 == 0x40);
 
 // Packet flags
 
@@ -1673,7 +1672,7 @@ typedef struct _NVSP_MESSAGE
     HV_UINT32 Padding;
 } NVSP_MESSAGE, *PNVSP_MESSAGE;
 
-static_assert(sizeof(NVSP_MESSAGE) % 8 == 0);
+HV_STATIC_ASSERT(sizeof(NVSP_MESSAGE) % 8 == 0);
 
 #pragma pack(pop)
 
@@ -2130,7 +2129,7 @@ typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR
 } CM_PARTIAL_RESOURCE_DESCRIPTOR, *PCM_PARTIAL_RESOURCE_DESCRIPTOR;
 #pragma pack()
 
-static_assert(sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) == 0x14);
+HV_STATIC_ASSERT(sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) == 0x14);
 
 #ifndef _WINNT_
 typedef enum _DEVICE_POWER_STATE {
