@@ -112,10 +112,14 @@ typedef struct _HV_GUID
 #endif // !HV_FIELD_CONTAINS
 
 #ifndef HV_DECLSPEC_ALIGN
+#ifdef _MSC_VER
 #if (_MSC_VER >= 1300) && !defined(MIDL_PASS)
 #define HV_DECLSPEC_ALIGN(x) __declspec(align(x))
 #else
 #define HV_DECLSPEC_ALIGN(x)
+#endif
+#else
+#define HV_DECLSPEC_ALIGN(x) __attribute__ ((aligned(x)))
 #endif
 #endif // !HV_DECLSPEC_ALIGN
 
