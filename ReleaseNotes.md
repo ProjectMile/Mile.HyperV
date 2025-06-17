@@ -1,5 +1,10 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.1.635.0**
+
+- Fix HV_DECLSPEC_ALIGN fallback definition.
+- Fix some definitions to improve the portability.
+
 **Mile.HyperV 1.1.633.0**
 
 - Introduce HV_STATIC_ASSERT to replace static_assert to improve the
