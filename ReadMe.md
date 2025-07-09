@@ -16,7 +16,7 @@ folder which you actually needed to your C/C++ projects.
   - Only depend on stdint.h if Mile.Mobility.Portable.Types.h if not available.
 - Mile.HyperV.Guest.Interface.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
+    https://github.com/microsoft/mu_msvm/tree/9337285a977fbf1682e21c17800c4809ce5bcd19
     - MsvmPkg\Include\Hv\HvStatus.h
     - MsvmPkg\Include\Hv\HvGuest.h
     - MsvmPkg\Include\Hv\HvGuestCpuid.h
@@ -31,7 +31,7 @@ folder which you actually needed to your C/C++ projects.
     - src\windows\inc\wdk.h
 - Mile.HyperV.Guest.Protocols.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/mu_msvm/tree/258361bd0d61320df8984705111d94af20b4d8a4
+    https://github.com/microsoft/mu_msvm/tree/9337285a977fbf1682e21c17800c4809ce5bcd19
     - MsvmPkg\MsvmPkg.dec
     - MsvmPkg\Include\Vmbus\NtStatus.h
     - MsvmPkg\Include\MsvmBase.h

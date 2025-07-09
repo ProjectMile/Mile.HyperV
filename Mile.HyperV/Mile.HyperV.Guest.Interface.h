@@ -263,6 +263,9 @@ typedef HV_UINT64 HV_GVA, *PHV_GVA;
 // The HVC immediate below is handled by the Microvisor for GICv3 support in the
 // absence of the full Hypervisor.
 #define HV_ARM64_ENABLE_SRE 2
+
+// Vendor-specific reset types
+#define HV_ARM64_SYSTEM_RESET2_FIRMWARE_CRASH 0x80000001
 #elif defined(_M_AMD64) || defined(_M_IX86)
 #define HV_X64_PAGE_SIZE 4096
 #define HV_X64_LARGE_PAGE_SIZE 0x200000
