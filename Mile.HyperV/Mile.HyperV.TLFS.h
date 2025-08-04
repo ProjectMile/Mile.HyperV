@@ -3519,7 +3519,9 @@ typedef struct _HV_TRANSLATE_GVA_RESULT_EX
     HV_UINT32 CacheType : 8;
     HV_UINT32 OverlayPage : 1;
     HV_UINT32 Reserved : 23;
+#if defined(_M_AMD64) || defined(_M_IX86)
     HV_X64_PENDING_EVENT EventInfo; // Not in TLFS
+#endif
 } HV_TRANSLATE_GVA_RESULT_EX, *PHV_TRANSLATE_GVA_RESULT_EX;
 
 /* Virtual Interrupt */
@@ -5863,6 +5865,146 @@ typedef struct _HV_DEVICE_PRQ_HEADER
     HV_UINT8 Error;
 } HV_DEVICE_PRQ_HEADER, *PHV_DEVICE_PRQ_HEADER;
 
+#if defined(_M_ARM64)
+typedef enum _HV_PARTITION_PROCESSOR_FEATURES_FIELD_INDEX
+{
+    HvPartitionProcessorFeaturesAsid16Index = 0x0,
+    HvPartitionProcessorFeaturesTGran16Index = 0x1,
+    HvPartitionProcessorFeaturesTGran64Index = 0x2,
+    HvPartitionProcessorFeaturesHafIndex = 0x3,
+    HvPartitionProcessorFeaturesHdbsIndex = 0x4,
+    HvPartitionProcessorFeaturesPanIndex = 0x5,
+    HvPartitionProcessorFeaturesAtS1E1Index = 0x6,
+    HvPartitionProcessorFeaturesUaoIndex = 0x7,
+    HvPartitionProcessorFeaturesEl0Aarch32Index = 0x8,
+    HvPartitionProcessorFeaturesFpIndex = 0x9,
+    HvPartitionProcessorFeaturesFpHpIndex = 0xA,
+    HvPartitionProcessorFeaturesAdvSimdIndex = 0xB,
+    HvPartitionProcessorFeaturesAdvSimdHpIndex = 0xC,
+    HvPartitionProcessorFeaturesGicV3V4Index = 0xD,
+    HvPartitionProcessorFeaturesGicV4P1Index = 0xE,
+    HvPartitionProcessorFeaturesRasIndex = 0xF,
+    HvPartitionProcessorFeaturesPmuV3Index = 0x10,
+    HvPartitionProcessorFeaturesPmuV3ArmV81Index = 0x11,
+    HvPartitionProcessorFeaturesPmuV3ArmV84Index = 0x12,
+    HvPartitionProcessorFeaturesPmuV3ArmV85Index = 0x13,
+    HvPartitionProcessorFeaturesAesIndex = 0x14,
+    HvPartitionProcessorFeaturesPolyMulIndex = 0x15,
+    HvPartitionProcessorFeaturesSha1Index = 0x16,
+    HvPartitionProcessorFeaturesSha256Index = 0x17,
+    HvPartitionProcessorFeaturesSha512Index = 0x18,
+    HvPartitionProcessorFeaturesCrc32Index = 0x19,
+    HvPartitionProcessorFeaturesAtomicIndex = 0x1A,
+    HvPartitionProcessorFeaturesRdmIndex = 0x1B,
+    HvPartitionProcessorFeaturesSha3Index = 0x1C,
+    HvPartitionProcessorFeaturesSm3Index = 0x1D,
+    HvPartitionProcessorFeaturesSm4Index = 0x1E,
+    HvPartitionProcessorFeaturesDpIndex = 0x1F,
+    HvPartitionProcessorFeaturesFhmIndex = 0x20,
+    HvPartitionProcessorFeaturesDcCvapIndex = 0x21,
+    HvPartitionProcessorFeaturesDcCvadpIndex = 0x22,
+    HvPartitionProcessorFeaturesApaBaseIndex = 0x23,
+    HvPartitionProcessorFeaturesApaEpIndex = 0x24,
+    HvPartitionProcessorFeaturesApaEp2Index = 0x25,
+    HvPartitionProcessorFeaturesApaEp2FpIndex = 0x26,
+    HvPartitionProcessorFeaturesApaEp2FpcIndex = 0x27,
+    HvPartitionProcessorFeaturesJscvtIndex = 0x28,
+    HvPartitionProcessorFeaturesFcmaIndex = 0x29,
+    HvPartitionProcessorFeaturesRcpcV83Index = 0x2A,
+    HvPartitionProcessorFeaturesRcpcV84Index = 0x2B,
+    HvPartitionProcessorFeaturesGpaIndex = 0x2C,
+    HvPartitionProcessorFeaturesL1ipPiptIndex = 0x2D,
+    HvPartitionProcessorFeaturesDzPermittedIndex = 0x2E,
+    HvPartitionProcessorFeaturesSsbsIndex = 0x2F,
+    HvPartitionProcessorFeaturesSsbsRwIndex = 0x30,
+    HvPartitionProcessorFeaturesSmcccW1SupportedIndex = 0x31,
+    HvPartitionProcessorFeaturesSmcccW1MitigatedIndex = 0x32,
+    HvPartitionProcessorFeaturesSmcccW2SupportedIndex = 0x33,
+    HvPartitionProcessorFeaturesSmcccW2MitigatedIndex = 0x34,
+    HvPartitionProcessorFeaturesCsv2Index = 0x35,
+    HvPartitionProcessorFeaturesCsv3Index = 0x36,
+    HvPartitionProcessorFeaturesSbIndex = 0x37,
+    HvPartitionProcessorFeaturesIdcIndex = 0x38,
+    HvPartitionProcessorFeaturesDicIndex = 0x39,
+    HvPartitionProcessorFeaturesTlbiOsIndex = 0x3A,
+    HvPartitionProcessorFeaturesTlbiOsRangeIndex = 0x3B,
+    HvPartitionProcessorFeaturesFlagsMIndex = 0x3C,
+    HvPartitionProcessorFeaturesFlagsM2Index = 0x3D,
+    HvPartitionProcessorFeaturesBf16Index = 0x3E,
+    HvPartitionProcessorFeaturesEbf16Index = 0x3F,
+    HvPartitionProcessorFeaturesSveBf16Index = 0x40,
+    HvPartitionProcessorFeaturesSveEbf16Index = 0x41,
+    HvPartitionProcessorFeaturesI8mmIndex = 0x42,
+    HvPartitionProcessorFeaturesSveI8mmIndex = 0x43,
+    HvPartitionProcessorFeaturesFrinttsIndex = 0x44,
+    HvPartitionProcessorFeaturesSpecresIndex = 0x45,
+    HvPartitionProcessorFeaturesMtpmuIndex = 0x46,
+    HvPartitionProcessorFeaturesRpresIndex = 0x47,
+    HvPartitionProcessorFeaturesExsIndex = 0x48,
+    HvPartitionProcessorFeaturesSpecSeiIndex = 0x49,
+    HvPartitionProcessorFeaturesEtsIndex = 0x4A,
+    HvPartitionProcessorFeaturesAfpIndex = 0x4B,
+    HvPartitionProcessorFeaturesIesbIndex = 0x4C,
+    HvPartitionProcessorFeaturesRngIndex = 0x4D,
+    HvPartitionProcessorFeaturesLse2Index = 0x4E,
+    HvPartitionProcessorFeaturesIdstIndex = 0x4F,
+    HvPartitionProcessorFeaturesRasV1P1Index = 0x50,
+    HvPartitionProcessorFeaturesRasFracV1P1Index = 0x51,
+    HvPartitionProcessorFeaturesSel2Index = 0x52,
+    HvPartitionProcessorFeaturesAmuV1Index = 0x53,
+    HvPartitionProcessorFeaturesAmuV1P1Index = 0x54,
+    HvPartitionProcessorFeaturesDitIndex = 0x55,
+    HvPartitionProcessorFeaturesCcidxIndex = 0x56,
+    HvPartitionProcessorFeaturesFgtForInterceptsIndex = 0x57,
+    HvPartitionProcessorFeaturesL1ipVpiptIndex = 0x58,
+    HvPartitionProcessorFeaturesL1ipViptIndex = 0x59,
+    HvPartitionProcessorFeaturesDebugV8Index = 0x5A,
+    HvPartitionProcessorFeaturesDebugV8P2Index = 0x5B,
+    HvPartitionProcessorFeaturesDebugV8P4Index = 0x5C,
+    HvPartitionProcessorFeaturesPmuV3ArmV87Index = 0x5D,
+    HvPartitionProcessorFeaturesDoubleLockIndex = 0x5E,
+    HvPartitionProcessorFeaturesClrbhbIndex = 0x5F,
+    HvPartitionProcessorFeaturesSpeIndex = 0x60,
+    HvPartitionProcessorFeaturesSpeV1P1Index = 0x61,
+    HvPartitionProcessorFeaturesSpeV1P2Index = 0x62,
+    HvPartitionProcessorFeaturesTtCnpIndex = 0x63,
+    HvPartitionProcessorFeaturesHpdsIndex = 0x64,
+    HvPartitionProcessorFeaturesSveIndex = 0x65,
+    HvPartitionProcessorFeaturesSveV2Index = 0x66,
+    HvPartitionProcessorFeaturesSveV2P1Index = 0x67,
+    HvPartitionProcessorFeaturesSpecFpaccIndex = 0x68,
+} HV_PARTITION_PROCESSOR_FEATURES_FIELD_INDEX, *PHV_PARTITION_PROCESSOR_FEATURES_FIELD_INDEX;
+#endif
+
+typedef enum _HV_PARTITION_MIRRORING_POLICY
+{
+    HvPartitionMirroringNone = 0x0,
+    HvPartitionMirroringInclude = 0x1,
+    HvPartitionMirroringExclude = 0x2,
+    HvPartitionMirroringMax = 0x2,
+} HV_PARTITION_MIRRORING_POLICY, *PHV_PARTITION_MIRRORING_POLICY;
+
+typedef enum _HV_EXT_EPF_MODE
+{
+    HvExtEpfModeMin = 0x0,
+    HvExtEpfModeNt = 0x0,
+    HvExtEpfModeMax = 0x1,
+} HV_EXT_EPF_MODE, *PHV_EXT_EPF_MODE;
+
+typedef struct HV_DECLSPEC_ALIGN(8) _HV_SUBNODE
+{
+    HV_UINT64 SubnodeId;
+    HV_SUBNODE_TYPE SubnodeType;
+} HV_SUBNODE, *PHV_SUBNODE;
+
+typedef struct _HV_EXT_INPUT_EPF_SETUP
+{
+    HV_UINT32 Version;
+    HV_EXT_EPF_MODE Mode;
+    HV_UINT64 CompletionQueueGpaPage;
+    HV_UINT64 CompletionQueuePageCount;
+} HV_EXT_INPUT_EPF_SETUP, *PHV_EXT_INPUT_EPF_SETUP;
+
 // *****************************************************************************
 // Hypervisor CPUID Definitions
 //
@@ -8164,6 +8306,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY
 } HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY, *PHV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY;
 
 // HvCallTranslateVirtualAddressEx | 0x00AC
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX
+{
+    // Flags to indicate the disposition of the translation.
+    HV_TRANSLATE_GVA_RESULT_EX TranslationResult;
+    // The GPA to which the GVA translated.
+    HV_GPA_PAGE_NUMBER GpaPage;
+} HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX, *PHV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX;
+
 // HvCallCheckForIoIntercept | 0x00AD
 
 // HvCallSetGpaPageAttributes | 0x00AE
