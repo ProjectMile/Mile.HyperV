@@ -1288,8 +1288,7 @@ typedef enum _HV_MESSAGE_TYPE
     HvMessageTypeX64Halt = 0x80010007,
     HvMessageTypeX64InterruptionDeliverable = 0x80010008,
     HvMessageTypeX64SipiIntercept = 0x80010009,
-#endif
-#if defined(_M_ARM64)
+#elif defined(_M_ARM64)
     HvMessageTypeArm64ResetIntercept = 0x80010000,
 #endif
 } HV_MESSAGE_TYPE, *PHV_MESSAGE_TYPE;

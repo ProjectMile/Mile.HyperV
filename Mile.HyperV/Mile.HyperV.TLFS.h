@@ -26,13 +26,15 @@
 //   Microsoft in 2013
 // - https://github.com/rust-vmm/mshv
 // - https://github.com/microsoft/igvm
-// - Symbols in Windows Driver Kit version 10.0.26063.0's
+// - Symbols in Windows Driver Kit version 10.0.26100.0's
 //   Debuggers\ddk\samples\kdserial\lib\x64\kdhv.lib
 // - Symbols in Windows version 10.0.14393.0's urlmon.dll
 // - Geoff Chappell's hvgdk_mini researches hints
 //   - hvgdk.h is existed from Windows Driver Kit version 7.1.0
 //   - Symbols in Windows version 10.0.14393.0's urlmon.dll have HV symbols
 // - Symbols in Windows version 10.0.14347.0's ntoskrnl.exe
+// - Symbols in Windows version 10.0.26100.0's securekernel.exe (header dumped
+//   by Mezone)
 
 #ifndef MILE_HYPERV_TLFS
 #define MILE_HYPERV_TLFS
@@ -1067,6 +1069,11 @@ typedef const HV_MEMORY_RANGE_INFO* PCHV_MEMORY_RANGE_INFO;
 
 // Define all the trace buffer types.
 typedef HV_EVENTLOG_TYPE _HV_EVENTLOG_TYPE;
+
+typedef enum
+{
+    HvEventLogTypeSystemDiagnostics = 0x00000002,
+} HV_EVENTLOG_TYPE_PRIVATE;
 
 // Define all the trace buffer states.
 typedef enum
@@ -2271,6 +2278,8 @@ typedef union _HV_GVA_RANGE
 // SynIC messages encode the message type as a 32-bit number.
 typedef enum _HV_MESSAGE_TYPE_PRIVATE
 {
+    HvMessageTypeEnablePartitionVtlIntercept = 0x80000005,
+
     // Opaque intercept message. The original intercept message is only
     // accessible from the mapped intercept message page.
 
@@ -2281,14 +2290,22 @@ typedef enum _HV_MESSAGE_TYPE_PRIVATE
     HvMessageTypeSynicSintIntercept = 0x80000061,
     HvMessageTypeSynicSintDeliverable = 0x80000062,
 
+    HvMessageInsufficientMemory = 0x80000071,
+    HvMessageMirroringNotification = 0x80000072,
+    HvMessageRestartCompletionNotification = 0x80000073,
+
     // Async call completion intercept
 
     HvMessageTypeAsyncCallCompletion = 0x80000070,
 
     // Platform-specific processor intercept messages
 
+#if defined(_M_AMD64) || defined(_M_IX86)
     HvMessageTypeX64LegacyFpError = 0x80010005,
     HvMessageTypeX64ProxyInterruptIntercept = 0x8001000f,
+#elif defined(_M_ARM64)
+    HvMessageTypeArm64ResetInterceptUndocumented = 0x8001000C,
+#endif
 } HV_MESSAGE_TYPE_PRIVATE, *PHV_MESSAGE_TYPE_PRIVATE;
 
 #define HV_MESSAGE_TYPE_HYPERVISOR_MASK (0x80000000)
@@ -2402,6 +2419,41 @@ typedef struct _HV_MESSAGE_HEADER_PRIVATE
         HV_UINT64 OriginationId;
     };
 } HV_MESSAGE_HEADER_PRIVATE, *PHV_MESSAGE_HEADER_PRIVATE;
+
+typedef union _HV_FAULT_DEVICE_ID
+{
+    HV_UINT64 AsUINT64;
+    HV_UINT64 StreamId;
+} HV_FAULT_DEVICE_ID, *PHV_FAULT_DEVICE_ID;
+
+typedef struct _HV_IOMMU_FAULT_MESSAGE_PAYLOAD_PRIVATE
+{
+    HV_UINT64 Reserved0;
+    struct
+    {
+        HV_UINT32 Reserved1 : 2;
+        HV_UINT32 IsStage1Fault : 1;
+    } Flags;
+    HV_UINT64 LogicalId;
+    HV_FAULT_DEVICE_ID DeviceId;
+    HV_UINT64 FaultAddress;
+    HV_GVA IommuBaseAddress;
+} HV_IOMMU_FAULT_MESSAGE_PAYLOAD_PRIVATE, *PHV_IOMMU_FAULT_MESSAGE_PAYLOAD_PRIVATE;
+
+typedef struct _HV_SINT_NOTIFICATION_MESSAGE_PAYLOAD
+{
+    HV_UINT32 SintIndex;
+} HV_SINT_NOTIFICATION_MESSAGE_PAYLOAD, *PHV_SINT_NOTIFICATION_MESSAGE_PAYLOAD;
+
+typedef struct HV_DECLSPEC_ALIGN(16) _HV_MESSAGE_PRIVATE
+{
+    HV_MESSAGE_HEADER_PRIVATE Header;
+    union
+    {
+        HV_IOMMU_FAULT_MESSAGE_PAYLOAD_PRIVATE IommuFaultPayload;
+        HV_SINT_NOTIFICATION_MESSAGE_PAYLOAD SintNotificationPayload;
+    };
+} HV_MESSAGE_PRIVATE, *PHV_MESSAGE_PRIVATE;
 
 // Define the number of message buffers associated with each port.
 #define HV_PORT_MESSAGE_BUFFER_COUNT (16)
@@ -6180,7 +6232,8 @@ typedef enum _HV_VTL_ENTRY_REASON
     // Indicates entry due to a VTL call from a lower VTL.
     HvVtlEntryVtlCall = 1,
     // Indicates entry due to an interrupt targeted to the VTL.
-    HvVtlEntryInterrupt = 2
+    HvVtlEntryInterrupt = 2,
+    HvVtlEntryIntercept = 3,
 } HV_VTL_ENTRY_REASON, *PHV_VTL_ENTRY_REASON;
 
 typedef struct _HV_VP_VTL_CONTROL
@@ -6205,6 +6258,7 @@ typedef struct _HV_VP_VTL_CONTROL
     // will vary based on whether the VTL is 32-bit or 64-bit.
     union
     {
+#if defined(_M_AMD64) || defined(_M_IX86)
         struct
         {
             HV_UINT64 VtlReturnX64Rax;
@@ -6217,6 +6271,13 @@ typedef struct _HV_VP_VTL_CONTROL
             HV_UINT32 VtlReturnX86Edx;
             HV_UINT32 ReservedZ1;
         };
+#elif defined(_M_ARM64)
+        struct
+        {
+            HV_UINT64 ReservedZ2;
+            HV_UINT64 ReservedZ3;
+        };
+#endif
     };
 } HV_VP_VTL_CONTROL, *PHV_VP_VTL_CONTROL;
 
@@ -6249,16 +6310,26 @@ typedef struct _HV_NESTED_ENLIGHTENMENTS_CONTROL
 // The virtualization fault information area contains the current fault code and
 // fault parameters for the VP. It is 16 byte aligned.
 // It's 40 bytes according to MIT-licensed Hyper-V headers from Microsoft.
-typedef struct _HV_VIRTUALIZATION_FAULT_INFORMATION
+typedef union _HV_VIRTUALIZATION_FAULT_INFORMATION
 {
-    HV_UINT16 Parameter0;
-    HV_UINT16 Reserved0;
-    HV_UINT32 Code;
-    HV_UINT64 Parameter1;
-    HV_UINT64 Parameter2; // Guess according to BugCheck
-    HV_UINT64 Parameter3; // Guess according to BugCheck
-    HV_UINT64 Parameter4; // Guess according to BugCheck
+    struct
+    {
+        HV_UINT16 Parameter0;
+        HV_UINT16 Reserved0;
+        HV_UINT32 Code;
+        HV_UINT64 Parameter1;
+    };
+    struct
+    {
+        HV_UINT8 VeInformationArea[34];
+        HV_UINT8 Reserved1[6];
+    };
 } HV_VIRTUALIZATION_FAULT_INFORMATION, *PHV_VIRTUALIZATION_FAULT_INFORMATION;
+
+typedef struct _HV_MINIMAL_INTERCEPT_INFORMATION
+{
+    HV_MESSAGE_TYPE MessageType;
+} HV_MINIMAL_INTERCEPT_INFORMATION, *PHV_MINIMAL_INTERCEPT_INFORMATION;
 
 typedef union _HV_VP_ASSIST_PAGE
 {
@@ -6278,10 +6349,15 @@ typedef union _HV_VP_ASSIST_PAGE
         // VirtualizationFaultInformation must be 16 byte aligned.
         HV_VIRTUALIZATION_FAULT_INFORMATION VirtualizationFaultInformation;
         HV_UINT8 ReservedZ3[8];
-        HV_UINT8 InterceptMessage[256];
+        HV_MESSAGE InterceptMessage;
         HV_UINT8 VtlReturnActions[256];
     };
     HV_UINT8 ReservedZBytePadding[HV_PAGE_SIZE];
+    struct
+    {
+        HV_UINT8 Padding[112];
+        HV_MINIMAL_INTERCEPT_INFORMATION MinimalIntercept;
+    };
 } HV_VP_ASSIST_PAGE, *PHV_VP_ASSIST_PAGE;
 
 typedef union _HV_REGISTER_VP_ASSIST_PAGE

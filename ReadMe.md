@@ -63,6 +63,8 @@ folder which you actually needed to your C/C++ projects.
     10.0.14393.0's urlmon.dll
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's ntoskrnl.exe
+  - Include Hyper-V related definitions from symbols in Windows version
+    10.0.26100.0's securekernel.exe (header dumped by Mezone)
 - Mile.HyperV.Windows.VMBusPipe.h and Mile.HyperV.Windows.VMBusPipe.cpp
   - Definitions conform with Windows 10 Build 19041's vmbuspipe.dll
   - Include Hyper-V related definitions from symbols in Windows version
