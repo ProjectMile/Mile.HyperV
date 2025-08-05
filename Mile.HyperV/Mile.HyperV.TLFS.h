@@ -706,6 +706,8 @@ typedef enum _HV_CPU_COUNTER
 // Partition counter set
 typedef enum _HV_PROCESS_COUNTER
 {
+    // Windows Driver Kit version 7.1.0 era definitions
+
     StPtCounterVirtualProcessors = 1,
     StPtCounterTlbSize = 3,
     StPtCounterAddressSpaces = 4,
@@ -718,7 +720,37 @@ typedef enum _HV_PROCESS_COUNTER
     StPtCounterGpaPages2M = 11,
     StPtCounterGpaPages1G = 12,
     StPtCounterGpaPages512G = 13,
-    StPtCounterMAXIMUM
+    StPtCounterMAXIMUM,
+
+    // Windows 11 Build 26100 era definitions
+
+    StCounterPtVirtualProcessors = 0x1,
+    StCounterPtTlbSize = 0x3,
+    StCounterPtAddressSpaces = 0x4,
+    StCounterPtDepositedPages = 0x5,
+    StCounterPtGpaPages = 0x6,
+    StCounterPtGpaSpaceModifications = 0x7,
+    StCounterPtVirtualTlbFlushEntires = 0x8,
+    StCounterPtRecommendedTlbSize = 0x9,
+    StCounterPtGpaPages4K = 0xA,
+    StCounterPtGpaPages2M = 0xB,
+    StCounterPtGpaPages1G = 0xC,
+    StCounterPtGpaPages512G = 0xD,
+    StCounterPtDevicePages4K = 0xE,
+    StCounterPtDevicePages2M = 0xF,
+    StCounterPtDevicePages1G = 0x10,
+    StCounterPtDevicePages512G = 0x11,
+    StCounterPtAttachedDevices = 0x12,
+    StCounterPtDeviceInterruptMappings = 0x13,
+    StCounterPtIoTlbFlushes = 0x14,
+    StCounterPtIoTlbFlushCost = 0x15,
+    StCounterPtDeviceInterruptErrors = 0x16,
+    StCounterPtDeviceDmaErrors = 0x17,
+    StCounterPtDeviceInterruptThrottleEvents = 0x18,
+    StCounterPtSkippedTimerTicks = 0x19,
+    StCounterPtPartitionId = 0x1A,
+    StCounterPtHwpRequestValue = 0x1B,
+    StCounterPtMAXIMUM = 0x1C,
 } HV_PROCESS_COUNTER;
 
 #define HV_STATISTICS_GROUP_PTA_LENGTH 8
@@ -5464,9 +5496,15 @@ typedef enum _HV_VP_DISPATCH_STATE
 // HVCALL_DISPATCH_VP.
 typedef enum _HV_VP_DISPATCH_EVENT
 {
-    HvVpDispatchEventInvalid = 0x00000000,
-    HvVpDispatchEventSuspend = 0x00000001,
-    HvVpDispatchEventIntercept = 0x00000002
+    HvVpDispatchEventInvalid = 0x0,
+    HvVpDispatchEventSuspend = 0x1,
+    HvVpDispatchEventIntercept = 0x2,
+    HvVpDispatchEventInternal = 0x3,
+    HvVpDispatchEventPreempted = 0x4,
+    HvVpDispatchEventCancelled = 0x5,
+    HvVpDispatchEventScheduler = 0x6,
+    HvVpDispatchEventLongSpinWait = 0x7,
+    HvVpDispatchEventTimeSliceEnd = 0x8,
 } HV_VP_DISPATCH_EVENT, *PHV_VP_DISPATCH_EVENT;
 
 #define HV_ROOT_SCHEDULER_MAX_VPS_PER_CHILD_PARTITION 1024
@@ -5619,12 +5657,20 @@ typedef enum _HV_LOG_SWAP_REASON
 
 typedef enum _HV_LOGICAL_PROCESSOR_PROPERTY_TYPE
 {
+#if defined(_M_AMD64) || defined(_M_IX86)
     HvLogicalProcessorPerfStateConfig = 0x0,
     HvLogicalProcessorThrottleStateConfig = 0x1,
     HvLogicalProcessorPccConfig = 0x2,
     HvLogicalProcessorPerfStateCap = 0x3,
     HvLogicalProcessorMachineCheckContextInfo = 0x4,
     HvLogicalProcessorMcUpdateUpdateStatus = 0x5,
+#elif defined(_M_ARM64)
+    HvLogicalProcessorMachineCheckContextInfo = 0x0,
+    HvLogicalProcessorMcUpdateUpdateStatus = 0x1,
+    HvLogicalProcessorUpdateLpIndex = 0x2,
+    HvLogicalProcessorProcHwId = 0x3,
+    HvLogicalProcessorProximityDomainId = 0x4,
+#endif
 } HV_LOGICAL_PROCESSOR_PROPERTY_TYPE, *PHV_LOGICAL_PROCESSOR_PROPERTY_TYPE;
 
 typedef enum _HV_LOGICAL_PROCESSOR_REGISTER_TYPE
@@ -6846,6 +6892,57 @@ typedef enum _HV_CPU_GROUP_PROPERTY_CODE
     HvCpuGroupPropertySchedulingPriority = 0x20000,
     HvCpuGroupPropertyIdleLpReserve = 0x30000,
 } HV_CPU_GROUP_PROPERTY_CODE, *PHV_CPU_GROUP_PROPERTY_CODE;
+
+typedef enum _HV_SNP_STATUS
+{
+    HvSnpStatusNone = 0x0,
+    HvSnpStatusAvailable = 0x1,
+    HvSnpStatusIncompatible = 0x2,
+    HvSnpStatusPspUnavailable = 0x3,
+    HvSnpStatusPspInitFailed = 0x4,
+    HvSnpStatusPspBadFwVersion = 0x5,
+    HvSnpStatusBadConfiguration = 0x6,
+    HvSnpStatusPspFwUpdateInProgress = 0x7,
+    HvSnpStatusPspRbInitFailed = 0x8,
+    HvSnpStatusPspPlatformStatusFailed = 0x9,
+    HvSnpStatusPspInitLateFailed = 0xA,
+    HvSnpStatusPspInitEarlyFailed = 0xB,
+    HvSnpStatusPspUnexpectedState = 0xC,
+    HvSnpStatusDisabled = 0xD,
+} HV_SNP_STATUS, *PHV_SNP_STATUS;
+
+typedef enum _HV_PARTITION_PERFMON_MODE
+{
+    HvPartitionPerfmonModeUnsupported = 0x0,
+    HvPartitionPerfmonModeDynamicSystem = 0x1,
+    HvPartitionPerfmonModeGuest = 0x2,
+    HvPartitionPerfmonModeRemote = 0x3,
+} HV_PARTITION_PERFMON_MODE, *PHV_PARTITION_PERFMON_MODE;
+
+typedef enum _HV_RESTART_COMPLETION_TYPE
+{
+    HvRestartCompletionSuccess = 0x0,
+    HvRestartCompletionCancelled = 0x1,
+} HV_RESTART_COMPLETION_TYPE, *PHV_RESTART_COMPLETION_TYPE;
+
+typedef enum _HV_EXT_SCHEDULER_ASSIST_ACTION
+{
+    HvExtSchedulerAssistSetDataPage = 0x0,
+    HvExtSchedulerAssistUpdateBamQos = 0x1,
+    HvExtSchedulerAssistUpdatePriority = 0x2,
+    HvExtSchedulerAssistRemoveSystemWorkBoost = 0x3,
+    HvExtSchedulerAssistEventSignalled = 0x4,
+    HvExtSchedulerAssistActionMax = 0x5,
+} HV_EXT_SCHEDULER_ASSIST_ACTION, *PHV_EXT_SCHEDULER_ASSIST_ACTION;
+
+#if defined(_M_AMD64) || defined(_M_IX86)
+typedef enum _HV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY
+{
+    HvX64CppcContextSwitchUnsupported = 0x0,
+    HvX64CppcContextSwitchLazy = 0x1,
+    HvX64CppcContextSwitchAggressive = 0x2,
+} HV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY, *PHV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY;
+#endif
 
 typedef struct HV_DECLSPEC_ALIGN(8) _HV_SUBNODE
 {
