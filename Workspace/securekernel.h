@@ -3817,15 +3817,6 @@ enum _HAL_EXTENSION_ENVIRONMENT : __int32
   HalExtEnvironmentSK = 0x4,
 };
 
-/* 217 */
-enum _HV_IMAGE_QUERY_TYPE : __int32
-{
-  ImageQueryTypeModuleCount = 0x0,
-  ImageQueryTypeModuleTraits = 0x1,
-  ImageQueryTypeSlotVaMappings = 0x2,
-  ImageQueryTypeMax = 0x3,
-};
-
 /* 219 */
 enum _INTERRUPT_TARGET_TYPE : __int32
 {
@@ -3857,839 +3848,6 @@ enum _INTERRUPT_RESULT : __int32
   InterruptBeginNone = 0x4,
 };
 
-/* 222 */
-enum _HV_DEVICE_TYPE : __int32
-{
-  HV_DEVICE_TYPE_LOGICAL = 0x0,
-  HV_DEVICE_TYPE_PCI = 0x1,
-  HV_DEVICE_TYPE_IOAPIC = 0x2,
-  HV_DEVICE_TYPE_ACPI = 0x3,
-};
-
-/* 223 */
-enum _HV_REGISTER_NAME : __int32
-{
-  HvRegisterExplicitSuspend = 0x0,
-  HvRegisterInterceptSuspend = 0x1,
-  HvRegisterInstructionEmulationHints = 0x2,
-  HvRegisterDispatchSuspend = 0x3,
-  HvRegisterInternalActivityState = 0x4,
-  HvRegisterHypervisorVersion = 0x100,
-  HvRegisterPrivilegesAndFeaturesInfo = 0x200,
-  HvRegisterFeaturesInfo = 0x201,
-  HvRegisterImplementationLimitsInfo = 0x202,
-  HvRegisterHardwareFeaturesInfo = 0x203,
-  HvRegisterCpuManagementFeaturesInfo = 0x204,
-  HvRegisterPasidFeaturesInfo = 0x205,
-  HvRegisterSkipLevelFeaturesInfo = 0x206,
-  HvRegisterNestedVirtFeaturesInfo = 0x207,
-  HvRegisterIptFeaturesInfo = 0x208,
-  HvRegisterIsolationConfiguration = 0x209,
-  HvRegisterGuestCrashP0 = 0x210,
-  HvRegisterGuestCrashP1 = 0x211,
-  HvRegisterGuestCrashP2 = 0x212,
-  HvRegisterGuestCrashP3 = 0x213,
-  HvRegisterGuestCrashP4 = 0x214,
-  HvRegisterGuestCrashCtl = 0x215,
-  HvRegisterPowerStateConfigC1 = 0x220,
-  HvRegisterPowerStateTriggerC1 = 0x221,
-  HvRegisterPowerStateConfigC2 = 0x222,
-  HvRegisterPowerStateTriggerC2 = 0x223,
-  HvRegisterPowerStateConfigC3 = 0x224,
-  HvRegisterPowerStateTriggerC3 = 0x225,
-  HvRegisterProcessorClockFrequency = 0x240,
-  HvRegisterInterruptClockFrequency = 0x241,
-  HvRegisterGuestIdle = 0x250,
-  HvRegisterDebugDeviceOptions = 0x260,
-  HvRegisterMemoryZeroingControl = 0x270,
-  HvRegisterPendingEvent0 = 0x10004,
-  HvRegisterPendingEvent1 = 0x10005,
-  HvRegisterDeliverabilityNotifications = 0x10006,
-  HvRegisterPendingEvent2 = 0x10008,
-  HvRegisterPendingEvent3 = 0x10009,
-  HvRegisterVpRuntime = 0x90000,
-  HvRegisterGuestOsId = 0x90002,
-  HvRegisterVpIndex = 0x90003,
-  HvRegisterTimeRefCount = 0x90004,
-  HvRegisterCpuManagementVersion = 0x90007,
-  HvRegisterVpAssistPage = 0x90013,
-  HvRegisterVpRootSignalCount = 0x90014,
-  HvRegisterReferenceTsc = 0x90017,
-  HvRegisterVpConfig = 0x90018,
-  HvX64RegisterGhcb = 0x90019,
-  HvRegisterReferenceTscSequence = 0x9001A,
-  HvRegisterGuestSchedulerEvent = 0x9001B,
-  HvRegisterRegisterPage = 0x9001C,
-  HvRegisterStatsPartitionRetail = 0x90020,
-  HvRegisterStatsPartitionInternal = 0x90021,
-  HvRegisterStatsVpRetail = 0x90022,
-  HvRegisterStatsVpInternal = 0x90023,
-  HvRegisterNestedVpIndex = 0x91003,
-  HvRegisterSint0 = 0xA0000,
-  HvRegisterSint1 = 0xA0001,
-  HvRegisterSint2 = 0xA0002,
-  HvRegisterSint3 = 0xA0003,
-  HvRegisterSint4 = 0xA0004,
-  HvRegisterSint5 = 0xA0005,
-  HvRegisterSint6 = 0xA0006,
-  HvRegisterSint7 = 0xA0007,
-  HvRegisterSint8 = 0xA0008,
-  HvRegisterSint9 = 0xA0009,
-  HvRegisterSint10 = 0xA000A,
-  HvRegisterSint11 = 0xA000B,
-  HvRegisterSint12 = 0xA000C,
-  HvRegisterSint13 = 0xA000D,
-  HvRegisterSint14 = 0xA000E,
-  HvRegisterSint15 = 0xA000F,
-  HvRegisterScontrol = 0xA0010,
-  HvRegisterSversion = 0xA0011,
-  HvRegisterSifp = 0xA0012,
-  HvRegisterSipp = 0xA0013,
-  HvRegisterEom = 0xA0014,
-  HvRegisterSirbp = 0xA0015,
-  HvRegisterNestedSint0 = 0xA1000,
-  HvRegisterNestedSint1 = 0xA1001,
-  HvRegisterNestedSint2 = 0xA1002,
-  HvRegisterNestedSint3 = 0xA1003,
-  HvRegisterNestedSint4 = 0xA1004,
-  HvRegisterNestedSint5 = 0xA1005,
-  HvRegisterNestedSint6 = 0xA1006,
-  HvRegisterNestedSint7 = 0xA1007,
-  HvRegisterNestedSint8 = 0xA1008,
-  HvRegisterNestedSint9 = 0xA1009,
-  HvRegisterNestedSint10 = 0xA100A,
-  HvRegisterNestedSint11 = 0xA100B,
-  HvRegisterNestedSint12 = 0xA100C,
-  HvRegisterNestedSint13 = 0xA100D,
-  HvRegisterNestedSint14 = 0xA100E,
-  HvRegisterNestedSint15 = 0xA100F,
-  HvRegisterNestedScontrol = 0xA1010,
-  HvRegisterNestedSversion = 0xA1011,
-  HvRegisterNestedSifp = 0xA1012,
-  HvRegisterNestedSipp = 0xA1013,
-  HvRegisterNestedEom = 0xA1014,
-  HvRegisterNestedSirbp = 0xA1015,
-  HvRegisterStimer0Config = 0xB0000,
-  HvRegisterStimer0Count = 0xB0001,
-  HvRegisterStimer1Config = 0xB0002,
-  HvRegisterStimer1Count = 0xB0003,
-  HvRegisterStimer2Config = 0xB0004,
-  HvRegisterStimer2Count = 0xB0005,
-  HvRegisterStimer3Config = 0xB0006,
-  HvRegisterStimer3Count = 0xB0007,
-  HvRegisterStimeUnhaltedTimerConfig = 0xB0100,
-  HvRegisterStimeUnhaltedTimerCount = 0xB0101,
-  HvRegisterVsmCodePageOffsets = 0xD0002,
-  HvRegisterVsmVpStatus = 0xD0003,
-  HvRegisterVsmPartitionStatus = 0xD0004,
-  HvRegisterVsmVina = 0xD0005,
-  HvRegisterVsmCapabilities = 0xD0006,
-  HvRegisterVsmPartitionConfig = 0xD0007,
-  HvRegisterGuestVsmPartitionConfig = 0xD0008,
-  HvRegisterHvptControl = 0xD0000009,
-  HvRegisterVsmVpSecureConfigVtl0 = 0xD0010,
-  HvRegisterVsmVpSecureConfigVtl1 = 0xD0011,
-  HvRegisterVsmVpSecureConfigVtl2 = 0xD0012,
-  HvRegisterVsmVpSecureConfigVtl3 = 0xD0013,
-  HvRegisterVsmVpSecureConfigVtl4 = 0xD0014,
-  HvRegisterVsmVpSecureConfigVtl5 = 0xD0015,
-  HvRegisterVsmVpSecureConfigVtl6 = 0xD0016,
-  HvRegisterVsmVpSecureConfigVtl7 = 0xD0017,
-  HvRegisterVsmVpSecureConfigVtl8 = 0xD0018,
-  HvRegisterVsmVpSecureConfigVtl9 = 0xD0019,
-  HvRegisterVsmVpSecureConfigVtl10 = 0xD001A,
-  HvRegisterVsmVpSecureConfigVtl11 = 0xD001B,
-  HvRegisterVsmVpSecureConfigVtl12 = 0xD001C,
-  HvRegisterVsmVpSecureConfigVtl13 = 0xD001D,
-  HvRegisterVsmVpSecureConfigVtl14 = 0xD001E,
-  HvRegisterVsmVpWaitForTlbLock = 0xD0020,
-  HvRegisterIsolationCapabilities = 0xD0100,
-  HvArm64RegisterXzr = 0x2FFFE,
-  HvArm64RegisterX0 = 0x20000,
-  HvArm64RegisterX1 = 0x20001,
-  HvArm64RegisterX2 = 0x20002,
-  HvArm64RegisterX3 = 0x20003,
-  HvArm64RegisterX4 = 0x20004,
-  HvArm64RegisterX5 = 0x20005,
-  HvArm64RegisterX6 = 0x20006,
-  HvArm64RegisterX7 = 0x20007,
-  HvArm64RegisterX8 = 0x20008,
-  HvArm64RegisterX9 = 0x20009,
-  HvArm64RegisterX10 = 0x2000A,
-  HvArm64RegisterX11 = 0x2000B,
-  HvArm64RegisterX12 = 0x2000C,
-  HvArm64RegisterX13 = 0x2000D,
-  HvArm64RegisterX14 = 0x2000E,
-  HvArm64RegisterX15 = 0x2000F,
-  HvArm64RegisterX16 = 0x20010,
-  HvArm64RegisterX17 = 0x20011,
-  HvArm64RegisterX18 = 0x20012,
-  HvArm64RegisterX19 = 0x20013,
-  HvArm64RegisterX20 = 0x20014,
-  HvArm64RegisterX21 = 0x20015,
-  HvArm64RegisterX22 = 0x20016,
-  HvArm64RegisterX23 = 0x20017,
-  HvArm64RegisterX24 = 0x20018,
-  HvArm64RegisterX25 = 0x20019,
-  HvArm64RegisterX26 = 0x2001A,
-  HvArm64RegisterX27 = 0x2001B,
-  HvArm64RegisterX28 = 0x2001C,
-  HvArm64RegisterFp = 0x2001D,
-  HvArm64RegisterLr = 0x2001E,
-  HvArm64RegisterPc = 0x20022,
-  HvArm64RegisterQ0 = 0x30000,
-  HvArm64RegisterQ1 = 0x30001,
-  HvArm64RegisterQ2 = 0x30002,
-  HvArm64RegisterQ3 = 0x30003,
-  HvArm64RegisterQ4 = 0x30004,
-  HvArm64RegisterQ5 = 0x30005,
-  HvArm64RegisterQ6 = 0x30006,
-  HvArm64RegisterQ7 = 0x30007,
-  HvArm64RegisterQ8 = 0x30008,
-  HvArm64RegisterQ9 = 0x30009,
-  HvArm64RegisterQ10 = 0x3000A,
-  HvArm64RegisterQ11 = 0x3000B,
-  HvArm64RegisterQ12 = 0x3000C,
-  HvArm64RegisterQ13 = 0x3000D,
-  HvArm64RegisterQ14 = 0x3000E,
-  HvArm64RegisterQ15 = 0x3000F,
-  HvArm64RegisterQ16 = 0x30010,
-  HvArm64RegisterQ17 = 0x30011,
-  HvArm64RegisterQ18 = 0x30012,
-  HvArm64RegisterQ19 = 0x30013,
-  HvArm64RegisterQ20 = 0x30014,
-  HvArm64RegisterQ21 = 0x30015,
-  HvArm64RegisterQ22 = 0x30016,
-  HvArm64RegisterQ23 = 0x30017,
-  HvArm64RegisterQ24 = 0x30018,
-  HvArm64RegisterQ25 = 0x30019,
-  HvArm64RegisterQ26 = 0x3001A,
-  HvArm64RegisterQ27 = 0x3001B,
-  HvArm64RegisterQ28 = 0x3001C,
-  HvArm64RegisterQ29 = 0x3001D,
-  HvArm64RegisterQ30 = 0x3001E,
-  HvArm64RegisterQ31 = 0x3001F,
-  HvArm64RegisterZ0 = 0x30100,
-  HvArm64RegisterZ1 = 0x30101,
-  HvArm64RegisterZ2 = 0x30102,
-  HvArm64RegisterZ3 = 0x30103,
-  HvArm64RegisterZ4 = 0x30104,
-  HvArm64RegisterZ5 = 0x30105,
-  HvArm64RegisterZ6 = 0x30106,
-  HvArm64RegisterZ7 = 0x30107,
-  HvArm64RegisterZ8 = 0x30108,
-  HvArm64RegisterZ9 = 0x30109,
-  HvArm64RegisterZ10 = 0x3010A,
-  HvArm64RegisterZ11 = 0x3010B,
-  HvArm64RegisterZ12 = 0x3010C,
-  HvArm64RegisterZ13 = 0x3010D,
-  HvArm64RegisterZ14 = 0x3010E,
-  HvArm64RegisterZ15 = 0x3010F,
-  HvArm64RegisterZ16 = 0x30110,
-  HvArm64RegisterZ17 = 0x30111,
-  HvArm64RegisterZ18 = 0x30112,
-  HvArm64RegisterZ19 = 0x30113,
-  HvArm64RegisterZ20 = 0x30114,
-  HvArm64RegisterZ21 = 0x30115,
-  HvArm64RegisterZ22 = 0x30116,
-  HvArm64RegisterZ23 = 0x30117,
-  HvArm64RegisterZ24 = 0x30118,
-  HvArm64RegisterZ25 = 0x30119,
-  HvArm64RegisterZ26 = 0x3011A,
-  HvArm64RegisterZ27 = 0x3011B,
-  HvArm64RegisterZ28 = 0x3011C,
-  HvArm64RegisterZ29 = 0x3011D,
-  HvArm64RegisterZ30 = 0x3011E,
-  HvArm64RegisterZ31 = 0x3011F,
-  HvArm64RegisterP0 = 0x30120,
-  HvArm64RegisterP1 = 0x30121,
-  HvArm64RegisterP2 = 0x30122,
-  HvArm64RegisterP3 = 0x30123,
-  HvArm64RegisterP4 = 0x30124,
-  HvArm64RegisterP5 = 0x30125,
-  HvArm64RegisterP6 = 0x30126,
-  HvArm64RegisterP7 = 0x30127,
-  HvArm64RegisterP8 = 0x30128,
-  HvArm64RegisterP9 = 0x30129,
-  HvArm64RegisterP10 = 0x3012A,
-  HvArm64RegisterP11 = 0x3012B,
-  HvArm64RegisterP12 = 0x3012C,
-  HvArm64RegisterP13 = 0x3012D,
-  HvArm64RegisterP14 = 0x3012E,
-  HvArm64RegisterP15 = 0x3012F,
-  HvArm64RegisterFFR = 0x30130,
-  HvArm64RegisterCurrentEl = 0x21003,
-  HvArm64RegisterDaif = 0x21004,
-  HvArm64RegisterDit = 0x21005,
-  HvArm64RegisterPstate = 0x20023,
-  HvArm64RegisterElrEl1 = 0x40015,
-  HvArm64RegisterElrEl2 = 0x21001,
-  HvArm64RegisterElrElx = 0x2100C,
-  HvArm64RegisterFpcr = 0x40012,
-  HvArm64RegisterFpsr = 0x40013,
-  HvArm64RegisterNzcv = 0x21006,
-  HvArm64RegisterPan = 0x21007,
-  HvArm64RegisterSp = 0x2001F,
-  HvArm64RegisterSpEl0 = 0x20020,
-  HvArm64RegisterSpEl1 = 0x20021,
-  HvArm64RegisterSpEl2 = 0x21000,
-  HvArm64RegisterSpSel = 0x21008,
-  HvArm64RegisterSpsrEl1 = 0x40014,
-  HvArm64RegisterSpsrEl2 = 0x21002,
-  HvArm64RegisterSpsrElx = 0x2100D,
-  HvArm64RegisterSsbs = 0x21009,
-  HvArm64RegisterTco = 0x2100A,
-  HvArm64RegisterUao = 0x2100B,
-  HvArm64RegisterIdRes00El1 = 0x22000,
-  HvArm64RegisterIdRes01El1 = 0x22001,
-  HvArm64RegisterIdRes02El1 = 0x22002,
-  HvArm64RegisterIdRes03El1 = 0x22003,
-  HvArm64RegisterIdRes04El1 = 0x22004,
-  HvArm64RegisterIdRes05El1 = 0x22005,
-  HvArm64RegisterIdRes06El1 = 0x22006,
-  HvArm64RegisterIdRes07El1 = 0x22007,
-  HvArm64RegisterIdPfr0El1 = 0x22008,
-  HvArm64RegisterIdPfr1El1 = 0x22009,
-  HvArm64RegisterIdDfr0El1 = 0x2200A,
-  HvArm64RegisterIdRes13El1 = 0x2200B,
-  HvArm64RegisterIdMmfr0El1 = 0x2200C,
-  HvArm64RegisterIdMmfr1El1 = 0x2200D,
-  HvArm64RegisterIdMmfr2El1 = 0x2200E,
-  HvArm64RegisterIdMmfr3El1 = 0x2200F,
-  HvArm64RegisterIdIsar0El1 = 0x22010,
-  HvArm64RegisterIdIsar1El1 = 0x22011,
-  HvArm64RegisterIdIsar2El1 = 0x22012,
-  HvArm64RegisterIdIsar3El1 = 0x22013,
-  HvArm64RegisterIdIsar4El1 = 0x22014,
-  HvArm64RegisterIdIsar5El1 = 0x22015,
-  HvArm64RegisterIdRes26El1 = 0x22016,
-  HvArm64RegisterIdRes27El1 = 0x22017,
-  HvArm64RegisterIdRes30El1 = 0x22018,
-  HvArm64RegisterIdRes31El1 = 0x22019,
-  HvArm64RegisterIdRes32El1 = 0x2201A,
-  HvArm64RegisterIdRes33El1 = 0x2201B,
-  HvArm64RegisterIdPfr2El1 = 0x2201C,
-  HvArm64RegisterIdRes35El1 = 0x2201D,
-  HvArm64RegisterIdRes36El1 = 0x2201E,
-  HvArm64RegisterIdRes37El1 = 0x2201F,
-  HvArm64RegisterIdAa64Pfr0El1 = 0x22020,
-  HvArm64RegisterIdAa64Pfr1El1 = 0x22021,
-  HvArm64RegisterIdAa64Pfr2El1 = 0x22022,
-  HvArm64RegisterIdRes43El1 = 0x22023,
-  HvArm64RegisterIdAa64Zfr0El1 = 0x22024,
-  HvArm64RegisterIdAa64Smfr0El1 = 0x22025,
-  HvArm64RegisterIdRes46El1 = 0x22026,
-  HvArm64RegisterIdRes47El1 = 0x22027,
-  HvArm64RegisterIdAa64Dfr0El1 = 0x22028,
-  HvArm64RegisterIdAa64Dfr1El1 = 0x22029,
-  HvArm64RegisterIdRes52El1 = 0x2202A,
-  HvArm64RegisterIdRes53El1 = 0x2202B,
-  HvArm64RegisterIdRes54El1 = 0x2202C,
-  HvArm64RegisterIdRes55El1 = 0x2202D,
-  HvArm64RegisterIdRes56El1 = 0x2202E,
-  HvArm64RegisterIdRes57El1 = 0x2202F,
-  HvArm64RegisterIdAa64Isar0El1 = 0x22030,
-  HvArm64RegisterIdAa64Isar1El1 = 0x22031,
-  HvArm64RegisterIdAa64Isar2El1 = 0x22032,
-  HvArm64RegisterIdRes63El1 = 0x22033,
-  HvArm64RegisterIdRes64El1 = 0x22034,
-  HvArm64RegisterIdRes65El1 = 0x22035,
-  HvArm64RegisterIdRes66El1 = 0x22036,
-  HvArm64RegisterIdRes67El1 = 0x22037,
-  HvArm64RegisterIdAa64Mmfr0El1 = 0x22038,
-  HvArm64RegisterIdAa64Mmfr1El1 = 0x22039,
-  HvArm64RegisterIdAa64Mmfr2El1 = 0x2203A,
-  HvArm64RegisterIdAa64Mmfr3El1 = 0x2203B,
-  HvArm64RegisterIdAa64Mmfr4El1 = 0x2203C,
-  HvArm64RegisterIdRes75El1 = 0x2203D,
-  HvArm64RegisterIdRes76El1 = 0x2203E,
-  HvArm64RegisterIdRes77El1 = 0x2203F,
-  HvArm64RegisterIdRes80El1 = 0x22040,
-  HvArm64RegisterIdRes81El1 = 0x22041,
-  HvArm64RegisterIdRes82El1 = 0x22042,
-  HvArm64RegisterIdRes83El1 = 0x22043,
-  HvArm64RegisterIdRes84El1 = 0x22044,
-  HvArm64RegisterIdRes85El1 = 0x22045,
-  HvArm64RegisterIdRes86El1 = 0x22046,
-  HvArm64RegisterIdRes87El1 = 0x22047,
-  HvArm64RegisterIdRes90El1 = 0x22048,
-  HvArm64RegisterIdRes91El1 = 0x22049,
-  HvArm64RegisterIdRes92El1 = 0x2204A,
-  HvArm64RegisterIdRes93El1 = 0x2204B,
-  HvArm64RegisterIdRes94El1 = 0x2204C,
-  HvArm64RegisterIdRes95El1 = 0x2204D,
-  HvArm64RegisterIdRes96El1 = 0x2204E,
-  HvArm64RegisterIdRes97El1 = 0x2204F,
-  HvArm64RegisterIdRes100El1 = 0x22050,
-  HvArm64RegisterIdRes101El1 = 0x22051,
-  HvArm64RegisterIdRes102El1 = 0x22052,
-  HvArm64RegisterIdRes103El1 = 0x22053,
-  HvArm64RegisterIdRes104El1 = 0x22054,
-  HvArm64RegisterIdRes105El1 = 0x22055,
-  HvArm64RegisterIdRes106El1 = 0x22056,
-  HvArm64RegisterIdRes107El1 = 0x22057,
-  HvArm64RegisterIdRes110El1 = 0x22058,
-  HvArm64RegisterIdRes111El1 = 0x22059,
-  HvArm64RegisterIdRes112El1 = 0x2205A,
-  HvArm64RegisterIdRes113El1 = 0x2205B,
-  HvArm64RegisterIdRes114El1 = 0x2205C,
-  HvArm64RegisterIdRes115El1 = 0x2205D,
-  HvArm64RegisterIdRes116El1 = 0x2205E,
-  HvArm64RegisterIdRes117El1 = 0x2205F,
-  HvArm64RegisterIdRes120El1 = 0x22060,
-  HvArm64RegisterIdRes121El1 = 0x22061,
-  HvArm64RegisterIdRes122El1 = 0x22062,
-  HvArm64RegisterIdRes123El1 = 0x22063,
-  HvArm64RegisterIdRes124El1 = 0x22064,
-  HvArm64RegisterIdRes125El1 = 0x22065,
-  HvArm64RegisterIdRes126El1 = 0x22066,
-  HvArm64RegisterIdRes127El1 = 0x22067,
-  HvArm64RegisterIdRes130El1 = 0x22068,
-  HvArm64RegisterIdRes131El1 = 0x22069,
-  HvArm64RegisterIdRes132El1 = 0x2206A,
-  HvArm64RegisterIdRes133El1 = 0x2206B,
-  HvArm64RegisterIdRes134El1 = 0x2206C,
-  HvArm64RegisterIdRes135El1 = 0x2206D,
-  HvArm64RegisterIdRes136El1 = 0x2206E,
-  HvArm64RegisterIdRes137El1 = 0x2206F,
-  HvArm64RegisterIdRes140El1 = 0x22070,
-  HvArm64RegisterIdRes141El1 = 0x22071,
-  HvArm64RegisterIdRes142El1 = 0x22072,
-  HvArm64RegisterIdRes143El1 = 0x22073,
-  HvArm64RegisterIdRes144El1 = 0x22074,
-  HvArm64RegisterIdRes145El1 = 0x22075,
-  HvArm64RegisterIdRes146El1 = 0x22076,
-  HvArm64RegisterIdRes147El1 = 0x22077,
-  HvArm64RegisterIdRes150El1 = 0x22078,
-  HvArm64RegisterIdRes151El1 = 0x22079,
-  HvArm64RegisterIdRes152El1 = 0x2207A,
-  HvArm64RegisterIdRes153El1 = 0x2207B,
-  HvArm64RegisterIdRes154El1 = 0x2207C,
-  HvArm64RegisterIdRes155El1 = 0x2207D,
-  HvArm64RegisterIdRes156El1 = 0x2207E,
-  HvArm64RegisterIdRes157El1 = 0x2207F,
-  HvArm64RegisterAccdataEl1 = 0x40020,
-  HvArm64RegisterActlrEl1 = 0x40003,
-  HvArm64RegisterActlrEl2 = 0x40021,
-  HvArm64RegisterAfsr0El1 = 0x40016,
-  HvArm64RegisterAfsr0El2 = 0x40022,
-  HvArm64RegisterAfsr0Elx = 0x40073,
-  HvArm64RegisterAfsr1El1 = 0x40017,
-  HvArm64RegisterAfsr1El2 = 0x40023,
-  HvArm64RegisterAfsr1Elx = 0x40074,
-  HvArm64RegisterAidrEl1 = 0x40024,
-  HvArm64RegisterAmairEl1 = 0x40018,
-  HvArm64RegisterAmairEl2 = 0x40025,
-  HvArm64RegisterAmairElx = 0x40075,
-  HvArm64RegisterApdAKeyHiEl1 = 0x40026,
-  HvArm64RegisterApdAKeyLoEl1 = 0x40027,
-  HvArm64RegisterApdBKeyHiEl1 = 0x40028,
-  HvArm64RegisterApdBKeyLoEl1 = 0x40029,
-  HvArm64RegisterApgAKeyHiEl1 = 0x4002A,
-  HvArm64RegisterApgAKeyLoEl1 = 0x4002B,
-  HvArm64RegisterApiAKeyHiEl1 = 0x4002C,
-  HvArm64RegisterApiAKeyLoEl1 = 0x4002D,
-  HvArm64RegisterApiBKeyHiEl1 = 0x4002E,
-  HvArm64RegisterApiBKeyLoEl1 = 0x4002F,
-  HvArm64RegisterCcsidrEl1 = 0x40030,
-  HvArm64RegisterCcsidr2El1 = 0x40031,
-  HvArm64RegisterClidrEl1 = 0x40032,
-  HvArm64RegisterContextidrEl1 = 0x4000D,
-  HvArm64RegisterContextidrEl2 = 0x40033,
-  HvArm64RegisterContextidrElx = 0x40076,
-  HvArm64RegisterCpacrEl1 = 0x40004,
-  HvArm64RegisterCptrEl2 = 0x40034,
-  HvArm64RegisterCpacrElx = 0x40077,
-  HvArm64RegisterCsselrEl1 = 0x40035,
-  HvArm64RegisterCtrEl0 = 0x40036,
-  HvArm64RegisterDacr32El2 = 0x40037,
-  HvArm64RegisterDczidEl0 = 0x40038,
-  HvArm64RegisterEsrEl1 = 0x40008,
-  HvArm64RegisterEsrEl2 = 0x40039,
-  HvArm64RegisterEsrElx = 0x40078,
-  HvArm64RegisterFarEl1 = 0x40009,
-  HvArm64RegisterFarEl2 = 0x4003A,
-  HvArm64RegisterFarElx = 0x40079,
-  HvArm64RegisterFpexc32El2 = 0x4003B,
-  HvArm64RegisterGcrEl1 = 0x4003C,
-  HvArm64RegisterGmidEl1 = 0x4003D,
-  HvArm64RegisterHacrEl2 = 0x4003E,
-  HvArm64RegisterHafgrtrEl2 = 0x4003F,
-  HvArm64RegisterHcrEl2 = 0x40040,
-  HvArm64RegisterHcrxEl2 = 0x40041,
-  HvArm64RegisterHdfgrtrEl2 = 0x40042,
-  HvArm64RegisterHdfgwtrEl2 = 0x40043,
-  HvArm64RegisterHfgitrEl2 = 0x40044,
-  HvArm64RegisterHfgrtrEl2 = 0x40045,
-  HvArm64RegisterHfgwtrEl2 = 0x40046,
-  HvArm64RegisterHpfarEl2 = 0x40047,
-  HvArm64RegisterHstrEl2 = 0x40048,
-  HvArm64RegisterIfsr32El2 = 0x40049,
-  HvArm64RegisterIsrEl1 = 0x4004A,
-  HvArm64RegisterLorcEl1 = 0x4004B,
-  HvArm64RegisterLoreaEl1 = 0x4004C,
-  HvArm64RegisterLoridEl1 = 0x4004D,
-  HvArm64RegisterLornEl1 = 0x4004E,
-  HvArm64RegisterLorsaEl1 = 0x4004F,
-  HvArm64RegisterMairEl1 = 0x4000B,
-  HvArm64RegisterMairEl2 = 0x40050,
-  HvArm64RegisterMairElx = 0x4007A,
-  HvArm64RegisterMidrEl1 = 0x40051,
-  HvArm64RegisterMpidrEl1 = 0x40001,
-  HvArm64RegisterMvfr0El1 = 0x40052,
-  HvArm64RegisterMvfr1El1 = 0x40053,
-  HvArm64RegisterMvfr2El1 = 0x40054,
-  HvArm64RegisterParEl1 = 0x4000A,
-  HvArm64RegisterRevidrEl1 = 0x40055,
-  HvArm64RegisterRgsrEl1 = 0x40056,
-  HvArm64RegisterRndr = 0x40057,
-  HvArm64RegisterRndrrs = 0x40058,
-  HvArm64RegisterSctlrEl1 = 0x40002,
-  HvArm64RegisterSctlrEl2 = 0x40059,
-  HvArm64RegisterSctlrElx = 0x4007B,
-  HvArm64RegisterScxtnumEl0 = 0x4005A,
-  HvArm64RegisterScxtnumEl1 = 0x4005B,
-  HvArm64RegisterScxtnumEl2 = 0x4005C,
-  HvArm64RegisterSmcrEl1 = 0x4005D,
-  HvArm64RegisterSmcrEl2 = 0x4005E,
-  HvArm64RegisterSmidrEl1 = 0x4005F,
-  HvArm64RegisterSmpriEl1 = 0x40060,
-  HvArm64RegisterSmprimapEl2 = 0x40061,
-  HvArm64RegisterTcrEl1 = 0x40007,
-  HvArm64RegisterTcrEl2 = 0x40062,
-  HvArm64RegisterTcrElx = 0x4007C,
-  HvArm64RegisterTfsre0El1 = 0x40063,
-  HvArm64RegisterTfsrEl1 = 0x40064,
-  HvArm64RegisterTfsrEl2 = 0x40065,
-  HvArm64RegisterTpidr2El0 = 0x40066,
-  HvArm64RegisterTpidrEl0 = 0x40011,
-  HvArm64RegisterTpidrEl1 = 0x4000E,
-  HvArm64RegisterTpidrEl2 = 0x40067,
-  HvArm64RegisterTpidrroEl0 = 0x40010,
-  HvArm64RegisterTtbr0El1 = 0x40005,
-  HvArm64RegisterTtbr0El2 = 0x40068,
-  HvArm64RegisterTtbr0Elx = 0x4007D,
-  HvArm64RegisterTtbr1El1 = 0x40006,
-  HvArm64RegisterTtbr1El2 = 0x4007E,
-  HvArm64RegisterTtbr1Elx = 0x4007F,
-  HvArm64RegisterVbarEl1 = 0x4000C,
-  HvArm64RegisterVbarEl2 = 0x40069,
-  HvArm64RegisterVbarElx = 0x40080,
-  HvArm64RegisterVmpidrEl2 = 0x4006A,
-  HvArm64RegisterVncrEl2 = 0x4006B,
-  HvArm64RegisterVpidrEl2 = 0x4006C,
-  HvArm64RegisterVstcrEl2 = 0x4006D,
-  HvArm64RegisterVsttbrEl2 = 0x4006E,
-  HvArm64RegisterVtcrEl2 = 0x4006F,
-  HvArm64RegisterVttbrEl2 = 0x40070,
-  HvArm64RegisterZcrEl1 = 0x40071,
-  HvArm64RegisterZcrEl2 = 0x40072,
-  HvArm64RegisterZcrElx = 0x40081,
-  HvArm64RegisterDbgauthstatusEl1 = 0x50040,
-  HvArm64RegisterDbgbcr0El1 = 0x50000,
-  HvArm64RegisterDbgbcr1El1 = 0x50001,
-  HvArm64RegisterDbgbcr2El1 = 0x50002,
-  HvArm64RegisterDbgbcr3El1 = 0x50003,
-  HvArm64RegisterDbgbcr4El1 = 0x50004,
-  HvArm64RegisterDbgbcr5El1 = 0x50005,
-  HvArm64RegisterDbgbcr6El1 = 0x50006,
-  HvArm64RegisterDbgbcr7El1 = 0x50007,
-  HvArm64RegisterDbgbcr8El1 = 0x50008,
-  HvArm64RegisterDbgbcr9El1 = 0x50009,
-  HvArm64RegisterDbgbcr10El1 = 0x5000A,
-  HvArm64RegisterDbgbcr11El1 = 0x5000B,
-  HvArm64RegisterDbgbcr12El1 = 0x5000C,
-  HvArm64RegisterDbgbcr13El1 = 0x5000D,
-  HvArm64RegisterDbgbcr14El1 = 0x5000E,
-  HvArm64RegisterDbgbcr15El1 = 0x5000F,
-  HvArm64RegisterDbgbvr0El1 = 0x50020,
-  HvArm64RegisterDbgbvr1El1 = 0x50021,
-  HvArm64RegisterDbgbvr2El1 = 0x50022,
-  HvArm64RegisterDbgbvr3El1 = 0x50023,
-  HvArm64RegisterDbgbvr4El1 = 0x50024,
-  HvArm64RegisterDbgbvr5El1 = 0x50025,
-  HvArm64RegisterDbgbvr6El1 = 0x50026,
-  HvArm64RegisterDbgbvr7El1 = 0x50027,
-  HvArm64RegisterDbgbvr8El1 = 0x50028,
-  HvArm64RegisterDbgbvr9El1 = 0x50029,
-  HvArm64RegisterDbgbvr10El1 = 0x5002A,
-  HvArm64RegisterDbgbvr11El1 = 0x5002B,
-  HvArm64RegisterDbgbvr12El1 = 0x5002C,
-  HvArm64RegisterDbgbvr13El1 = 0x5002D,
-  HvArm64RegisterDbgbvr14El1 = 0x5002E,
-  HvArm64RegisterDbgbvr15El1 = 0x5002F,
-  HvArm64RegisterDbgclaimclrEl1 = 0x50041,
-  HvArm64RegisterDbgclaimsetEl1 = 0x50042,
-  HvArm64RegisterDbgdtrrxEl0 = 0x50043,
-  HvArm64RegisterDbgdtrtxEl0 = 0x50044,
-  HvArm64RegisterDbgprcrEl1 = 0x50045,
-  HvArm64RegisterDbgvcr32El2 = 0x50046,
-  HvArm64RegisterDbgwcr0El1 = 0x50010,
-  HvArm64RegisterDbgwcr1El1 = 0x50011,
-  HvArm64RegisterDbgwcr2El1 = 0x50012,
-  HvArm64RegisterDbgwcr3El1 = 0x50013,
-  HvArm64RegisterDbgwcr4El1 = 0x50014,
-  HvArm64RegisterDbgwcr5El1 = 0x50015,
-  HvArm64RegisterDbgwcr6El1 = 0x50016,
-  HvArm64RegisterDbgwcr7El1 = 0x50017,
-  HvArm64RegisterDbgwcr8El1 = 0x50018,
-  HvArm64RegisterDbgwcr9El1 = 0x50019,
-  HvArm64RegisterDbgwcr10El1 = 0x5001A,
-  HvArm64RegisterDbgwcr11El1 = 0x5001B,
-  HvArm64RegisterDbgwcr12El1 = 0x5001C,
-  HvArm64RegisterDbgwcr13El1 = 0x5001D,
-  HvArm64RegisterDbgwcr14El1 = 0x5001E,
-  HvArm64RegisterDbgwcr15El1 = 0x5001F,
-  HvArm64RegisterDbgwvr0El1 = 0x50030,
-  HvArm64RegisterDbgwvr1El1 = 0x50031,
-  HvArm64RegisterDbgwvr2El1 = 0x50032,
-  HvArm64RegisterDbgwvr3El1 = 0x50033,
-  HvArm64RegisterDbgwvr4El1 = 0x50034,
-  HvArm64RegisterDbgwvr5El1 = 0x50035,
-  HvArm64RegisterDbgwvr6El1 = 0x50036,
-  HvArm64RegisterDbgwvr7El1 = 0x50037,
-  HvArm64RegisterDbgwvr8El1 = 0x50038,
-  HvArm64RegisterDbgwvr9El1 = 0x50039,
-  HvArm64RegisterDbgwvr10El1 = 0x5003A,
-  HvArm64RegisterDbgwvr11El1 = 0x5003B,
-  HvArm64RegisterDbgwvr12El1 = 0x5003C,
-  HvArm64RegisterDbgwvr13El1 = 0x5003D,
-  HvArm64RegisterDbgwvr14El1 = 0x5003E,
-  HvArm64RegisterDbgwvr15El1 = 0x5003F,
-  HvArm64RegisterDlrEl0 = 0x50047,
-  HvArm64RegisterDspsrEl0 = 0x50048,
-  HvArm64RegisterMdccintEl1 = 0x50049,
-  HvArm64RegisterMdccsrEl0 = 0x5004A,
-  HvArm64RegisterMdcrEl2 = 0x5004B,
-  HvArm64RegisterMdrarEl1 = 0x5004C,
-  HvArm64RegisterMdscrEl1 = 0x5004D,
-  HvArm64RegisterOsdlrEl1 = 0x5004E,
-  HvArm64RegisterOsdtrrxEl1 = 0x5004F,
-  HvArm64RegisterOsdtrtxEl1 = 0x50050,
-  HvArm64RegisterOseccrEl1 = 0x50051,
-  HvArm64RegisterOslarEl1 = 0x50052,
-  HvArm64RegisterOslsrEl1 = 0x50053,
-  HvArm64RegisterSder32El2 = 0x50054,
-  HvArm64RegisterTrfcrEl1 = 0x50055,
-  HvArm64RegisterTrfcrEl2 = 0x50056,
-  HvArm64RegisterTrfcrElx = 0x50057,
-  HvArm64RegisterPmccfiltrEl0 = 0x52000,
-  HvArm64RegisterPmccntrEl0 = 0x52001,
-  HvArm64RegisterPmceid0El0 = 0x52002,
-  HvArm64RegisterPmceid1El0 = 0x52003,
-  HvArm64RegisterPmcntenclrEl0 = 0x52004,
-  HvArm64RegisterPmcntensetEl0 = 0x52005,
-  HvArm64RegisterPmcrEl0 = 0x52006,
-  HvArm64RegisterPmevcntr0El0 = 0x52007,
-  HvArm64RegisterPmevcntr1El0 = 0x52008,
-  HvArm64RegisterPmevcntr2El0 = 0x52009,
-  HvArm64RegisterPmevcntr3El0 = 0x5200A,
-  HvArm64RegisterPmevcntr4El0 = 0x5200B,
-  HvArm64RegisterPmevcntr5El0 = 0x5200C,
-  HvArm64RegisterPmevcntr6El0 = 0x5200D,
-  HvArm64RegisterPmevcntr7El0 = 0x5200E,
-  HvArm64RegisterPmevcntr8El0 = 0x5200F,
-  HvArm64RegisterPmevcntr9El0 = 0x52010,
-  HvArm64RegisterPmevcntr10El0 = 0x52011,
-  HvArm64RegisterPmevcntr11El0 = 0x52012,
-  HvArm64RegisterPmevcntr12El0 = 0x52013,
-  HvArm64RegisterPmevcntr13El0 = 0x52014,
-  HvArm64RegisterPmevcntr14El0 = 0x52015,
-  HvArm64RegisterPmevcntr15El0 = 0x52016,
-  HvArm64RegisterPmevcntr16El0 = 0x52017,
-  HvArm64RegisterPmevcntr17El0 = 0x52018,
-  HvArm64RegisterPmevcntr18El0 = 0x52019,
-  HvArm64RegisterPmevcntr19El0 = 0x5201A,
-  HvArm64RegisterPmevcntr20El0 = 0x5201B,
-  HvArm64RegisterPmevcntr21El0 = 0x5201C,
-  HvArm64RegisterPmevcntr22El0 = 0x5201D,
-  HvArm64RegisterPmevcntr23El0 = 0x5201E,
-  HvArm64RegisterPmevcntr24El0 = 0x5201F,
-  HvArm64RegisterPmevcntr25El0 = 0x52020,
-  HvArm64RegisterPmevcntr26El0 = 0x52021,
-  HvArm64RegisterPmevcntr27El0 = 0x52022,
-  HvArm64RegisterPmevcntr28El0 = 0x52023,
-  HvArm64RegisterPmevcntr29El0 = 0x52024,
-  HvArm64RegisterPmevcntr30El0 = 0x52025,
-  HvArm64RegisterPmevtyper0El0 = 0x52026,
-  HvArm64RegisterPmevtyper1El0 = 0x52027,
-  HvArm64RegisterPmevtyper2El0 = 0x52028,
-  HvArm64RegisterPmevtyper3El0 = 0x52029,
-  HvArm64RegisterPmevtyper4El0 = 0x5202A,
-  HvArm64RegisterPmevtyper5El0 = 0x5202B,
-  HvArm64RegisterPmevtyper6El0 = 0x5202C,
-  HvArm64RegisterPmevtyper7El0 = 0x5202D,
-  HvArm64RegisterPmevtyper8El0 = 0x5202E,
-  HvArm64RegisterPmevtyper9El0 = 0x5202F,
-  HvArm64RegisterPmevtyper10El0 = 0x52030,
-  HvArm64RegisterPmevtyper11El0 = 0x52031,
-  HvArm64RegisterPmevtyper12El0 = 0x52032,
-  HvArm64RegisterPmevtyper13El0 = 0x52033,
-  HvArm64RegisterPmevtyper14El0 = 0x52034,
-  HvArm64RegisterPmevtyper15El0 = 0x52035,
-  HvArm64RegisterPmevtyper16El0 = 0x52036,
-  HvArm64RegisterPmevtyper17El0 = 0x52037,
-  HvArm64RegisterPmevtyper18El0 = 0x52038,
-  HvArm64RegisterPmevtyper19El0 = 0x52039,
-  HvArm64RegisterPmevtyper20El0 = 0x5203A,
-  HvArm64RegisterPmevtyper21El0 = 0x5203B,
-  HvArm64RegisterPmevtyper22El0 = 0x5203C,
-  HvArm64RegisterPmevtyper23El0 = 0x5203D,
-  HvArm64RegisterPmevtyper24El0 = 0x5203E,
-  HvArm64RegisterPmevtyper25El0 = 0x5203F,
-  HvArm64RegisterPmevtyper26El0 = 0x52040,
-  HvArm64RegisterPmevtyper27El0 = 0x52041,
-  HvArm64RegisterPmevtyper28El0 = 0x52042,
-  HvArm64RegisterPmevtyper29El0 = 0x52043,
-  HvArm64RegisterPmevtyper30El0 = 0x52044,
-  HvArm64RegisterPmintenclrEl1 = 0x52045,
-  HvArm64RegisterPmintensetEl1 = 0x52046,
-  HvArm64RegisterPmmirEl1 = 0x52047,
-  HvArm64RegisterPmovsclrEl0 = 0x52048,
-  HvArm64RegisterPmovssetEl0 = 0x52049,
-  HvArm64RegisterPmselrEl0 = 0x5204A,
-  HvArm64RegisterPmswincEl0 = 0x5204B,
-  HvArm64RegisterPmuserenrEl0 = 0x5204C,
-  HvArm64RegisterPmxevcntrEl0 = 0x5204D,
-  HvArm64RegisterPmxevtyperEl0 = 0x5204E,
-  HvArm64RegisterAmevcntr00El0 = 0x53000,
-  HvArm64RegisterAmevcntr01El0 = 0x53001,
-  HvArm64RegisterAmevcntr02El0 = 0x53002,
-  HvArm64RegisterAmevcntr03El0 = 0x53003,
-  HvArm64RegisterPmbidrEl1 = 0x54000,
-  HvArm64RegisterPmblimitrEl1 = 0x54001,
-  HvArm64RegisterPmbptrEl1 = 0x54002,
-  HvArm64RegisterPmbsrEl1 = 0x54003,
-  HvArm64RegisterPmscrEl1 = 0x54004,
-  HvArm64RegisterPmscrEl2 = 0x54005,
-  HvArm64RegisterPmsevfrEl1 = 0x54006,
-  HvArm64RegisterPmsfcrEl1 = 0x54007,
-  HvArm64RegisterPmsicrEl1 = 0x54008,
-  HvArm64RegisterPmsidrEl1 = 0x54009,
-  HvArm64RegisterPmsirrEl1 = 0x5400A,
-  HvArm64RegisterPmslatfrEl1 = 0x5400B,
-  HvArm64RegisterPmsnevfrEl1 = 0x5400C,
-  HvArm64RegisterDisrEl1 = 0x56000,
-  HvArm64RegisterErridrEl1 = 0x56001,
-  HvArm64RegisterErrselrEl1 = 0x56002,
-  HvArm64RegisterErxaddrEl1 = 0x56003,
-  HvArm64RegisterErxctlrEl1 = 0x56004,
-  HvArm64RegisterErrxfrEl1 = 0x56005,
-  HvArm64RegisterErxmisc0El1 = 0x56006,
-  HvArm64RegisterErxmisc1El1 = 0x56007,
-  HvArm64RegisterErxmisc2El1 = 0x56008,
-  HvArm64RegisterErxmisc3El1 = 0x56009,
-  HvArm64RegisterErxpfgcdnEl1 = 0x5600A,
-  HvArm64RegisterErxpfgctlEl1 = 0x5600B,
-  HvArm64RegisterErxpfgfEl1 = 0x5600C,
-  HvArm64RegisterErxstatusEl1 = 0x5600D,
-  HvArm64RegisterVdisrEl2 = 0x5600E,
-  HvArm64RegisterVsesrEl2 = 0x5600F,
-  HvArm64RegisterCntfrqEl0 = 0x58000,
-  HvArm64RegisterCnthctlEl2 = 0x58001,
-  HvArm64RegisterCnthpCtlEl2 = 0x58002,
-  HvArm64RegisterCnthpCvalEl2 = 0x58003,
-  HvArm64RegisterCnthpTvalEl2 = 0x58004,
-  HvArm64RegisterCnthvCtlEl2 = 0x58005,
-  HvArm64RegisterCnthvCvalEl2 = 0x58006,
-  HvArm64RegisterCnthvTvalEl2 = 0x58007,
-  HvArm64RegisterCntkctlEl1 = 0x58008,
-  HvArm64RegisterCntkctlElx = 0x58013,
-  HvArm64RegisterCntpCtlEl0 = 0x58009,
-  HvArm64RegisterCntpCtlElx = 0x58014,
-  HvArm64RegisterCntpCvalEl0 = 0x5800A,
-  HvArm64RegisterCntpCvalElx = 0x58015,
-  HvArm64RegisterCntpTvalEl0 = 0x5800B,
-  HvArm64RegisterCntpTvalElx = 0x58016,
-  HvArm64RegisterCntpctEl0 = 0x5800C,
-  HvArm64RegisterCntpoffEl2 = 0x5800D,
-  HvArm64RegisterCntvCtlEl0 = 0x5800E,
-  HvArm64RegisterCntvCtlElx = 0x58017,
-  HvArm64RegisterCntvCvalEl0 = 0x5800F,
-  HvArm64RegisterCntvCvalElx = 0x58018,
-  HvArm64RegisterCntvTvalEl0 = 0x58010,
-  HvArm64RegisterCntvTvalElx = 0x58019,
-  HvArm64RegisterCntvctEl0 = 0x58011,
-  HvArm64RegisterCntvoffEl2 = 0x58012,
-  HvArm64RegisterIccAp1R0El1 = 0x60000,
-  HvArm64RegisterIccAp1R1El1 = 0x60001,
-  HvArm64RegisterIccAp1R2El1 = 0x60002,
-  HvArm64RegisterIccAp1R3El1 = 0x60003,
-  HvArm64RegisterIccAsgi1REl1 = 0x60004,
-  HvArm64RegisterIccBpr1El1 = 0x60005,
-  HvArm64RegisterIccCtlrEl1 = 0x60006,
-  HvArm64RegisterIccDirEl1 = 0x60007,
-  HvArm64RegisterIccEoir1El1 = 0x60008,
-  HvArm64RegisterIccHppir1El1 = 0x60009,
-  HvArm64RegisterIccIar1El1 = 0x6000A,
-  HvArm64RegisterIccIgrpen1El1 = 0x6000B,
-  HvArm64RegisterIccPmrEl1 = 0x6000C,
-  HvArm64RegisterIccRprEl1 = 0x6000D,
-  HvArm64RegisterIccSgi1REl1 = 0x6000E,
-  HvArm64RegisterIccSreEl1 = 0x6000F,
-  HvArm64RegisterIccSreEl2 = 0x60010,
-  HvArm64RegisterIchAp1R0El2 = 0x61000,
-  HvArm64RegisterIchAp1R1El2 = 0x61001,
-  HvArm64RegisterIchAp1R2El2 = 0x61002,
-  HvArm64RegisterIchAp1R3El2 = 0x61003,
-  HvArm64RegisterIchEisrEl2 = 0x61004,
-  HvArm64RegisterIchElrsrEl2 = 0x61005,
-  HvArm64RegisterIchHcrEl2 = 0x61006,
-  HvArm64RegisterIchLr0El2 = 0x61007,
-  HvArm64RegisterIchLr1El2 = 0x61008,
-  HvArm64RegisterIchLr2El2 = 0x61009,
-  HvArm64RegisterIchLr3El2 = 0x6100A,
-  HvArm64RegisterIchLr4El2 = 0x6100B,
-  HvArm64RegisterIchLr5El2 = 0x6100C,
-  HvArm64RegisterIchLr6El2 = 0x6100D,
-  HvArm64RegisterIchLr7El2 = 0x6100E,
-  HvArm64RegisterIchLr8El2 = 0x6100F,
-  HvArm64RegisterIchLr9El2 = 0x61010,
-  HvArm64RegisterIchLr10El2 = 0x61011,
-  HvArm64RegisterIchLr11El2 = 0x61012,
-  HvArm64RegisterIchLr12El2 = 0x61013,
-  HvArm64RegisterIchLr13El2 = 0x61014,
-  HvArm64RegisterIchLr14El2 = 0x61015,
-  HvArm64RegisterIchLr15El2 = 0x61016,
-  HvArm64RegisterIchMisrEl2 = 0x61017,
-  HvArm64RegisterIchVmcrEl2 = 0x61018,
-  HvArm64RegisterIchVtrEl2 = 0x61019,
-  HvArm64RegisterGicrPropbaser = 0x90100,
-  HvArm64RegisterGicrPendbaser = 0x90101,
-  HvArm64RegisterInterfaceVersion = 0x90006,
-  HvArm64RegisterPartitionInfoPage = 0x90015,
-  HvArm64RegisterSyntheticEsrEl1 = 0x40401,
-  HvArm64RegisterSyntheticVbarEl1 = 0x40400,
-  HvArm64RegisterTlbiControl = 0x90016,
-  HvArm64RegisterMpam0El1 = 0x71000,
-  HvArm64RegisterMpam1El1 = 0x71001,
-  HvArm64RegisterMpam2El2 = 0x71002,
-  HvArm64RegisterMpamhcrEl2 = 0x71003,
-  HvArm64RegisterMpamidrEl1 = 0x71004,
-  HvArm64RegisterMpamsmEl1 = 0x71005,
-  HvArm64RegisterMpamvpm0El2 = 0x71006,
-  HvArm64RegisterMpamvpm1El2 = 0x71007,
-  HvArm64RegisterMpamvpm2El2 = 0x71008,
-  HvArm64RegisterMpamvpm3El2 = 0x71009,
-  HvArm64RegisterMpamvpm4El2 = 0x7100A,
-  HvArm64RegisterMpamvpm5El2 = 0x7100B,
-  HvArm64RegisterMpamvpm6El2 = 0x7100C,
-  HvArm64RegisterMpamvpm7El2 = 0x7100D,
-  HvArm64RegisterMpamvpmvEl2 = 0x7100E,
-  HvArm64RegisterS3ImpldefinedRegMin = 0x72000,
-  HvArm64RegisterS3ImpldefinedRegMax = 0x72FFF,
-};
-
-/* 224 */
-enum _HV_ARM64_SYNTHETIC_EXCEPTION_TYPE : __int32
-{
-  HvArm64SyntheticExceptionTypeSmc = 0x0,
-  HvArm64SyntheticExceptionTypeSecure = 0x1,
-  HvArm64SyntheticExceptionTypeCrashdump = 0x2,
-  HvArm64SyntheticExceptionTypeVirtualizationFault = 0x3,
-  HvArm64SyntheticExceptionTypeMax = 0x40,
-};
-
 /* 225 */
 enum _SKE_TSC_SOURCE : __int32
 {
@@ -4697,94 +3855,6 @@ enum _SKE_TSC_SOURCE : __int32
   SKE_TSC_SOURCE_PMU = 0x1,
   SKE_TSC_SOURCE_HV = 0x2,
   SKE_TSC_SOURCE_GIT = 0x3,
-};
-
-/* 226 */
-enum _HV_ARM64_PENDING_EVENT_TYPE : __int32
-{
-  HvArm64PendingEventException = 0x0,
-  HvArm64PendingEventSyntheticException = 0x1,
-  HvArm64PendingEventHypercallOutput = 0x2,
-};
-
-/* 227 */
-enum _HV_SYSTEM_PROPERTY : __int32
-{
-  HvPerfCounterProperty = 0x1,
-  HvDeprecatedLegacyPowerPolicySettingProperty = 0x2,
-  HvSleepStateProperty = 0x3,
-  HvMachineCheckProperty = 0x4,
-  HvIommuInitStatusProperty = 0x5,
-  HvHpetConfigProperty = 0x6,
-  HvHpetInterruptProperty = 0x7,
-  HvHpetEnabledProperty = 0x8,
-  HvHypervisorLaunchStatsProperty = 0x9,
-  HvHypervisorDebugProperty = 0xA,
-  HvRootPasidCapabilitiesProperty = 0xB,
-  HvRootNumaCostPagesProperty = 0xC,
-  HvHostPageTableRootProperty = 0xD,
-  HvTscSyncStatusProperty = 0xE,
-  HvSchedulerTypeProperty = 0xF,
-  HvPlatformVirtualizationSupportProperty = 0x10,
-  HvHostDebugTransferPages = 0x11,
-  HvHostTimelineBiasProperty = 0x12,
-  HvSmcDataPathProperty = 0x13,
-  HvDmaInitializeBlockedProperty = 0x14,
-  HvDynamicProcessorFeatureProperty = 0x15,
-  HvUnusedSystemProperty_22 = 0x16,
-  HvRdtCatCosBitmaskProperty_Legacy = 0x17,
-  HvUnusedSystemProperty_24 = 0x18,
-  HvGuestStateScrubbingStatusProperty = 0x19,
-  HvDmaUnblockedProperty = 0x1A,
-  HvRdtMbaCosThrottleProperty_Legacy = 0x1B,
-  HvSystemDiagnosticsLogBuffers = 0x1C,
-  HvSystemPageCombiningIntervalProperty = 0x1D,
-  HvIommuLiveHandoffProperty = 0x1E,
-  HvIommuDomainIdSelectorProperty = 0x1F,
-  HvIommuRootFaultReportingReady = 0x20,
-  HvGuestAssertProperty = 0x21,
-  HvLogicalProcessorCountProperty = 0x22,
-  HvSnpPspIdProperty = 0x23,
-  HvSchedulingIntervalProperty = 0x24,
-  HvSnpPspTcbVersionProperty = 0x25,
-  HvSubnodeInformationProperty = 0x26,
-  HvSnpPspDevicesProperty = 0x27,
-  HvProcessorLiveHandoffProperty = 0x28,
-  HvProcessorParkBlockProperty = 0x29,
-  HvBootConfigProperty = 0x2A,
-  HvVirtualizationFeaturesProperty = 0x2B,
-  HvSystemRebootCountProperty = 0x2C,
-  HvSystemMirroringProperty = 0x2D,
-  HvSystemProtoAbiVersionProperty = 0x2E,
-  HvCrashdumpAreaAddressProperty = 0x2F,
-  HvMicrocodeLatencyProperty = 0x30,
-  HvDefaultIoCacheBitmapProperty = 0x31,
-  HvHardwareIsolationEnabledProperty = 0x32,
-  HvFirmwareX2ApicProperty = 0x33,
-  HvCrashdumpTrampolineAddressProperty = 0x34,
-  HvResourceControlSupportProperty = 0x35,
-  HvResourceControlBitmaskProperty = 0x36,
-  HvResourceControlMonitorValueProperty = 0x37,
-  HvSgxEUpdateSvnProperty = 0x38,
-};
-
-/* 228 */
-enum _HV_COMPATIBILITY_VERSION : __int32
-{
-  HvCompatibilityVersionRedstone1 = 0x600,
-  HvCompatibilityVersionRedstone2 = 0x601,
-  HvCompatibilityVersionRedstone3 = 0x602,
-  HvCompatibilityVersionRedstone4 = 0x603,
-  HvCompatibilityVersionRedstone5 = 0x604,
-  HvCompatibilityVersion19H1 = 0x605,
-  HvCompatibilityVersionVibranium = 0x606,
-  HvCompatibilityVersionManganese = 0x607,
-  HvCompatibilityVersionIron = 0x608,
-  HvCompatibilityVersionNickel = 0x609,
-  HvCompatibilityVersionCopper = 0x60A,
-  HvCompatibilityVersionGermanium = 0x1000,
-  HvCompatibilityVersionPrerelease = 0xFE00,
-  HvCompatibilityVersionExperiment = 0xFF00,
 };
 
 /* 229 */
@@ -4802,14 +3872,6 @@ enum _PPM_PERF_QOS_DISABLE_REASON : __int32
   PpmPerfQosDisableMax = 0x9,
 };
 
-/* 230 */
-enum _HV_SMC_DATA_PATH_LOCK_STATE : __int32
-{
-  HvSmcDataPathUnlocked = 0x0,
-  HvSmcDataPathLockedByHvx = 0x1,
-  HvSmcDataPathLockedByVtl1 = 0x2,
-};
-
 /* 231 */
 enum _PO_MODERN_SLEEP_ACTION : __int32
 {
@@ -4818,26 +3880,6 @@ enum _PO_MODERN_SLEEP_ACTION : __int32
   PoModernSleepActionForceIdle = 0x2,
   PoModernSleepActionMinimalBlockingNotificationClients = 0x3,
   PoModernSleepActionMax = 0x4,
-};
-
-/* 232 */
-enum _HV_GUEST_OS_VENDOR : __int32
-{
-  HvGuestOsVendorMicrosoft = 0x1,
-};
-
-/* 233 */
-enum _HV_INTERCEPT_TYPE : __int32
-{
-  HvInterceptTypeException = 0x3,
-  HvInterceptTypeReserved0 = 0x4,
-  HvInterceptTypeMmio = 0x5,
-  HvInterceptTypeHypercall = 0x8,
-  HvInterceptTypeUnknownSynicConnection = 0xD,
-  HvInterceptTypeRetargetInterruptWithUnknownDeviceId = 0xF,
-  HvInterceptTypeRegister = 0x12,
-  HvInterceptTypeMax = 0x13,
-  HvInterceptTypeInvalid = 0xFFFFFFFF,
 };
 
 /* 234 */
@@ -4879,17 +3921,6 @@ enum _POWER_REQUEST_TYPE : __int32
   PowerRequestExecutionRequired = 0x3,
 };
 
-/* 237 */
-enum _HV_GUEST_OS_MICROSOFT_IDS : __int32
-{
-  HvGuestOsMicrosoftUndefined = 0x0,
-  HvGuestOsMicrosoftMSDOS = 0x1,
-  HvGuestOsMicrosoftWindows3x = 0x2,
-  HvGuestOsMicrosoftWindows9x = 0x3,
-  HvGuestOsMicrosoftWindowsNT = 0x4,
-  HvGuestOsMicrosoftWindowsCE = 0x5,
-};
-
 /* 238 */
 enum SLEEPSTUDY_SPM_SCENARIO_CS_EXIT : __int32
 {
@@ -4926,115 +3957,6 @@ enum _SKPG_DYNAMIC_CODE_TYPE : __int32
 {
   SkpgDynamicCodeImageAltMapping = 0x0,
   LastSkpgDynamicCodeType = 0x1,
-};
-
-/* 241 */
-enum HV_PARTITION_PROPERTY_CODE : __int32
-{
-  HvPartitionPropertyPrivilegeFlags = 0x10000,
-  HvPartitionPropertySyntheticProcFeatures = 0x10001,
-  HvPartitionPropertyAllowedParentUserModeHypercalls = 0x10002,
-  HvPartitionPropertySuspend = 0x20000,
-  HvPartitionPropertyCpuReserve = 0x20001,
-  HvPartitionPropertyCpuCap = 0x20002,
-  HvPartitionPropertyCpuWeight = 0x20003,
-  HvPartitionPropertyCpuGroupId = 0x20004,
-  HvPartitionPropertyTimeFreeze = 0x30003,
-  HvPartitionPropertyApicFrequency = 0x30004,
-  HvPartitionPropertyReferenceTime = 0x30005,
-  HvPartitionPropertyDebugChannelId = 0x40000,
-  HvPartitionPropertyVirtualTlbPageCount = 0x50000,
-  HvPartitionPropertyVsmConfig = 0x50001,
-  HvPartitionPropertyZeroMemoryOnReset = 0x50002,
-  HvPartitionPropertyProcessorsPerSocket = 0x50003,
-  HvPartitionPropertyNestedTlbSize = 0x50004,
-  HvPartitionPropertyGpaPageAccessTracking = 0x50005,
-  HvPartitionPropertyVsmPermissionsDirtySinceLastQuery = 0x50006,
-  HvPartitionPropertySgxLaunchControlConfig = 0x50007,
-  HvPartitionPropertyDefaultSgxLaunchControl0 = 0x50008,
-  HvPartitionPropertyDefaultSgxLaunchControl1 = 0x50009,
-  HvPartitionPropertyDefaultSgxLaunchControl2 = 0x5000A,
-  HvPartitionPropertyDefaultSgxLaunchControl3 = 0x5000B,
-  HvPartitionPropertyIsolationState = 0x5000C,
-  HvPartitionPropertyIsolationControl = 0x5000D,
-  HvPartitionPropertyAllocationId = 0x5000E,
-  HvPartitionPropertyMonitoringId = 0x5000F,
-  HvPartitionPropertyImplementedPhysicalAddressBits = 0x50010,
-  HvPartitionPropertyNonArchitecturalCoreSharing = 0x50011,
-  HvPartitionPropertyHypercallDoorbellPage = 0x50012,
-  HvPartitionPropertyCppcRequestValue = 0x50013,
-  HvPartitionPropertyIsolationPolicy = 0x50014,
-  HvPartitionPropertyDmaCapableDevices = 0x50015,
-  HvPartitionPropertyProcessorsPerL3 = 0x50016,
-  HvPartitionPropertyUnimplementedMsrAction = 0x50017,
-  HvPartitionPropertyAmdNodesPerSocket = 0x50018,
-  HvPartitionPropertyReferenceTscPageActive = 0x50019,
-  HvPartitionPropertyAutoEoiEnabled = 0x5001A,
-  HvPartitionPropertyL3CacheWays = 0x5001B,
-  HvPartitionPropertyIsolationType = 0x5001C,
-  HvPartitionPropertyPerfmonMode = 0x5001D,
-  HvPartitionPropertyDepositStatus = 0x5001E,
-  HvPartitionPropertyMirroring = 0x5001F,
-  HvPartitionPropertyMirrorState = 0x50020,
-  HvPartitionPropertyMgmtVtlMaxMemorySections = 0x50021,
-  HvPartitionPropertySevVmgexitOffloads = 0x50022,
-  HvPartitionPropertyPenalizeBusLock = 0x50023,
-  HvPartitionPropertyTopologyApicIdOptIn = 0x50024,
-  HvPartitionPropertyCppcResourcePrioritiesValue = 0x50025,
-  HvPartitionPropertyPartitionDiagBufferConfig = 0x50026,
-  HvPartitionPropertyTerminateOnInstructionTimeout = 0x50027,
-  HvPartitionPropertyProcessorVendor = 0x60000,
-  HvPartitionPropertyProcessorFeaturesDeprecated = 0x60001,
-  HvPartitionPropertyProcessorXsaveFeatures = 0x60002,
-  HvPartitionPropertyProcessorCLFlushSize = 0x60003,
-  HvPartitionPropertyEnlightenmentModifications = 0x60004,
-  HvPartitionPropertyCompatibilityVersion = 0x60005,
-  HvPartitionPropertyPhysicalAddressWidth = 0x60006,
-  HvPartitionPropertyXsaveStates = 0x60007,
-  HvPartitionPropertyMaxXsaveDataSize = 0x60008,
-  HvPartitionPropertyProcessorClockFrequency = 0x60009,
-  HvPartitionPropertyProcessorFeatures0 = 0x6000A,
-  HvPartitionPropertyProcessorFeatures1 = 0x6000B,
-  HvPartitionPropertyProcessorInstructionCLFlushSize = 0x6000C,
-  HvPartitionPropertyProcessorZeroDataCacheBs = 0x6000D,
-  HvPartitionPropertyProcessorPREbits = 0x6000E,
-  HvPartitionPropertyProcessorPRIbits = 0x6000F,
-  HvPartitionPropertyRootProcessorFeatures0 = 0x60010,
-  HvPartitionPropertyRootProcessorFeatures1 = 0x60011,
-  HvPartitionPropertyRootProcessorXsaveFeatures = 0x60012,
-  HvPartitionPropertyRootSyntheticProcFeatures = 0x60013,
-  HvPartitionPropertyPhysicalAddressSize = 0x60014,
-  HvPartitionPropertyGuestOsId = 0x70000,
-  HvPartitionPropertyProcessorVirtualizationFeatures = 0x80000,
-  HvPartitionPropertyMaxHardwareIsolatedGuests = 0x80001,
-  HvPartitionPropertySnpEnabled = 0x80002,
-  HvPartitionPropertyNestedVmxBasic = 0x80003,
-  HvPartitionPropertyNestedVmxPinbasedCtls = 0x80004,
-  HvPartitionPropertyNestedVmxProcbasedCtls = 0x80005,
-  HvPartitionPropertyNestedVmxExitCtls = 0x80006,
-  HvPartitionPropertyNestedVmxEntryCtls = 0x80007,
-  HvPartitionPropertyNestedVmxMisc = 0x80008,
-  HvPartitionPropertyNestedVmxCr0Fixed0 = 0x80009,
-  HvPartitionPropertyNestedVmxCr0Fixed1 = 0x8000A,
-  HvPartitionPropertyNestedVmxCr4Fixed0 = 0x8000B,
-  HvPartitionPropertyNestedVmxCr4Fixed1 = 0x8000C,
-  HvPartitionPropertyNestedVmxVmcsEnum = 0x8000D,
-  HvPartitionPropertyNestedVmxProcbasedCtls2 = 0x8000E,
-  HvPartitionPropertyNestedVmxEptVpidCap = 0x8000F,
-  HvPartitionPropertyNestedVmxTruePinbasedCtls = 0x80010,
-  HvPartitionPropertyNestedVmxTrueProcbasedCtls = 0x80011,
-  HvPartitionPropertyNestedVmxTrueExitCtls = 0x80012,
-  HvPartitionPropertyNestedVmxTrueEntryCtls = 0x80013,
-  HvPartitionPropertyVhChildrenState = 0x80100,
-  HvPartitionPropertyMaxHierarchicalPartitionCount = 0x80101,
-  HvPartitionPropertyMaxHierarchicalVpCount = 0x80102,
-  HvPartitionPropertyInheritedDeviceDomainReservedRegions = 0x90000,
-  HvPartitionPropertyTdMrConfigId = 0x90001,
-  HvPartitionPropertyTdMrOwner = 0x90002,
-  HvPartitionPropertyTdMrOwnerConfig = 0x90003,
-  HvPartitionPropertyExRootProcessorFeaturesExperimental = 0x90004,
-  HvPartitionPropertyRootVpSharedPages = 0x90005,
-  HVPartitionPropertyExtendedProperyMax = 0xA0000,
 };
 
 /* 242 */
@@ -5130,14 +4052,6 @@ enum _SKPG_EVENT_CODE : __int32
   SkpgEventNestedExtentVerifyBegin = 0x2D,
   SkpgEventSecureVaPageHashMiscomparePfn = 0x2E,
   SkpgEventLast = 0x2F,
-};
-
-/* 245 */
-enum _HV_GENERIC_SET_FORMAT : __int32
-{
-  HvGenericSetSparse4k = 0x0,
-  HvGenericSetAll = 0x1,
-  HvGenericSetInvalid = 0x2,
 };
 
 /* 246 */
@@ -5264,16 +4178,6 @@ enum _PROCESSINFOCLASS : __int32
   MaxProcessInfoClass = 0x74,
 };
 
-/* 247 */
-enum _HV_CRASHDUMP_ACTION : __int32
-{
-  HvCrashdumpNone = 0x0,
-  HvCrashdumpSuspendAllVps = 0x1,
-  HvCrashdumpPrepareForStateSave = 0x2,
-  HvCrashdumpStateSaved = 0x3,
-  HvCrashdumpEntry = 0x4,
-};
-
 /* 248 */
 enum _THREADINFOCLASS : __int32
 {
@@ -5338,16 +4242,6 @@ enum _THREADINFOCLASS : __int32
   ThreadTebInformationAtomic = 0x3A,
   ThreadIndexInformation = 0x3B,
   MaxThreadInfoClass = 0x3C,
-};
-
-/* 249 */
-enum _HV_PARTITION_EVENT : __int32
-{
-  HvPartitionEventDebugDeviceAvailable = 0x1,
-  HvPartitionEventRootCrashdump = 0x2,
-  HvPartitionEventAcpiReenabled = 0x3,
-  HvPartitionAllLogicalProcessorsStarted = 0x4,
-  HvPartitionCommitLpIndices = 0x5,
 };
 
 /* 250 */
@@ -5447,15 +4341,6 @@ enum _KNOWN_CONTROLLER_TYPE : __int32
   InterruptControllerGicV4 = 0x5,
   InterruptControllerBcm = 0x6,
   InterruptControllerUnknown = 0x1000,
-};
-
-/* 258 */
-enum _HV_CACHE_TYPE : __int32
-{
-  HvCacheTypeUncached = 0x0,
-  HvCacheTypeWriteCombining = 0x1,
-  HvCacheTypeWriteThrough = 0x4,
-  HvCacheTypeWriteBack = 0x6,
 };
 
 /* 259 */
@@ -6232,18 +5117,6 @@ enum _STORAGE_RESERVE_ID : __int32
   StorageReserveIdSoft = 0x2,
   StorageReserveIdUpdateScratch = 0x3,
   StorageReserveIdMax = 0x4,
-};
-
-/* 304 */
-enum _HV_PPM_POWER_POLICY_SETTING_ID : __int32
-{
-  HvPowerPolicyIdleDisable = 0x0,
-  HvPowerPolicyIdleTimeCheck = 0x1,
-  HvPowerPolicyIdleScalingAllow = 0x2,
-  HvPowerPolicyIdlePromoteThreshold = 0x3,
-  HvPowerPolicyIdleDemoteThreshold = 0x4,
-  HvPowerPolicyIdleStateMaximum = 0x5,
-  HvPowerPolicyMax = 0x6,
 };
 
 /* 305 */
@@ -14781,15 +13654,6 @@ enum PCI_EXPRESS_RCB : __int32
 {
   RCB64Bytes = 0x0,
   RCB128Bytes = 0x1,
-};
-
-/* 1074 */
-enum _HV_PROCESSOR_VENDOR : __int32
-{
-  HvProcessorVendorAmd = 0x0,
-  HvProcessorVendorIntel = 0x1,
-  HvProcessorVendorHygon = 0x2,
-  HvProcessorVendorArm = 0x10,
 };
 
 /* 1075 */
@@ -30128,21 +28992,6 @@ struct _EX_CALLBACK_ROUTINE_BLOCK
   _EX_RUNDOWN_REF RundownProtect;
   int (__fastcall *Function)(void *, void *, void *);
   void *Context;
-};
-
-/* 2434 */
-struct $806297571E904691199317275B27DA28
-{
-  unsigned __int64 Low64;
-  unsigned __int64 High64;
-};
-
-/* 2435 */
-union _HV_UINT128
-{
-  $806297571E904691199317275B27DA28 __s0;
-  unsigned int Dword[4];
-  unsigned __int8 AsUINT8[16];
 };
 
 /* 2436 */
@@ -51501,20 +50350,6 @@ struct _HAL_CHANNEL_MEMORY_RANGES
   unsigned __int8 DeepPowerState;
 };
 
-/* 4584 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
-{
-  unsigned __int64 AddressSpace;
-  unsigned __int64 Flags;
-  unsigned __int64 ProcessorMask;
-};
-
-/* 4585 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE
-{
-  _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
-};
-
 /* 4586 */
 struct $C2DEDE268A55AE19A9129802947E1E43
 {
@@ -51696,20 +50531,6 @@ struct __declspec(align(8)) _HV_INPUT_GET_INTERCEPT_DATA
 {
   unsigned __int64 PartitionId;
   unsigned int VpIndex;
-};
-
-/* 4604 */
-struct _HV_UINT256
-{
-  _HV_UINT128 Low128;
-  _HV_UINT128 High128;
-};
-
-/* 4605 */
-struct _HV_UINT512
-{
-  _HV_UINT256 Low256;
-  _HV_UINT256 High256;
 };
 
 /* 4606 */
@@ -53901,12 +52722,6 @@ struct _PNP_REPLACE_DRIVER_INTERFACE
   int (__fastcall *EnableDisableHardwareQuiesce)(void *, unsigned __int8);
 };
 
-/* 4852 */
-struct __declspec(align(8)) _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
-{
-  unsigned int LpIndex;
-};
-
 /* 4853 */
 struct _RTL_CALLER_ALLOCATED_ACTIVATION_CONTEXT_STACK_FRAME_EXTENDED
 {
@@ -54613,14 +53428,6 @@ struct __declspec(align(8)) _KD_TRACE_DATA_DESCRIPTOR
 {
   void *Data;
   unsigned int DataSize;
-};
-
-/* 4921 */
-struct _HV_GENERIC_SET
-{
-  unsigned __int64 Format;
-  unsigned __int64 ValidBanksMask;
-  unsigned __int64 BankContents[];
 };
 
 /* 4922 */
@@ -65618,20 +64425,6 @@ struct _OB_PRE_OPERATION_INFORMATION
   _OB_PRE_OPERATION_PARAMETERS *Parameters;
 };
 
-/* 6061 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX
-{
-  unsigned __int64 AddressSpace;
-  unsigned __int64 Flags;
-  _HV_GENERIC_SET ProcessorSet;
-};
-
-/* 6062 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX
-{
-  _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
-};
-
 /* 6063 */
 struct _LOCAL_NMISOURCE
 {
@@ -67191,12 +65984,6 @@ struct _TRANSACTIONMANAGER_BASIC_INFORMATION
 {
   _GUID TmIdentity;
   _LARGE_INTEGER VirtualClock;
-};
-
-/* 6232 */
-struct _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE
-{
-  unsigned __int64 AddressSpace;
 };
 
 /* 6233 */
@@ -70434,13 +69221,6 @@ struct _EVENT_TRACE_COVERAGE_SAMPLER_INFORMATION
   unsigned __int8 MinorVersion;
   unsigned __int8 Reserved;
   unsigned __int64 SamplerHandle;
-};
-
-/* 6576 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST
-{
-  _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
-  unsigned __int64 GvaList[];
 };
 
 /* 6577 */
@@ -80482,12 +79262,6 @@ struct _LSA_FOREST_TRUST_RECORD
   $959CFB57590D9E7F0CC19006C34FBC59 ForestTrustData;
 };
 
-/* 7545 */
-struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX
-{
-  _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
-};
-
 /* 7546 */
 struct _FILE_END_OF_FILE_INFORMATION
 {
@@ -81784,15 +80558,6 @@ struct _ACTIVATION_CONTEXT_STACK32
   unsigned int Flags;
   unsigned int NextCookieSequenceNumber;
   unsigned int StackId;
-};
-
-/* 7684 */
-struct _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
-{
-  unsigned __int64 GlobalTime;
-  unsigned __int64 LocalRunTime;
-  unsigned __int64 RsvdZ;
-  unsigned __int64 HypervisorTime;
 };
 
 /* 7685 */
@@ -103109,9 +101874,6 @@ typedef _HV_INITIAL_VP_CONTEXT *PHV_INITIAL_VP_CONTEXT;
 /* 10007 */
 typedef _CENTRAL_ACCESS_POLICY_ENTRY CENTRAL_ACCESS_POLICY_ENTRY;
 
-/* 10008 */
-typedef _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME *PHV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
-
 /* 10009 */
 typedef int (__fastcall *PHAL_LP_READ_CPUID)(unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
 
@@ -104425,9 +103187,6 @@ typedef _ASSEMBLY_STORAGE_MAP_RESOLUTION_CALLBACK_DATA_RESOLUTION_BEGINNING ASSE
 
 /* 10446 */
 typedef _EISA_PORT_DESCRIPTOR EISA_PORT_DESCRIPTOR;
-
-/* 10447 */
-typedef _HV_ARM64_SYNTHETIC_EXCEPTION_TYPE *PHV_ARM64_SYNTHETIC_EXCEPTION_TYPE;
 
 /* 10448 */
 typedef int (__fastcall *PHAL_GET_HYBRID_PASSTHROUGH_RESERVED_REGIONS)(_HAL_HV_DMA_HYBRID_PASSTHROUGH_RESERVED_REGIONS *);
@@ -106652,9 +105411,6 @@ typedef _PERFINFO_SET_POWER_ACTION_RET *PPERFINFO_SET_POWER_ACTION_RET;
 /* 11189 */
 typedef int (__fastcall *PPS_OCT_HOST_GET_USER_CONTEXT_THREAD_INTERNAL)(_ETHREAD *, _CONTEXT *, char, char, unsigned __int8);
 
-/* 11190 */
-typedef _HV_CACHE_TYPE *PHV_CACHE_TYPE;
-
 /* 11191 */
 typedef _ETW_RT_EVENT_LOSS *PETW_RT_EVENT_LOSS;
 
@@ -106699,9 +105455,6 @@ typedef _PCI_MSI_CAPABILITY_64BIT_PVM *PPCI_MSI_CAPABILITY_64BIT_PVM;
 
 /* 11205 */
 typedef _IO_WORKITEM *(__fastcall *PIO_ALLOCATE_WORK_ITEM_INTERNAL)(_DEVICE_OBJECT *, void *);
-
-/* 11206 */
-typedef _HV_UINT128 HV_UINT128;
 
 /* 11207 */
 typedef _WHEA_MSR_DUMP_SECTION WHEA_MSR_DUMP_SECTION;
@@ -108143,9 +106896,6 @@ typedef _EFI_CONFIGURATION_TABLE EFI_CONFIGURATION_TABLE;
 /* 11693 */
 typedef _HV_INPUT_WITHDRAW_MEMORY *PHV_INPUT_WITHDRAW_MEMORY;
 
-/* 11694 */
-typedef _HV_SMC_DATA_PATH_LOCK_STATE *PHV_SMC_DATA_PATH_LOCK_STATE;
-
 /* 11695 */
 typedef _STORAGE_RESERVE_AREA_DEFINITION *PSTORAGE_RESERVE_AREA_DEFINITION;
 
@@ -108866,9 +107616,6 @@ typedef _LSA_COMMAND_MESSAGE *PLSA_COMMAND_MESSAGE;
 /* 11935 */
 typedef _ETW_CREATE_HANDLE_EVENT ETW_CLOSE_HANDLE_EVENT;
 
-/* 11936 */
-typedef _HV_GUEST_OS_MICROSOFT_IDS HV_GUEST_OS_MICROSOFT_IDS;
-
 /* 11937 */
 typedef _AMD64_OBSOLETE_CONTEXT_2 *PAMD64_OBSOLETE_CONTEXT_2;
 
@@ -109273,9 +108020,6 @@ typedef _TEB_ACTIVE_FRAME_CONTEXT_EX *PTEB_ACTIVE_FRAME_CONTEXT_EX;
 
 /* 12071 */
 typedef _HIDDEN_PROCESSOR_POWER_INTERFACE HIDDEN_PROCESSOR_POWER_INTERFACE;
-
-/* 12072 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
 
 /* 12074 */
 typedef _LUID_AND_ATTRIBUTES LUID_AND_ATTRIBUTES_ARRAY[1];
@@ -110285,9 +109029,6 @@ typedef _WNF_DATA_SCOPE *PWNF_DATA_SCOPE;
 /* 12410 */
 typedef _KE_PRCB_RCU_DATA KE_PRCB_RCU_DATA;
 
-/* 12411 */
-typedef _HV_SYSTEM_PROPERTY HV_SYSTEM_PROPERTY;
-
 /* 12412 */
 typedef _KHETERO_POLICY KHETERO_POLICY;
 
@@ -110629,9 +109370,6 @@ typedef void __fastcall KSTART_ROUTINE(void *);
 
 /* 12525 */
 typedef unsigned __int64 *PSID_HASH_ENTRY;
-
-/* 12526 */
-typedef _HV_GENERIC_SET_FORMAT HV_GENERIC_SET_FORMAT;
 
 /* 12527 */
 typedef _IMAGE_BASE_RELOCATION *PIMAGE_BASE_RELOCATION;
@@ -111208,9 +109946,6 @@ typedef _RESOURCE_PERFORMANCE_DATA RESOURCE_PERFORMANCE_DATA;
 
 /* 12719 */
 typedef _POLICY_AUDIT_CATEGORIES_INFO *PPOLICY_AUDIT_CATEGORIES_INFO;
-
-/* 12720 */
-typedef _HV_GENERIC_SET_FORMAT *PHV_GENERIC_SET_FORMAT;
 
 /* 12721 */
 typedef _ETW_COVERAGE_SAMPLER_OPTION_FLAGS ETW_COVERAGE_SAMPLER_OPTION_FLAGS;
@@ -111961,9 +110696,6 @@ typedef _DMAR DMAR;
 
 /* 12973 */
 typedef _CSV_NAMESPACE_INFO CSV_NAMESPACE_INFO;
-
-/* 12974 */
-typedef _HV_ARM64_PENDING_EVENT_TYPE HV_ARM64_PENDING_EVENT_TYPE;
 
 /* 12975 */
 typedef _DBGKM_EXIT_THREAD *PDBGKM_EXIT_THREAD;
@@ -113158,9 +111890,6 @@ typedef _LOADER_DEBUGGER_BLOCK LOADER_DEBUGGER_BLOCK;
 
 /* 13373 */
 typedef unsigned __int8 (__fastcall *PFAST_IO_MDL_READ_COMPLETE)(_FILE_OBJECT *, _MDL *, _DEVICE_OBJECT *);
-
-/* 13374 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
 
 /* 13375 */
 typedef _IOSPACE_EX64 *PIOSPACE_EX64;
@@ -115391,9 +114120,6 @@ typedef _PLUGPLAY_CONTROL_DEVICE_CONTROL_DATA PLUGPLAY_CONTROL_DEVICE_CONTROL_DA
 /* 14120 */
 typedef _IMAGE_INFO *PIMAGE_INFO;
 
-/* 14121 */
-typedef _HV_IMAGE_QUERY_TYPE HV_IMAGE_QUERY_TYPE;
-
 /* 14122 */
 typedef _IMAGE_TLS_DIRECTORY32 *PIMAGE_TLS_DIRECTORY32;
 
@@ -117137,9 +115863,6 @@ typedef int (__fastcall *PEXT_ENV_SOFT_REBOOT_CALLBACK)(void *, void *, void *);
 /* 14704 */
 typedef _ARM64_KSWITCH_FRAME ARM64_KSWITCH_FRAME;
 
-/* 14705 */
-typedef _HV_COMPATIBILITY_VERSION *PHV_COMPATIBILITY_VERSION;
-
 /* 14706 */
 typedef _ETW_WORKING_SET_SWAP_STOP_PARAMS ETW_WORKING_SET_SWAP_STOP_PARAMS;
 
@@ -118016,9 +116739,6 @@ typedef _KERNEL_SHADOW_STACK_TYPE KERNEL_SHADOW_STACK_TYPE;
 /* 14999 */
 typedef _RTLP_STACKDB_SEGMENT_ADDR *PRTLP_STACKDB_SEGMENT_ADDR;
 
-/* 15000 */
-typedef _HV_SMC_DATA_PATH_LOCK_STATE HV_SMC_DATA_PATH_LOCK_STATE;
-
 /* 15001 */
 typedef _PS_DYNAMIC_ENFORCED_ADDRESS_RANGES PS_DYNAMIC_ENFORCED_ADDRESS_RANGES;
 
@@ -118463,9 +117183,6 @@ typedef _RTL_FEATURE_CONFIGURATION_PRIORITY RTL_FEATURE_CONFIGURATION_PRIORITY;
 /* 15148 */
 typedef _SECTION_IMAGE_INFORMATION32 *PSECTION_IMAGE_INFORMATION32;
 
-/* 15149 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE;
-
 /* 15150 */
 typedef _SKPRCB SKPRCB;
 
@@ -118730,17 +117447,11 @@ typedef void __fastcall __WIL_RealtimeFeatureUsageHook(unsigned int, unsigned in
 /* 15237 */
 typedef _PCC_TABLE PCC_TABLE;
 
-/* 15238 */
-typedef _HV_GENERIC_SET *PHV_VP_SET;
-
 /* 15239 */
 typedef _HAL_CALLBACKS *PHAL_CALLBACKS;
 
 /* 15240 */
 typedef _PPM_PERF_SNAPSHOT PPM_PERF_SNAPSHOT;
-
-/* 15241 */
-typedef _HV_GUEST_OS_VENDOR HV_GUEST_OS_VENDOR;
 
 /* 15242 */
 typedef int __fastcall DRIVER_DISPATCH_PAGED(_DEVICE_OBJECT *, _IRP *);
@@ -118864,9 +117575,6 @@ typedef _MM_VERIFIER_THUNK MM_VERIFIER_THUNK;
 
 /* 15282 */
 typedef _RTL_PROCESS_HEAPS RTL_PROCESS_HEAPS;
-
-/* 15283 */
-typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
 
 /* 15284 */
 typedef unsigned __int64 (__fastcall *EFI_IMAGE_START)(void *, unsigned __int64 *, unsigned __int16 **);
@@ -120353,9 +119061,6 @@ typedef _WHEA_SEL_BUGCHECK_RECOVERY_STATUS_MULTIPLE_BUGCHECK_EVENT *PWHEA_SEL_BU
 /* 15780 */
 typedef __int64 time_t;
 
-/* 15781 */
-typedef _HV_GENERIC_SET HV_GENERIC_SET;
-
 /* 15782 */
 typedef _EISA_MEMORY_CONFIGURATION EISA_MEMORY_CONFIGURATION;
 
@@ -120574,9 +119279,6 @@ typedef int (__fastcall *PLSA_AP_CALL_PACKAGE_PASSTHROUGH)(void **, void *, void
 
 /* 15854 */
 typedef _LARGE_INTEGER TP_TIMESTAMP;
-
-/* 15855 */
-typedef _HV_DEVICE_TYPE *PHV_DEVICE_TYPE;
 
 /* 15856 */
 typedef int (__fastcall *pHalIommuBlockDevice)(_IOMMU_DMA_DEVICE *);
@@ -121298,9 +120000,6 @@ typedef _SEP_RM_LSA_MEMORY_TYPE SEP_RM_LSA_MEMORY_TYPE;
 /* 16095 */
 typedef _NT_IORING_COMPLETION_QUEUE NT_IORING_COMPLETION_QUEUE;
 
-/* 16096 */
-typedef _HV_ARM64_SYNTHETIC_EXCEPTION_TYPE HV_ARM64_SYNTHETIC_EXCEPTION_TYPE;
-
 /* 16097 */
 typedef _X86_DBGKD_CONTROL_REPORT *PX86_DBGKD_CONTROL_REPORT;
 
@@ -121666,9 +120365,6 @@ typedef _HV_SCHEDULING_INTERVAL_INFO *PHV_SCHEDULING_INTERVAL_INFO;
 
 /* 16218 */
 typedef _ETW_TP_EVENT_TIMER_EXPIRATION ETW_TP_EVENT_TIMER_EXPIRATION;
-
-/* 16219 */
-typedef _HV_PPM_POWER_POLICY_SETTING_ID HV_PPM_POWER_POLICY_SETTING_ID;
 
 /* 16220 */
 typedef _HVLP_FLAGS HVLP_FLAGS;
@@ -122482,9 +121178,6 @@ typedef _EFI_TCG_PROTOCOL *P_EFI_TCG_PROTOCOL;
 
 /* 16493 */
 typedef _SYSTEM_HANDLE_INFORMATION *PSYSTEM_HANDLE_INFORMATION;
-
-/* 16494 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE;
 
 /* 16495 */
 typedef _IOMMU_DEVICE_CREATION_CONFIGURATION_TYPE IOMMU_DEVICE_CREATION_CONFIGURATION_TYPE;
@@ -123695,9 +122388,6 @@ typedef _REG_POST_CREATE_KEY_INFORMATION REG_POST_OPEN_KEY_INFORMATION;
 /* 16900 */
 typedef _PS_TRUSTLET_CREATE_ATTRIBUTES *PPS_TRUSTLET_CREATE_ATTRIBUTES;
 
-/* 16901 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
-
 /* 16902 */
 typedef _ETW_DFSS_START_NEW_INTERVAL *PETW_DFSS_START_NEW_INTERVAL;
 
@@ -124711,9 +123401,6 @@ typedef void (__fastcall *PRTL_FINALIZE_SMART_LBLOB_UCS_WRITING_CONTEXT_FUNCTION
 
 /* 17241 */
 typedef _ASSEMBLY_STORAGE_MAP_RESOLUTION_CALLBACK_DATA_RESOLUTION_SUCCESSFUL ASSEMBLY_STORAGE_MAP_RESOLUTION_CALLBACK_DATA_RESOLUTION_SUCCESSFUL;
-
-/* 17242 */
-typedef _HV_CRASHDUMP_ACTION HV_CRASHDUMP_ACTION;
 
 /* 17243 */
 typedef _KSW_INTERRUPT_CONTEXT KSW_INTERRUPT_CONTEXT;
@@ -127211,9 +125898,6 @@ typedef _FILE_INITIATE_REPAIR_OUTPUT_BUFFER *PFILE_INITIATE_REPAIR_OUTPUT_BUFFER
 /* 18077 */
 typedef _PCI_EXPRESS_DEVICE_CONTROL_REGISTER *PPCI_EXPRESS_DEVICE_CONTROL_REGISTER;
 
-/* 18078 */
-typedef _HV_DEVICE_TYPE HV_DEVICE_TYPE;
-
 /* 18079 */
 typedef _RTL_HASH_ENTRY *PRTL_HASH_ENTRY;
 
@@ -127286,9 +125970,6 @@ typedef _KCRMPROTOCOL *PKCRMPROTOCOL;
 /* 18102 */
 typedef _ALIGNED_KAFFINITY ALIGNED_KAFFINITY;
 
-/* 18103 */
-typedef _HV_PARTITION_EVENT HV_PARTITION_EVENT;
-
 /* 18104 */
 typedef _SE_CM_VALUE_AUDIT *PSE_CM_VALUE_AUDIT;
 
@@ -127333,9 +126014,6 @@ typedef _SYSTEM_SINGLE_MODULE_INFORMATION *PSYSTEM_SINGLE_MODULE_INFORMATION;
 
 /* 18118 */
 typedef _HV_LOGICAL_PROCESSOR_REGISTER_ASSOC *PHV_LOGICAL_PROCESSOR_REGISTER_ASSOC;
-
-/* 18119 */
-typedef _HV_UINT256 *PHV_UINT256;
 
 /* 18120 */
 typedef _SKCORE_PHASE3_INIT_PARAMS SKCORE_PHASE3_INIT_PARAMS;
@@ -128219,9 +126897,6 @@ typedef _DBGUI_CREATE_PROCESS *PDBGUI_CREATE_PROCESS;
 /* 18414 */
 typedef _TEB_ACTIVE_FRAME_CONTEXT_EX TEB_ACTIVE_FRAME_CONTEXT_EX;
 
-/* 18415 */
-typedef _HV_PROCESSOR_VENDOR *PHV_PROCESSOR_VENDOR;
-
 /* 18416 */
 typedef _ENCLAVE_LOAD_INFO_VBS *PENCLAVE_LOAD_INFO_VBS;
 
@@ -128986,9 +127661,6 @@ typedef _SYSTEM_SECUREBOOT_PLATFORM_MANIFEST_INFORMATION SYSTEM_SECUREBOOT_PLATF
 
 /* 18670 */
 typedef _PSP_JOB_RATE_CONTROL_TYPE PSP_JOB_RATE_CONTROL_TYPE;
-
-/* 18671 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
 
 /* 18672 */
 typedef _HEAP_RANGE_LOG HEAP_RANGE_LOG;
@@ -129776,9 +128448,6 @@ typedef _SYSTEM_LOOKASIDE_INFORMATION SYSTEM_LOOKASIDE_INFORMATION;
 /* 18933 */
 typedef unsigned __int64 (__fastcall *EFI_UNINSTALL_PROTOCOL_INTERFACE)(void *, EFI_GUID *, void *);
 
-/* 18934 */
-typedef _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE;
-
 /* 18935 */
 typedef _PCI_EXPRESS_PASID_CAPABILITY_REGISTER PCI_EXPRESS_PASID_CAPABILITY_REGISTER;
 
@@ -130087,9 +128756,6 @@ typedef unsigned __int64 SMCCC_STATUS_64;
 
 /* 19037 */
 typedef void (__fastcall *PKE_RCU_CALLBACK)(unsigned __int64, unsigned __int64);
-
-/* 19038 */
-typedef _HV_REGISTER_NAME *PHV_REGISTER_NAME;
 
 /* 19039 */
 typedef int __fastcall RTL_STACKDB_READ_ROUTINE(void *, unsigned __int64, void *);
@@ -130930,9 +129596,6 @@ typedef _PAGE_OFFLINE_ERROR_TYPES *PPAGE_OFFLINE_ERROR_TYPES;
 
 /* 19318 */
 typedef _RTL_UNLOAD_EVENT_TRACE32 *PRTL_UNLOAD_EVENT_TRACE32;
-
-/* 19319 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
 
 /* 19320 */
 typedef _WHEA_RAW_DATA_FORMAT WHEA_RAW_DATA_FORMAT;
@@ -131878,9 +130541,6 @@ typedef _KTIMER *PKTIMER;
 
 /* 19636 */
 typedef __int16 *PLANGNAMEINDEX;
-
-/* 19637 */
-typedef _HV_CRASHDUMP_ACTION *PHV_CRASHDUMP_ACTION;
 
 /* 19638 */
 typedef _EVENT_EXTENDED_ITEM_STACK_KEY32 EVENT_EXTENDED_ITEM_STACK_KEY32;
@@ -133703,9 +132363,6 @@ typedef _TRUSTLET_COLLABORATION_ID *PTRUSTLET_COLLABORATION_ID;
 /* 20249 */
 typedef char *LPSTR;
 
-/* 20250 */
-typedef _HV_INTERCEPT_TYPE HV_INTERCEPT_TYPE;
-
 /* 20251 */
 typedef _WHEA_PCI_SLOT_NUMBER WHEA_PCI_SLOT_NUMBER;
 
@@ -133774,9 +132431,6 @@ typedef void (__fastcall *PWMI_DISKIO_INITIATION_NOTIFY_ROUTINE)(_IRP *);
 
 /* 20273 */
 typedef void __fastcall SKTIMER_CALLBACK(_SKTIMER *);
-
-/* 20274 */
-typedef _HV_INTERCEPT_TYPE *PHV_INTERCEPT_TYPE;
 
 /* 20275 */
 typedef _HAL_PROFILE_SOURCE_INTERVAL HAL_PROFILE_SOURCE_INTERVAL;
@@ -134672,9 +133326,6 @@ typedef _WATCHDOG_TIMER_INSTRUCTION_ENTRY *PWATCHDOG_TIMER_INSTRUCTION_ENTRY;
 /* 20574 */
 typedef _COMPONENT_FILTER COMPONENT_FILTER;
 
-/* 20575 */
-typedef _HV_GUEST_OS_MICROSOFT_IDS *PHV_GUEST_OS_MICROSOFT_IDS;
-
 /* 20576 */
 typedef _CM_DISK_GEOMETRY_DEVICE_DATA *PCM_DISK_GEOMETRY_DEVICE_DATA;
 
@@ -135089,9 +133740,6 @@ typedef _SYSTEM_WORKINGSET_ENTRY *PSYSTEM_WORKINGSET_ENTRY;
 /* 20713 */
 typedef _ACPI_GENERIC_ADDRESS_TYPE *PACPI_GENERIC_ADDRESS_TYPE;
 
-/* 20714 */
-typedef _HV_CACHE_TYPE HV_CACHE_TYPE;
-
 /* 20715 */
 typedef void (__fastcall *PSHED_PI_INIT_PROC)(unsigned int);
 
@@ -135280,9 +133928,6 @@ typedef unsigned __int64 HV_TRANSLATE_GVA_CONTROL_FLAGS;
 
 /* 20777 */
 typedef _SYSTEM_NET_RATE_CONTROL_CONTEXT_HEADER SYSTEM_NET_RATE_CONTROL_CONTEXT_HEADER;
-
-/* 20778 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
 
 /* 20779 */
 typedef _CLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE *PCLAIM_SECURITY_ATTRIBUTE_OCTET_STRING_VALUE;
@@ -136523,9 +135168,6 @@ typedef _VF_TARGET_VERIFIED_DRIVER_DATA *PVF_TARGET_VERIFIED_DRIVER_DATA;
 /* 21191 */
 typedef _PCI_TYPE1_CFG_BITS PCI_TYPE1_CFG_BITS;
 
-/* 21192 */
-typedef _HV_PARTITION_EVENT *PHV_PARTITION_EVENT;
-
 /* 21193 */
 typedef _HV_INPUT_CREATE_PARTITION_V2 HV_INPUT_CREATE_PARTITION_V2;
 
@@ -136946,9 +135588,6 @@ typedef _KTM *PRKTM;
 /* 21334 */
 typedef _WHEAP_PROCESS_HEST_EVENT WHEAP_PROCESS_HEST_EVENT;
 
-/* 21335 */
-typedef _HV_ARM64_PENDING_EVENT_TYPE *PHV_ARM64_PENDING_EVENT_TYPE;
-
 /* 21336 */
 typedef int (__fastcall *PKE_SET_USER_GROUP_AFFINITY_THREAD)(_KTHREAD *, _GROUP_AFFINITY *);
 
@@ -136972,9 +135611,6 @@ typedef unsigned __int64 (__fastcall *EFI_SET_WAKEUP_TIME)(unsigned __int8, EFI_
 
 /* 21343 */
 typedef _HEAP_LFH_COMMIT_UNIT_INFO HEAP_LFH_COMMIT_UNIT_INFO;
-
-/* 21344 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
 
 /* 21345 */
 typedef int (__fastcall *PRTL_GET_HASH_ALGORITHM_HASH_LENGTH_FUNCTION)(unsigned int, unsigned int, unsigned __int64 *);
@@ -137059,9 +135695,6 @@ typedef _CLS_WRITE_ENTRY CLFS_WRITE_ENTRY;
 
 /* 21372 */
 typedef _CRYPT_PROVIDERS *PCRYPT_PROVIDERS;
-
-/* 21373 */
-typedef _HV_REGISTER_NAME HV_REGISTER_NAME;
 
 /* 21374 */
 typedef _REMOTE_PORT_VIEW *PREMOTE_PORT_VIEW;
@@ -137728,9 +136361,6 @@ typedef _PROCESS_MITIGATION_FONT_DISABLE_POLICY *PPROCESS_MITIGATION_FONT_DISABL
 
 /* 21597 */
 typedef _STRING *PUTF8_STRING;
-
-/* 21598 */
-typedef _HV_GENERIC_SET *PHV_GENERIC_SET;
 
 /* 21599 */
 typedef _CLS_SCAN_CONTEXT *PCLS_SCAN_CONTEXT;
@@ -138413,9 +137043,6 @@ typedef _PCI_DEBUGGING_DEVICE_IN_USE *PPCI_DEBUGGING_DEVICE_IN_USE;
 /* 21825 */
 typedef _PCI_EXPRESS_NPEM_STATUS_REGISTER *PPCI_EXPRESS_NPEM_STATUS_REGISTER;
 
-/* 21826 */
-typedef const _HV_REGISTER_NAME *PCHV_REGISTER_NAME;
-
 /* 21827 */
 typedef _MAP_REGISTER_ENTRY *PMAP_REGISTER_ENTRY;
 
@@ -138673,9 +137300,6 @@ typedef void (__fastcall *PBOOT_DRIVER_CALLBACK_FUNCTION)(void *, _BDCB_CALLBACK
 
 /* 21912 */
 typedef void (__fastcall *PWMI_FLTIO_IO_REDIRECTION_NOTIFY_ROUTINE)(_IRP *, _FILE_OBJECT *);
-
-/* 21913 */
-typedef _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME *PHV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
 
 /* 21914 */
 typedef _ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION ACTIVATION_CONTEXT_COMPATIBILITY_INFORMATION;
@@ -139096,9 +137720,6 @@ typedef _SMMNTE SMMNTE;
 
 /* 22053 */
 typedef unsigned int *PHV_PASID;
-
-/* 22054 */
-typedef _HV_IMAGE_QUERY_TYPE *PHV_IMAGE_QUERY_TYPE;
 
 /* 22055 */
 typedef const _SECUREBOOT_POLICY_PD_V1 *PCSECUREBOOT_POLICY_PD_V1;
@@ -139694,9 +138315,6 @@ typedef _PROCESS_DEVICEMAP_INFORMATION_EX PROCESS_DEVICEMAP_INFORMATION_EX;
 /* 22253 */
 typedef unsigned __int8 (__fastcall *pHalPciGetDeviceLocationFromPhysicalAddress)(unsigned __int64, unsigned __int16 *, unsigned __int8 *, unsigned __int8 *, unsigned __int8 *);
 
-/* 22254 */
-typedef _HV_UINT512 *PHV_UINT512;
-
 /* 22255 */
 typedef _RTL_CRITICAL_SECTION_DEBUG64 *PRTL_RESOURCE_DEBUG64;
 
@@ -140291,9 +138909,6 @@ typedef _ENCLAVE_LOAD_DATA_VBS_BASIC ENCLAVE_LOAD_DATA_VBS_BASIC;
 /* 22452 */
 typedef _HV_INPUT_ADD_PHYSICAL_MEMORY HV_INPUT_ADD_PHYSICAL_MEMORY;
 
-/* 22453 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
-
 /* 22454 */
 typedef _FILE_GET_QUOTA_INFORMATION FILE_GET_QUOTA_INFORMATION;
 
@@ -140489,9 +139104,6 @@ typedef __n128x2 int8x16x2_t;
 /* 22518 */
 typedef _HV_PSP_DEVICE *PHV_PSP_DEVICE;
 
-/* 22519 */
-typedef _HV_SYSTEM_PROPERTY *PHV_SYSTEM_PROPERTY;
-
 /* 22520 */
 typedef _WHEA_XPF_CMC_DESCRIPTOR *PWHEA_XPF_CMC_DESCRIPTOR;
 
@@ -140518,9 +139130,6 @@ typedef _SOCDATA_MEM_ASSIGN_RULE SOCDATA_MEM_ASSIGN_RULE;
 
 /* 22528 */
 typedef __WIL__WNF_STATE_NAME __WIL_WNF_STATE_NAME;
-
-/* 22529 */
-typedef _HV_COMPATIBILITY_VERSION HV_COMPATIBILITY_VERSION;
 
 /* 22530 */
 typedef _LPC_UNREGISTER_PROCESS_MSG LPC_UNREGISTER_PROCESS_MSG;
@@ -140719,9 +139328,6 @@ typedef _MM_DUMP_TYPE *PMM_DUMP_TYPE;
 
 /* 22595 */
 typedef _IMAGE_EC_RANGE_ENTRY *PIMAGE_EC_RANGE_ENTRY;
-
-/* 22596 */
-typedef _HV_UINT256 HV_UINT256;
 
 /* 22597 */
 typedef _SECURITY_CAPABILITIES *PSECURITY_CAPABILITIES;
@@ -141977,9 +140583,6 @@ typedef _CM_RESOURCE_LIST CM_RESOURCE_LIST;
 /* 23014 */
 typedef _WHEA_ERROR_STATUS WHEA_ERROR_STATUS;
 
-/* 23015 */
-typedef _HV_PROCESSOR_VENDOR HV_PROCESSOR_VENDOR;
-
 /* 23016 */
 typedef _ETW_NOTIFICATION_HEADER *PETW_NOTIFICATION_HEADER;
 
@@ -142354,9 +140957,6 @@ typedef int __fastcall __WIL_WNF_NtUpdateWnfStateData(const __WIL__WNF_STATE_NAM
 
 /* 23141 */
 typedef _REFS_SET_VOLUME_COMPRESSION_INFO_INPUT_BUFFER *PREFS_SET_VOLUME_COMPRESSION_INFO_INPUT_BUFFER;
-
-/* 23142 */
-typedef HV_PARTITION_PROPERTY_CODE *PHV_PARTITION_PROPERTY_CODE;
 
 /* 23143 */
 typedef _SYSTEM_VERIFIER_CANCELLATION_INFORMATION *PSYSTEM_VERIFIER_CANCELLATION_INFORMATION;
@@ -143128,9 +141728,6 @@ typedef _IO_UNLOAD_SAFE_COMPLETION_CONTEXT IO_UNLOAD_SAFE_COMPLETION_CONTEXT;
 
 /* 23400 */
 typedef _ARM_FIBER *PARM_FIBER;
-
-/* 23401 */
-typedef _HV_GUEST_OS_VENDOR *PHV_GUEST_OS_VENDOR;
 
 /* 23402 */
 typedef _FILE_PIPE_CLIENT_PROCESS_BUFFER_EX *PFILE_PIPE_CLIENT_PROCESS_BUFFER_EX;
@@ -144503,9 +143100,6 @@ typedef int (__fastcall *PLDR_LOAD_DLL)(const wchar_t *, unsigned int *, const _
 /* 23858 */
 typedef _HV_NESTED_MSR_INTERCEPT_MODE HV_NESTED_MSR_INTERCEPT_MODE;
 
-/* 23859 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX;
-
 /* 23860 */
 typedef _PROCESS_FIBER_SHADOW_STACK_ALLOCATION_INFORMATION *PPROCESS_FIBER_SHADOW_STACK_ALLOCATION_INFORMATION;
 
@@ -145820,9 +144414,6 @@ typedef _KPROCESSOR_IDLE_STATE KPROCESSOR_IDLE_STATE;
 /* 24298 */
 typedef _MM_STORE_KEY_DESCRIPTOR *PMM_STORE_KEY_DESCRIPTOR;
 
-/* 24299 */
-typedef _HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME HV_INPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
-
 /* 24300 */
 typedef _HVLP_LPCB *PHVLP_LPCB;
 
@@ -146923,9 +145514,6 @@ typedef _ARM64_ESR_ISS_HVC_SVC_REGISTER ARM64_ESR_ISS_HVC_SVC_REGISTER;
 
 /* 24667 */
 typedef _IUM_ON_DEMAND_DEBUG_CHALLENGE *PIUM_ON_DEMAND_DEBUG_CHALLENGE;
-
-/* 24669 */
-typedef _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE *PHV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE;
 
 /* 24670 */
 typedef _PLATFORM_IDLE_VETO PLATFORM_IDLE_VETO;
@@ -148868,9 +147456,6 @@ typedef _SYSTEM_ENTROPY_TIMING_INFORMATION SYSTEM_ENTROPY_TIMING_INFORMATION;
 /* 25321 */
 typedef _WHEA_PSHED_PI_CPU_BUSES_INIT_FAILED_EVENT *PWHEA_PSHED_PI_CPU_BUSES_INIT_FAILED_EVENT;
 
-/* 25322 */
-typedef _HV_UINT128 *PHV_UINT128;
-
 /* 25323 */
 typedef _KE_TEST_THREAD_PRIORITY_TUPLE *PKE_TEST_THREAD_PRIORITY_TUPLE;
 
@@ -149248,9 +147833,6 @@ typedef _EFI_SYSTEM_TABLE EFI_SYSTEM_TABLE;
 
 /* 25449 */
 typedef _ARM64_DBGKD_CONTROL_SET *PARM64_DBGKD_CONTROL_SET;
-
-/* 25450 */
-typedef _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX;
 
 /* 25451 */
 typedef unsigned int TCG_EVENTTYPE;
@@ -149935,9 +148517,6 @@ typedef const char *PCSCHAR;
 
 /* 25678 */
 typedef _AVX_ZMM_256_REGISTERS AVX_ZMM_256_REGISTERS;
-
-/* 25679 */
-typedef _HV_UINT512 HV_UINT512;
 
 /* 25680 */
 typedef _HV_INPUT_SET_PERF_REGISTER *PHV_INPUT_SET_PERF_REGISTER;
@@ -150856,9 +149435,6 @@ typedef int __fastcall IOMMU_DMA_LOGICAL_ALLOCATOR_ALLOCATE(_IOMMU_DMA_LOGICAL_A
 
 /* 25986 */
 typedef _PCI_EXPRESS_UNCORRECTABLE_ERROR_MASK *PPCI_EXPRESS_UNCORRECTABLE_ERROR_MASK;
-
-/* 25987 */
-typedef _HV_GENERIC_SET HV_VP_SET;
 
 /* 25988 */
 typedef void (__fastcall *PFREE_MAP_REGISTERS)(_DMA_ADAPTER *, void *, unsigned int);
