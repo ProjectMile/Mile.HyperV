@@ -1547,6 +1547,7 @@ typedef enum _HV_SAVE_RESTORE_STATE_RESULT
 {
     HvStateComplete = 0,
     HvStateIncomplete = 1,
+#if defined(_M_AMD64) || defined(_M_IX86)
     HvStateRestorable = 2,
     HvStateCorruptData = 3,
     HvStateUnsupportedVersion = 4,
@@ -1579,7 +1580,14 @@ typedef enum _HV_SAVE_RESTORE_STATE_RESULT
     HvStateProcessorFeatureXsaveLegacySseMismatch = 31,
     HvStateProcessorFeatureXsaveAvxMismatch = 32,
     HvStateProcessorFeatureXsaveUnknownFeatureMismatch = 33,
-    HvStateProcessorXsaveSaveAreaMismatch = 34
+    HvStateProcessorXsaveSaveAreaMismatch = 34,
+#elif defined(_M_ARM64)
+    HvStateCorruptData = 2,
+    HvStateUnsupportedVersion = 3,
+    HvStateProcessorFeatureMismatch = 4,
+    HvStateIncompatibleProcessor = 5,
+    HvStateProcessorCacheLineFlushSizeMismatch = 6,
+#endif
 } HV_SAVE_RESTORE_STATE_RESULT, *PHV_SAVE_RESTORE_STATE_RESULT;
 typedef HV_UINT32 HV_SAVE_RESTORE_STATE_FLAGS, *PHV_SAVE_RESTORE_STATE_FLAGS;
 
@@ -5635,6 +5643,9 @@ typedef enum _HV_POWER_PROPERTY_TYPE
     HvPowerPropertyLpNextPlatformStateIndex = 0x3,
     HvPowerPropertyStatsOffsets = 0x4,
     HvPowerPropertyPolicySetting = 0x5,
+    HvPowerPropertyLpCppcRequestValue = 0x6,
+    HvPowerPropertyLpCppcRequestRegister = 0x7,
+    HvPowerPropertyLpIdleStateConfigEx = 0x8,
 } HV_POWER_PROPERTY_TYPE, *PHV_POWER_PROPERTY_TYPE;
 
 typedef enum _HV_PARTITION_EVENT
@@ -5702,6 +5713,10 @@ typedef enum _HV_PHYSICAL_DEVICE_PROPERTY
 {
     HvPhysicalDevicePropertyCapabilities = 0x0,
     HvPhysicalDevicePropertyEnabled = 0x1,
+    HvPhysicalDevicePropertyDmaEnabled = 0x1,
+    HvPhysicalDevicePropertyAtsEnabled = 0x1,
+    HvPhysicalDevicePropertyFaultReporting = 0x2,
+    HvPhysicalDevicePropertyIrtRange = 0x4,
 } HV_PHYSICAL_DEVICE_PROPERTY, *PHV_PHYSICAL_DEVICE_PROPERTY;
 
 typedef enum _HV_X64_PPM_PERF_STATE_PORT_ACCESS_SIZE
@@ -6817,6 +6832,21 @@ typedef enum _HV_SMC_DATA_PATH_LOCK_STATE
 } HV_SMC_DATA_PATH_LOCK_STATE, *PHV_SMC_DATA_PATH_LOCK_STATE;
 #endif
 
+typedef enum _HV_NON_ARCH_CORE_SHARING_TYPE
+{
+    HvNonArchCoreSharingUnreported = 0x0,
+    HvNonArchCoreSharingOff = 0x1,
+    HvNonArchCoreSharingOn = 0x2,
+    HvNonArchCoreSharingMax = 0x2,
+} HV_NON_ARCH_CORE_SHARING_TYPE, *PHV_NON_ARCH_CORE_SHARING_TYPE;
+
+typedef enum _HV_CPU_GROUP_PROPERTY_CODE
+{
+    HvCpuGroupPropertyCpuCap = 0x10000,
+    HvCpuGroupPropertySchedulingPriority = 0x20000,
+    HvCpuGroupPropertyIdleLpReserve = 0x30000,
+} HV_CPU_GROUP_PROPERTY_CODE, *PHV_CPU_GROUP_PROPERTY_CODE;
+
 typedef struct HV_DECLSPEC_ALIGN(8) _HV_SUBNODE
 {
     HV_UINT64 SubnodeId;
@@ -7760,6 +7790,14 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
 } HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME, *PHV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME;
 
 // HvCallUpdateHvProcessorFeatures | 0x0005
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UPDATE_PROCESSOR_FEATURES
+{
+    HV_UINT32 Property;
+    HV_UINT32 RsvdZ;
+    HV_UINT64 Value;
+} HV_INPUT_UPDATE_PROCESSOR_FEATURES, *PHV_INPUT_UPDATE_PROCESSOR_FEATURES;
+
 // HvCallSwitchAliasMap | 0x0006
 // HvCallUpdateMicrocode | 0x0007
 
@@ -7767,8 +7805,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_LOGICAL_PROCESSOR_RUN_TIME
 
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_NOTIFY_LONG_SPINWAIT
 {
-    HV_UINT32 InitialLongSpinWait;
-    HV_UINT32 Padding;
+    HV_UINT64 InitialLongSpinWait;
 } HV_INPUT_NOTIFY_LONG_SPINWAIT, *PHV_INPUT_NOTIFY_LONG_SPINWAIT;
 
 // HvCallParkedVirtualProcessors | 0x0009
