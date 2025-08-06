@@ -51,6 +51,8 @@
 #pragma warning(disable:4200) // zero length array
 #pragma warning(disable:4201) // nameless struct/union
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
+// actual alignment is greater than the value specified in __declspec(align())
+#pragma warning(disable:4359)
 #endif
 
 // Define a 256bit type.
@@ -2089,13 +2091,12 @@ typedef enum _HV_INTERCEPT_TYPE
 {
     // Platform-specific intercept types.
 
+#if defined(_M_AMD64) || defined(_M_IX86)
     HvInterceptTypeX64IoPort = 0x00000000,
     HvInterceptTypeX64Msr = 0x00000001,
     HvInterceptTypeX64Cpuid = 0x00000002,
     HvInterceptTypeX64Exception = 0x00000003,
-    HvInterceptTypeException = 0x00000003,
     HvInterceptTypeRegister = 0x00000004,
-    HvInterceptTypeReserved0 = 0x00000004,
     HvInterceptTypeMmio = 0x00000005,
     HvInterceptTypeX64GlobalCpuid = 0x00000006,
     HvInterceptTypeX64ApicSmi = 0x00000007,
@@ -2103,10 +2104,17 @@ typedef enum _HV_INTERCEPT_TYPE
     HvInterceptTypeX64ApicInitSipi = 0x00000009,
     HvInterceptTypeX64ApicWrite = 0x0000000B,
     HvInterceptTypeX64MsrIndex = 0x0000000C,
+    HvInterceptTypeMax,
+#elif defined(_M_ARM64)
+    HvInterceptTypeException = 0x00000003,
+    HvInterceptTypeReserved0 = 0x00000004,
+    HvInterceptTypeMmio = 0x00000005,
+    HvInterceptTypeHypercall = 0x00000008,
     HvInterceptTypeUnknownSynicConnection = 0x0000000D,
     HvInterceptTypeRetargetInterruptWithUnknownDeviceId = 0x0000000F,
     HvInterceptTypeRegister = 0x00000012,
     HvInterceptTypeMax = 0x00000013,
+#endif
     HvInterceptTypeInvalid = 0xFFFFFFFF
 } HV_INTERCEPT_TYPE, *PHV_INTERCEPT_TYPE;
 
@@ -5708,8 +5716,6 @@ typedef enum _HV_PPM_POWER_POLICY_SETTING_ID
     HvPowerPolicyIdleDisable = 0x0,
     HvPowerPolicyIdleTimeCheck = 0x1,
 #if defined(_M_AMD64) || defined(_M_IX86)
-
-    HvPowerPolicyIdleTimeCheck = 0x1,
     HvPowerPolicyIdlePromoteThreshold = 0x2,
     HvPowerPolicyIdleDemoteThreshold = 0x3,
     HvPowerPolicyIdleStateMaximum = 0x4,
@@ -6942,6 +6948,14 @@ typedef enum _HV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY
     HvX64CppcContextSwitchLazy = 0x1,
     HvX64CppcContextSwitchAggressive = 0x2,
 } HV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY, *PHV_X64_PPM_CPPC_CONTEXT_SWITCH_POLICY;
+#endif
+
+#if defined(_M_ARM64)
+typedef enum _HV_ARM64_UNSUPPORTED_FEATURE_CODE
+{
+    HvUnsupportedFeatureIntercept = 0x1,
+    HvUnsupportedFeatureMemoryIntercept = 0x2,
+} HV_ARM64_UNSUPPORTED_FEATURE_CODE, *PHV_ARM64_UNSUPPORTED_FEATURE_CODE;
 #endif
 
 typedef struct HV_DECLSPEC_ALIGN(8) _HV_SUBNODE
@@ -9599,6 +9613,8 @@ typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_GET_VP_CPUID_VALUES
 #pragma warning(default:4200) // zero length array
 #pragma warning(default:4201) // nameless struct/union
 #pragma warning(default:4324) // structure was padded due to __declspec(align())
+// actual alignment is greater than the value specified in __declspec(align())
+#pragma warning(default:4359)
 #endif
 #endif
 

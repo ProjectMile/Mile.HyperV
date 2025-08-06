@@ -8611,13 +8611,6 @@ enum _BCDE_FIRST_MEGABYTE_POLICY : __int32
   FirstMegabytePolicyUsePrivate = 0x2,
 };
 
-/* 628 */
-enum __bitmask _HV_ARM64_UNSUPPORTED_FEATURE_CODE : __int32
-{
-  HvUnsupportedFeatureIntercept = 0x1,
-  HvUnsupportedFeatureMemoryIntercept = 0x2,
-};
-
 /* 629 */
 enum _D3COLD_LAST_TRANSITION_STATUS : __int32
 {
@@ -132375,9 +132368,6 @@ typedef unsigned __int64 (__fastcall *EFI_BLOCK_RESET_EX)(_EFI_BLOCK_IO2 *, unsi
 /* 20390 */
 typedef _HV_OUTPUT_COLLECT_LIVE_DUMP HV_OUTPUT_COLLECT_LIVE_DUMP;
 
-/* 20391 */
-typedef _HV_ARM64_UNSUPPORTED_FEATURE_CODE HV_ARM64_UNSUPPORTED_FEATURE_CODE;
-
 /* 20392 */
 typedef _PPTT *PPPTT;
 
@@ -144548,9 +144538,6 @@ typedef _IA64_KSWITCH_FRAME *PIA64_KSWITCH_FRAME;
 
 /* 24490 */
 typedef unsigned __int8 (__fastcall *pHalIommuProcessPageRequestQueue)(unsigned int);
-
-/* 24491 */
-typedef _HV_ARM64_UNSUPPORTED_FEATURE_CODE *PHV_ARM64_UNSUPPORTED_FEATURE_CODE;
 
 /* 24492 */
 typedef _STORAGE_QUERY_DEPENDENT_VOLUME_LEV1_ENTRY *PSTORAGE_QUERY_DEPENDENT_VOLUME_LEV1_ENTRY;
