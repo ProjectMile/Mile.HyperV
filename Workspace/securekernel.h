@@ -28321,15 +28321,6 @@ struct _WHEA_MEMORY_CORRECTABLE_ERROR_DATA
   unsigned int CorrectableErrorCount;
 };
 
-/* 2477 */
-struct _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED
-{
-  unsigned __int8 Enabled;
-  unsigned __int8 Reserved0;
-  unsigned __int16 Reserved1;
-  unsigned int Reserved2;
-};
-
 /* 2478 */
 struct _INTERRUPT_LINE_STATE
 {
@@ -32004,34 +31995,11 @@ struct _SECUREBOOT_POLICY_VALUE_BOOL
   unsigned __int16 Value;
 };
 
-/* 2861 */
-struct $0DBAADEAE0A29557E59F4B21B2C1B138
-{
-  unsigned __int16 ErrorDetail : 14;
-  unsigned __int16 HypervisorError : 1;
-  unsigned __int16 SoftwareError : 1;
-};
-
-/* 2862 */
-union _HV_SYNMC_ARM64_EVENT
-{
-  unsigned __int16 ModelSpecificErrorCode;
-  $0DBAADEAE0A29557E59F4B21B2C1B138 __s1;
-};
-
 /* 2863 */
 struct $C05C835E7D370C1DBA126913381457C0
 {
   _MDL CoreMdl;
   unsigned __int64 PfnArray[512];
-};
-
-/* 2864 */
-struct __declspec(align(4)) _HV_INPUT_INJECT_SYNTHETIC_MACHINE_CHECK
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  _HV_SYNMC_ARM64_EVENT SynmcEvent;
 };
 
 /* 2865 */
@@ -32046,15 +32014,6 @@ struct __declspec(align(8)) _IUM_HIBERNATE_INFO
   unsigned __int64 ResumeInformationPfn;
   unsigned __int32 SecureMorRequired : 1;
   unsigned __int32 Reserved : 31;
-};
-
-/* 2868 */
-struct _HV_OUTPUT_GET_SPA_PAGE_LIST
-{
-  unsigned __int64 NextPageToScan;
-  unsigned __int16 RangeCount;
-  unsigned __int16 Rsvd[3];
-  _HV_SPA_PAGE_RANGE RangeList[510];
 };
 
 /* 2869 */
@@ -39874,20 +39833,6 @@ struct _SYSDBG_KD_PULL_REMOTE_FILE
   _UNICODE_STRING ImageFileName;
 };
 
-/* 3713 */
-struct _HV_INITIAL_VP_CONTEXT
-{
-  unsigned __int64 Pc;
-  unsigned __int64 Sp_ELh;
-  unsigned __int64 SCTLR_EL1;
-  unsigned __int64 MAIR_EL1;
-  unsigned __int64 TCR_EL1;
-  unsigned __int64 VBAR_EL1;
-  unsigned __int64 TTBR0_EL1;
-  unsigned __int64 TTBR1_EL1;
-  unsigned __int64 X18;
-};
-
 /* 3714 */
 struct _SK_START_VP_PACKET
 {
@@ -39980,15 +39925,6 @@ struct _MINIDUMP_STREAM_INFO
   unsigned int NumberOfMemoryBlocks;
   unsigned int ContextRva;
   _LIST_ENTRY MemoryList;
-};
-
-/* 3717 */
-struct _HV_INPUT_DISABLE_PASID
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 LogicalDeviceId;
-  unsigned int Pasid;
-  unsigned int Reserved;
 };
 
 /* 3718 */
@@ -44287,14 +44223,6 @@ struct __cppobj _tlgCharTraits<unsigned short>
 {
 };
 
-/* 4131 */
-struct _HV_X64_INPUT_DISABLE_HYPERVISOR
-{
-  unsigned __int64 TrampolineCr3;
-  unsigned __int64 KernelCr3;
-  unsigned __int64 Rip;
-};
-
 /* 4132 */
 struct _IMAGE_OPTIONAL_HEADER
 {
@@ -44808,17 +44736,6 @@ struct _RTLP_HP_QUEUE_LOCK_HANDLE
   unsigned __int64 Reserved1;
   unsigned __int64 LockPtr;
   unsigned __int64 HandleData;
-};
-
-/* 4193 */
-struct _HV_INPUT_START_VIRTUAL_PROCESSOR
-{
-  unsigned __int64 PartitionId;
-  unsigned int VpIndex;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 ReservedZ0;
-  unsigned __int16 ReservedZ1;
-  _HV_INITIAL_VP_CONTEXT VpContext;
 };
 
 /* 4197 */
@@ -48378,13 +48295,6 @@ struct _ENCLAVE_VBS_BASIC_KEY_REQUEST
   unsigned int CurrentSystemKeyID;
 };
 
-/* 4558 */
-struct _HV_OUTPUT_COLLECT_LIVE_DUMP
-{
-  unsigned __int64 PagesCopied;
-  unsigned __int64 DepositedPages;
-};
-
 /* 4559 */
 struct _HV_INPUT_COMPLETE_INTERCEPT
 {
@@ -48648,30 +48558,6 @@ struct _HAL_CHANNEL_MEMORY_RANGES
   unsigned __int8 DeepPowerState;
 };
 
-/* 4586 */
-struct $C2DEDE268A55AE19A9129802947E1E43
-{
-  unsigned __int64 Deposited : 1;
-  unsigned __int64 Minimal : 1;
-  unsigned __int64 Hardware : 1;
-  unsigned __int64 RsvdZ : 61;
-};
-
-/* 4587 */
-union _HV_SPA_PAGE_LIST_FLAGS
-{
-  unsigned __int64 AsUINT64;
-  $C2DEDE268A55AE19A9129802947E1E43 __s1;
-};
-
-/* 4588 */
-struct _HV_INPUT_GET_SPA_PAGE_LIST
-{
-  unsigned __int64 StartPage;
-  unsigned __int64 EndPage;
-  _HV_SPA_PAGE_LIST_FLAGS Flags;
-};
-
 /* 4589 */
 struct __declspec(align(8)) _RTL_RANGE
 {
@@ -48758,23 +48644,6 @@ struct __declspec(align(8)) _HV_INPUT_GET_INTERCEPT_DATA
 {
   unsigned __int64 PartitionId;
   unsigned int VpIndex;
-};
-
-/* 4606 */
-struct __declspec(align(8)) _HV_PROCESSOR_CPPC_REQUEST_REGISTER
-{
-  unsigned __int64 PhysicalAddress;
-  unsigned __int64 Address;
-  unsigned __int64 Mask;
-  unsigned __int8 AccessSize;
-};
-
-/* 4607 */
-struct _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER
-{
-  _HV_DEVICE_ID PhysicalDeviceId;
-  _HV_PHYSICAL_DEVICE_PROPERTY Property;
-  unsigned int Reserved;
 };
 
 /* 4608 */
@@ -49513,32 +49382,6 @@ struct __unaligned __declspec(align(1)) _WHEA_SRAR_DETAIL_EVENT
   unsigned __int8 KernelConsumerError;
 };
 
-/* 4713 */
-union $5DD9B18BD9F58084F3A2184E3BD6ADE3
-{
-  _HV_PPM_POWER_POLICY_SETTING_ID PolicySettingId;
-};
-
-/* 4714 */
-struct $7175F5A3BB6D3CD366109F1FEEB8052F
-{
-  unsigned int LpIndex;
-};
-
-/* 4715 */
-union $2A77C18AF9320E4496BD2BD922E7D61C
-{
-  $5DD9B18BD9F58084F3A2184E3BD6ADE3 Global;
-  $7175F5A3BB6D3CD366109F1FEEB8052F Processor;
-};
-
-/* 4716 */
-struct _HV_INPUT_GET_POWER_PROPERTY
-{
-  _HV_POWER_PROPERTY_TYPE Type;
-  $2A77C18AF9320E4496BD2BD922E7D61C ___u1;
-};
-
 /* 4717 */
 struct _ASYNC_DUPLICATE_EXTENTS_STATUS
 {
@@ -49795,12 +49638,6 @@ struct _KENLISTMENT_HISTORY
 {
   unsigned int Notification;
   _KENLISTMENT_STATE NewState;
-};
-
-/* 4755 */
-struct _HV_INPUT_SCRUB_PARTITION
-{
-  unsigned __int64 PartitionId;
 };
 
 /* 4756 */
@@ -51568,67 +51405,6 @@ union _WHEA_ARM_CACHE_ERROR_VALID_BITS
   unsigned __int16 AsUSHORT;
 };
 
-/* 4948 */
-struct $3BF51BF07D970A7AD3F227DC952BC96F
-{
-  unsigned __int64 ReservedZ : 52;
-};
-
-/* 4949 */
-struct $D8ED04AA15CA5EE4387A029BCB42E4BE
-{
-  unsigned __int16 Port;
-  unsigned __int16 ReservedZ1;
-  unsigned __int32 ReservedZ2 : 20;
-};
-
-/* 4950 */
-struct $CCBD12C915509F5FCC777673CF5E3E97
-{
-  unsigned int Hints;
-  unsigned __int32 BreakOnMaskedInterrupt : 1;
-  unsigned __int32 ReservedZ : 19;
-};
-
-/* 4951 */
-struct $AF58724678BBC8374F744989A4080C65
-{
-  unsigned int PowerState;
-  unsigned int Reserved;
-};
-
-/* 4952 */
-struct $7F4CED1B7939382884282FA80C1C523B
-{
-  unsigned __int64 TypeSpecific : 52;
-  unsigned __int64 ChangeType : 4;
-  unsigned __int64 CheckBM_STS : 1;
-  unsigned __int64 SetBM_RST : 1;
-  unsigned __int64 ClearBM_RST : 1;
-  unsigned __int64 SetARB_DIS : 1;
-  unsigned __int64 ReservedZ : 4;
-};
-
-/* 4953 */
-union _HV_PPM_IDLE_STATE_CONFIG
-{
-  unsigned __int64 AsUINT64;
-  $7F4CED1B7939382884282FA80C1C523B __s1;
-  $3BF51BF07D970A7AD3F227DC952BC96F Hlt;
-  $D8ED04AA15CA5EE4387A029BCB42E4BE Io;
-  $CCBD12C915509F5FCC777673CF5E3E97 Mwait;
-  $AF58724678BBC8374F744989A4080C65 Psci;
-};
-
-/* 4954 */
-struct __declspec(align(8)) _HV_PPM_IDLE_STATE
-{
-  _HV_PPM_IDLE_STATE_CONFIG Config;
-  unsigned int Type;
-  unsigned int HardwareLatency;
-  unsigned int PowerConsumption;
-};
-
 /* 4955 */
 struct $310AF36CCEB6430C6442DA481D97D0C0
 {
@@ -52153,14 +51929,6 @@ struct _SYSTEM_PROCESSOR_IDLE_INFORMATION
   unsigned int C2Transitions;
   unsigned int C3Transitions;
   unsigned int Padding;
-};
-
-/* 5013 */
-struct _HV_INPUT_DELETE_DEVICE_PR_QUEUE
-{
-  unsigned __int64 PartitionId;
-  unsigned int QueueId;
-  unsigned int Reserved;
 };
 
 /* 5014 */
@@ -53494,21 +53262,6 @@ struct _GIC_REDISTRIBUTOR
   unsigned int DiscoveryRangeLength;
 };
 
-/* 5173 */
-struct $141587A1BF54C8542EA3A154C7FD7C9B
-{
-  unsigned __int64 VirtualFunction : 1;
-  unsigned __int64 PhysicalFunctionRid : 16;
-  unsigned __int64 Reserved : 47;
-};
-
-/* 5174 */
-union _HV_PHYSICAL_DEVICE_FLAGS
-{
-  unsigned __int64 AsUINT64;
-  $141587A1BF54C8542EA3A154C7FD7C9B __s1;
-};
-
 /* 5175 */
 struct _IA64_KNONVOLATILE_CONTEXT_POINTERS
 {
@@ -53822,14 +53575,6 @@ struct _WHEA_ARM_AARCH64_EL2_CSR
 struct _TOKEN_LINKED_TOKEN
 {
   void *LinkedToken;
-};
-
-/* 5203 */
-struct _HV_INPUT_DELETE_PASID_SPACE
-{
-  unsigned __int64 PartitionId;
-  unsigned int PasidSpaceId;
-  unsigned int Reserved;
 };
 
 /* 5204 */
@@ -58584,31 +58329,6 @@ union _HV_GVA_RANGE_SIMPLE
   $25D440EDD0315888F0B51F4CF05601CA __s1;
 };
 
-/* 5734 */
-struct $5F1F719EEB124085CCB1937C2839FB20
-{
-  unsigned __int64 AdditionalPages : 11;
-  unsigned __int64 LargePage : 1;
-  unsigned __int64 GvaPageNumber : 52;
-};
-
-/* 5735 */
-struct $FFDCEF264585998FB8853663CE595314
-{
-  unsigned __int64 : 12;
-  unsigned __int64 PageSize : 1;
-  unsigned __int64 Reserved : 8;
-  unsigned __int64 GvaLargePageNumber : 43;
-};
-
-/* 5736 */
-union _HV_GVA_RANGE_EXTENDED
-{
-  unsigned __int64 AsUINT64;
-  $5F1F719EEB124085CCB1937C2839FB20 __s1;
-  $FFDCEF264585998FB8853663CE595314 __s2;
-};
-
 /* 5737 */
 union _HV_GVA_RANGE
 {
@@ -59459,100 +59179,6 @@ struct _PROCESS_FAULT_INFORMATION
 {
   unsigned int FaultFlags;
   unsigned int AdditionalInfo;
-};
-
-/* 5827 */
-struct _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY
-{
-  unsigned int StateCount;
-  _HV_PPM_IDLE_STATE States[16];
-};
-
-/* 5828 */
-struct __declspec(align(8)) _HV_PPM_FEEDBACK_REGISTER_PAIR
-{
-  _HV_PPM_PERF_STATE_REGISTER ReferenceCount;
-  _HV_PPM_PERF_STATE_REGISTER ActualCount;
-  unsigned __int8 ResetRegisters;
-};
-
-/* 5829 */
-struct _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG
-{
-  unsigned int Count;
-  _HV_PPM_FEEDBACK_REGISTER_PAIR FeedbackCounters[4];
-};
-
-/* 5830 */
-struct $099DE00852DDDB25B9F3ADDB7201B967
-{
-  unsigned int Value;
-};
-
-/* 5831 */
-struct $4830772E2C22628E264B1A6B5630F19D
-{
-  unsigned int Reference;
-  unsigned int Actual;
-};
-
-/* 5832 */
-struct _HV_POWER_STATS_OFFSETS
-{
-  unsigned int GlobalTime;
-  unsigned int TotalRunTime;
-  unsigned int IdleSequenceNumber;
-  unsigned int GlobalTscCount;
-  unsigned int ActiveTscCount;
-  unsigned int IdleAccumulation;
-  $4830772E2C22628E264B1A6B5630F19D CycleCount[2];
-  unsigned int CounterRefreshSequenceNumber;
-  unsigned int CounterRefreshReferenceTime;
-  unsigned int IdleAccumulationSnapshot;
-  unsigned int ActiveTscCountSnapshot;
-};
-
-/* 5833 */
-struct __unaligned __declspec(align(4)) $826540024E9359EF8CA47A3B2515EF1A
-{
-  _HV_PPM_IDLE_STATE_CONFIG Config;
-  unsigned int Type;
-  unsigned int HardwareLatency;
-  unsigned int PowerConsumption;
-};
-
-/* 5834 */
-union $6D0DBE63680474E5BCF9A153F8240061
-{
-  _HV_PPM_IDLE_STATE LegacyHvIdleState;
-  $826540024E9359EF8CA47A3B2515EF1A __s1;
-};
-
-/* 5835 */
-struct __declspec(align(8)) _HV_PPM_IDLE_STATE_EX
-{
-  $6D0DBE63680474E5BCF9A153F8240061 ___u0;
-  unsigned int MinimumResidency;
-};
-
-/* 5836 */
-struct _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX
-{
-  unsigned int Version;
-  unsigned int StateCount;
-  _HV_PPM_IDLE_STATE_EX States[16];
-};
-
-/* 5837 */
-union _HV_OUTPUT_GET_POWER_PROPERTY
-{
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
-  unsigned int PercentFrequency;
-  unsigned int NextPlatformStateIndex;
-  _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
-  $099DE00852DDDB25B9F3ADDB7201B967 Policy;
-  _HV_POWER_STATS_OFFSETS StatsOffsets;
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX IdleStateConfigEx;
 };
 
 /* 5838 */
@@ -61448,26 +61074,6 @@ struct _IO_FOEXT_SHADOW_FILE
   void *BackingFltInstance;
 };
 
-/* 6019 */
-struct _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES
-{
-  unsigned __int32 RootSvm : 1;
-  unsigned __int32 Execute : 1;
-  unsigned __int32 Privileged : 1;
-  unsigned __int32 IovAts : 1;
-  unsigned __int32 DeviceDomains : 1;
-  unsigned __int32 S1DeviceDomains : 1;
-  unsigned __int32 RootAts : 1;
-  unsigned __int32 DomainTransitionSupported : 1;
-  unsigned __int32 La57 : 1;
-  unsigned __int32 RootPasid : 1;
-  unsigned __int32 RootDefaultDomainAts : 1;
-  unsigned __int32 Reserved0 : 21;
-  unsigned int PasidCount;
-  unsigned int RootSvmIommuIndex;
-  unsigned int Reserved1;
-};
-
 /* 6020 */
 struct _MM_DRIVER_VERIFIER_DATA
 {
@@ -61918,14 +61524,6 @@ struct _LSA_FOREST_TRUST_SCANNER_INFO
 struct _EVENT_EXTENDED_ITEM_PROCESS_START_KEY
 {
   unsigned __int64 ProcessStartKey;
-};
-
-/* 6067 */
-struct _HV_IMAGE_COVERAGE_INFO
-{
-  unsigned int HeaderSize;
-  unsigned int Size;
-  wchar_t ImageName[32];
 };
 
 /* 6068 */
@@ -66264,32 +65862,6 @@ struct _PROCESS_COMMIT_RELEASE_INFORMATION
   unsigned __int64 RepurposedMemResetSize;
 };
 
-/* 6536 */
-struct _HV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING
-{
-  unsigned __int8 FaultReportingEnabled;
-  unsigned __int8 Reserved0;
-  unsigned __int16 Reserved1;
-  unsigned int Reserved2;
-};
-
-/* 6537 */
-struct _HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE
-{
-  unsigned int BaseIrtIndex;
-  unsigned int Count;
-};
-
-/* 6538 */
-union _HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY
-{
-  _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES Capabilities;
-  _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED DmaEnabled;
-  _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED AtsEnabled;
-  _HV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING FaultReporting;
-  _HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE IrtRange;
-};
-
 /* 6539 */
 struct _SYSTEM_ACTIVITY_MODERATION_INFO
 {
@@ -70263,14 +69835,6 @@ struct __declspec(align(4)) _TXFS_GET_TRANSACTED_VERSION
   unsigned __int16 LatestMiniVersion;
 };
 
-/* 6957 */
-struct _HV_INPUT_GET_COVERAGE_VECTOR
-{
-  _HV_COVERAGE_OPERATION CoverageOp;
-  unsigned int PageCount;
-  unsigned __int64 GpaPageNumbers[128];
-};
-
 /* 6958 */
 struct _COPY_INFORMATION
 {
@@ -71909,15 +71473,6 @@ struct _FILE_PROVIDER_EXTERNAL_INFO_V0
   unsigned int Algorithm;
 };
 
-/* 7127 */
-struct _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY
-{
-  _HV_DEVICE_ID PhysicalDeviceId;
-  _HV_PHYSICAL_DEVICE_FLAGS Flags;
-  _HV_PHYSICAL_DEVICE_PROPERTY Property;
-  unsigned int Reserved;
-};
-
 /* 7128 */
 struct _VM_COUNTERS_EX
 {
@@ -72358,44 +71913,6 @@ struct _TRANSACTION_NOTIFICATION_RECOVERY_ARGUMENT
 {
   _GUID EnlistmentId;
   _GUID UOW;
-};
-
-/* 7171 */
-struct $4F25DB81483CB6DA906F3348C99EC014
-{
-  unsigned int Pasid;
-  unsigned int PasidSpaceId;
-};
-
-/* 7172 */
-union _HV_FULL_PASID
-{
-  $4F25DB81483CB6DA906F3348C99EC014 __s0;
-  unsigned __int64 AsUINT64;
-};
-
-/* 7173 */
-struct $E8ABFDBC44FDE7FEF4951FBCD68BB169
-{
-  unsigned __int64 Present : 1;
-  unsigned __int64 Supervisor : 1;
-  unsigned __int64 Reserved : 10;
-  unsigned __int64 PageTableRootPfn : 52;
-};
-
-/* 7174 */
-union _HV_DEVICE_ADDRESS_SPACE
-{
-  $E8ABFDBC44FDE7FEF4951FBCD68BB169 __s0;
-  unsigned __int64 AsUINT64;
-};
-
-/* 7175 */
-struct _HV_INPUT_SET_PASID_ADDRESS_SPACE
-{
-  unsigned __int64 PartitionId;
-  _HV_FULL_PASID FullPasid;
-  _HV_DEVICE_ADDRESS_SPACE AddressSpace;
 };
 
 /* 7176 */
@@ -73562,17 +73079,6 @@ struct _REENUMERATE_SELF_INTERFACE_STANDARD
 struct _PREFETCH_ALTERNATE_PARAM_INFO
 {
   unsigned int Parameter;
-};
-
-/* 7295 */
-struct _HV_INPUT_CREATE_PASID_SPACE
-{
-  unsigned __int64 PartitionId;
-  unsigned int PasidSpaceId;
-  unsigned int PasidCount;
-  unsigned __int64 Pat;
-  unsigned int Flags;
-  unsigned int Reserved;
 };
 
 /* 7296 */
@@ -76023,15 +75529,6 @@ struct _VBS_BASIC_ENCLAVE_EXCEPTION_AMD64
   unsigned __int64 ExceptionRIP;
   unsigned __int64 ExceptionRFLAGS;
   unsigned __int64 ExceptionRSP;
-};
-
-/* 7501 */
-struct _HV_INPUT_ENABLE_PASID
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 LogicalDeviceId;
-  unsigned int Pasid;
-  unsigned int Reserved;
 };
 
 /* 7502 */
@@ -79208,19 +78705,6 @@ struct _ETW_AUTOBOOST_CLEAR_PRIORITY_FLOOR_EVENT
   unsigned int BoostBitmap;
 };
 
-/* 7836 */
-struct _HV_INPUT_CREATE_DEVICE_PR_QUEUE
-{
-  unsigned __int64 PartitionId;
-  unsigned int QueueId;
-  unsigned int Size;
-  unsigned __int64 BaseGpaPage;
-  unsigned int InterruptVector;
-  unsigned int InterruptVpIndex;
-  unsigned int Flags;
-  unsigned int Reserved;
-};
-
 /* 7837 */
 struct _MAC_ADDR_DEVICE_PATH
 {
@@ -79478,13 +78962,6 @@ struct _ETW_PMC_COUNTER_OWNERSHIP_STATUS
   unsigned int ProcessorNumber;
   unsigned int NumberOfCounters;
   _ETW_PMC_COUNTER_OWNER CounterOwners[1];
-};
-
-/* 7867 */
-struct _HV_INPUT_DETACH_PASID_SPACE
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 LogicalDeviceId;
 };
 
 /* 7868 */
@@ -82486,27 +81963,6 @@ struct __unaligned __declspec(align(2)) _WHEA_ARM_MISC_CSR
   unsigned __int64 Value;
 };
 
-/* 8136 */
-struct $12B1AA28320BEE2946124956E0484EC6
-{
-  unsigned __int64 LongMode : 1;
-};
-
-/* 8137 */
-union $F92C1B92646BF5D2E1F9E97D822DCBA6
-{
-  unsigned __int64 AsUINT64;
-  $12B1AA28320BEE2946124956E0484EC6 __s1;
-};
-
-/* 8138 */
-struct _HV_X64_INPUT_DISABLE_HYPERVISOR_EX
-{
-  unsigned __int64 Rip;
-  $F92C1B92646BF5D2E1F9E97D822DCBA6 Flags;
-  unsigned __int64 Arg;
-};
-
 /* 8139 */
 struct $E1F76BD6070F30024AD71EC1D3E97394
 {
@@ -83703,12 +83159,6 @@ struct __declspec(align(8)) _TP_CALLBACK_ENVIRON_V3
   unsigned int Size;
 };
 
-/* 8256 */
-struct _HV_OUTPUT_GET_COVERAGE_VECTOR
-{
-  _HV_IMAGE_COVERAGE_INFO CoverageInfo;
-};
-
 /* 8257 */
 struct _HV_INPUT_RESERVE_DEVICE_DOMAIN_ATTACHMENT
 {
@@ -84499,15 +83949,6 @@ struct __declspec(align(8)) _PLUGPLAY_CONTROL_STATUS_DATA
   int ProblemStatus;
 };
 
-/* 8345 */
-struct _HV_INPUT_ATTACH_PASID_SPACE
-{
-  unsigned __int64 PartitionId;
-  unsigned __int64 LogicalDeviceId;
-  unsigned int PasidSpaceId;
-  unsigned int Reserved;
-};
-
 /* 8346 */
 struct _FSCTL_QUERY_VOLUME_NUMA_INFO_OUTPUT
 {
@@ -85112,14 +84553,6 @@ struct _I2O_DEVICE_PATH
 {
   _EFI_DEVICE_PATH Header;
   unsigned int Tid;
-};
-
-/* 8416 */
-struct _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE
-{
-  _HV_FULL_PASID FullPasid;
-  unsigned int Flags;
-  unsigned int Reserved;
 };
 
 /* 8417 */
@@ -85981,52 +85414,6 @@ struct _BDCB_IMAGE_INFORMATION
   unsigned int ThumbprintHashAlgorithm;
   unsigned int ImageHashLength;
   unsigned int CertificateThumbprintLength;
-};
-
-/* 8487 */
-union $6FA9C8910523B6A278F66008C288F6F2
-{
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY IdleStateConfig;
-  _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX IdleStateConfigEx;
-  unsigned int PercentFrequency;
-  _HV_PLATFORM_STATE_INDEX NextPlatformStateIndex;
-  _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG FeedbackCounterConfig;
-  unsigned __int64 CppcRequestValue;
-  _HV_PROCESSOR_CPPC_REQUEST_REGISTER CppcRequestRegister;
-};
-
-/* 8488 */
-struct $024AE899CEB99130A246315017E046E3
-{
-  unsigned int LpIndex;
-  $6FA9C8910523B6A278F66008C288F6F2 ___u1;
-};
-
-/* 8489 */
-struct _HV_PPM_POWER_POLICY_SETTING
-{
-  _HV_PPM_POWER_POLICY_SETTING_ID SettingId;
-  unsigned int Value;
-};
-
-/* 8490 */
-union $0DE646A80BECB070E6CD69EEE280C598
-{
-  _HV_PPM_POWER_POLICY_SETTING Policy;
-};
-
-/* 8491 */
-union $9AF8786668A9738138A44482F945E206
-{
-  $024AE899CEB99130A246315017E046E3 Processor;
-  $0DE646A80BECB070E6CD69EEE280C598 Global;
-};
-
-/* 8492 */
-struct _HV_INPUT_SET_POWER_PROPERTY
-{
-  _HV_POWER_PROPERTY_TYPE Type;
-  $9AF8786668A9738138A44482F945E206 ___u1;
 };
 
 /* 8493 */
@@ -91074,13 +90461,6 @@ struct __declspec(align(8)) _FILE_ID_EXTD_DIR_INFORMATION
   wchar_t FileName[1];
 };
 
-/* 8997 */
-struct _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER
-{
-  unsigned int QueueId;
-  _HV_DEVICE_PRQ_PROPERTY Property;
-};
-
 /* 8998 */
 struct _WHEA_REGNOTIFY_POLICY_CHANGE_EVENT
 {
@@ -91212,15 +90592,6 @@ struct _WMI_PROCESS_INFORMATION
   unsigned __int64 DirectoryTableBase;
   unsigned int Flags;
   unsigned int Sid;
-};
-
-/* 9013 */
-struct _HV_INPUT_FLUSH_PASID_ADDRESS_LIST
-{
-  _HV_FULL_PASID FullPasid;
-  unsigned int Flags;
-  unsigned int Reserved;
-  _HV_GVA_RANGE_EXTENDED VaList[];
 };
 
 /* 9014 */
@@ -91962,17 +91333,6 @@ union _HV_REENLIGHTENMENT_CONTROL
   $7D0238F22EA8DE0D4CF52ECB1D7674F4 __s1;
 };
 
-/* 9098 */
-struct _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID
-{
-  unsigned __int64 PartitionId;
-  unsigned __int8 TargetVtl;
-  unsigned __int8 ReservedZ0;
-  unsigned __int16 ReservedZ1;
-  unsigned int ReservedZ2;
-  unsigned __int64 ProcHwIds[];
-};
-
 /* 9100 */
 struct __unaligned __declspec(align(1)) _WATCHDOG_TIMER_RESOURCE_TABLE
 {
@@ -92612,15 +91972,6 @@ struct _PCI_EXPRESS_PASID_CAPABILITY
   _PCI_EXPRESS_ENHANCED_CAPABILITY_HEADER Header;
   _PCI_EXPRESS_PASID_CAPABILITY_REGISTER Capability;
   _PCI_EXPRESS_PASID_CONTROL_REGISTER Control;
-};
-
-/* 9171 */
-struct _HV_INPUT_MODIFY_SPARSE_GPA_PAGES
-{
-  unsigned __int64 TargetPartitionId;
-  unsigned int MapFlags;
-  unsigned int Rsvdz;
-  unsigned __int64 GpaPageList[];
 };
 
 /* 9172 */
@@ -97890,9 +97241,6 @@ typedef _CLFS_LOG_NAME_INFORMATION *PCLFS_LOG_NAME_INFORMATION;
 /* 9726 */
 typedef _IO_STEER_INTERRUPT_CONNECTION_TYPE IO_STEER_INTERRUPT_CONNECTION_TYPE;
 
-/* 9727 */
-typedef _HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY;
-
 /* 9728 */
 typedef _LSA_REGISTRATION_INFO *PLSA_REGISTRATION_INFO;
 
@@ -98352,9 +97700,6 @@ typedef _OSVERSIONINFOW *POSVERSIONINFOW;
 /* 9888 */
 typedef _EX_GEN_RANDOM_DOMAIN EX_GEN_RANDOM_DOMAIN;
 
-/* 9889 */
-typedef _HV_INPUT_START_VIRTUAL_PROCESSOR *PHV_INPUT_START_VIRTUAL_PROCESSOR;
-
 /* 9890 */
 typedef _SYSTEM_FEATURE_CONFIGURATION_SECTIONS_INFORMATION_ENTRY SYSTEM_FEATURE_CONFIGURATION_SECTIONS_INFORMATION_ENTRY;
 
@@ -98694,14 +98039,8 @@ typedef int __fastcall GET_VIRTUAL_DEVICE_LOCATION(void *, unsigned __int16, uns
 /* 10003 */
 typedef _EVENT_TRACE_LBR_CONFIGURATION_INFORMATION *PEVENT_TRACE_LBR_CONFIGURATION_INFORMATION;
 
-/* 10004 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING *PHV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING;
-
 /* 10005 */
 typedef _MOVE_FILE_DATA32 MOVE_FILE_DATA32;
-
-/* 10006 */
-typedef _HV_INITIAL_VP_CONTEXT *PHV_INITIAL_VP_CONTEXT;
 
 /* 10007 */
 typedef _CENTRAL_ACCESS_POLICY_ENTRY CENTRAL_ACCESS_POLICY_ENTRY;
@@ -98918,9 +98257,6 @@ typedef _PSW32JOBCALLOUTTYPE PSW32JOBCALLOUTTYPE;
 
 /* 10079 */
 typedef _REARRANGE_FILE_DATA32 *PREARRANGE_FILE_DATA32;
-
-/* 10080 */
-typedef _HV_INPUT_DELETE_DEVICE_PR_QUEUE HV_INPUT_DELETE_DEVICE_PR_QUEUE;
 
 /* 10081 */
 typedef _SYSTEM_POOLTAG SYSTEM_POOLTAG;
@@ -99474,9 +98810,6 @@ typedef int (__fastcall *PHAL_UNMAP_DEVICE_LOGICAL_RANGE)(_HAL_HV_DMA_DOMAIN_INF
 /* 10276 */
 typedef _RTL_HP_HEAP_VA_CALLBACKS_ENCODED_ENTRY RTL_HP_HEAP_VA_CALLBACKS_ENCODED_ENTRY;
 
-/* 10277 */
-typedef _HV_INPUT_DETACH_PASID_SPACE *PHV_INPUT_DETACH_PASID_SPACE;
-
 /* 10278 */
 typedef _SYSTEM_FEATURE_CONFIGURATION_UPDATE SYSTEM_FEATURE_CONFIGURATION_UPDATE;
 
@@ -99738,9 +99071,6 @@ typedef _PPM_IDLE_SYNCHRONIZATION_STATE *PPPM_IDLE_SYNCHRONIZATION_STATE;
 /* 10368 */
 typedef _SYSTEM_CODEINTEGRITY_INFORMATION SYSTEM_CODEINTEGRITY_INFORMATION;
 
-/* 10369 */
-typedef _HV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY *PHV_OUTPUT_GET_PHYSICAL_DEVICE_PROPERTY;
-
 /* 10370 */
 typedef _KSCHEDULER_SYSTEM_SUBNODE_ENUMERATION_CONTEXT KSCHEDULER_SYSTEM_SUBNODE_ENUMERATION_CONTEXT;
 
@@ -99806,9 +99136,6 @@ typedef _WOF_VERSION_INFO WOF_VERSION_INFO;
 
 /* 10392 */
 typedef struct _EXP_LICENSE_STATE *PEXP_LICENSE_STATE;
-
-/* 10393 */
-typedef _HV_INPUT_ENABLE_PASID *PHV_INPUT_ENABLE_PASID;
 
 /* 10394 */
 typedef _NEGOTIATE_PACKAGE_PREFIXES NEGOTIATE_PACKAGE_PREFIXES;
@@ -100290,9 +99617,6 @@ typedef _KE_USER_CET_CP_STATE *PKE_USER_CET_CP_STATE;
 /* 10558 */
 typedef _IO_COMPLETION_RESERVE *PIO_COMPLETION_RESERVE;
 
-/* 10559 */
-typedef _HV_PHYSICAL_DEVICE_FLAGS HV_PHYSICAL_DEVICE_FLAGS;
-
 /* 10560 */
 typedef _HV_OUTPUT_GET_CPU_GROUP_AFFINITY HV_OUTPUT_GET_CPU_GROUP_AFFINITY;
 
@@ -100371,9 +99695,6 @@ typedef _PROCLOCALAPIC *PPROCLOCALAPIC;
 /* 10585 */
 typedef _MM_PAGE_ACCESS_TYPE MM_PAGE_ACCESS_TYPE;
 
-/* 10586 */
-typedef _HV_SYNMC_ARM64_EVENT HV_SYNMC_EVENT;
-
 /* 10587 */
 typedef _CM_PERF_COUNTERS CM_PERF_COUNTERS;
 
@@ -100430,9 +99751,6 @@ typedef _WHEA_GENERIC_ERROR_DESCRIPTOR_V2 *PWHEA_GENERIC_ERROR_DESCRIPTOR_V2;
 
 /* 10607 */
 typedef _REFS_SET_VOLUME_IO_METRICS_INFO_INPUT_BUFFER *PREFS_SET_VOLUME_IO_METRICS_INFO_INPUT_BUFFER;
-
-/* 10608 */
-typedef _HV_INPUT_ATTACH_PASID_SPACE HV_INPUT_ATTACH_PASID_SPACE;
 
 /* 10609 */
 typedef unsigned __int8 (__fastcall *pHalClearLastBranchRecordStack)();
@@ -100628,9 +99946,6 @@ typedef _LARGE_INTEGER (__fastcall *PMAP_TRANSFER)(_DMA_ADAPTER *, _MDL *, void 
 
 /* 10675 */
 typedef _PCI_EXPRESS_VIRTUAL_CHANNEL_CAPABILITY PCI_EXPRESS_VIRTUAL_CHANNEL_CAPABILITY;
-
-/* 10677 */
-typedef _HV_POWER_STATS_OFFSETS *PHV_POWER_STATS_OFFSETS;
 
 /* 10678 */
 typedef _IMAGE_OS2_HEADER *PUIMAGE_OS2_HEADER;
@@ -101232,9 +100547,6 @@ typedef _EFI_DRIVER_ENTRY *PEFI_DRIVER_ENTRY;
 /* 10881 */
 typedef _ENERGY_STATE_DURATION ENERGY_STATE_DURATION;
 
-/* 10882 */
-typedef _HV_POWER_STATS_OFFSETS HV_POWER_STATS_OFFSETS;
-
 /* 10883 */
 typedef _BOOT_ENTROPY_LDR_RESULT BOOT_ENTROPY_LDR_RESULT;
 
@@ -101366,9 +100678,6 @@ typedef _EX_PUSH_LOCK_AUTO_EXPAND *PEX_PUSH_LOCK_AUTO_EXPAND;
 
 /* 10928 */
 typedef int (__fastcall *PHAL_LP_WRITE_MULTIPLE_MSR)(unsigned int, unsigned int, unsigned int *, unsigned __int64 *);
-
-/* 10929 */
-typedef _HV_INPUT_ATTACH_PASID_SPACE *PHV_INPUT_ATTACH_PASID_SPACE;
 
 /* 10930 */
 typedef int __fastcall KD_WRITE_FILE_CALLBACK(void *, unsigned __int64, void *, unsigned int);
@@ -102501,9 +101810,6 @@ typedef _HV_SNP_PSP_DEVICES HV_SNP_PSP_DEVICES;
 /* 11324 */
 typedef _OSVERSIONINFOEX3A *POSVERSIONINFOEX3A;
 
-/* 11325 */
-typedef _HV_INPUT_DISABLE_PASID HV_INPUT_DISABLE_PASID;
-
 /* 11327 */
 typedef _SKPG_PAGE_WALK_STATE *PSKPG_PAGE_WALK_STATE;
 
@@ -102918,9 +102224,6 @@ typedef _IMAGE_HOT_PATCH_BASE *PIMAGE_HOT_PATCH_BASE;
 /* 11472 */
 typedef int (__fastcall *PPPM_PARK_CLEAR_FORCED_MASK)(unsigned __int16 *);
 
-/* 11473 */
-typedef _HV_INPUT_SET_PASID_ADDRESS_SPACE *PHV_INPUT_SET_PASID_ADDRESS_SPACE;
-
 /* 11474 */
 typedef _IRP *(__fastcall *PIO_CSQ_PEEK_NEXT_IRP)(_IO_CSQ *, _IRP *, void *);
 
@@ -102944,9 +102247,6 @@ typedef _LSA_FOREST_TRUST_INFORMATION *PLSA_FOREST_TRUST_INFORMATION;
 
 /* 11481 */
 typedef _STREAMS_ASSOCIATE_ID_INPUT_BUFFER *PSTREAMS_ASSOCIATE_ID_INPUT_BUFFER;
-
-/* 11482 */
-typedef _HV_PROCESSOR_CPPC_REQUEST_REGISTER *PHV_PROCESSOR_CPPC_REQUEST_REGISTER;
 
 /* 11483 */
 typedef _EXT_SET_PARAMETERS_V0 *PKT2_SET_PARAMETERS;
@@ -103004,9 +102304,6 @@ typedef unsigned int CLFS_CONTAINER_ID;
 
 /* 11501 */
 typedef _RTL_CRITICAL_SECTION32 *PRTL_CRITICAL_SECTION32;
-
-/* 11502 */
-typedef _HV_INPUT_SCRUB_PARTITION HV_INPUT_SCRUB_PARTITION;
 
 /* 11503 */
 typedef _HV_NESTED_STATE_REGISTER *PHV_NESTED_STATE_REGISTER;
@@ -103224,9 +102521,6 @@ typedef _READCONTROLSPACE64 *PREADCONTROLSPACE64;
 /* 11578 */
 typedef _DBGKD_WAIT_STATE_CHANGE64 DBGKD_WAIT_STATE_CHANGE64;
 
-/* 11579 */
-typedef _HV_INPUT_SCRUB_PARTITION *PHV_INPUT_SCRUB_PARTITION;
-
 /* 11580 */
 typedef const _TRUSTLET_COLLABORATION_ID *PCTRUSTLET_COLLABORATION_ID;
 
@@ -103265,9 +102559,6 @@ typedef unsigned __int64 SIZE_T64;
 
 /* 11593 */
 typedef _ETW_DEBUG_PRINT_EVENT ETW_DEBUG_PRINT_EVENT;
-
-/* 11594 */
-typedef unsigned __int64 *PHV_LOGICAL_DEVICE_ID;
 
 /* 11595 */
 typedef _VIRTUALIZATION_RECORD *PVIRTUALIZATION_RECORD;
@@ -103691,9 +102982,6 @@ typedef void __fastcall RTL_XPRESS_CALLBACK_FUNCTION(void *);
 
 /* 11742 */
 typedef _FILE_FS_VOLUME_FLAGS_INFORMATION FILE_FS_VOLUME_FLAGS_INFORMATION;
-
-/* 11743 */
-typedef _HV_PROCESSOR_CPPC_REQUEST_REGISTER HV_PROCESSOR_CPPC_REQUEST_REGISTER;
 
 /* 11744 */
 typedef int (__fastcall *PIO_CONTAINER_NOTIFICATION_FUNCTION)();
@@ -104369,9 +103657,6 @@ typedef _KQOS_GROUPING_SETS *PKQOS_GROUPING_SETS;
 
 /* 11978 */
 typedef _WHEAP_ROW_FAILURE_EVENT WHEAP_ROW_FAILURE_EVENT;
-
-/* 11979 */
-typedef _HV_INPUT_GET_COVERAGE_VECTOR *PHV_INPUT_GET_COVERAGE_VECTOR;
 
 /* 11980 */
 typedef _KI_IDEAL_PROCESSOR_ASSIGNMENT_BLOCK *PKI_IDEAL_PROCESSOR_ASSIGNMENT_BLOCK;
@@ -105158,9 +104443,6 @@ typedef _DBGKD_RELEASE_BREAKPOINT DBGKD_RELEASE_BREAKPOINT;
 
 /* 12252 */
 typedef _HV_INPUT_GET_PARTITION_RESERVED_PAGES *PHV_INPUT_GET_PARTITION_RESERVED_PAGES;
-
-/* 12253 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY *PHV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY;
 
 /* 12254 */
 typedef _EX_FAST_REF EX_FAST_REF;
@@ -105974,9 +105256,6 @@ typedef _CSV_QUERY_FILE_REVISION *PCSV_QUERY_FILE_REVISION;
 
 /* 12535 */
 typedef _HEAP_EXTENDED_INFORMATION HEAP_EXTENDED_INFORMATION;
-
-/* 12536 */
-typedef _HV_OUTPUT_GET_POWER_PROPERTY *PHV_OUTPUT_GET_POWER_PROPERTY;
 
 /* 12537 */
 typedef void *(__fastcall *PRTL_SPARSE_BITMAP_ALLOCATE_ROUTINE)(unsigned __int64);
@@ -106835,9 +106114,6 @@ typedef int (__fastcall *PHAL_ATTACH_DEVICE_DOMAIN)(unsigned __int64, _HAL_HV_DM
 
 /* 12832 */
 typedef _FILE_DIRECTORY_INFORMATION FILE_DIRECTORY_INFORMATION;
-
-/* 12833 */
-typedef _HV_INPUT_SET_POWER_PROPERTY HV_INPUT_SET_POWER_PROPERTY;
 
 /* 12834 */
 typedef _SYSTEM_RESOURCE_ATTRIBUTE_ACE *PSYSTEM_RESOURCE_ATTRIBUTE_ACE;
@@ -108120,9 +107396,6 @@ typedef _SYSTEM_VDM_INSTEMUL_INFO *PSYSTEM_VDM_INSTEMUL_INFO;
 /* 13281 */
 typedef _SECURITY_DESCRIPTOR_RELATIVE SECURITY_DESCRIPTOR_RELATIVE;
 
-/* 13282 */
-typedef _HV_X64_INPUT_DISABLE_HYPERVISOR_EX *PHV_X64_INPUT_DISABLE_HYPERVISOR_EX;
-
 /* 13283 */
 typedef unsigned __int64 WPARAM;
 
@@ -108587,9 +107860,6 @@ typedef _HAL_ERROR_INFO HAL_ERROR_INFO;
 
 /* 13443 */
 typedef _KSR_VSM_NK_INIT_CONTEXT *PKSR_VSM_NK_INIT_CONTEXT;
-
-/* 13444 */
-typedef _HV_PHYSICAL_DEVICE_FLAGS *PHV_PHYSICAL_DEVICE_FLAGS;
 
 /* 13445 */
 typedef _PPM_CONCURRENCY_ACCOUNTING PPM_CONCURRENCY_ACCOUNTING;
@@ -109260,9 +108530,6 @@ typedef int __fastcall IOMMU_SET_DEVICE_FAULT_REPORTING(_DEVICE_OBJECT *, unsign
 /* 13670 */
 typedef _PCI_EXPRESS_DVSEC_ALTERNATE_FUNCTION *PPCI_EXPRESS_DVSEC_ALTERNATE_FUNCTION;
 
-/* 13671 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX;
-
 /* 13672 */
 typedef _HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES;
 
@@ -109328,9 +108595,6 @@ typedef _SKP_SYSTEM_DLL SKP_SYSTEM_DLL;
 
 /* 13696 */
 typedef _VRF_TRIAGE_CONTEXT VRF_TRIAGE_CONTEXT;
-
-/* 13697 */
-typedef _HV_PPM_FEEDBACK_REGISTER_PAIR *PHV_PPM_FEEDBACK_REGISTER_PAIR;
 
 /* 13698 */
 typedef _PCI_EXPRESS_DPC_RP_PIO_SEVERITY_REGISTER *PPCI_EXPRESS_DPC_RP_PIO_SEVERITY_REGISTER;
@@ -109797,9 +109061,6 @@ typedef _ENCLAVE_CREATE_INFO_VBS_BASIC *PENCLAVE_CREATE_INFO_VBS_BASIC;
 /* 13860 */
 typedef void (__fastcall *PS_APPLY_DEEP_FREEZE_OPTIMIZATIONS)(_EPROCESS *, _PS_TEST_DEEPFREEZE_OPTIMIZATIONS *);
 
-/* 13861 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE;
-
 /* 13862 */
 typedef _STRING STRING;
 
@@ -109841,9 +109102,6 @@ typedef void (__fastcall *__WIL_PSubscribeFeatureStateCacheToConfigurationChange
 
 /* 13876 */
 typedef _DBGKD_SEARCH_MEMORY *PDBGKD_SEARCH_MEMORY;
-
-/* 13877 */
-typedef _HV_GVA_RANGE_EXTENDED *PHV_GVA_RANGE_EXTENDED;
 
 /* 13878 */
 typedef int (__fastcall *PHAL_UNBLOCK_DEFAULT_DMA)();
@@ -110420,9 +109678,6 @@ typedef _HAL_PROFILE_SOURCE_INFORMATION *PHAL_PROFILE_SOURCE_INFORMATION;
 
 /* 14076 */
 typedef _RTL_IMAGE_MITIGATION_HEAP_POLICY *PRTL_IMAGE_MITIGATION_HEAP_POLICY;
-
-/* 14077 */
-typedef _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID *PHV_INPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 /* 14078 */
 typedef _OWNER_ENTRY *POWNER_ENTRY;
@@ -111705,9 +110960,6 @@ typedef int (__fastcall *PEXT_IOMMU_PREPARE_FOR_REBOOT)(_EXT_IOMMU *, unsigned _
 /* 14515 */
 typedef _PLUGPLAY_CONTROL_INSTALL_DATA PLUGPLAY_CONTROL_INSTALL_DATA;
 
-/* 14516 */
-typedef _HV_INPUT_INJECT_SYNTHETIC_MACHINE_CHECK HV_INPUT_INJECT_SYNTHETIC_MACHINE_CHECK;
-
 /* 14517 */
 typedef _HV_INSTRUCTION_EMULATION_HINTS_REGISTER *PHV_INSTRUCTION_EMULATION_HINTS_REGISTER;
 
@@ -111728,9 +110980,6 @@ typedef _SCRUB_PARITY_EXTENT_DATA *PSCRUB_PARITY_EXTENT_DATA;
 
 /* 14524 */
 typedef _SYSTEM_ERROR_PORT_TIMEOUTS SYSTEM_ERROR_PORT_TIMEOUTS;
-
-/* 14525 */
-typedef _HV_X64_INPUT_DISABLE_HYPERVISOR HV_X64_INPUT_DISABLE_HYPERVISOR;
 
 /* 14526 */
 typedef _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION *PJOBOBJECT_CPU_RATE_CONTROL_INFORMATION;
@@ -111884,9 +111133,6 @@ typedef _KSR_SECURE_CLEANUP_HEADER *PKSR_SECURE_CLEANUP_HEADER;
 
 /* 14576 */
 typedef _CENTRAL_ACCESS_POLICY_ENTRY *PCENTRAL_ACCESS_POLICY_ENTRY;
-
-/* 14577 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING HV_PHYSICAL_DEVICE_PROPERTY_FAULT_REPORTING;
 
 /* 14578 */
 typedef LIST_ENTRY64 *PLIST_ENTRY64;
@@ -112044,9 +111290,6 @@ typedef int (__fastcall *PMM_ROTATE_COPY_CALLBACK_FUNCTION)(_MDL *, _MDL *, void
 /* 14634 */
 typedef _SYSTEM_NET_RATE_CONTROL_SET_CONTEXT SYSTEM_NET_RATE_CONTROL_SET_CONTEXT;
 
-/* 14635 */
-typedef _HV_PPM_IDLE_STATE_EX *PHV_PPM_IDLE_STATE_EX;
-
 /* 14637 */
 typedef _MPAM_FUNCTIONAL_DEPENDENCY_DESCRIPTOR MPAM_FUNCTIONAL_DEPENDENCY_DESCRIPTOR;
 
@@ -112109,9 +111352,6 @@ typedef _STORAGE_RESERVE_ID STORAGE_RESERVE_ID;
 
 /* 14657 */
 typedef _GITS_CBASER_REGISTER GITS_CBASER_REGISTER;
-
-/* 14660 */
-typedef _HV_OUTPUT_COLLECT_LIVE_DUMP *PHV_OUTPUT_COLLECT_LIVE_DUMP;
 
 /* 14661 */
 typedef _KEXCEPTION_FRAME KEXCEPTION_FRAME;
@@ -112208,9 +111448,6 @@ typedef int (__fastcall *PIOMMU_DEVICE_CREATE)(_DEVICE_OBJECT *, _IOMMU_DEVICE_C
 
 /* 14693 */
 typedef _ALPC_PORT_ASSOCIATE_COMPLETION_PORT ALPC_PORT_ASSOCIATE_COMPLETION_PORT;
-
-/* 14694 */
-typedef _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER;
 
 /* 14695 */
 typedef void *EFI_EVENT;
@@ -113136,9 +112373,6 @@ typedef void (__fastcall *pHalPrepareForBugcheck)(unsigned int);
 /* 15020 */
 typedef _PROCESS_HEAP_INFORMATION PROCESS_HEAP_INFORMATION;
 
-/* 15021 */
-typedef _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY *PHV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY;
-
 /* 15022 */
 typedef _JOBOBJECT_NOTIFICATION_LIMIT_INFORMATION JOBOBJECT_NOTIFICATION_LIMIT_INFORMATION;
 
@@ -113150,9 +112384,6 @@ typedef _KHETERO_WORKLOAD_CLASS_THRESHOLDS KHETERO_WORKLOAD_CLASS_THRESHOLDS;
 
 /* 15025 */
 typedef _VF_POOL_TRACE *PVF_POOL_TRACE;
-
-/* 15026 */
-typedef unsigned __int64 HV_LOGICAL_DEVICE_ID;
 
 /* 15027 */
 typedef _IO_LIVEDUMP_CONTROL_ADDPAGES IO_LIVEDUMP_CONTROL_ADDPAGES;
@@ -113255,9 +112486,6 @@ typedef _ETW_DISKIO_READWRITE_V3 ETW_DISKIO_READWRITE_V3;
 
 /* 15060 */
 typedef _NEGOTIATE_CALLER_NAME_REQUEST *PNEGOTIATE_CALLER_NAME_REQUEST;
-
-/* 15061 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_LIST *PHV_INPUT_FLUSH_PASID_ADDRESS_LIST;
 
 /* 15062 */
 typedef _RTL_SPARSE_ARRAY *PRTL_SPARSE_ARRAY;
@@ -113913,9 +113141,6 @@ typedef _IO_ALLOCATION_ACTION *PIO_ALLOCATION_ACTION;
 /* 15291 */
 typedef _SOCDATA_SMMU_SID_TYPE *PSOCDATA_SMMU_SID_TYPE;
 
-/* 15292 */
-typedef _HV_OUTPUT_GET_COVERAGE_VECTOR *PHV_OUTPUT_GET_COVERAGE_VECTOR;
-
 /* 15293 */
 typedef _RTL_BALANCED_NODE RTL_RB_NODE;
 
@@ -114288,9 +113513,6 @@ typedef _TRUSTLET_BINDING_DATA TRUSTLET_BINDING_DATA;
 /* 15418 */
 typedef _WHEAP_DEVICE_DRV_EVENT WHEAP_DEVICE_DRV_EVENT;
 
-/* 15419 */
-typedef _HV_PPM_POWER_POLICY_SETTING *PHV_PPM_POWER_POLICY_SETTING;
-
 /* 15420 */
 typedef _TRANSACTIONMANAGER_LOGPATH_INFORMATION TRANSACTIONMANAGER_LOGPATH_INFORMATION;
 
@@ -114549,9 +113771,6 @@ typedef _DBGKD_SET_INTERNAL_BREAKPOINT64 *PDBGKD_SET_INTERNAL_BREAKPOINT64;
 /* 15507 */
 typedef _SKCALLPARAMS_INITIALIZE_PROCESS *PSKCALLPARAMS_INITIALIZE_PROCESS;
 
-/* 15508 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE HV_INPUT_FLUSH_PASID_ADDRESS_SPACE;
-
 /* 15509 */
 typedef int __fastcall PCI_SET_ATS(void *, unsigned __int8);
 
@@ -114804,9 +114023,6 @@ typedef _DBGKM_LOAD_DLL32 *PDBGKM_LOAD_DLL32;
 /* 15593 */
 typedef _FILE_STORAGE_TIER *PFILE_STORAGE_TIER;
 
-/* 15594 */
-typedef _HV_INPUT_CREATE_PASID_SPACE HV_INPUT_CREATE_PASID_SPACE;
-
 /* 15595 */
 typedef _PERFINFO_PPM_IDLE_EXIT_LATENCY *PPERFINFO_PPM_IDLE_EXIT_LATENCY;
 
@@ -114930,9 +114146,6 @@ typedef _OBJECT_HANDLE_INFORMATION *POBJECT_HANDLE_INFORMATION;
 /* 15637 */
 typedef _DBGKD_ANY_CONTROL_SET DBGKD_ANY_CONTROL_SET;
 
-/* 15638 */
-typedef _HV_PPM_IDLE_STATE_CONFIG HV_PPM_IDLE_STATE_CONFIG;
-
 /* 15639 */
 typedef _IOV_FORCED_PENDING_TRACE *PIOV_FORCED_PENDING_TRACE;
 
@@ -114953,9 +114166,6 @@ typedef __n128 int16x8_t;
 
 /* 15645 */
 typedef _SUPPORTED_RANGE SUPPORTED_RANGE;
-
-/* 15646 */
-typedef _HV_PPM_IDLE_STATE HV_PPM_IDLE_STATE;
 
 /* 15647 */
 typedef _HV_MUX_PACKET_HEADER HV_MUX_PACKET_HEADER;
@@ -115410,9 +114620,6 @@ typedef unsigned __int8 (__fastcall *PCANCEL_ADAPTER_CHANNEL)(_DMA_ADAPTER *, _D
 /* 15808 */
 typedef _POLICY_MACHINE_ACCT_INFO2 *PPOLICY_MACHINE_ACCT_INFO2;
 
-/* 15809 */
-typedef _HV_PPM_POWER_POLICY_SETTING HV_PPM_POWER_POLICY_SETTING;
-
 /* 15811 */
 typedef _SHRINK_VOLUME_REQUEST_TYPES *PSHRINK_VOLUME_REQUEST_TYPES;
 
@@ -115652,9 +114859,6 @@ typedef _OB_OPERATION_REGISTRATION OB_OPERATION_REGISTRATION;
 
 /* 15894 */
 typedef _RTL_FEATURE_CONFIGURATION_TYPE *PRTL_FEATURE_CONFIGURATION_TYPE;
-
-/* 15895 */
-typedef _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER;
 
 /* 15896 */
 typedef _MEMORY_DEFECT *PMEMORY_DEFECT;
@@ -116102,9 +115306,6 @@ typedef _PERFINFO_LONG_DPC_DETECTION_INFORMATION *PPERFINFO_LONG_DPC_DETECTION_I
 
 /* 16048 */
 typedef _HAL_PSCI_INFO *PHAL_PSCI_INFO;
-
-/* 16049 */
-typedef _HV_FULL_PASID *PHV_FULL_PASID;
 
 /* 16050 */
 typedef _CRYPT_PROPERTY_REF CRYPT_PROPERTY_REF;
@@ -116871,9 +116072,6 @@ typedef _WHEA_PCIXBUS_ID WHEA_PCIXBUS_ID;
 /* 16320 */
 typedef unsigned __int16 RTL_ATOM;
 
-/* 16321 */
-typedef _HV_X64_INPUT_DISABLE_HYPERVISOR *PHV_X64_INPUT_DISABLE_HYPERVISOR;
-
 /* 16322 */
 typedef unsigned __int8 (__fastcall *PSHVL_EXCEPTION_INTERCEPT_ROUTINE)(_HV_ARM64_EXCEPTION_INTERCEPT_MESSAGE *);
 
@@ -116984,9 +116182,6 @@ typedef int __fastcall KD_CREATE_FILE_CALLBACK(void *, _UNICODE_STRING *, unsign
 
 /* 16361 */
 typedef int __fastcall VSM_ALLOC_EARLY_BOOT_MEMORY_ROUTINE(_VSM_ALLOC_EARLY_BOOT_MEMORY_REQUEST *);
-
-/* 16362 */
-typedef _HV_INPUT_INJECT_SYNTHETIC_MACHINE_CHECK *PHV_INPUT_INJECT_SYNTHETIC_MACHINE_CHECK;
 
 /* 16363 */
 typedef _PO_SESSION_INIT PO_SESSION_INIT;
@@ -117551,9 +116746,6 @@ typedef __n64 float32x2_t;
 
 /* 16557 */
 typedef int (__fastcall *PHAL_ATTACH_PASID_SPACE)(unsigned __int64, unsigned int);
-
-/* 16558 */
-typedef _HV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER *PHV_INPUT_SET_DEVICE_PRQ_PROPERTY_HEADER;
 
 /* 16559 */
 typedef struct _IOV_STACK_LOCATION *PIOV_STACK_LOCATION;
@@ -118560,9 +117752,6 @@ typedef _PNP_REPLACE_MEMORY_LIST PNP_REPLACE_MEMORY_LIST;
 /* 16908 */
 typedef _HAL_ARM64_MANUFACTURER_ID *PHAL_ARM64_MANUFACTURER_ID;
 
-/* 16909 */
-typedef _HV_INPUT_GET_POWER_PROPERTY HV_INPUT_GET_POWER_PROPERTY;
-
 /* 16910 */
 typedef _SOCDATA_ACCESS_CONTROL_ENTRY *PSOCDATA_ACCESS_CONTROL_ENTRY;
 
@@ -118635,9 +117824,6 @@ typedef _HV_EXT_OUTPUT_QUERY_CAPABILITIES *PHV_EXT_OUTPUT_QUERY_CAPABILITIES;
 /* 16934 */
 typedef _JOBOBJECT_MEMORY_USAGE_INFORMATION_V2 JOBOBJECT_MEMORY_USAGE_INFORMATION_V2;
 
-/* 16935 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED;
-
 /* 16936 */
 typedef _ACL ACL;
 
@@ -118682,9 +117868,6 @@ typedef int (__fastcall *PVM_HOST_INTERFACE_SPLIT_MEMORY_RANGE)(void *, unsigned
 
 /* 16950 */
 typedef void *(__fastcall *pHalAllocateEarlyPages)(_LOADER_PARAMETER_BLOCK *, unsigned int, unsigned __int64 *, unsigned int);
-
-/* 16951 */
-typedef _HV_OUTPUT_GET_COVERAGE_VECTOR HV_OUTPUT_GET_COVERAGE_VECTOR;
 
 /* 16952 */
 typedef _RTL_CALLER_ALLOCATED_ACTIVATION_CONTEXT_STACK_FRAME_BASIC RTL_CALLER_ALLOCATED_ACTIVATION_CONTEXT_STACK_FRAME_BASIC;
@@ -118952,9 +118135,6 @@ typedef _HV_VP_SIGNAL_BITSET_SCHEDULER_MESSAGE *PHV_VP_SIGNAL_BITSET_SCHEDULER_M
 
 /* 17042 */
 typedef _CSV_QUERY_VOLUME_ID CSV_QUERY_VOLUME_ID;
-
-/* 17043 */
-typedef _HV_INITIAL_VP_CONTEXT HV_INITIAL_VP_CONTEXT;
 
 /* 17044 */
 typedef _RTL_FEATURE_CONFIGURATION RTL_FEATURE_CONFIGURATION;
@@ -119480,9 +118660,6 @@ typedef tag_VSM_SK_REPORT_VARDATA_USER_DATA *PVSM_SK_REPORT_VARDATA_USER_DATA;
 
 /* 17221 */
 typedef volatile int EX_SPIN_LOCK;
-
-/* 17222 */
-typedef _HV_FULL_PASID HV_FULL_PASID;
 
 /* 17223 */
 typedef threadlocaleinfostruct threadlocinfo;
@@ -121437,9 +120614,6 @@ typedef _ETW_UMS_EVENT_CONTEXT_SWITCH ETW_UMS_EVENT_CONTEXT_SWITCH;
 /* 17890 */
 typedef void __fastcall VSM_KSRCALL(_KSR_VSM_PARAMETERS *);
 
-/* 17891 */
-typedef _HV_INPUT_DETACH_PASID_SPACE HV_INPUT_DETACH_PASID_SPACE;
-
 /* 17892 */
 typedef _KE_PRIVILEGED_PAGE_IDENTITY KE_PRIVILEGED_PAGE_IDENTITY;
 
@@ -123231,9 +122405,6 @@ typedef _ARM64_CACHE_INFO_SELECTOR ARM64_CACHE_INFO_SELECTOR;
 /* 18519 */
 typedef _KCORE_CONTROL_BLOCK_SHADOW KCORE_CONTROL_BLOCK_SHADOW;
 
-/* 18520 */
-typedef _HV_INPUT_CREATE_PASID_SPACE *PHV_INPUT_CREATE_PASID_SPACE;
-
 /* 18521 */
 typedef unsigned __int64 (__fastcall *EFI_FILE_SET_INFO)(_EFI_FILE_HANDLE *, EFI_GUID *, unsigned __int64, void *);
 
@@ -123489,9 +122660,6 @@ typedef int __fastcall LSA_COPY_TO_CLIENT_BUFFER(void **, unsigned int, void *, 
 /* 18608 */
 typedef _FILE_LINK_ENTRY_INFORMATION *PFILE_LINK_ENTRY_INFORMATION;
 
-/* 18609 */
-typedef _HV_INPUT_SET_POWER_PROPERTY *PHV_INPUT_SET_POWER_PROPERTY;
-
 /* 18610 */
 typedef _EX_PARTITION EX_PARTITION;
 
@@ -123545,9 +122713,6 @@ typedef _KTHREAD_INIT_PARAMETERS *PKTHREAD_INIT_PARAMETERS;
 
 /* 18627 */
 typedef _KEY_VALUE_LAYER_INFORMATION KEY_VALUE_LAYER_INFORMATION;
-
-/* 18628 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_SPACE *PHV_INPUT_FLUSH_PASID_ADDRESS_SPACE;
 
 /* 18629 */
 typedef _ASPT_ENTRY ASPT_ENTRY;
@@ -124320,9 +123485,6 @@ typedef _SKMI_IMAGE_VIEW_EXTENSION_TYPE *PSKMI_IMAGE_VIEW_EXTENSION_TYPE;
 /* 18899 */
 typedef _FILE_REMOTE_PROTOCOL_INFORMATION *PFILE_REMOTE_PROTOCOL_INFORMATION;
 
-/* 18900 */
-typedef _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER *PHV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER;
-
 /* 18901 */
 typedef _SKMI_DV_PATCH_IMAGE *PSKMI_DV_PATCH_IMAGE;
 
@@ -124331,9 +123493,6 @@ typedef _REG_CREATE_KEY_INFORMATION *PREG_OPEN_KEY_INFORMATION;
 
 /* 18903 */
 typedef _PROCESS_SESSION_INFORMATION PROCESS_SESSION_INFORMATION;
-
-/* 18904 */
-typedef _HV_PPM_FEEDBACK_REGISTER_PAIR HV_PPM_FEEDBACK_REGISTER_PAIR;
 
 /* 18905 */
 typedef int (__fastcall *PFN_SKPNP_BUS_UNPROTECT_DEVICE)(_SKPNP_DEVICE_NODE *);
@@ -124599,9 +123758,6 @@ typedef _AMD64_COUNTER_STATUS *PAMD64_COUNTER_STATUS;
 /* 19001 */
 typedef _SYSDBG_KD_PULL_REMOTE_FILE *PSYSDBG_KD_PULL_REMOTE_FILE;
 
-/* 19002 */
-typedef _HV_INPUT_SET_PASID_ADDRESS_SPACE HV_INPUT_SET_PASID_ADDRESS_SPACE;
-
 /* 19003 */
 typedef _KAB_UM_PROCESS_CONTEXT KAB_UM_PROCESS_CONTEXT;
 
@@ -124715,9 +123871,6 @@ typedef HINSTANCE__ *HMODULE;
 
 /* 19044 */
 typedef _FILE_BASIC_INFORMATION *PFILE_BASIC_INFORMATION;
-
-/* 19045 */
-typedef _HV_SPA_PAGE_LIST_FLAGS *PHV_SPA_PAGE_LIST_FLAGS;
 
 /* 19046 */
 typedef void (__fastcall *PSKPS_PROCESS_ENUM_CALLBACK)(_SEPROCESS *, void *);
@@ -124950,9 +124103,6 @@ typedef _ETW_AUTOBOOST_CLEAR_PRIORITY_FLOOR_EVENT *PETW_AUTOBOOST_CLEAR_PRIORITY
 /* 19125 */
 typedef _HEAP_VS_CHUNK_FREE_HEADER HEAP_VS_CHUNK_FREE_HEADER;
 
-/* 19126 */
-typedef _HV_INPUT_GET_SPA_PAGE_LIST HV_INPUT_GET_SPA_PAGE_LIST;
-
 /* 19127 */
 typedef _PROCESS_HANDLE_TRACING_ENABLE *PPROCESS_HANDLE_TRACING_ENABLE;
 
@@ -124991,9 +124141,6 @@ typedef _VF_POOL_TRACE VF_POOL_TRACE;
 
 /* 19139 */
 typedef _HAL_ARM64_MANUFACTURER_ID HAL_ARM64_MANUFACTURER_ID;
-
-/* 19140 */
-typedef _HV_INPUT_MODIFY_SPARSE_GPA_PAGES HV_INPUT_MODIFY_SPARSE_GPA_PAGES;
 
 /* 19141 */
 typedef _SKOB_IDENTITY SKOB_IDENTITY;
@@ -125609,9 +124756,6 @@ typedef _GEN_ADDR GEN_ADDR;
 
 /* 19354 */
 typedef _OBJECT_SYMBOLIC_LINK OBJECT_SYMBOLIC_LINK;
-
-/* 19355 */
-typedef _HV_INPUT_DELETE_PASID_SPACE HV_INPUT_DELETE_PASID_SPACE;
 
 /* 19356 */
 typedef const wchar_t *LPCWCHAR;
@@ -126714,9 +125858,6 @@ typedef __int64 *PLONG64;
 /* 19743 */
 typedef void *LSA_HANDLE;
 
-/* 19744 */
-typedef _HV_X64_INPUT_DISABLE_HYPERVISOR_EX HV_X64_INPUT_DISABLE_HYPERVISOR_EX;
-
 /* 19745 */
 typedef _JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL JOBOBJECT_RATE_CONTROL_TOLERANCE_INTERVAL;
 
@@ -127644,9 +126785,6 @@ typedef _PERFINFO_MEMORY_NODE_INFORMATION PERFINFO_MEMORY_NODE_INFORMATION;
 /* 20063 */
 typedef int (__fastcall *PKSR_PREPARE_SCENARIO)(unsigned int, unsigned __int8);
 
-/* 20064 */
-typedef _HV_INPUT_GET_POWER_PROPERTY *PHV_INPUT_GET_POWER_PROPERTY;
-
 /* 20065 */
 typedef _VPB *PVPB;
 
@@ -127956,9 +127094,6 @@ typedef _MARK_HANDLE_INFO32 MARK_HANDLE_INFO32;
 /* 20169 */
 typedef unsigned __int8 (__fastcall *pHalAcpiAoacCapable)();
 
-/* 20170 */
-typedef _HV_INPUT_ENABLE_PASID HV_INPUT_ENABLE_PASID;
-
 /* 20171 */
 typedef _RTL_SCP_CFG_HEADER RTL_SCP_CFG_HEADER;
 
@@ -127986,14 +127121,8 @@ typedef _HV_REGISTER_VSM_VP_SECURE_VTL_CONFIG *PHV_REGISTER_VSM_VP_SECURE_VTL_CO
 /* 20179 */
 typedef _CLS_WRITE_ENTRY *PCLFS_WRITE_ENTRY;
 
-/* 20180 */
-typedef _HV_SYNMC_ARM64_EVENT *PHV_SYNMC_ARM64_EVENT;
-
 /* 20181 */
 typedef _X86PAE_HARDWARE_PTE X86PAE_HARDWARE_PDPTE;
-
-/* 20182 */
-typedef _HV_SPA_PAGE_LIST_FLAGS HV_SPA_PAGE_LIST_FLAGS;
 
 /* 20183 */
 typedef unsigned __int8 (__fastcall *pHalTranslateBusAddress)(_INTERFACE_TYPE, unsigned int, _LARGE_INTEGER, unsigned int *, _LARGE_INTEGER *);
@@ -128103,9 +127232,6 @@ typedef _PERFINFO_KERNELMEMORY_RANGE_USAGE *PPERFINFO_KERNELMEMORY_RANGE_USAGE;
 /* 20219 */
 typedef _PCI_EXPRESS_DPC_RP_PIO_HEADERLOG_REGISTER *PPCI_EXPRESS_DPC_RP_PIO_HEADERLOG_REGISTER;
 
-/* 20220 */
-typedef _HV_PPM_IDLE_STATE *PHV_PPM_IDLE_STATE;
-
 /* 20222 */
 typedef void (__fastcall *PINTERRUPT_FAST_END_OF_INTERRUPT)();
 
@@ -128117,9 +127243,6 @@ typedef int __fastcall RTLP_EXIT_THREAD(int);
 
 /* 20225 */
 typedef _OBJECT_ATTRIBUTES32 OBJECT_ATTRIBUTES32;
-
-/* 20226 */
-typedef _HV_PPM_IDLE_STATE_EX HV_PPM_IDLE_STATE_EX;
 
 /* 20227 */
 typedef unsigned __int64 (__fastcall *EFI_PXE_BASE_CODE_STOP)(_EFI_PXE_BASE_CODE *);
@@ -128580,9 +127703,6 @@ typedef _INITIAL_PEB *PINITIAL_PEB;
 /* 20389 */
 typedef unsigned __int64 (__fastcall *EFI_BLOCK_RESET_EX)(_EFI_BLOCK_IO2 *, unsigned __int8);
 
-/* 20390 */
-typedef _HV_OUTPUT_COLLECT_LIVE_DUMP HV_OUTPUT_COLLECT_LIVE_DUMP;
-
 /* 20392 */
 typedef _PPTT *PPPTT;
 
@@ -129020,9 +128140,6 @@ typedef _PCI_VIRTUALIZATION_INTERFACE *PPCI_VIRTUALIZATION_INTERFACE;
 
 /* 20540 */
 typedef _ARMCE_CONTEXT *PARMCE_CONTEXT;
-
-/* 20541 */
-typedef _HV_SYNMC_ARM64_EVENT HV_SYNMC_ARM64_EVENT;
 
 /* 20542 */
 typedef _FILE_LINKS_INFORMATION FILE_LINKS_INFORMATION;
@@ -129639,9 +128756,6 @@ typedef _MU_TELEMETRY_SECTION *PMU_TELEMETRY_SECTION;
 /* 20755 */
 typedef _KEY_VIRTUALIZATION_INFORMATION *PKEY_VIRTUALIZATION_INFORMATION;
 
-/* 20756 */
-typedef _HV_IMAGE_COVERAGE_INFO HV_IMAGE_COVERAGE_INFO;
-
 /* 20757 */
 typedef _SEP_AUDIT_DISCARDED_WORK_ITEM *PSEP_AUDIT_DISCARDED_WORK_ITEM;
 
@@ -129737,9 +128851,6 @@ typedef _MEMORY_IMAGE_INFORMATION *PMEMORY_IMAGE_INFORMATION;
 
 /* 20790 */
 typedef unsigned int __fastcall __WILAPI_GetFeatureVariant(unsigned int, FEATURE_CHANGE_TIME, unsigned int *, int *, int *);
-
-/* 20791 */
-typedef _HV_INPUT_GET_SPA_PAGE_LIST *PHV_INPUT_GET_SPA_PAGE_LIST;
 
 /* 20792 */
 typedef _PROCESS_WORKING_SET_CONTROL *PPROCESS_WORKING_SET_CONTROL;
@@ -131001,9 +130112,6 @@ typedef _TRANSACTION_NOTIFICATION_SAVEPOINT_ARGUMENT TRANSACTION_NOTIFICATION_SA
 /* 21226 */
 typedef STARTING_LCN_INPUT_BUFFER *PSTARTING_LCN_INPUT_BUFFER;
 
-/* 21227 */
-typedef _HV_INPUT_GET_COVERAGE_VECTOR HV_INPUT_GET_COVERAGE_VECTOR;
-
 /* 21228 */
 typedef _FILE_PIPE_DELETE_SYMLINK_INPUT *PFILE_PIPE_DELETE_SYMLINK_INPUT;
 
@@ -131973,9 +131081,6 @@ typedef _HEAP_SEG_CONTEXT HEAP_SEG_CONTEXT;
 /* 21566 */
 typedef unsigned __int64 (__fastcall *EFI_WAIT_FOR_EVENT)(unsigned __int64, void **, unsigned __int64 *);
 
-/* 21567 */
-typedef _HV_INPUT_DELETE_PASID_SPACE *PHV_INPUT_DELETE_PASID_SPACE;
-
 /* 21568 */
 typedef _HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA;
 
@@ -132206,9 +131311,6 @@ typedef _KSPECIAL_REGISTERS *PKSPECIAL_REGISTERS;
 
 /* 21648 */
 typedef _TRUSTED_INFORMATION_CLASS TRUSTED_INFORMATION_CLASS;
-
-/* 21649 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED *PHV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED;
 
 /* 21650 */
 typedef _SKPG_PAGE_TABLE_TRACE SKPG_PAGE_TABLE_TRACE;
@@ -132692,9 +131794,6 @@ typedef _JOBOBJECT_BASIC_PROCESS_ID_LIST JOBOBJECT_BASIC_PROCESS_ID_LIST;
 
 /* 21815 */
 typedef int (__fastcall *pHalInterruptGetHighestPriorityInterrupt)(unsigned int *, unsigned __int8 *);
-
-/* 21816 */
-typedef _HV_SYNMC_ARM64_EVENT *PHV_SYNMC_EVENT;
 
 /* 21817 */
 typedef _KRANK_LIST *PKRANK_LIST;
@@ -134070,9 +133169,6 @@ typedef _FOUR_PART_VERSION *PFOUR_PART_VERSION;
 /* 22294 */
 typedef _TOKEN_USER_CLAIMS *PTOKEN_USER_CLAIMS;
 
-/* 22295 */
-typedef _HV_DEVICE_ADDRESS_SPACE *PHV_DEVICE_ADDRESS_SPACE;
-
 /* 22296 */
 typedef _HAL_PROFILE_SOURCE_CORRUPTION_STATUS HAL_PROFILE_SOURCE_CORRUPTION_STATUS;
 
@@ -134310,9 +133406,6 @@ typedef _KEY_VALUE_PARTIAL_INFORMATION *PKEY_VALUE_PARTIAL_INFORMATION;
 /* 22376 */
 typedef _JOBOBJECT_EXTENDED_ACCOUNTING_INFORMATION_V3 JOBOBJECT_EXTENDED_ACCOUNTING_INFORMATION_V3;
 
-/* 22377 */
-typedef _HV_GVA_RANGE_EXTENDED HV_GVA_RANGE_EXTENDED;
-
 /* 22378 */
 typedef _WIN32K_SYSCALL_FILTER WIN32K_SYSCALL_FILTER;
 
@@ -134361,9 +133454,6 @@ typedef _PROC_HYPERVISOR_STATE PROC_HYPERVISOR_STATE;
 /* 22393 */
 typedef _PHYSICAL_DISK_RECORD PHYSICAL_DISK_RECORD;
 
-/* 22394 */
-typedef _HV_IMAGE_COVERAGE_INFO *PHV_IMAGE_COVERAGE_INFO;
-
 /* 22395 */
 typedef _IMAGE_MITIGATION_POLICY *PIMAGE_MITIGATION_POLICY;
 
@@ -134372,9 +133462,6 @@ typedef _PCI_FPB_CAPABILITY_HEADER *PPCI_FPB_CAPABILITY_HEADER;
 
 /* 22397 */
 typedef _RTL_UNICODE_STRING_BUFFER *PRTL_UNICODE_STRING_BUFFER;
-
-/* 22398 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY;
 
 /* 22399 */
 typedef _GUID UUID;
@@ -134432,9 +133519,6 @@ typedef _KI_READY_QUEUE_ENUMERATOR KI_READY_QUEUE_ENUMERATOR;
 
 /* 22417 */
 typedef _REG_CREATE_KEY_INFORMATION_V1 *PREG_OPEN_KEY_INFORMATION_V1;
-
-/* 22418 */
-typedef _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG *PHV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG;
 
 /* 22419 */
 typedef _DBGKD_TRACE_DATA DBGKD_TRACE_DATA;
@@ -134567,9 +133651,6 @@ typedef _PF_FILE_ACCESS_TYPE *PPF_FILE_ACCESS_TYPE;
 
 /* 22467 */
 typedef _RTL_PROCESS_MODULE_INFORMATION RTL_PROCESS_MODULE_INFORMATION;
-
-/* 22468 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED HV_PHYSICAL_DEVICE_PROPERTY_ATS_ENABLED;
 
 /* 22469 */
 typedef __n128x4 poly8x16x4_t;
@@ -135108,9 +134189,6 @@ typedef _THREAD_STATE_CHANGE_TYPE THREAD_STATE_CHANGE_TYPE;
 /* 22654 */
 typedef _HEAP_SEGMGR_LARGE_PAGE_POLICY *PHEAP_SEGMGR_LARGE_PAGE_POLICY;
 
-/* 22655 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE *PHV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE;
-
 /* 22656 */
 typedef _HV_PICO100_DURATION HV_PICO100_DURATION;
 
@@ -135212,9 +134290,6 @@ typedef unsigned int ACCESS_MASK;
 
 /* 22691 */
 typedef _PERFINFO_CC_CAN_WRITE_FAIL *PPERFINFO_CC_CAN_WRITE_FAIL;
-
-/* 22692 */
-typedef _HV_INPUT_DELETE_DEVICE_PR_QUEUE *PHV_INPUT_DELETE_DEVICE_PR_QUEUE;
 
 /* 22693 */
 typedef _JOBOBJECT_ENERGY_TRACKING_STATE *PJOBOBJECT_ENERGY_TRACKING_STATE;
@@ -135441,9 +134516,6 @@ typedef int (__fastcall *PNPEM_CONTROL_SET_STANDARD_CONTROL)(void *, _NPEM_CONTR
 /* 22769 */
 typedef _CPU_PARTITION_QUERY_INFORMATION_CLASS CPU_PARTITION_QUERY_INFORMATION_CLASS;
 
-/* 22770 */
-typedef _HV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX *PHV_X64_PPM_IDLE_STATE_CONFIG_PROPERTY_EX;
-
 /* 22771 */
 typedef _WMI_DISKIO_NOTIFY_ROUTINES WMI_DISKIO_NOTIFY_ROUTINES;
 
@@ -135470,9 +134542,6 @@ typedef IMAGE_AUX_SYMBOL_TOKEN_DEF *PIMAGE_AUX_SYMBOL_TOKEN_DEF;
 
 /* 22780 */
 typedef _HV_PSP_REQUEST_COMPLETION_DATA HV_PSP_REQUEST_COMPLETION_DATA;
-
-/* 22781 */
-typedef _HV_INPUT_CREATE_DEVICE_PR_QUEUE HV_INPUT_CREATE_DEVICE_PR_QUEUE;
 
 /* 22782 */
 typedef _SLIST_HEADER *PSLIST_HEADER;
@@ -136776,9 +135845,6 @@ typedef _KCRM_TRANSACTION_BLOB KCRM_TRANSACTION_BLOB;
 /* 23235 */
 typedef _VIRTUAL_STORAGE_TYPE *PVIRTUAL_STORAGE_TYPE;
 
-/* 23236 */
-typedef _HV_PPM_IDLE_STATE_CONFIG *PHV_PPM_IDLE_STATE_CONFIG;
-
 /* 23237 */
 typedef void __fastcall EXT_IOMMU_CONFIGURE_DEVICE_FAULT_REPORTING(_EXT_IOMMU *, _EXT_IOMMU_DEVICE *, unsigned __int8);
 
@@ -137064,9 +136130,6 @@ typedef void (__fastcall *PPS_PICO_PROVIDER_THREAD_EXIT)(_ETHREAD *);
 /* 23334 */
 typedef void __fastcall PROCESSOR_COMPUTE_ENERGY_ROUTINE(unsigned int, unsigned __int64, unsigned __int64, unsigned int, unsigned __int64 *);
 
-/* 23335 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES;
-
 /* 23336 */
 typedef int (__fastcall *PRTL_QUERY_DEBUG_VIRTUAL_PROCESS_READ_MEMORY_ROUTINE)(void *, void *, void *, unsigned __int64, unsigned __int64 *);
 
@@ -137129,9 +136192,6 @@ typedef _SYSTEM_KERNEL_DEBUGGER_FLAGS SYSTEM_KERNEL_DEBUGGER_FLAGS;
 
 /* 23358 */
 typedef _HANDLE_TABLE_ENTRY HANDLE_TABLE_ENTRY;
-
-/* 23359 */
-typedef _HV_DEVICE_ADDRESS_SPACE HV_DEVICE_ADDRESS_SPACE;
 
 /* 23360 */
 typedef _KSOFTWARE_INTERRUPT_TARGET KSOFTWARE_INTERRUPT_TARGET;
@@ -137231,9 +136291,6 @@ typedef _ARBITER_BOOT_ALLOCATION_PARAMETERS *PARBITER_BOOT_ALLOCATION_PARAMETERS
 
 /* 23393 */
 typedef _PROCESS_SYSTEM_RESOURCE_MANAGEMENT *PPROCESS_SYSTEM_RESOURCE_MANAGEMENT;
-
-/* 23394 */
-typedef _HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY HV_INPUT_GET_PHYSICAL_DEVICE_PROPERTY;
 
 /* 23395 */
 typedef void (__fastcall *PVM_HOST_INTERFACE_FREE_PREALLOCATION_FOR_RANGE_CREATE)(void *);
@@ -137883,9 +136940,6 @@ typedef _FILE_VOLUME_NAME_INFORMATION *PFILE_VOLUME_NAME_INFORMATION;
 /* 23615 */
 typedef void __fastcall DEVICE_CHANGE_COMPLETE_CALLBACK(void *);
 
-/* 23616 */
-typedef _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID HV_INPUT_GET_VP_INDEX_FROM_APIC_ID;
-
 /* 23617 */
 typedef _SINGLE_LIST_ENTRY *PSINGLE_LIST_ENTRY;
 
@@ -138158,9 +137212,6 @@ typedef _ETW_DISKIO_READWRITE_V3 PETW_DISKIO_READWRITE_V3;
 
 /* 23710 */
 typedef _WMI_DISKIO_NOTIFY_ROUTINES *PWMI_DISKIO_NOTIFY_ROUTINES;
-
-/* 23711 */
-typedef _HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG HV_PROCESSOR_PERF_FEEDBACK_COUNTERS_CONFIG;
 
 /* 23712 */
 typedef _EXTSTACKTRACE32 EXTSTACKTRACE32;
@@ -139911,9 +138962,6 @@ typedef _RTLP_HP_MEMORY_TYPE *PRTLP_HP_MEMORY_TYPE;
 /* 24318 */
 typedef _PROCESSOR_IDLE_STATE *PPROCESSOR_IDLE_STATE;
 
-/* 24319 */
-typedef _HV_INPUT_DISABLE_PASID *PHV_INPUT_DISABLE_PASID;
-
 /* 24320 */
 typedef void *__fastcall RTL_GENERIC_ALLOCATE_ROUTINE(_RTL_GENERIC_TABLE *, unsigned int);
 
@@ -141099,9 +140147,6 @@ typedef _HEAP_VAMGR_VA_QUERY *PHEAP_VAMGR_VA_QUERY;
 /* 24731 */
 typedef _PROCESS_HEAP_INFORMATION *PPROCESS_HEAP_INFORMATION;
 
-/* 24732 */
-typedef _HV_INPUT_FLUSH_PASID_ADDRESS_LIST HV_INPUT_FLUSH_PASID_ADDRESS_LIST;
-
 /* 24733 */
 typedef void __fastcall HIVE_LOAD_CALLBACK_FUNCTION(void *);
 
@@ -141425,9 +140470,6 @@ typedef _RTL_HASH_TABLE RTL_HASH_TABLE;
 
 /* 24844 */
 typedef _WHEA_PCIXDEVICE_ID WHEA_PCIXDEVICE_ID;
-
-/* 24845 */
-typedef _HV_INPUT_MODIFY_SPARSE_GPA_PAGES *PHV_INPUT_MODIFY_SPARSE_GPA_PAGES;
 
 /* 24846 */
 typedef _HEAP_SPAN *PHEAP_SPAN;
@@ -142160,9 +141202,6 @@ typedef _GIC3_CRASHDUMP_LOCALUNIT_INFO *PGIC3_CRASHDUMP_LOCALUNIT_INFO;
 
 /* 25102 */
 typedef _PCI_EXPRESS_CXL_DVSEC_STATUS_REGISTER *PPCI_EXPRESS_CXL_DVSEC_STATUS_REGISTER;
-
-/* 25103 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES *PHV_PHYSICAL_DEVICE_PROPERTY_CAPABILITIES;
 
 /* 25104 */
 typedef _SYSTEM_ENERGY_ESTIMATION_CONFIG_INFORMATION SYSTEM_ENERGY_ESTIMATION_CONFIG_INFORMATION;
@@ -143043,9 +142082,6 @@ typedef int (__fastcall *PPPM_DISPATCH_NOTIFY_LPI_COORDINATED_STATES_NOTIFICATIO
 /* 25408 */
 typedef _PLATFORM_IDLE_STATES PLATFORM_IDLE_STATES;
 
-/* 25410 */
-typedef _HV_OUTPUT_GET_POWER_PROPERTY HV_OUTPUT_GET_POWER_PROPERTY;
-
 /* 25411 */
 typedef _REFS_REMOVE_HARDLINK_BACKPOINTER REFS_REMOVE_HARDLINK_BACKPOINTER;
 
@@ -143234,9 +142270,6 @@ typedef int (__fastcall *PPTM_DEVICE_QUERY_TIME_SOURCE)(void *, unsigned int *);
 
 /* 25476 */
 typedef _SKCALLPARAMS_CREATE_SECURE_SECTION *PSKCALLPARAMS_CREATE_SECURE_SECTION;
-
-/* 25477 */
-typedef _HV_PHYSICAL_DEVICE_PROPERTY_DMA_ENABLED *PHV_PHYSICAL_DEVICE_PROPERTY_ATS_ENABLED;
 
 /* 25478 */
 typedef unsigned __int64 EFI_STATUS;
@@ -143649,9 +142682,6 @@ typedef READ_FILE_USN_DATA *PREAD_FILE_USN_DATA;
 /* 25615 */
 typedef const _TEB_ACTIVE_FRAME_CONTEXT32 *PCTEB_ACTIVE_FRAME_CONTEXT32;
 
-/* 25616 */
-typedef _HV_INPUT_CREATE_DEVICE_PR_QUEUE *PHV_INPUT_CREATE_DEVICE_PR_QUEUE;
-
 /* 25617 */
 typedef _EVENT_INSTANCE_HEADER *PEVENT_INSTANCE_HEADER;
 
@@ -143921,9 +142951,6 @@ typedef _WHEA_ARMV8_AARCH32_GPRS *PWHEA_ARMV8_AARCH32_GPRS;
 
 /* 25712 */
 typedef _HV_PCI_PATH *PHV_PCI_PATH;
-
-/* 25713 */
-typedef _HV_OUTPUT_GET_SPA_PAGE_LIST *PHV_OUTPUT_GET_SPA_PAGE_LIST;
 
 /* 25715 */
 typedef _Wx86TIB *PWX86TIB;
@@ -144263,9 +143290,6 @@ typedef _IOSPACE64 *PIOSPACE64;
 
 /* 25831 */
 typedef _ENCRYPTION_BUFFER ENCRYPTION_BUFFER;
-
-/* 25832 */
-typedef _HV_OUTPUT_GET_SPA_PAGE_LIST HV_OUTPUT_GET_SPA_PAGE_LIST;
 
 /* 25833 */
 typedef HSTR__ *HSTR;
@@ -144782,9 +143806,6 @@ typedef _ARM64_MPAMVPM7 ARM64_MPAMVPM7;
 
 /* 26008 */
 typedef _POLICY_AUDIT_SUBCATEGORIES_INFO POLICY_AUDIT_SUBCATEGORIES_INFO;
-
-/* 26009 */
-typedef _HV_INPUT_START_VIRTUAL_PROCESSOR HV_INPUT_START_VIRTUAL_PROCESSOR;
 
 /* 26010 */
 typedef unsigned __int64 *PHV_GVA;
