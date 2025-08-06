@@ -2006,7 +2006,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
 {
     HV_CONNECTION_ID ConnectionId;
     HV_UINT16 FlagNumber;
-    HV_UINT16 RsvdZ[7];
+    HV_UINT16 RsvdZ[3];
 } HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
 
 // Hypervisor register names for accessing a virtual processor's registers.
