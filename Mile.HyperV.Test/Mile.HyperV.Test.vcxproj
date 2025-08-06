@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2B3CC3A9-A129-4AD2-9594-A87994145CFD}</ProjectGuid>
+    <RootNamespace>Mile.HyperV.Test</RootNamespace>
+    <MileProjectType>StaticLibrary</MileProjectType>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x86.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.props" />
+  <PropertyGroup>
+    <IncludePath>$(MSBuildThisFileDirectory)..\Mile.HyperV\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Mile.HyperV\Mile.HyperV.Windows.VMBusPipe.cpp" />
+    <ClCompile Include="Mile.HyperV.Test.Mobility.cpp" />
+    <ClCompile Include="Mile.HyperV.Test.Windows.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Guest.Interface.h" />
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Guest.Protocols.h" />
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Portable.Types.h" />
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.TLFS.h" />
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.VMBus.h" />
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Windows.VMBusPipe.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.0.212</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.targets" />
+</Project>

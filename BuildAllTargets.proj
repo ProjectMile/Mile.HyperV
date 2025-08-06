@@ -1,7 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project 
-  DefaultTargets="Build;Packaging"
+  DefaultTargets="Restore;Build;Packaging"
   xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Restore">
+    <ItemGroup>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Debug;Platform=x86</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Release;Platform=x86</AdditionalProperties>   
+      </ProjectReference>
+    </ItemGroup>
+    <MSBuild
+      Projects="@(ProjectReference)"
+      Targets="Restore"
+      StopOnFirstFailure="True"
+      Properties="PreferredToolArchitecture=x64" />
+  </Target>
   <Target Name="Build">
     <ItemGroup>
       <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\Mile.HyperV\Mile.HyperV.Windows.VMBusPipe.cpp">
+      <Filter>Mile.HyperV</Filter>
+    </ClCompile>
+    <ClCompile Include="Mile.HyperV.Test.Mobility.cpp" />
+    <ClCompile Include="Mile.HyperV.Test.Windows.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Mile.HyperV">
+      <UniqueIdentifier>{63d4f3fd-fb40-41ff-b7d2-3856da16c550}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Portable.Types.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.TLFS.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.VMBus.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Windows.VMBusPipe.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Guest.Interface.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Mile.HyperV\Mile.HyperV.Guest.Protocols.h">
+      <Filter>Mile.HyperV</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
