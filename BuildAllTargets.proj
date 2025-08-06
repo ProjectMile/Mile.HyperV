@@ -1,7 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project 
-  DefaultTargets="Packaging"
+  DefaultTargets="Build;Packaging"
   xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Build">
+    <ItemGroup>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Debug;Platform=x86</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Release;Platform=x86</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Debug;Platform=x64</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Release;Platform=x64</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Debug;Platform=ARM64</AdditionalProperties>   
+      </ProjectReference>
+      <ProjectReference Include="$(MSBuildThisFileDirectory)Mile.HyperV.sln">
+        <AdditionalProperties>Configuration=Release;Platform=ARM64</AdditionalProperties>   
+      </ProjectReference>
+    </ItemGroup>
+    <MSBuild
+      Projects="@(ProjectReference)"
+      Targets="Build"
+      BuildInParallel="True"
+      StopOnFirstFailure="True"
+      Properties="PreferredToolArchitecture=x64" />
+  </Target>
   <Target Name="Packaging">
     <MSBuild
       Projects="$(MSBuildThisFileDirectory)Mile.HyperV.NuGet\Mile.HyperV.proj"
