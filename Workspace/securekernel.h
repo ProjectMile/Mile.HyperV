@@ -31846,73 +31846,6 @@ struct _PUBLIC_OBJECT_BASIC_INFORMATION
   unsigned int Reserved[10];
 };
 
-/* 2871 */
-struct __declspec(align(8)) $0CA0F081347DB20A89CE97C2BC59E6C5
-{
-  unsigned __int64 Base;
-  unsigned int Size;
-  unsigned int Checksum;
-  unsigned int Timestamp;
-};
-
-/* 2872 */
-struct $7DFB00CE93844740CC1D1242E0252B25
-{
-  unsigned __int32 Valid : 1;
-  unsigned __int32 NotAllProcessorsSuspended : 1;
-  unsigned __int32 ExcludesNonEssentialPages : 1;
-  unsigned __int32 Reserved : 29;
-};
-
-/* 2873 */
-union $C508AEEC05F05760A06ECE12206221FD
-{
-  unsigned int FlagsAsUINT32;
-  $7DFB00CE93844740CC1D1242E0252B25 __s1;
-};
-
-/* 2874 */
-struct $99D833F2ABF461B5EEA7926F3BB40BA4
-{
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned int CheckSum;
-};
-
-/* 2875 */
-union $CDB4F2C711C602B1D869642648AF5C51
-{
-  $99D833F2ABF461B5EEA7926F3BB40BA4 __s0;
-  $0CA0F081347DB20A89CE97C2BC59E6C5 ImageInfo[3];
-};
-
-/* 2876 */
-struct __declspec(align(4)) _HV_CRASHDUMP_AREA
-{
-  unsigned int Version;
-  $C508AEEC05F05760A06ECE12206221FD ___u1;
-  $CDB4F2C711C602B1D869642648AF5C51 ___u2;
-  unsigned __int64 CurrentPartition;
-  unsigned __int64 PartitionsCreated;
-  unsigned int PartitionsRunning;
-  unsigned __int64 CompartmentFreePfns;
-  unsigned __int16 ImageNameLength;
-  __unaligned __declspec(align(1)) wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  unsigned __int64 BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int CurrentProcessor;
-  unsigned __int64 CodeSpa;
-  unsigned __int8 CodeChunk[512];
-  unsigned int ContextCount;
-  unsigned int ContextOffset;
-  unsigned int ContextSize;
-  unsigned __int8 Partial;
-};
-
 /* 2877 */
 struct $AEB3573B2EA0D955F891761DE42245E2
 {
@@ -50712,35 +50645,6 @@ struct _ATSR
   _DEVICESCOPE DeviceScope[1];
 };
 
-/* 4939 */
-union $54098E10C0D9F79368E8EA60D813A561
-{
-  unsigned int FlagsAsUINT32;
-  $AEB3573B2EA0D955F891761DE42245E2 __s1;
-};
-
-/* 4940 */
-struct _HV_CRASHDUMP_AREA_V1
-{
-  unsigned int Version;
-  $54098E10C0D9F79368E8EA60D813A561 ___u1;
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned __int16 ImageNameLength;
-  __unaligned __declspec(align(1)) wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  void *BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int ProcessorStateOffset;
-  unsigned int ProcessorStateSize;
-  unsigned int CrashStackSize;
-  unsigned int CrashStackOffset;
-  unsigned __int64 CrashStackAddress;
-};
-
 /* 4941 */
 struct _CRYPT_CONTEXTS
 {
@@ -62606,38 +62510,6 @@ struct _PERFINFO_CC_LOGGED_STREAM_INFO
   _LARGE_INTEGER LargestLsnForLWS;
 };
 
-/* 6309 */
-struct __declspec(align(8)) _HV_CRASHDUMP_AREA_V4
-{
-  unsigned int Version;
-  $54098E10C0D9F79368E8EA60D813A561 ___u1;
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned int CheckSum;
-  unsigned __int64 CurrentPartition;
-  unsigned __int64 PartitionsCreated;
-  unsigned int PartitionsRunning;
-  unsigned __int64 CompartmentFreePfns;
-  unsigned __int16 ImageNameLength;
-  __unaligned __declspec(align(1)) wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  unsigned __int64 BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 MaxPfn;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int CurrentProcessor;
-  unsigned __int64 CodeSpa;
-  unsigned __int8 CodeChunk[512];
-  unsigned int ContextCount;
-  unsigned int ContextOffset;
-  unsigned int ContextSize;
-  unsigned int PfnEntrySize;
-  unsigned __int16 AllocatedPfnEntryMask;
-  unsigned __int8 Partial;
-};
-
 /* 6310 */
 struct $D9D11309C58813AA7B8D2389A98C8C59
 {
@@ -70664,18 +70536,6 @@ struct __declspec(align(8)) USN_JOURNAL_DATA_V1
   unsigned __int64 AllocationDelta;
   unsigned __int16 MinSupportedMajorVersion;
   unsigned __int16 MaxSupportedMajorVersion;
-};
-
-/* 7191 */
-struct _HV_CRASHDUMP_PROCESSOR_STATE
-{
-  unsigned int RegisterStateOffset;
-  unsigned int RegisterStateSize;
-  unsigned int CrashStackSize;
-  unsigned int CrashStackOffset;
-  unsigned __int64 CrashStackAddress;
-  unsigned int PlatformStateSize;
-  unsigned int PlatformStateOffset;
 };
 
 /* 7192 */
@@ -80108,34 +79968,6 @@ struct _PERFINFO_PROCESS_PERFCTR64
   unsigned __int64 PrivatePageCount;
 };
 
-/* 8108 */
-struct __declspec(align(8)) _HV_CRASHDUMP_AREA_V2
-{
-  unsigned int Version;
-  $54098E10C0D9F79368E8EA60D813A561 ___u1;
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned int CheckSum;
-  unsigned __int64 CurrentPartition;
-  unsigned __int64 PartitionsCreated;
-  unsigned int PartitionsRunning;
-  unsigned __int64 CompartmentFreePfns;
-  unsigned __int16 ImageNameLength;
-  __unaligned __declspec(align(1)) wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  unsigned __int64 BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int CurrentProcessor;
-  unsigned __int64 CodeSpa;
-  unsigned __int8 CodeChunk[512];
-  unsigned int ContextCount;
-  unsigned int ContextOffset;
-  unsigned int ContextSize;
-};
-
 /* 8109 */
 struct _EFI_BLOCK_IO
 {
@@ -87903,37 +87735,6 @@ struct _SECTIONBASICINFO
   void *BaseAddress;
   unsigned int AllocationAttributes;
   _LARGE_INTEGER MaximumSize;
-};
-
-/* 8929 */
-struct __declspec(align(8)) _HV_CRASHDUMP_AREA_V3
-{
-  unsigned int Version;
-  $54098E10C0D9F79368E8EA60D813A561 ___u1;
-  unsigned __int64 HypervisorBase;
-  unsigned int SizeOfImage;
-  unsigned int CheckSum;
-  unsigned __int64 CurrentPartition;
-  unsigned __int64 PartitionsCreated;
-  unsigned int PartitionsRunning;
-  unsigned __int64 CompartmentFreePfns;
-  unsigned __int16 ImageNameLength;
-  __unaligned __declspec(align(1)) wchar_t ImageName[32];
-  unsigned __int64 BugCheckData[5];
-  unsigned __int64 BugCheckErrorReturnAddress;
-  unsigned __int64 PageTableBase;
-  unsigned __int64 PfnDataBase;
-  unsigned __int64 MaxPfn;
-  unsigned __int64 DebuggerDataBlock;
-  unsigned int NumberProcessors;
-  unsigned int CurrentProcessor;
-  unsigned __int64 CodeSpa;
-  unsigned __int8 CodeChunk[512];
-  unsigned int ContextCount;
-  unsigned int ContextOffset;
-  unsigned int ContextSize;
-  unsigned int PfnEntrySize;
-  unsigned __int16 AllocatedPfnEntryMask;
 };
 
 /* 8930 */
@@ -115767,9 +115568,6 @@ typedef _PCI_EXPRESS_ARI_CONTROL_REGISTER *PPCI_EXPRESS_ARI_CONTROL_REGISTER;
 /* 17081 */
 typedef _ACTIVATION_CONTEXT_SECTION_KEYED_DATA_ASSEMBLY_METADATA ACTIVATION_CONTEXT_SECTION_KEYED_DATA_ASSEMBLY_METADATA;
 
-/* 17082 */
-typedef _HV_CRASHDUMP_AREA *PHV_CRASHDUMP_AREA;
-
 /* 17083 */
 typedef _KTHREAD_INIT_PARAMETERS KTHREAD_INIT_PARAMETERS;
 
@@ -119549,9 +119347,6 @@ typedef _AUTHZBASEP_SECURITY_ATTRIBUTE_QUERY *PAUTHZBASEP_SECURITY_ATTRIBUTE_QUE
 
 /* 18446 */
 typedef void (__fastcall *PPROCESSOR_PERF_CHECK_COMPLETE_HANDLER)(unsigned __int64, unsigned __int64);
-
-/* 18447 */
-typedef _HV_CRASHDUMP_PROCESSOR_STATE HV_CRASHDUMP_PROCESSOR_STATE;
 
 /* 18448 */
 typedef _TRANSACTION_ENLISTMENT_PAIR *PTRANSACTION_ENLISTMENT_PAIR;
@@ -125460,9 +125255,6 @@ typedef _PCI_EXPRESS_ACS_CAPABILITY_REGISTER PCI_EXPRESS_ACS_CAPABILITY_REGISTER
 /* 20585 */
 typedef _IMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY *PIMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY;
 
-/* 20586 */
-typedef _HV_CRASHDUMP_AREA_V2 *PHV_CRASHDUMP_AREA_V2;
-
 /* 20587 */
 typedef _EFI_DRIVER_ENTRY_LIST *PEFI_DRIVER_ENTRY_LIST;
 
@@ -125483,9 +125275,6 @@ typedef _DISK_SIGNATURE DISK_SIGNATURE;
 
 /* 20594 */
 typedef _RTL_SPLAY_LINKS RTL_SPLAY_LINKS;
-
-/* 20595 */
-typedef _HV_CRASHDUMP_AREA_V3 *PHV_CRASHDUMP_AREA_V3;
 
 /* 20596 */
 typedef _LDR_IMPORT_CALLBACK_INFO LDR_IMPORT_CALLBACK_INFO;
@@ -125516,9 +125305,6 @@ typedef int (__fastcall *PGPE_ENABLE_EVENT)(_DEVICE_OBJECT *, void *);
 
 /* 20605 */
 typedef _KTIMER_TABLE_STATE KTIMER_TABLE_STATE;
-
-/* 20606 */
-typedef _HV_CRASHDUMP_AREA_V1 *PHV_CRASHDUMP_AREA_V1;
 
 /* 20607 */
 typedef _HEAP_SEGMENT_MGR_VA_CTX *PHEAP_SEGMENT_MGR_VA_CTX;
@@ -125561,9 +125347,6 @@ typedef _OBJECT_HEADER_PROCESS_INFO *POBJECT_HEADER_PROCESS_INFO;
 
 /* 20620 */
 typedef void __fastcall IO_CSQ_COMPLETE_CANCELED_IRP(_IO_CSQ *, _IRP *);
-
-/* 20621 */
-typedef _HV_CRASHDUMP_AREA_V4 *PHV_CRASHDUMP_AREA_V4;
 
 /* 20622 */
 typedef tagWNODE_EVENT_REFERENCE WNODE_EVENT_REFERENCE;
@@ -125975,9 +125758,6 @@ typedef _WIN32_PROCESS_TIMER_STATISTICS_CALLOUT_PARAMETERS *PWIN32_PROCESS_TIMER
 
 /* 20771 */
 typedef unsigned int PNP_DEVICE_STATE;
-
-/* 20772 */
-typedef _HV_CRASHDUMP_AREA_V4 HV_CRASHDUMP_AREA_V4;
 
 /* 20773 */
 typedef _WHEAP_ROW_FAILURE_EVENT *PWHEAP_ROW_FAILURE_EVENT;
@@ -127496,9 +127276,6 @@ typedef _RTL_PERTHREAD_CURDIR RTL_PERTHREAD_CURDIR;
 
 /* 21307 */
 typedef int (__fastcall *PFN_VSLMAKECODECATALOG)(void **, unsigned __int64);
-
-/* 21308 */
-typedef _HV_CRASHDUMP_AREA HV_CRASHDUMP_AREA;
 
 /* 21309 */
 typedef _SYSDBG_LIVEDUMP_CONTROL_V1 SYSDBG_LIVEDUMP_CONTROL_V1;
@@ -131760,9 +131537,6 @@ typedef int (__fastcall *PCMP_SET_SECURITY_DESCRIPTOR_REF_COUNT)(void *, unsigne
 /* 22832 */
 typedef _TRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT *PTRANSACTION_NOTIFICATION_TM_ONLINE_ARGUMENT;
 
-/* 22833 */
-typedef _HV_CRASHDUMP_AREA_V2 HV_CRASHDUMP_AREA_V2;
-
 /* 22834 */
 typedef int (__fastcall *RTL_SMART_UCSCHAR_ENCODING_FUNCTION)(unsigned int, _RTL_SMART_LBLOB_WRITING_CONTEXT *);
 
@@ -134684,9 +134458,6 @@ typedef _SE_SID SE_SID;
 
 /* 23885 */
 typedef _VIRTUAL_RESOURCE *PVIRTUAL_RESOURCE;
-
-/* 23886 */
-typedef _HV_CRASHDUMP_AREA_V3 HV_CRASHDUMP_AREA_V3;
 
 /* 23887 */
 typedef void __fastcall EX_PROCESSING_FUNCTION(void *, void *, void *, void *, void *);
@@ -137838,9 +137609,6 @@ typedef _SEPROCESS_REF_TYPE *PSEPROCESS_REF_TYPE;
 /* 25013 */
 typedef _OB_SYMLINK_CREATE_INFO OB_SYMLINK_CREATE_INFO;
 
-/* 25014 */
-typedef _HV_CRASHDUMP_PROCESSOR_STATE *PHV_CRASHDUMP_PROCESSOR_STATE;
-
 /* 25015 */
 typedef _EVENT_TRACE_TAG_FILTER_INFORMATION EVENT_TRACE_POOLTAG_FILTER_INFORMATION;
 
@@ -140336,9 +140104,6 @@ typedef unsigned int *PDRIVER_PROXY_ENDPOINT_FUNCTION_ID;
 
 /* 25908 */
 typedef _SKMI_FLAGS *PSKMI_FLAGS;
-
-/* 25909 */
-typedef _HV_CRASHDUMP_AREA_V1 HV_CRASHDUMP_AREA_V1;
 
 /* 25910 */
 typedef _DEVICE_DSM_DEFINITION *PDEVICE_DSM_DEFINITION;

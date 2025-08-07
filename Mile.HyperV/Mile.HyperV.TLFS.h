@@ -3168,7 +3168,7 @@ typedef struct _HV_CRASHDUMP_AREA_V2
 
 } HV_CRASHDUMP_AREA_V2, *PHV_CRASHDUMP_AREA_V2;
 
-typedef struct _HV_CRASHDUMP_AREA
+typedef struct _HV_CRASHDUMP_AREA_V3
 {
     // Version of the Crashdump Area structure
 
@@ -3237,6 +3237,162 @@ typedef struct _HV_CRASHDUMP_AREA
 
     HV_UINT32 PfnEntrySize;
     HV_UINT16 AllocatedPfnEntryMask;
+
+} HV_CRASHDUMP_AREA_V3, *PHV_CRASHDUMP_AREA_V3;
+
+typedef struct _HV_CRASHDUMP_AREA_V4
+{
+    // Version of the Crashdump Area structure
+
+    HV_UINT32 Version;
+
+    // Flags indicating content validity and other attributes of the Crashdump
+    // Area
+
+    union
+    {
+        HV_UINT32 FlagsAsUINT32;
+        struct
+        {
+            // Indicates the contents of the Crashdump Area are valid
+            HV_UINT32 Valid : 1;
+            HV_UINT32 Reserved : 31;
+        };
+    };
+
+    // Loaded Module Information.
+
+    HV_UINT64 HypervisorBase;
+    HV_UINT32 SizeOfImage;
+    HV_UINT32 CheckSum;
+
+    // Partition State.
+
+    HV_UINT64 CurrentPartition;
+    HV_UINT64 PartitionsCreated;
+    HV_UINT32 PartitionsRunning;
+    HV_UINT64 CompartmentFreePfns;
+
+    HV_UINT16 ImageNameLength;
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
+
+    // Bugcheck error code fields.
+
+    HV_UINT64 BugCheckData[5];
+    HV_UINT64 BugCheckErrorReturnAddress;
+
+    // The root of the page table needed to lookup virtual addresses and the
+    // debugger data block. The debugger data block contains all the information
+    // necc. for the debugger to interpret the dump file. Of particular interest
+    // within it is the prcb address that contain the processor state.
+
+    HV_UINT64 PageTableBase;
+    HV_UINT64 PfnDataBase;
+    HV_UINT64 MaxPfn;
+    HV_UINT64 DebuggerDataBlock;
+    HV_UINT32 NumberProcessors;
+    HV_UINT32 CurrentProcessor;
+
+    // Code page data. If we know the source of the fault this will have the in
+    // memory copy of the code and its spa.
+
+    HV_UINT64 CodeSpa;
+    HV_UINT8 CodeChunk[CODE_CHUNK_SIZE];
+
+    // Processor contexts. This is the offset to a set of
+    // HV_CRASHDUMP_PROCESSOR_STATE structs. The crashing processor should
+    // always be included.
+
+    HV_UINT32 ContextCount;
+    HV_UINT32 ContextOffset;
+    HV_UINT32 ContextSize;
+
+    HV_UINT32 PfnEntrySize;
+    HV_UINT16 AllocatedPfnEntryMask;
+    HV_UINT8 Partial;
+
+} HV_CRASHDUMP_AREA_V4, *PHV_CRASHDUMP_AREA_V4;
+
+typedef struct _HV_CRASHDUMP_AREA
+{
+    // Version of the Crashdump Area structure
+
+    HV_UINT32 Version;
+
+    // Flags indicating content validity and other attributes of the Crashdump
+    // Area
+
+    union
+    {
+        HV_UINT32 FlagsAsUINT32;
+        struct
+        {
+            // Indicates the contents of the Crashdump Area are valid
+            HV_UINT32 Valid : 1;
+            HV_UINT32 NotAllProcessorsSuspended : 1;
+            HV_UINT32 ExcludesNonEssentialPages : 1;
+            HV_UINT32 Reserved : 29;
+        };
+    };
+
+    // Loaded Module Information.
+    union
+    {
+        struct
+        {
+            HV_UINT64 HypervisorBase;
+            HV_UINT32 SizeOfImage;
+            HV_UINT32 CheckSum;
+        };
+        struct
+        {
+            HV_UINT64 Base;
+            HV_UINT32 Size;
+            HV_UINT32 Checksum;
+            HV_UINT32 Timestamp;
+        } ImageInfo[3];
+    };
+
+    // Partition State.
+
+    HV_UINT64 CurrentPartition;
+    HV_UINT64 PartitionsCreated;
+    HV_UINT32 PartitionsRunning;
+    HV_UINT64 CompartmentFreePfns;
+
+    HV_UINT16 ImageNameLength;
+    HV_WCHAR ImageName[HV_IMAGE_NAME_MAX_LENGTH];
+
+    // Bugcheck error code fields.
+
+    HV_UINT64 BugCheckData[5];
+    HV_UINT64 BugCheckErrorReturnAddress;
+
+    // The root of the page table needed to lookup virtual addresses and the
+    // debugger data block. The debugger data block contains all the information
+    // necc. for the debugger to interpret the dump file. Of particular interest
+    // within it is the prcb address that contain the processor state.
+
+    HV_UINT64 PageTableBase;
+    HV_UINT64 PfnDataBase;
+    HV_UINT64 DebuggerDataBlock;
+    HV_UINT32 NumberProcessors;
+    HV_UINT32 CurrentProcessor;
+
+    // Code page data. If we know the source of the fault this will have the in
+    // memory copy of the code and its spa.
+
+    HV_UINT64 CodeSpa;
+    HV_UINT8 CodeChunk[CODE_CHUNK_SIZE];
+
+    // Processor contexts. This is the offset to a set of
+    // HV_CRASHDUMP_PROCESSOR_STATE structs. The crashing processor should
+    // always be included.
+
+    HV_UINT32 ContextCount;
+    HV_UINT32 ContextOffset;
+    HV_UINT32 ContextSize;
+
     HV_UINT8 Partial;
 
 } HV_CRASHDUMP_AREA, *PHV_CRASHDUMP_AREA;

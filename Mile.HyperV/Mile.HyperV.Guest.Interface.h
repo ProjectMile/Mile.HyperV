@@ -32,6 +32,7 @@
 #pragma warning(push)
 #endif
 #pragma warning(disable:4201) // nameless struct/union
+#pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
 // *****************************************************************************
@@ -2687,6 +2688,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
 #pragma warning(pop)
 #else
 #pragma warning(default:4201) // nameless struct/union
+#pragma warning(default:4324) // structure was padded due to __declspec(align())
 #endif
 #endif
 
