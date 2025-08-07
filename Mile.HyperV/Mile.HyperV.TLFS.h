@@ -255,14 +255,14 @@ typedef union _HV_X64_XSAVE_XFEM_REGISTER
         HV_UINT64 Avx512OpMask : 1;
         HV_UINT64 Avx512Zmmhi : 1;
         HV_UINT64 Avx512Zmm16_31 : 1;
-        HV_UINT64 Reserved : 2;
+        HV_UINT64 Reserved8_9 : 2;
         HV_UINT64 Pasid : 1;
         HV_UINT64 CetU : 1;
         HV_UINT64 CetS : 1;
-        HV_UINT64 Reserved1 : 4;
+        HV_UINT64 Reserved13_16 : 4;
         HV_UINT64 XtileCfg : 1;
         HV_UINT64 XtileData : 1;
-        HV_UINT64 Reserved2 : 45;
+        HV_UINT64 Reserved19_63 : 45;
     };
 } HV_X64_XSAVE_XFEM_REGISTER, *PHV_X64_XSAVE_XFEM_REGISTER;
 
@@ -272,7 +272,7 @@ typedef struct HV_DECLSPEC_ALIGN(64) _HV_X64_XSAVE_HEADER
 {
     // Bit vector indicating which features have state store in the XSAVE area.
     HV_X64_XSAVE_XFEM_REGISTER XstateBv; // Bit 63 MBZ
-    HV_UINT64 Reserved0MBZ; // Must be 0.
+    HV_X64_XSAVE_XFEM_REGISTER XcompBv;
     HV_UINT16 RevisionID;
     HV_UINT16 Reserved1MBZ; // Must be 0.
     HV_UINT32 Reserved2;
@@ -551,17 +551,33 @@ typedef struct _HV_ARM64_CONTEXT
 
 typedef struct _HV_VP_CONTEXT
 {
-    // The version of the HV_VP_CONTEXT structure
-    HV_UINT32 Version;
-    // The architecture of these registers
-    HV_ARCHITECTURE Architecture;
     union
     {
+        struct
+        {
+            // The version of the HV_VP_CONTEXT structure
+            HV_UINT32 Version;
+            // The architecture of these registers
+            HV_ARCHITECTURE Architecture;
+            union
+            {
 #if defined(_M_AMD64) || defined(_M_IX86)
-        HV_X64_CONTEXT x64;
+                HV_X64_CONTEXT x64;
+#elif defined(_M_ARM64)
+                HV_ARM64_CONTEXT aa64;
 #endif
+            };
+        };
 #if defined(_M_ARM64)
-        HV_ARM64_CONTEXT aa64;
+        struct
+        {
+            HV_UINT64 Pc;
+            HV_UINT64 Sctlr;
+            HV_UINT64 Ttbr0;
+            HV_UINT64 Ttbr1;
+            HV_UINT64 Tcr;
+            HV_UINT64 Mair;
+        };
 #endif
     };
 } HV_VP_CONTEXT, *PHV_VP_CONTEXT;
@@ -1239,8 +1255,12 @@ typedef struct _HV_PROXIMITY_DOMAIN_INFO
 // physical processor
 typedef struct _HV_PROCESSOR_INFO
 {
+#if defined(_M_AMD64) || defined(_M_IX86)
     // The Local APIC ID for the processor.
     HV_UINT32 LocalApicId;
+#elif defined(_M_ARM64)
+    HV_UINT64 ProcessorHwId;
+#endif
     // The proximity domain the processor resides in
     HV_PROXIMITY_DOMAIN_ID ProximityDomainId;
 } HV_PROCESSOR_INFO, *PHV_PROCESSOR_INFO;
@@ -1252,9 +1272,23 @@ typedef struct _HV_MEMORY_RANGE_INFO
     HV_SPA BaseAddress;
     // The length of this range of memory in bytes.
     HV_UINT64 Length;
-    // The proximity domain this memory range resides in.
-    HV_PROXIMITY_DOMAIN_ID ProximityDomainId;
-
+    union
+    {
+        // The proximity domain this memory range resides in.
+        HV_PROXIMITY_DOMAIN_ID ProximityDomainId;
+        union
+        {
+            HV_UINT8 AsUINT8;
+            struct
+            {
+                HV_UINT8 IsRam : 1;
+                HV_UINT8 IsNonRootRam : 1;
+                HV_UINT8 IsHotAddableRam : 1;
+                HV_UINT8 IsBadRam : 1;
+                HV_UINT8 Reserved : 4;
+            };
+        } Attributes;
+    };
 } HV_MEMORY_RANGE_INFO, *PHV_MEMORY_RANGE_INFO;
 typedef const HV_MEMORY_RANGE_INFO* PCHV_MEMORY_RANGE_INFO;
 
@@ -1292,7 +1326,7 @@ typedef enum
 typedef union
 {
     HV_NANO100_TIME ReferenceTime;
-    HV_UINT64 TimeStamp;
+    HV_TIME_STAMP TimeStamp;
 } HV_EVENTLOG_ENTRY_TIME;
 
 // Define trace buffer header.
@@ -1304,7 +1338,7 @@ typedef struct _HV_EVENTLOG_BUFFER_HEADER
     volatile HV_UINT32 ReferenceCounter; // ReferenceCount
     union
     {
-        HV_UINT64 TimeStamp;
+        HV_TIME_STAMP TimeStamp;
         HV_NANO100_TIME ReferenceTime;
     };
     HV_UINT64 Reserved1;
@@ -1335,7 +1369,7 @@ typedef struct _HV_EVENTLOG_ENTRY_HEADER
     HV_UINT16 Type; // HookId in WMI_TRACE_PACKET
     union
     {
-        HV_UINT64 TimeStamp;
+        HV_TIME_STAMP TimeStamp;
         HV_NANO100_TIME ReferenceTime;
     };
 } HV_EVENTLOG_ENTRY_HEADER, *PHV_EVENTLOG_ENTRY_HEADER;
@@ -2083,6 +2117,7 @@ typedef const HV_PARTITION_PROCESSOR_FEATURES* PCHV_PARTITION_PROCESSOR_FEATURES
 // be de-featured.
 typedef union _HV_PARTITION_PROCESSOR_XSAVE_FEATURES
 {
+#if defined(_M_AMD64) || defined(_M_IX86)
     struct
     {
         HV_UINT64 XsaveSupport : 1;
@@ -2090,6 +2125,7 @@ typedef union _HV_PARTITION_PROCESSOR_XSAVE_FEATURES
         HV_UINT64 AvxSupport : 1;
         HV_UINT64 Reserved1 : 61;
     };
+#endif
     HV_UINT64 AsUINT64;
 } HV_PARTITION_PROCESSOR_XSAVE_FEATURES, *PHV_PARTITION_PROCESSOR_XSAVE_FEATURES;
 
@@ -2159,7 +2195,8 @@ typedef union _HV_X64_INTERRUPT_STATE_REGISTER
     {
         HV_UINT64 InterruptShadow : 1;
         HV_UINT64 NmiMasked : 1;
-        HV_UINT64 Reserved : 62;
+        HV_UINT64 GlobalInterruptDisable : 1;
+        HV_UINT64 Reserved : 61;
     };
 } HV_X64_INTERRUPT_STATE_REGISTER, *PHV_X64_INTERRUPT_STATE_REGISTER;
 
@@ -2637,7 +2674,7 @@ typedef enum _HV_MESSAGE_TYPE_PRIVATE
 typedef struct _HV_X64_APIC_EOI_MESSAGE
 {
     HV_VP_INDEX VpIndex;
-    HV_UINT32 InterruptVector;
+    HV_INTERRUPT_VECTOR InterruptVector;
 } HV_X64_APIC_EOI_MESSAGE, *PHV_X64_APIC_EOI_MESSAGE;
 
 // Define port type.
@@ -2853,8 +2890,7 @@ typedef union _HV_EMULATED_TIMER_CONTROL
         HV_UINT32 LogicalDestinationMode : 1;
         HV_UINT32 Enabled : 1;
         HV_UINT32 Reserved1 : 19;
-        HV_UINT32 Reserved2 : 24;
-        HV_UINT32 Mda : 8;
+        HV_UINT32 Mda : 32;
     };
 } HV_EMULATED_TIMER_CONTROL, *PHV_EMULATED_TIMER_CONTROL;
 
@@ -2904,11 +2940,12 @@ typedef union _HV_MONITOR_TRIGGER_STATE
 typedef struct _HV_MONITOR_PAGE
 {
     HV_MONITOR_TRIGGER_STATE TriggerState;
-    HV_UINT32 Reserved1;
+    HV_UINT32 RsvdZ1;
     HV_MONITOR_TRIGGER_GROUP TriggerGroup[4];
-    HV_UINT8 Reserved2[536];
+    HV_UINT64 RsvdZ2[3];
+    HV_INT32 NextCheckTime[4][32];
     HV_UINT16 Latency[4][32];
-    HV_UINT8 Reserved3[256];
+    HV_UINT64 RsvdZ3[32];
     HV_MONITOR_PARAMETER Parameter[4][32];
     HV_UINT8 Reserved4[1984];
 } HV_MONITOR_PAGE, *PHV_MONITOR_PAGE;
@@ -5684,8 +5721,8 @@ typedef struct _HV_X64_SINT_DELIVERABLE_MESSAGE
 typedef struct _HV_X64_SIPI_INTERCEPT_MESSAGE
 {
     HV_X64_INTERCEPT_MESSAGE_HEADER Header;
-    HV_UINT32 TargetVpIndex;
-    HV_UINT32 InterruptVector;
+    HV_VP_INDEX TargetVpIndex;
+    HV_INTERRUPT_VECTOR InterruptVector;
 } HV_X64_SIPI_INTERCEPT_MESSAGE, *PHV_X64_SIPI_INTERCEPT_MESSAGE;
 
 typedef struct _HV_REGISTER_X64_CPUID_RESULT_PARAMETERS
@@ -7981,6 +8018,7 @@ typedef enum _HV_SERVICE_BRANCH
     HvServiceBranchQfe = 0x00000001
 } HV_SERVICE_BRANCH, *PHV_SERVICE_BRANCH;
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_FEATURES_PRIVATE
 {
     HV_PARTITION_PRIVILEGE_MASK_PRIVATE PartitionPrivileges;
@@ -7998,7 +8036,24 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES_PRIVATE
     HV_UINT32 TranslateGvaFlagsAvailable : 1;
     HV_UINT32 ApicEoiInterceptAvailable : 1;
 } HV_X64_HYPERVISOR_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_FEATURES_PRIVATE _HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_FEATURES_PRIVATE HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef PHV_X64_HYPERVISOR_FEATURES_PRIVATE PHV_HYPERVISOR_FEATURES_PRIVATE;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_FEATURES_PRIVATE
+{
+    HV_PARTITION_PRIVILEGE_MASK_PRIVATE PartitionPrivileges;
+    HV_UINT32 Reserved0 : 16;
+    HV_UINT32 CrossVtlFlushAvailable : 1;
+    HV_UINT32 S1ExtendedAsidsAvailable : 1;
+    HV_UINT32 Reserved1 : 14;
+} HV_ARM64_HYPERVISOR_FEATURES_PRIVATE, *PHV_ARM64_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_FEATURES_PRIVATE _HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_FEATURES_PRIVATE HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef PHV_ARM64_HYPERVISOR_FEATURES_PRIVATE PHV_HYPERVISOR_FEATURES_PRIVATE;
+#endif
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE
 {
     HV_UINT32 Reserved0 : 16;
@@ -8016,7 +8071,28 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE
     HV_UINT32 ReservedEcx : 25;
     HV_UINT32 ReservedEdx;
 } HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE, *PHV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE _HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef PHV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE PHV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE
+{
+    HV_UINT32 Reserved01 : 21;
+    HV_UINT32 UseHypercallForMmioAccess : 1;
+    HV_UINT32 UseGpaPinningHypercall : 1;
+    HV_UINT32 WakeVps : 1;
+    HV_UINT32 SyncContext : 1;
+    HV_UINT32 Reserved02 : 7;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+    HV_UINT32 Reserved3;
+} HV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE, *PHV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE _HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef PHV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE PHV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+#endif
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
 {
     HV_UINT32 Reserved0 : 18;
@@ -8029,7 +8105,28 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE _HV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE HV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef PHV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE PHV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
+{
+    HV_UINT32 Reserved0 : 8;
+    HV_UINT32 ApicEmulationSupported : 1;
+    HV_UINT32 DeviceAccessTrackingSupported : 1;
+    HV_UINT32 DeviceDomainInputWidth : 8;
+    HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
+    HV_UINT32 Reserved1 : 13;
+    HV_UINT32 Reserved2;
+    HV_UINT32 Reserved3;
+    HV_UINT32 Reserved4;
+} HV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE, *PHV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE _HV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE HV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+typedef PHV_ARM64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE PHV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE;
+#endif
 
+#if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE
 {
     HV_UINT32 ReservedEax;
@@ -8039,6 +8136,23 @@ typedef struct _HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
 } HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE _HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef PHV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE PHV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+#elif defined(_M_ARM64)
+typedef struct _HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE
+{
+    HV_UINT32 ReservedEax;
+    HV_UINT32 ReservedEbx0 : 3;
+    HV_UINT32 DriveIdleTransitions : 1;
+    HV_UINT32 ReservedEbx1 : 28;
+    HV_UINT32 ReservedEcx;
+    HV_UINT32 ReservedEdx;
+} HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE, *PHV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE _HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef HV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+typedef PHV_ARM64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE PHV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE;
+#endif
 
 typedef struct _HV_HYPERVISOR_PASID_FEATURES
 {
@@ -8103,10 +8217,10 @@ typedef struct _HV_HYPERVISOR_IPT_FEATURES
 
 typedef union _HV_CPUID_RESULT_PRIVATE
 {
-    HV_X64_HYPERVISOR_FEATURES_PRIVATE MsHvFeatures;
-    HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE MsHvEnlightenmentInformation;
-    HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE MsHvHardwareFeatures;
-    HV_X64_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE MsHvCpuManagementFeatures;
+    HV_HYPERVISOR_FEATURES_PRIVATE MsHvFeatures;
+    HV_ENLIGHTENMENT_INFORMATION_PRIVATE MsHvEnlightenmentInformation;
+    HV_HYPERVISOR_HARDWARE_FEATURES_PRIVATE MsHvHardwareFeatures;
+    HV_HYPERVISOR_CPU_MANAGEMENT_FEATURES_PRIVATE MsHvCpuManagementFeatures;
     HV_HYPERVISOR_PASID_FEATURES MsHvPasidFeatures;
     HV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE MsHvIsolationConfiguration;
     HV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE MsHvNestedVirtFeatures;
@@ -8711,16 +8825,22 @@ typedef union _HV_TSC_EMULATION_STATUS
 // Hypervisor Hypercall Definitions
 //
 
+typedef HV_HYPERCALL_INPUT HV_X64_HYPERCALL_INPUT;
+
+typedef HV_HYPERCALL_OUTPUT HV_X64_HYPERCALL_OUTPUT;
+
 typedef union _HV_HYPERCALL_INPUT_PRIVATE
 {
     HV_UINT64 AsUINT64;
     struct
     {
-        HV_UINT32 CallCode : 15;
+        HV_UINT32 CallCode : 14;
+        HV_UINT32 IsIsolated : 1;
         HV_UINT32 IsExtended : 1;
         HV_UINT32 IsFast : 1;
         HV_UINT32 VariableHeaderSize : 9;
-        HV_UINT32 Reserved1 : 5;
+        HV_UINT32 Reserved1 : 4;
+        HV_UINT32 AddressesAreVirtual : 1;
         HV_UINT32 IsNested : 1;
         HV_UINT32 CountOfElements : 12;
         HV_UINT32 Reserved2 : 4;
@@ -10183,11 +10303,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA
     HV_VP_INDEX VpIndex;
 } HV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA, *PHV_INPUT_QUERY_ASSOCIATED_LP_FOR_MCA;
 
-typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA
 {
     HV_UINT32 Count;
-    HV_UINT32 AssociatedLpList[512];
-} HV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA, *PHV_OUTPUT_QUERY_ASSOCIATED_LPS_FOR_MCA;
+    HV_UINT16 AssociatedLpList[320];
+} HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA, *PHV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA;
 
 // HvCallNotifyRingEmpty | 0x008B
 
@@ -10524,8 +10644,8 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CREATE_DEVICE_PR_QUEUE
     HV_UINT32 QueueId;
     HV_UINT32 Size;
     HV_GPA_PAGE_NUMBER BaseGpaPage;
-    HV_UINT32 InterruptVector;
-    HV_UINT32 InterruptVpIndex;
+    HV_INTERRUPT_VECTOR InterruptVector;
+    HV_VP_INDEX InterruptVpIndex;
     HV_UINT32 Flags;
     HV_UINT32 Reserved;
 } HV_INPUT_CREATE_DEVICE_PR_QUEUE, *PHV_INPUT_CREATE_DEVICE_PR_QUEUE;
@@ -11487,6 +11607,12 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RESTORE_PARTITION_TIME
 } HV_INPUT_RESTORE_PARTITION_TIME, *PHV_INPUT_RESTORE_PARTITION_TIME;
 
 // HvCallQueryAssociatedLpsForMcaEx | 0x0104
+
+typedef union HV_CALL_ATTRIBUTES _HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA_EX
+{
+    HV_GENERIC_SET AssociatedLpSet;
+    HV_UINT64 AssociatedLpSetBuffer[7];
+} HV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA_EX, *PHV_OUTPUT_QUERY_ASSOCIATED_LP_FOR_MCA_EX;
 
 // HvCallQueryPartitionReservedPages | 0x0105
 
