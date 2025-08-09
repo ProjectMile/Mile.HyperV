@@ -9300,6 +9300,7 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallSetPerfRegister = 0x001B, // Symbols
     HvCallGetPerfRegister = 0x001C, // Symbols
     HvCallFlushCache = 0x001D, // Symbols
+    HvCallLaunchHypervisor = 0x008F, // Symbols
     HvCallReserved0098 = 0x0098, // Reserved
     HvCallSignalEventDirect = 0x00C0, // Undocumented
     HvCallPostMessageDirect = 0x00C1, // Undocumented
@@ -10789,13 +10790,19 @@ typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_COLLECT_LIVE_DUMP
 } HV_OUTPUT_COLLECT_LIVE_DUMP, *PHV_OUTPUT_COLLECT_LIVE_DUMP;
 
 // HvCallDisableHypervisor | 0x008F
+// HvCallLaunchHypervisor | 0x008F
 
-typedef union HV_CALL_ATTRIBUTES _HV_X64_INPUT_DISABLE_HYPERVISOR
+typedef struct HV_CALL_ATTRIBUTES _HV_X64_INPUT_DISABLE_HYPERVISOR
 {
     HV_UINT64 TrampolineCr3;
     HV_UINT64 KernelCr3;
     HV_UINT64 Rip;
 } HV_X64_INPUT_DISABLE_HYPERVISOR, *PHV_X64_INPUT_DISABLE_HYPERVISOR;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_ARM64_INPUT_LAUNCH_HYPERVISOR
+{
+    HV_UINT64 HvEntryPoint;
+} HV_ARM64_INPUT_LAUNCH_HYPERVISOR, *PHV_ARM64_INPUT_LAUNCH_HYPERVISOR;
 
 // HvCallModifySparseGpaPages | 0x0090
 
