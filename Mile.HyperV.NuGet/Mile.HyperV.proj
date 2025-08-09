@@ -16,7 +16,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <OutputFileNamesWithoutVersion>true</OutputFileNamesWithoutVersion>
     <PackageOutputPath>$(MileProjectOutputPath)</PackageOutputPath>
-    <Version>1.1.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2023-09-21'))).TotalDays).0</Version>
+    <Version>1.2.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2023-09-21'))).TotalDays).0</Version>
     <NuspecProperties>version=$(Version);</NuspecProperties>
     <NuspecFile>Mile.HyperV.nuspec</NuspecFile>
   </PropertyGroup>

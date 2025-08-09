@@ -1,5 +1,14 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.688.0**
+
+- Revise the Mile.HyperV.TLFS definitions via symbols in Windows version
+  10.0.26100.0's securekernel.exe. (Thanks to Mezone.)
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/mu_msvm/tree/9337285a977fbf1682e21c17800c4809ce5bcd19.
+- Fix the source code file header comment format.
+- Introduce Mile.HyperV.Test project for testing the definitions.
+
 **Mile.HyperV 1.1.635.0**
 
 - Fix HV_DECLSPEC_ALIGN fallback definition.
