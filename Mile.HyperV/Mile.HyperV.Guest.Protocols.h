@@ -29,6 +29,7 @@
 // - OpenVMM
 //   - vm\devices\vmbus\vmbfs\src\protocol.rs
 //   - vm\devices\vmbus\vmbus_ring\src\lib.rs
+//   - vm\devices\vmbus\vmbus_core\src\protocol.rs
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -59,10 +60,24 @@ typedef long NTSTATUS;
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 #endif // !NT_SUCCESS
 
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
+#endif // !STATUS_SUCCESS
+
+#ifndef STATUS_UNSUCCESSFUL
+// The requested operation was unsuccessful.
+#define STATUS_UNSUCCESSFUL ((NTSTATUS)0xC0000001L)
+#endif // !STATUS_UNSUCCESSFUL
+
 #ifndef STATUS_REVISION_MISMATCH
 // Indicates two revision levels are incompatible.
 #define STATUS_REVISION_MISMATCH ((NTSTATUS)0xC0000059L)
 #endif // !STATUS_REVISION_MISMATCH
+
+#ifndef STATUS_CONNECTION_REFUSED
+// The transport connection attempt was refused by the remote system.
+#define STATUS_CONNECTION_REFUSED ((NTSTATUS)0xC0000236L)
+#endif // !STATUS_CONNECTION_REFUSED
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus
@@ -116,9 +131,9 @@ typedef struct _GPA_RANGE
 // ChannelMessageModifyConnectionResponse messages are supported.
 #define VMBUS_FEATURE_FLAG_MODIFY_CONNECTION 0x4
 
-// Feature which allows the guest to specify a GUID when initiating contact.
-// The GUID signifies the type of VMBus client that is contacting the host,
-// e.g. Windows, Linux, UEFI, minivmbus, etc.
+// Feature which allows a client (Windows, Linux, MiniVMBus, etc) to specify a
+// well-known GUID to identify itself when initiating contact. If not used, the
+// client ID is zero.
 #define VMBUS_FEATURE_FLAG_CLIENT_ID 0x8
 
 // Indicates the CONFIDENTIAL_CHANNEL flag is supported in the OfferChannel
@@ -126,6 +141,22 @@ typedef struct _GPA_RANGE
 // N.B. This flag is only used by paravisors offering VmBus service and is not
 //      supported by the root VmBus driver.
 #define VMBUS_FEATURE_FLAG_CONFIDENTIAL_CHANNELS 0x10
+
+// The server supports messages to pause and resume additional control messages.
+#define VMBUS_FEATURE_FLAG_PAUSE_RESUME 0x20
+
+// The guest supports having the server (host or paravisor) provide monitor page
+// GPAs.
+// If this flag is present in the `InitiateContact` message, the guest may still
+// provide its own monitor pages, which the server may ignore if it supports the
+// flag. The server will only set this flag in the `VersionResponse` message if
+// it is actually providing monitor pages, which the guest must then use instead
+// of its own.
+// If the server sets the flag in the `VersionResponse` message, it must provide
+// a non-zero value for the `ChildToParentMonitorPageGpa`; the
+// `ParentToChildMonitorPageGpa` is optional and may be zero, in which case the
+// guest cannot cancel MNF interrupts from the host.
+#define VMBUS_FEATURE_FLAG_SERVER_SPECIFIED_MONITOR_PAGES 0x40
 
 #define VMBUS_SUPPORTED_FEATURE_FLAGS_COPPER \
     (VMBUS_FEATURE_FLAG_GUEST_SPECIFIED_SIGNAL_PARAMETERS | \
@@ -139,6 +170,9 @@ typedef struct _GPA_RANGE
 typedef enum _VMBUS_CHANNEL_MESSAGE_TYPE
 {
     ChannelMessageInvalid = 0,
+
+    // Since VMBUS_VERSION_V1
+
     ChannelMessageOfferChannel = 1,
     ChannelMessageRescindChannelOffer = 2,
     ChannelMessageRequestOffers = 3,
@@ -155,16 +189,37 @@ typedef enum _VMBUS_CHANNEL_MESSAGE_TYPE
     ChannelMessageInitiateContact = 14,
     ChannelMessageVersionResponse = 15,
     ChannelMessageUnload = 16,
+
+    // Since VMBUS_VERSION_WIN7
+
     ChannelMessageUnloadComplete = 17,
+
+    // Since VMBUS_VERSION_WIN10
+
     ChannelMessageOpenReservedChannel = 18,
     ChannelMessageCloseReservedChannel = 19,
     ChannelMessageCloseReservedResponse = 20,
+    // Some clients send the old message even for newer protocols, so check the
+    // size to allow the old version to match if it's smaller.
     ChannelMessageTlConnectRequest = 21,
+
+    // Since VMBUS_VERSION_WIN10RS3_0
+
     ChannelMessageModifyChannel = 22,
     ChannelMessageTlConnectRequestResult = 23,
+
+    // Since VMBUS_VERSION_IRON
+
     ChannelMessageModifyChannelResponse = 24,
+
+    // Since VMBUS_VERSION_COPPER
+
     ChannelMessageModifyConnection = 25,
     ChannelMessageModifyConnectionResponse = 26,
+    ChannelMessagePause = 27,
+    ChannelMessagePauseResponse = 28,
+    ChannelMessageResume = 29,
+
     ChannelMessageCount
 } VMBUS_CHANNEL_MESSAGE_TYPE, *PVMBUS_CHANNEL_MESSAGE_TYPE;
 
@@ -195,7 +250,36 @@ typedef struct _VMBUS_CHANNEL_MESSAGE_HEADER
 #define VMBUS_OFFER_FLAGS_WIN10 \
     (VMBUS_OFFER_FLAGS_WIN6 | VMBUS_OFFER_FLAG_TLNPI_PROVIDER)
 
+// Target VP index value that indicates that interrupts should be disabled for
+// the channel.
 #define VMBUS_VP_INDEX_DISABLE_INTERRUPT ((HV_UINT32)-1)
+
+typedef enum _HVSOCK_PIPE_TYPE
+{
+    VmbusHvsockPipeTypeByte = 0,
+    VmbusHvsockPipeTypeMessage = 4,
+} HVSOCK_PIPE_TYPE, *PHVSOCK_PIPE_TYPE;
+
+typedef struct _HVSOCK_PIPE_USER_DEFINED_PARAMETERS
+{
+    HVSOCK_PIPE_TYPE PipeType;
+} HVSOCK_PIPE_USER_DEFINED_PARAMETERS, *PHVSOCK_PIPE_USER_DEFINED_PARAMETERS;
+
+typedef enum _HVSOCK_PARAMETERS_VERSION
+{
+    HvsockParametersVersionPreRS5 = 0,
+    HvsockParametersVersionRS5 = 1,
+} HVSOCK_PARAMETERS_VERSION, *PHVSOCK_PARAMETERS_VERSION;
+
+typedef struct _HVSOCK_USER_DEFINED_PARAMETERS
+{
+    HVSOCK_PIPE_USER_DEFINED_PARAMETERS PipeParameters;
+    HV_UINT8 IsForGuestAccept; // HV_BOOLEAN
+    HV_UINT8 IsForGuestContainer; // HV_BOOLEAN
+    HVSOCK_PARAMETERS_VERSION Version;
+    HV_GUID SiloId;
+    HV_UINT8 Padding[2];
+} HVSOCK_USER_DEFINED_PARAMETERS, *PHVSOCK_USER_DEFINED_PARAMETERS;
 
 // Offer Channel parameters
 typedef struct _VMBUS_CHANNEL_OFFER_CHANNEL
@@ -227,7 +311,7 @@ typedef struct _VMBUS_CHANNEL_OFFER_CHANNEL
         {
             HV_UINT16 IsDedicatedInterrupt : 1;
             HV_UINT16 Reserved5 : 15;
-            HV_UINT32 ConnectionId;
+            HV_CONNECTION_ID ConnectionId;
         };
         HV_UINT8 Windows6Offset;
     };
@@ -246,6 +330,12 @@ typedef struct _VMBUS_CHANNEL_RESCIND_OFFER
     HV_UINT32 ChildRelId;
 } VMBUS_CHANNEL_RESCIND_OFFER, *PVMBUS_CHANNEL_RESCIND_OFFER;
 
+typedef VMBUS_CHANNEL_MESSAGE_HEADER
+VMBUS_CHANNEL_REQUEST_OFFERS, *PVMBUS_CHANNEL_REQUEST_OFFERS;
+
+typedef VMBUS_CHANNEL_MESSAGE_HEADER
+VMBUS_CHANNEL_ALL_OFFERS_DELIVERED, *PVMBUS_CHANNEL_ALL_OFFERS_DELIVERED;
+
 // Indicates the host-to-guest interrupt for this channel should be sent to the
 // redirected VTL and SINT. This has no effect if the server is not using
 // redirection.
@@ -263,7 +353,7 @@ typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
     // GPADL for the channel's ring buffer.
     HV_UINT32 RingBufferGpadlHandle;
     // Target VP index for the server-to-client interrupt. (>= Win8 only)
-    HV_UINT32 TargetVp;
+    HV_VP_INDEX TargetVp;
     // The upstream ring buffer begins at offset zero in the memory described
     // by RingBufferGpadlHandle. The downstream ring buffer follows it at this
     // offset (in pages).
@@ -274,9 +364,10 @@ typedef struct _VMBUS_CHANNEL_OPEN_CHANNEL
     // Guest-specified signal parameters; valid only if
     // VMBUS_FEATURE_FLAG_GUEST_SPECIFIED_SIGNAL_PARAMETERS is used.
 
-    HV_UINT32 ConnectionId;
+    HV_CONNECTION_ID ConnectionId;
     HV_UINT16 EventFlag;
 
+    // VMBUS_OPEN_FLAG_*
     // Valid only if VMBUS_FEATURE_FLAG_INTERRUPT_REDIRECTION is used.
     HV_UINT16 Flags;
 } VMBUS_CHANNEL_OPEN_CHANNEL, *PVMBUS_CHANNEL_OPEN_CHANNEL;
@@ -305,7 +396,7 @@ typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChildRelId;
     // Target VP index for the server-to-client interrupt.
-    HV_UINT32 TargetVp;
+    HV_VP_INDEX TargetVp;
 } VMBUS_CHANNEL_MODIFY_CHANNEL, *PVMBUS_CHANNEL_MODIFY_CHANNEL;
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CHANNEL_RESPONSE
@@ -369,24 +460,22 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 VMBusVersionRequested;
-    HV_UINT32 TargetMessageVp;
+    HV_VP_INDEX TargetMessageVp;
     union
     {
         HV_UINT64 InterruptPage;
         struct
         {
-            // VMBUS_VERSION_WIN10RS3_1
-            HV_UINT8 TargetSint;
-            // VMBUS_VERSION_WIN10RS4
-            HV_UINT8 TargetVtl;
+            HV_UINT8 TargetSint; // VMBUS_VERSION_WIN10RS3_1
+            HV_VTL TargetVtl; // VMBUS_VERSION_WIN10RS4
             HV_UINT8 Reserved[2];
-            // VMBUS_VERSION_COPPER
-            HV_UINT32 FeatureFlags;
+            HV_UINT32 FeatureFlags; // VMBUS_VERSION_COPPER
         };
     };
-    HV_UINT64 ParentToChildMonitorPageGpa;
-    HV_UINT64 ChildToParentMonitorPageGpa;
-    // VMBUS_FEATURE_FLAG_CLIENT_ID
+    HV_GPA ParentToChildMonitorPageGpa;
+    HV_GPA ChildToParentMonitorPageGpa; 
+    // Used with `VMBUS_FEATURE_FLAG_CLIENT_ID` when the feature is supported
+    // (Copper and above).
     HV_GUID ClientId;
 } VMBUS_CHANNEL_INITIATE_CONTACT, *PVMBUS_CHANNEL_INITIATE_CONTACT;
 
@@ -403,10 +492,17 @@ typedef struct _VMBUS_CHANNEL_VERSION_RESPONSE
     union
     {
         HV_UINT32 SelectedVersion;
-        HV_UINT32 ConnectionId;
+        HV_CONNECTION_ID ConnectionId;
     };
-    // Supported features is available with the Copper protocol.
+
+    // Available with VMBUS_VERSION_COPPER.
+
     HV_UINT32 SupportedFeatures;
+    HV_UINT32 Padding;
+    // Only valid if VMBUS_FEATURE_FLAG_SERVER_SPECIFIED_MONITOR_PAGES is set.
+    HV_GPA ParentToChildMonitorPageGpa;
+    // Only valid if VMBUS_FEATURE_FLAG_SERVER_SPECIFIED_MONITOR_PAGES is set.
+    HV_GPA ChildToParentMonitorPageGpa;
 } VMBUS_CHANNEL_VERSION_RESPONSE, *PVMBUS_CHANNEL_VERSION_RESPONSE;
 
 #define VMBUS_CHANNEL_VERSION_RESPONSE_MIN_SIZE \
@@ -437,7 +533,7 @@ typedef struct _VMBUS_CHANNEL_OPEN_RESERVED_CHANNEL
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChannelId;
-    HV_UINT32 TargetVp;
+    HV_VP_INDEX TargetVp;
     HV_UINT32 TargetSint;
     HV_UINT32 RingBufferGpadl;
     HV_UINT32 DownstreamPageOffset;
@@ -447,7 +543,7 @@ typedef struct _VMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
     HV_UINT32 ChannelId;
-    HV_UINT32 TargetVp;
+    HV_VP_INDEX TargetVp;
     HV_UINT32 TargetSint;
 } VMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL, *PVMBUS_CHANNEL_CLOSE_RESERVED_CHANNEL;
 
@@ -484,8 +580,8 @@ typedef struct _VMBUS_CHANNEL_TL_CONNECT_RESULT
 typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION
 {
     VMBUS_CHANNEL_MESSAGE_HEADER Header;
-    HV_UINT64 ParentToChildMonitorPageGpa;
-    HV_UINT64 ChildToParentMonitorPageGpa;
+    HV_GPA ParentToChildMonitorPageGpa;
+    HV_GPA ChildToParentMonitorPageGpa;
 } VMBUS_CHANNEL_MODIFY_CONNECTION, *PVMBUS_CHANNEL_MODIFY_CONNECTION;
 
 typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE
@@ -495,9 +591,19 @@ typedef struct _VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE
     HV_UINT8 ConnectionState;
 } VMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE, *PVMBUS_CHANNEL_MODIFY_CONNECTION_RESPONSE;
 
+typedef VMBUS_CHANNEL_MESSAGE_HEADER
+VMBUS_CHANNEL_PAUSE, *PVMBUS_CHANNEL_PAUSE;
+
+typedef VMBUS_CHANNEL_MESSAGE_HEADER
+VMBUS_CHANNEL_PAUSE_RESPONSE, *PVMBUS_CHANNEL_PAUSE_RESPONSE;
+
+typedef VMBUS_CHANNEL_MESSAGE_HEADER
+VMBUS_CHANNEL_RESUME, *PVMBUS_CHANNEL_RESUME;
+
 #pragma pack(pop)
 
 #define VMBUS_MESSAGE_CONNECTION_ID 1
+#define VMBUS_MESSAGE_REDIRECT_CONNECTION_ID 0x800074
 #define VMBUS_MESSAGE_TYPE 1
 #define VMBUS_MAX_GPADLS 256
 #define VMBUS_MAX_CHANNELS HV_EVENT_FLAGS_COUNT
@@ -2416,7 +2522,7 @@ const HV_GUID VMBFS_CLASS_ID =
     { 0x90, 0xA9, 0xC0, 0x47, 0x48, 0x07, 0x2C, 0x60 }
 };
 
-// C4E5E7D1-D748-4AFC-979D-683167910A55
+// {C4E5E7D1-D748-4AFC-979D-683167910A55}
 const HV_GUID VMBFS_IMC_INSTANCE_ID =
 {
     0xC4E5E7D1,
@@ -2544,6 +2650,19 @@ typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE
 } VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE;
 
 #pragma pack(pop)
+
+// *****************************************************************************
+// Unknown VMBus devices
+//
+
+// {3375BAF4-9E15-4B30-B765-67ACB10D607B}
+const HV_GUID INHERITED_ACTIVATION_CLASS_ID =
+{
+    0x3375BAF4,
+    0x9E15,
+    0x4B30,
+    { 0xB7, 0x65, 0x67, 0xAC, 0xB1, 0x0D, 0x60, 0x7B }
+};
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
