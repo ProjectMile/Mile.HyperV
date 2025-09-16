@@ -52,6 +52,10 @@ folder which you actually needed to your C/C++ projects.
     https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94
     - vm\devices\vmbus\vmbfs\src\protocol.rs
     - vm\devices\vmbus\vmbus_ring\src\lib.rs
+    - vm\devices\vmbus\vmbus_core\src\protocol.rs
+    - vm\devices\hyperv_ic_protocol\src\lib.rs
+  - Definitions conform with Windows 10 Build 14347's icsvc.dll
+  - Definitions conform with Windows 10 Build 14347's icsvcext.dll
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

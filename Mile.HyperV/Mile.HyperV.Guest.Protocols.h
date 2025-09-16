@@ -30,6 +30,9 @@
 //   - vm\devices\vmbus\vmbfs\src\protocol.rs
 //   - vm\devices\vmbus\vmbus_ring\src\lib.rs
 //   - vm\devices\vmbus\vmbus_core\src\protocol.rs
+//   - vm\devices\hyperv_ic_protocol\src\lib.rs
+// - Symbols in Windows version 10.0.14347.0's icsvc.dll
+// - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -2650,6 +2653,173 @@ typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE
 } VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE;
 
 #pragma pack(pop)
+
+// *****************************************************************************
+// Microsoft Hyper-V Integration Components
+// - Microsoft Hyper-V Heartbeat
+// - Microsoft Hyper-V Data Exchange
+// - Microsoft Hyper-V Guest Shutdown
+// - Microsoft Hyper-V Time Synchronization
+// - Microsoft Hyper-V Volume Shadow Copy
+// - Microsoft Hyper-V Remote Desktop Virtualization
+//
+
+// {57164F39-9115-4E78-AB55-382F3BD5422D}
+const HV_GUID IC_HEARTBEAT_CLASS_ID =
+{
+    0x57164F39,
+    0x9115,
+    0x4E78,
+    { 0xAB, 0x55, 0x38, 0x2F, 0x3B, 0xD5, 0x42, 0x2D }
+};
+
+// {A9A0F4E7-5A45-4D96-B827-8A841E8C03E6}
+const HV_GUID IC_KVP_EXCHANGE_CLASS_ID =
+{
+    0xA9A0F4E7,
+    0x5A45,
+    0x4D96,
+    { 0xB8, 0x27, 0x8A, 0x84, 0x1E, 0x8C, 0x03, 0xE6 }
+};
+
+// {0E0B6031-5213-4934-818B-38D90CED39DB}
+const HV_GUID IC_SHUTDOWN_CLASS_ID =
+{
+    0x0E0B6031,
+    0x5213,
+    0x4934,
+    { 0x81, 0x8B, 0x38, 0xD9, 0x0C, 0xED, 0x39, 0xDB }
+};
+
+// {9527E630-D0AE-497B-ADCE-E80AB0175CAF}
+const HV_GUID IC_TIMESYNC_CLASS_ID =
+{
+    0x9527E630,
+    0xD0AE,
+    0x497B,
+    { 0xAD, 0xCE, 0xE8, 0x0A, 0xB0, 0x17, 0x5C, 0xAF }
+};
+
+// {35FA2E29-EA23-4236-96AE-3A6EBACBA440}
+const HV_GUID IC_VSS_CLASS_ID =
+{
+    0x35FA2E29,
+    0xEA23,
+    0x4236,
+    { 0x96, 0xAE, 0x3A, 0x6E, 0xBA, 0xCB, 0xA4, 0x40 }
+};
+
+// {276AACF4-AC15-426C-98DD-7521AD3F01FE}
+const HV_GUID IC_RDV_CLASS_ID =
+{
+    0x276AACF4,
+    0xAC15,
+    0x426C,
+    { 0x98, 0xDD, 0x75, 0x21, 0xAD, 0x3F, 0x01, 0xFE }
+};
+
+// Maximum message size between guest and host for IC devices.
+#define IC_MAXIMUM_MESSAGE_SIZE 13312
+
+typedef HV_UINT16 IC_VERSION_FIELD, *PIC_VERSION_FIELD;
+
+// Protocol version.
+typedef struct _IC_VERSION
+{
+    IC_VERSION_FIELD Major;
+    IC_VERSION_FIELD Minor;
+} IC_VERSION, *PIC_VERSION;
+
+#define IC_VERSION_NULL { 0, 0 }
+
+#define IC_FRAMEWORK_VERSION_1 { 1, 0 }
+#define IC_FRAMEWORK_VERSION_3 { 3, 0 }
+
+// Type of message
+typedef enum _IC_FEATURE_IDX
+{
+    // Initial version negotiation between host and guest.
+    ICFeatureVersionNegotiation = 0,
+    // Heartbeat / check if alive.
+    ICFeatureIdxHeartbeat = 1,
+    // KVP exchange.
+    ICFeatureIdxKvpExchange = 2,
+    // Request shutdown.
+    ICFeatureIdxShutdown = 3,
+    // Synchronize time.
+    ICFeatureIdxTimeSync = 4,
+    // VSS
+    ICFeatureIdxVss = 5,
+    // RDV
+    ICFeatureIdxRdv = 6,
+    // Guest interface.
+    ICFeatureIdxGuestInterface = 7,
+    // VM Session.
+    ICFeatureIdxVMSession = 8,
+    ICFeatureCount = 9,
+} IC_FEATURE_IDX, *PIC_FEATURE_IDX;
+
+typedef HV_UINT16 IC_MSG_TYPE, *PIC_MSG_TYPE;
+
+// Status code for a message response.
+
+// Message was processed successfully. (S_OK)
+#define IC_STATUS_SUCCESS 0x00000000
+// There are no more items to process. (HRESULT_FROM_WIN32(ERROR_NO_MORE_ITEMS))
+#define IC_STATUS_NO_MORE_ITEMS 0x80070103
+// Generic failure. (E_FAIL)
+#define IC_STATUS_FAIL 0x80004005
+// The operation is not supported. (HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED))
+#define IC_STATUS_NOT_SUPPORTED 0x80070032
+// Not found. (WBEM_E_NOT_FOUND)
+#define IC_STATUS_NOT_FOUND 0x80041002
+
+typedef HV_UINT8 IC_MSG_TRANS_ID, * PIC_MSG_TRANS_ID;
+
+// Flags for IC messages.
+typedef HV_UINT8 IC_MSG_HDR_FLAG, * PIC_MSG_HDR_FLAG;
+
+// Message expects a response.
+#define IC_MSG_FLAG_TRANSACTION 0x01
+// Message is a request.
+#define IC_MSG_FLAG_REQUEST 0x02
+// Message is a response.
+#define IC_MSG_FLAG_RESPONSE 0x04
+
+// Common message header for IC messages.
+typedef struct _IC_MSG_HDR
+{
+    // Version of the IC framework.
+    IC_VERSION ICVerFramework;
+    // Type of message. (IC_FEATURE_IDX)
+    IC_MSG_TYPE ICMsgType;
+    // Version of message content.
+    IC_VERSION ICVerMessage;
+    // Size in bytes of the message.
+    HV_UINT16 ICMsgSize;
+    // Status code used for message response. (IC_STATUS_*)
+    HV_UINT32 Status;
+    // Transaction ID; should be matched by response message.
+    IC_MSG_TRANS_ID ICTransactionId;
+    // Message flags.
+    IC_MSG_HDR_FLAG ICFlags;
+    // Reserved -- should be zero.
+    HV_UINT8 RESERVED[2];
+} IC_MSG_HDR, *PIC_MSG_HDR;
+
+// Version negotiation message.
+typedef struct _IC_MSG_NEGOTIATE
+{
+    // The number of supported framework versions, located directly after this
+    // structure.
+    HV_UINT16 ICFrameworkVersionCount;
+    // The number of supported message versions, located after the framework
+    // versions.
+    HV_UINT16 ICMessageVersionCount;
+    // Reserved -- must be zero.
+    HV_UINT32 Reserved;
+    IC_VERSION ICVersionData[HV_ANYSIZE_ARRAY];
+} IC_MSG_NEGOTIATE, *PIC_MSG_NEGOTIATE;
 
 // *****************************************************************************
 // Unknown VMBus devices

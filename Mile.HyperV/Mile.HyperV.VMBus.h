@@ -680,15 +680,6 @@ const HV_GUID IC_NEGOTIATE_INSTANCE_ID =
     { 0xB6, 0x5B, 0xDB, 0xA0, 0xDF, 0x85, 0xC8, 0x12 }
 };
 
-// {57164F39-9115-4E78-AB55-382F3BD5422D}
-const HV_GUID IC_HEARTBEAT_CLASS_ID =
-{
-    0x57164F39,
-    0x9115,
-    0x4E78,
-    { 0xAB, 0x55, 0x38, 0x2F, 0x3B, 0xD5, 0x42, 0x2D }
-};
-
 // {FD149E91-82E0-4A7D-AFA6-2A4166CBD7C0}
 const HV_GUID IC_HEARTBEAT_INSTANCE_ID =
 {
@@ -696,15 +687,6 @@ const HV_GUID IC_HEARTBEAT_INSTANCE_ID =
     0x82E0,
     0x4A7D,
     { 0xAF, 0xA6, 0x2A, 0x41, 0x66, 0xCB, 0xD7, 0xC0 }
-};
-
-// {A9A0F4E7-5A45-4D96-B827-8A841E8C03E6}
-const HV_GUID IC_KVP_EXCHANGE_CLASS_ID =
-{
-    0xA9A0F4E7,
-    0x5A45,
-    0x4D96,
-    { 0xB8, 0x27, 0x8A, 0x84, 0x1E, 0x8C, 0x03, 0xE6 }
 };
 
 // {242FF919-07DB-4180-9C2E-B86CB68C8C55}
@@ -716,15 +698,6 @@ const HV_GUID IC_KVP_EXCHANGE_INSTANCE_ID =
     { 0x9C, 0x2E, 0xB8, 0x6C, 0xB6, 0x8C, 0x8C, 0x55 }
 };
 
-// {0E0B6031-5213-4934-818B-38D90CED39DB}
-const HV_GUID IC_SHUTDOWN_CLASS_ID =
-{
-    0x0E0B6031,
-    0x5213,
-    0x4934,
-    { 0x81, 0x8B, 0x38, 0xD9, 0x0C, 0xED, 0x39, 0xDB }
-};
-
 // {B6650FF7-33BC-4840-8048-E0676786F393}
 const HV_GUID IC_SHUTDOWN_INSTANCE_ID =
 {
@@ -732,15 +705,6 @@ const HV_GUID IC_SHUTDOWN_INSTANCE_ID =
     0x33BC,
     0x4840,
     { 0x80, 0x48, 0xE0, 0x67, 0x67, 0x86, 0xF3, 0x93 }
-};
-
-// {9527E630-D0AE-497B-ADCE-E80AB0175CAF}
-const HV_GUID IC_TIMESYNC_CLASS_ID =
-{
-    0x9527E630,
-    0xD0AE,
-    0x497B,
-    { 0xAD, 0xCE, 0xE8, 0x0A, 0xB0, 0x17, 0x5C, 0xAF }
 };
 
 // {2DD1CE17-079E-403C-B352-A1921EE207EE}
@@ -752,15 +716,6 @@ const HV_GUID IC_TIMESYNC_INSTANCE_ID =
     { 0xB3, 0x52, 0xA1, 0x92, 0x1E, 0xE2, 0x07, 0xEE }
 };
 
-// {35FA2E29-EA23-4236-96AE-3A6EBACBA440}
-const HV_GUID IC_VSS_CLASS_ID =
-{
-    0x35FA2E29,
-    0xEA23,
-    0x4236,
-    { 0x96, 0xAE, 0x3A, 0x6E, 0xBA, 0xCB, 0xA4, 0x40 }
-};
-
 // {2450EE40-33BF-4FBD-892E-9FB06E9214CF}
 const HV_GUID IC_VSS_INSTANCE_ID =
 {
@@ -768,15 +723,6 @@ const HV_GUID IC_VSS_INSTANCE_ID =
     0x33BF,
     0x4FBD,
     { 0x89, 0x2E, 0x9F, 0xB0, 0x6E, 0x92, 0x14, 0xCF }
-};
-
-// {276AACF4-AC15-426C-98DD-7521AD3F01FE}
-const HV_GUID IC_RDV_CLASS_ID =
-{
-    0x276AACF4,
-    0xAC15,
-    0x426C,
-    { 0x98, 0xDD, 0x75, 0x21, 0xAD, 0x3F, 0x01, 0xFE }
 };
 
 // {F5BEE29C-1741-4AAD-A4C2-8FDEDB46DCC2}
@@ -815,19 +761,6 @@ const HV_GUID IC_GUESTSVC_INSTANCE_ID =
 #define IC_RDV_CONTROL_CLASS_ID IC_RDV_CLASS_ID
 #define IC_GUESTSVC_CONTROL_CLASS_ID IC_GUESTSVC_CLASS_ID
 
-typedef HV_UINT16 IC_VERSION_FIELD, *PIC_VERSION_FIELD;
-
-typedef struct _IC_VERSION
-{
-    IC_VERSION_FIELD Major;
-    IC_VERSION_FIELD Minor;
-} IC_VERSION, *PIC_VERSION;
-
-#define IC_VERSION_NULL { 0, 0 }
-
-#define IC_FRAMEWORK_VERSION_1 { 1, 0 }
-#define IC_FRAMEWORK_VERSION_3 { 3, 0 }
-
 #define IC_HEARTBEAT_VERSION_3 { 3, 0 }
 #define IC_HEARTBEAT_VERSION_31 { 3, 1 }
 
@@ -850,38 +783,6 @@ typedef struct _IC_VERSION
 #define IC_RDV_VERSION_3 { 3, 0 }
 
 #define IC_GUESTIFACE_VERSION_11 { 1, 1 }
-
-typedef enum _IC_FEATURE_IDX
-{
-    ICFeatureVersionNegotiation = 0,
-    ICFeatureIdxHeartbeat = 1,
-    ICFeatureIdxKvpExchange = 2,
-    ICFeatureIdxShutdown = 3,
-    ICFeatureIdxTimeSync = 4,
-    ICFeatureIdxVss = 5,
-    ICFeatureIdxRdv = 6,
-    ICFeatureIdxGuestInterface = 7,
-    ICFeatureIdxVMSession = 8,
-    ICFeatureCount = 9,
-} IC_FEATURE_IDX, *PIC_FEATURE_IDX;
-
-typedef HV_UINT16 IC_MSG_TYPE, *PIC_MSG_TYPE;
-
-typedef HV_UINT8 IC_MSG_TRANS_ID, *PIC_MSG_TRANS_ID;
-
-typedef HV_UINT8 IC_MSG_HDR_FLAG, *PIC_MSG_HDR_FLAG;
-
-typedef struct _IC_MSG_HDR
-{
-    IC_VERSION ICVerFramework;
-    IC_MSG_TYPE ICMsgType; // IC_FEATURE_IDX
-    IC_VERSION ICVerMessage;
-    HV_UINT16 ICMsgSize;
-    HV_UINT32 Status;
-    IC_MSG_TRANS_ID ICTransactionId;
-    IC_MSG_HDR_FLAG ICFlags;
-    HV_UINT8 RESERVED[2];
-} IC_MSG_HDR, *PIC_MSG_HDR;
 
 typedef enum _GUEST_APPLICATION_STATE
 {
@@ -1112,13 +1013,7 @@ typedef HV_UINT8 IC_TRANSPORT_FLAG, *PIC_TRANSPORT_FLAG;
 
 /* ICFeatureVersionNegotiation | 0 */
 
-typedef struct _IC_MSG_NEGOTIATE
-{
-    HV_UINT16 ICFrameworkVersionCount;
-    HV_UINT16 ICMessageVersionCount;
-    HV_UINT32 Reserved;
-    IC_VERSION ICVersionData[HV_ANYSIZE_ARRAY];
-} IC_MSG_NEGOTIATE, *PIC_MSG_NEGOTIATE;
+// Already defined in Mile.HyperV.Guest.Protocols.h.
 
 /* ICFeatureIdxHeartbeat | 1 */
 

@@ -163,3 +163,5 @@ https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce
 
 - vm\devices\vmbus\vmbfs\src\protocol.rs
 - vm\devices\vmbus\vmbus_ring\src\lib.rs
+- vm\devices\vmbus\vmbus_core\src\protocol.rs
+- vm\devices\hyperv_ic_protocol\src\lib.rs
