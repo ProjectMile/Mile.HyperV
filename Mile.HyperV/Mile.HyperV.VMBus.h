@@ -649,14 +649,7 @@ typedef struct _NVSP_MESSAGE_PRIVATE
 
 #define VMBFS_CONTROL_CLASS_ID VMBFS_CLASS_ID
 
-// {C63C9BDF-5FA5-4208-B03F-6B458B365592}
-const HV_GUID VMBFS_INSTANCE_ID =
-{
-    0xC63C9BDF,
-    0x5FA5,
-    0x4208,
-    { 0xB0, 0x3F, 0x6B, 0x45, 0x8B, 0x36, 0x55, 0x92 }
-};
+#define VMBFS_INSTANCE_ID VMBFS_BOOT_INSTANCE_ID
 
 // *****************************************************************************
 // Microsoft Hyper-V Integration Components

@@ -48,6 +48,10 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\VpcivscDxe\VpciProtocol.h
     - MsvmPkg\VpcivscDxe\PciBars.h
     - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+  - Include Hyper-V related definitions from
+    https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94
+    - vm\devices\vmbus\vmbfs\src\protocol.rs
+    - vm\devices\vmbus\vmbus_ring\src\lib.rs
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

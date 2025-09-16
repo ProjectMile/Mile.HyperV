@@ -26,6 +26,9 @@
 //   - MsvmPkg\VpcivscDxe\VpciProtocol.h
 //   - MsvmPkg\VpcivscDxe\PciBars.h
 //   - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+// - OpenVMM
+//   - vm\devices\vmbus\vmbfs\src\protocol.rs
+//   - vm\devices\vmbus\vmbus_ring\src\lib.rs
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -507,6 +510,8 @@ typedef enum _ENDPOINT_TYPE {
 
 #pragma pack(push, 1)
 
+// VMBus ring buffers are sized in multiples 4KB pages, with a 4KB control page.
+
 // The VM ring control block is the control region for one direction of an
 // endpoint. It is always page aligned.
 typedef struct _VMRCB
@@ -527,6 +532,8 @@ typedef struct _VMRCB
     {
         struct
         {
+            // If set, the endpoint supports sending signals when the number of
+            // free bytes in the ring reaches or exceeds `PendingSendSize`.
             HV_UINT32 SupportsPendingSendSize : 1;
         };
         HV_UINT32 Value;
@@ -535,9 +542,10 @@ typedef struct _VMRCB
 
 HV_STATIC_ASSERT(HV_FIELD_OFFSET(VMRCB, FeatureBits) == 64);
 
+// The descriptor header on every packet.
 typedef struct _VMPACKET_DESCRIPTOR
 {
-    HV_UINT16 Type;
+    HV_UINT16 Type; // VMBUS_PACKET_TYPE
     HV_UINT16 DataOffset8;
     HV_UINT16 Length8;
     HV_UINT16 Flags;
@@ -554,12 +562,16 @@ typedef union _PREVIOUS_PACKET_OFFSET
     HV_UINT64 AsUINT64;
 } PREVIOUS_PACKET_OFFSET, *PPREVIOUS_PACKET_OFFSET;
 
+// A transfer range specifying a length and offset within a transfer page set.
+// Only used by NetVSP.
 typedef struct _VMTRANSFER_PAGE_RANGE
 {
     HV_UINT32 ByteCount;
     HV_UINT32 ByteOffset;
 } VMTRANSFER_PAGE_RANGE, *PVMTRANSFER_PAGE_RANGE;
 
+// The extended portion of the packet descriptor that describes a transfer page
+// packet.
 typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
 {
     VMPACKET_DESCRIPTOR Descriptor;
@@ -575,6 +587,7 @@ typedef struct _VMTRANSFER_PAGE_PACKET_HEADER
 typedef struct _VMDATA_GPA_DIRECT
 {
     VMPACKET_DESCRIPTOR Descriptor;
+    // may have garbage non-zero values
     HV_UINT32 Reserved;
     HV_UINT32 RangeCount;
     GPA_RANGE Range[HV_ANYSIZE_ARRAY];
@@ -583,13 +596,24 @@ typedef struct _VMDATA_GPA_DIRECT
 typedef enum _VMPIPE_PROTOCOL_MESSAGE_TYPE
 {
     VmPipeMessageInvalid = 0,
+    // Regular data packet.
     VmPipeMessageData = 1,
+    // Data packet that has been partially consumed, in which case the
+    // `DataSize` field's high word is the number of bytes already read.
+    // The opposite endpoint will never write this type.
     VmPipeMessagePartial = 2,
+    // Setup a GPA direct buffer for RDMA.
     VmPipeMessageSetupGpaDirect = 3,
+    // Tear down a GPA direct buffer.
     VmPipeMessageTeardownGpaDirect = 4,
     VmPipeMessageIndicationComplete = 5,
 } VMPIPE_PROTOCOL_MESSAGE_TYPE, *PVMPIPE_PROTOCOL_MESSAGE_TYPE;
 
+// The maximum size of a pipe packet's payload.
+#define VMPIPE_MAXIMUM_PIPE_PACKET_SIZE 16384
+
+// Pipe channel packets are prefixed with this header to allow for
+// non-8-multiple lengths.
 typedef struct _VMPIPE_PROTOCOL_HEADER
 {
     VMPIPE_PROTOCOL_MESSAGE_TYPE PacketType;
@@ -2392,6 +2416,24 @@ const HV_GUID VMBFS_CLASS_ID =
     { 0x90, 0xA9, 0xC0, 0x47, 0x48, 0x07, 0x2C, 0x60 }
 };
 
+// C4E5E7D1-D748-4AFC-979D-683167910A55
+const HV_GUID VMBFS_IMC_INSTANCE_ID =
+{
+    0xC4E5E7D1,
+    0xD748,
+    0x4AFC,
+    { 0x97, 0x9D, 0x68, 0x31, 0x67, 0x91, 0x0A, 0x55 }
+};
+
+// {C63C9BDF-5FA5-4208-B03F-6B458B365592}
+const HV_GUID VMBFS_BOOT_INSTANCE_ID =
+{
+    0xC63C9BDF,
+    0x5FA5,
+    0x4208,
+    { 0xB0, 0x3F, 0x6B, 0x45, 0x8B, 0x36, 0x55, 0x92 }
+};
+
 #define VMBFS_MAXIMUM_MESSAGE_SIZE 12288
 #define VMBFS_MAXIMUM_PAYLOAD_SIZE(_Header_) \
     (VMBFS_MAXIMUM_MESSAGE_SIZE - sizeof(_Header_))
@@ -2432,7 +2474,7 @@ typedef struct _VMBFS_MESSAGE_HEADER
 typedef struct _VMBFS_MESSAGE_VERSION_REQUEST
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_UINT32 RequestedVersion;
+    HV_UINT32 RequestedVersion; // VMBFS_VERSION_*
 } VMBFS_MESSAGE_VERSION_REQUEST, *PVMBFS_MESSAGE_VERSION_REQUEST;
 
 typedef enum _VMBFS_STATUS_VERSION_RESPONSE
@@ -2444,13 +2486,13 @@ typedef enum _VMBFS_STATUS_VERSION_RESPONSE
 typedef struct _VMBFS_MESSAGE_VERSION_RESPONSE
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_UINT32 Status;
+    HV_UINT32 Status; // VMBFS_STATUS_VERSION_RESPONSE
 } VMBFS_MESSAGE_VERSION_RESPONSE, *PVMBFS_MESSAGE_VERSION_RESPONSE;
 
 typedef struct _VMBFS_MESSAGE_GET_FILE_INFO
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY]; // UTF-16
 } VMBFS_MESSAGE_GET_FILE_INFO, *PVMBFS_MESSAGE_GET_FILE_INFO;
 
 typedef enum _VMBFS_STATUS_FILE_RESPONSE
@@ -2464,8 +2506,8 @@ typedef enum _VMBFS_STATUS_FILE_RESPONSE
 typedef struct _VMBFS_MESSAGE_GET_FILE_INFO_RESPONSE
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_UINT32 Status;
-    HV_UINT32 Flags;
+    HV_UINT32 Status; // VMBFS_STATUS_FILE_RESPONSE
+    HV_UINT32 Flags; // VMBFS_GET_FILE_INFO_FLAG_*
     HV_UINT64 FileSize;
 } VMBFS_MESSAGE_GET_FILE_INFO_RESPONSE, *PVMBFS_MESSAGE_GET_FILE_INFO_RESPONSE;
 
@@ -2474,14 +2516,14 @@ typedef struct _VMBFS_MESSAGE_READ_FILE
     VMBFS_MESSAGE_HEADER Header;
     HV_UINT32 ByteCount;
     HV_UINT64 Offset;
-    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY]; // UTF-16
 } VMBFS_MESSAGE_READ_FILE, *PVMBFS_MESSAGE_READ_FILE;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RESPONSE
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_UINT32 Status;
-    HV_UINT8 Payload[HV_ANYSIZE_ARRAY];
+    HV_UINT32 Status; // VMBFS_STATUS_FILE_RESPONSE
+    HV_UINT8 Payload[HV_ANYSIZE_ARRAY]; // Data
 } VMBFS_MESSAGE_READ_FILE_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RESPONSE;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA
@@ -2491,13 +2533,13 @@ typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA
     HV_UINT32 ByteCount;
     HV_UINT64 FileOffset;
     HV_UINT64 TokenOffset;
-    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY];
+    HV_WCHAR FilePath[HV_ANYSIZE_ARRAY]; // UTF-16
 } VMBFS_MESSAGE_READ_FILE_RDMA, *PVMBFS_MESSAGE_READ_FILE_RDMA;
 
 typedef struct _VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE
 {
     VMBFS_MESSAGE_HEADER Header;
-    HV_UINT32 Status;
+    HV_UINT32 Status; // VMBFS_STATUS_FILE_RESPONSE
     HV_UINT32 ByteCount;
 } VMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE, *PVMBFS_MESSAGE_READ_FILE_RDMA_RESPONSE;
 

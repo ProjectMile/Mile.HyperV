@@ -150,3 +150,16 @@ https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
 ### Referenced by Mile.HyperV:
 
 - src\windows\inc\wdk.h
+
+## OpenVMM
+
+https://github.com/microsoft/openvmm
+
+### Referenced Version
+
+https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94
+
+### Referenced by Mile.HyperV:
+
+- vm\devices\vmbus\vmbfs\src\protocol.rs
+- vm\devices\vmbus\vmbus_ring\src\lib.rs
