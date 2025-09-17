@@ -689,24 +689,6 @@ const HV_GUID IC_HEARTBEAT_INSTANCE_ID =
     { 0xAF, 0xA6, 0x2A, 0x41, 0x66, 0xCB, 0xD7, 0xC0 }
 };
 
-// {242FF919-07DB-4180-9C2E-B86CB68C8C55}
-const HV_GUID IC_KVP_EXCHANGE_INSTANCE_ID =
-{
-    0x242FF919,
-    0x07DB,
-    0x4180,
-    { 0x9C, 0x2E, 0xB8, 0x6C, 0xB6, 0x8C, 0x8C, 0x55 }
-};
-
-// {B6650FF7-33BC-4840-8048-E0676786F393}
-const HV_GUID IC_SHUTDOWN_INSTANCE_ID =
-{
-    0xB6650FF7,
-    0x33BC,
-    0x4840,
-    { 0x80, 0x48, 0xE0, 0x67, 0x67, 0x86, 0xF3, 0x93 }
-};
-
 // {2DD1CE17-079E-403C-B352-A1921EE207EE}
 const HV_GUID IC_TIMESYNC_INSTANCE_ID =
 {
@@ -764,14 +746,6 @@ const HV_GUID IC_GUESTSVC_INSTANCE_ID =
 #define IC_HEARTBEAT_VERSION_3 { 3, 0 }
 #define IC_HEARTBEAT_VERSION_31 { 3, 1 }
 
-#define IC_KVP_EXCHANGE_VERSION_3 { 3, 0 }
-#define IC_KVP_EXCHANGE_VERSION_4 { 4, 0 }
-#define IC_KVP_EXCHANGE_VERSION_5 { 5, 0 }
-
-#define IC_SHUTDOWN_VERSION_1 { 1, 0 }
-#define IC_SHUTDOWN_VERSION_3 { 3, 0 }
-#define IC_SHUTDOWN_VERSION_31 { 3, 1 }
-
 #define IC_TIMESYNC_VERSION_1 { 1, 0 }
 #define IC_TIMESYNC_VERSION_3 { 3, 0 }
 #define IC_TIMESYNC_VERSION_4 { 4, 0 }
@@ -783,111 +757,6 @@ const HV_GUID IC_GUESTSVC_INSTANCE_ID =
 #define IC_RDV_VERSION_3 { 3, 0 }
 
 #define IC_GUESTIFACE_VERSION_11 { 1, 1 }
-
-typedef enum _GUEST_APPLICATION_STATE
-{
-    GuestApplicationStateUnknown = 0,
-    GuestApplicationStateHealthy = 1,
-    GuestApplicationStateCritical = 2,
-} GUEST_APPLICATION_STATE, *PGUEST_APPLICATION_STATE;
-
-typedef enum _IC_KVP_EXCHANGE_OPERATION
-{
-    ICKvpExchangeOperationGet = 0,
-    ICKvpExchangeOperationSet = 1,
-    ICKvpExchangeOperationDelete = 2,
-    ICKvpExchangeOperationEnumerate = 3,
-    ICKvpExchangeOperationGetIpAddressInfo = 4,
-    ICKvpExchangeOperationSetIpAddressInfo = 5,
-    ICKvpExchangeOperationCount = 6,
-} IC_KVP_EXCHANGE_OPERATION, *PIC_KVP_EXCHANGE_OPERATION;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_HDR
-{
-    HV_UINT8 Operation; // IC_KVP_EXCHANGE_OPERATION
-    HV_UINT8 Pool;
-} IC_KVP_EXCHANGE_MSG_HDR, *PIC_KVP_EXCHANGE_MSG_HDR;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_VALUE
-{
-    HV_UINT32 ValueType;
-    HV_UINT32 KeySize;
-    HV_UINT32 ValueSize;
-    HV_UINT8 Key[512];
-    HV_UINT8 Value[2048];
-} IC_KVP_EXCHANGE_MSG_VALUE, *PIC_KVP_EXCHANGE_MSG_VALUE;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_GET
-{
-    IC_KVP_EXCHANGE_MSG_VALUE Value;
-} IC_KVP_EXCHANGE_MSG_GET, *PIC_KVP_EXCHANGE_MSG_GET;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_SET
-{
-    IC_KVP_EXCHANGE_MSG_VALUE Value;
-} IC_KVP_EXCHANGE_MSG_SET, *PIC_KVP_EXCHANGE_MSG_SET;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_DELETE
-{
-    HV_UINT32 KeySize;
-    HV_UINT8 Key[512];
-} IC_KVP_EXCHANGE_MSG_DELETE, *PIC_KVP_EXCHANGE_MSG_DELETE;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_ENUMERATE
-{
-    HV_UINT32 Index;
-    IC_KVP_EXCHANGE_MSG_VALUE Value;
-} IC_KVP_EXCHANGE_MSG_ENUMERATE, *PIC_KVP_EXCHANGE_MSG_ENUMERATE;
-
-typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE
-{
-    HV_WCHAR AdapterId[128];
-    HV_UINT8 AddressFamily;
-    HV_UINT8 DHCPEnabled;
-    HV_WCHAR IPAddress[1024];
-    HV_WCHAR Subnet[1024];
-    HV_WCHAR Gateway[512];
-    HV_WCHAR DNSServerAddresses[1024];
-} IC_KVP_EXCHANGE_IP_ADDRESS_VALUE, *PIC_KVP_EXCHANGE_IP_ADDRESS_VALUE;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO
-{
-    IC_KVP_EXCHANGE_MSG_HDR Header;
-    IC_KVP_EXCHANGE_IP_ADDRESS_VALUE Value;
-} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO;
-
-typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER
-{
-    HV_UINT32 IPv4AddressCount;
-    HV_UINT32 IPv6AddressCount;
-    HV_UINT32 IPv4GatewayCount;
-    HV_UINT32 IPv6GatewayCount;
-    HV_UINT32 IPv4DNSServerCount;
-    HV_UINT32 IPv6DNSServerCount;
-} IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER, *PIC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER;
-
-typedef struct _IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY
-{
-    IC_KVP_EXCHANGE_IP_ADDRESS_BINARY_HEADER Header;
-    HV_WCHAR AdapterId[128];
-    HV_UINT8 AddressFamily;
-    HV_UINT8 DHCPEnabled;
-    HV_UINT32 IPv4Addresses[64];
-    HV_IPV6_ADDRESS IPv6Addresses[64];
-    HV_UINT32 IPv4Subnets[64];
-    HV_UINT32 IPv6Subnets[64];
-    HV_UINT32 IPv4Gateways[5];
-    HV_IPV6_ADDRESS IPv6Gateways[5];
-    HV_UINT32 IPv4DNSServers[64];
-    HV_IPV6_ADDRESS IPv6DNSServers[64];
-    HV_UINT16 IPAddressOrigins[128];
-} IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY, *PIC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY;
-
-typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY
-{
-    IC_KVP_EXCHANGE_MSG_HDR Header;
-    IC_KVP_EXCHANGE_IP_ADDRESS_VALUE_BINARY Value;
-} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY;
 
 typedef enum _IC_VSS_OPERATION
 {
@@ -1017,46 +886,15 @@ typedef HV_UINT8 IC_TRANSPORT_FLAG, *PIC_TRANSPORT_FLAG;
 
 /* ICFeatureIdxHeartbeat | 1 */
 
-typedef struct _IC_HEARTBEAT_MSG_DATA
-{
-    HV_UINT64 SeqNum;
-    GUEST_APPLICATION_STATE ApplicationState;
-    HV_UINT8 Reserved[4];
-} IC_HEARTBEAT_MSG_DATA, *PIC_HEARTBEAT_MSG_DATA;
+// Already defined in Mile.HyperV.Guest.Protocols.h.
 
 /* ICFeatureIdxKvpExchange | 2 */
 
-typedef struct _IC_KVP_EXCHANGE_MSG
-{
-    IC_KVP_EXCHANGE_MSG_HDR Header;
-    union
-    {
-        IC_KVP_EXCHANGE_MSG_GET Get;
-        IC_KVP_EXCHANGE_MSG_SET Set;
-        IC_KVP_EXCHANGE_MSG_DELETE Delete;
-        IC_KVP_EXCHANGE_MSG_ENUMERATE Enumerate;
-    } Body;
-} IC_KVP_EXCHANGE_MSG, *PIC_KVP_EXCHANGE_MSG;
-
-typedef struct _IC_KVP_EXCHANGE_MSG2
-{
-    union
-    {
-        IC_KVP_EXCHANGE_MSG_HDR Header;
-        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO IpAddressInfo;
-        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY IpAddressInfoBinary;
-    } IpMsg;
-} IC_KVP_EXCHANGE_MSG2, *PIC_KVP_EXCHANGE_MSG2;
+// Already defined in Mile.HyperV.Guest.Protocols.h.
 
 /* ICFeatureIdxShutdown | 3 */
 
-typedef struct _IC_SHUTDOWN_MSG_DATA
-{
-    HV_UINT32 ReasonCode;
-    HV_UINT32 TimeoutInSeconds;
-    HV_UINT32 Flags;
-    HV_UINT8 Message[2048];
-} IC_SHUTDOWN_MSG_DATA, *PIC_SHUTDOWN_MSG_DATA;
+// Already defined in Mile.HyperV.Guest.Protocols.h.
 
 /* ICFeatureIdxTimeSync | 4 */
 

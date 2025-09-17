@@ -31,6 +31,9 @@
 //   - vm\devices\vmbus\vmbus_ring\src\lib.rs
 //   - vm\devices\vmbus\vmbus_core\src\protocol.rs
 //   - vm\devices\hyperv_ic_protocol\src\lib.rs
+//   - vm\devices\hyperv_ic_protocol\src\heartbeat.rs
+//   - vm\devices\hyperv_ic_protocol\src\kvp.rs
+//   - vm\devices\hyperv_ic_protocol\src\shutdown.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 
@@ -2682,6 +2685,15 @@ const HV_GUID IC_KVP_EXCHANGE_CLASS_ID =
     { 0xB8, 0x27, 0x8A, 0x84, 0x1E, 0x8C, 0x03, 0xE6 }
 };
 
+// {242FF919-07DB-4180-9C2E-B86CB68C8C55}
+const HV_GUID IC_KVP_EXCHANGE_INSTANCE_ID =
+{
+    0x242FF919,
+    0x07DB,
+    0x4180,
+    { 0x9C, 0x2E, 0xB8, 0x6C, 0xB6, 0x8C, 0x8C, 0x55 }
+};
+
 // {0E0B6031-5213-4934-818B-38D90CED39DB}
 const HV_GUID IC_SHUTDOWN_CLASS_ID =
 {
@@ -2689,6 +2701,15 @@ const HV_GUID IC_SHUTDOWN_CLASS_ID =
     0x5213,
     0x4934,
     { 0x81, 0x8B, 0x38, 0xD9, 0x0C, 0xED, 0x39, 0xDB }
+};
+
+// {B6650FF7-33BC-4840-8048-E0676786F393}
+const HV_GUID IC_SHUTDOWN_INSTANCE_ID =
+{
+    0xB6650FF7,
+    0x33BC,
+    0x4840,
+    { 0x80, 0x48, 0xE0, 0x67, 0x67, 0x86, 0xF3, 0x93 }
 };
 
 // {9527E630-D0AE-497B-ADCE-E80AB0175CAF}
@@ -2734,6 +2755,15 @@ typedef struct _IC_VERSION
 
 #define IC_FRAMEWORK_VERSION_1 { 1, 0 }
 #define IC_FRAMEWORK_VERSION_3 { 3, 0 }
+
+#define IC_KVP_EXCHANGE_VERSION_3 { 3, 0 }
+#define IC_KVP_EXCHANGE_VERSION_4 { 4, 0 }
+#define IC_KVP_EXCHANGE_VERSION_5 { 5, 0 }
+
+#define IC_SHUTDOWN_VERSION_1 { 1, 0 }
+#define IC_SHUTDOWN_VERSION_3 { 3, 0 }
+#define IC_SHUTDOWN_VERSION_31 { 3, 1 }
+#define IC_SHUTDOWN_VERSION_32 { 3, 2 }
 
 // Type of message
 typedef enum _IC_FEATURE_IDX
@@ -2801,7 +2831,7 @@ typedef struct _IC_MSG_HDR
     HV_UINT32 Status;
     // Transaction ID; should be matched by response message.
     IC_MSG_TRANS_ID ICTransactionId;
-    // Message flags.
+    // Message flags. (IC_MSG_FLAG_*)
     IC_MSG_HDR_FLAG ICFlags;
     // Reserved -- should be zero.
     HV_UINT8 RESERVED[2];
@@ -2820,6 +2850,289 @@ typedef struct _IC_MSG_NEGOTIATE
     HV_UINT32 Reserved;
     IC_VERSION ICVersionData[HV_ANYSIZE_ARRAY];
 } IC_MSG_NEGOTIATE, *PIC_MSG_NEGOTIATE;
+
+// Current state of guest.
+typedef enum _GUEST_APPLICATION_STATE
+{
+    // Guest is in an unknown state.
+    GuestApplicationStateUnknown = 0,
+    // Guest is healthy.
+    GuestApplicationStateHealthy = 1,
+    // Guest encountered a critical error.
+    GuestApplicationStateCritical = 2,
+    // Guest is no longer running.
+    GuestApplicationStateStopped = 3,
+} GUEST_APPLICATION_STATE, *PGUEST_APPLICATION_STATE;
+
+// Heartbeat message from guest to host.
+typedef struct _IC_HEARTBEAT_MSG_DATA
+{
+    // Incrementing sequence counter.
+    HV_UINT64 SeqNum;
+    // Current state of the guest.
+    GUEST_APPLICATION_STATE ApplicationState;
+    // Reserved.
+    HV_UINT8 Reserved[4];
+} IC_HEARTBEAT_MSG_DATA, *PIC_HEARTBEAT_MSG_DATA;
+
+// The operation to perform.
+typedef enum _IC_KVP_EXCHANGE_OPERATION
+{
+    // Get a value.
+    ICKvpExchangeOperationGet = 0,
+    // Set a value.
+    ICKvpExchangeOperationSet = 1,
+    // Delete a value.
+    ICKvpExchangeOperationDelete = 2,
+    // Enumerate values.
+    ICKvpExchangeOperationEnumerate = 3,
+    // Get IP address information.
+    ICKvpExchangeOperationGetIpAddressInfo = 4,
+    // Set IP address information.
+    ICKvpExchangeOperationSetIpAddressInfo = 5,
+    ICKvpExchangeOperationCount = 6,
+} IC_KVP_EXCHANGE_OPERATION, *PIC_KVP_EXCHANGE_OPERATION;
+
+// The pool to use for a value.
+typedef enum _IC_KVP_EXCHANGE_POOL
+{
+    ICKvpExchangePoolExternal = 0,
+    ICKvpExchangePoolGuest = 1,
+    ICKvpExchangePoolAuto = 2,
+    ICKvpExchangePoolAutoExternal = 3,
+    // There is an "internal" pool defined in some places, but this is never
+    // exchanged between host and guest.
+} IC_KVP_EXCHANGE_POOL, *PIC_KVP_EXCHANGE_POOL;
+
+// The header for KVP messages.
+typedef struct _IC_KVP_EXCHANGE_MSG_HDR
+{
+    // The operation to perform. (IC_KVP_EXCHANGE_OPERATION)
+    HV_UINT8 Operation;
+    // The pool to use. (IC_KVP_EXCHANGE_POOL)
+    HV_UINT8 Pool;
+} IC_KVP_EXCHANGE_MSG_HDR, *PIC_KVP_EXCHANGE_MSG_HDR;
+
+// The maximum key size, in bytes.
+#define IC_KVP_EXCHANGE_MAX_KEY_BYTES 512
+// The maximum value size, in bytes.
+#define IC_KVP_EXCHANGE_MAX_VALUE_BYTES 2048
+
+// The type of the value.
+typedef enum _IC_KVP_EXCHANGE_VALUE_TYPE
+{
+    // A UTF-16 string. (REG_SZ)
+    ICKvpExchangeValueTypeString = 1,
+    // A UTF-16 string, with environment variables expanded. (REG_EXPAND_SZ)
+    ICKvpExchangeValueTypeExpandString = 2,
+    // A 32-bit integer. (REG_DWORD)
+    ICKvpExchangeValueTypeDword = 4,
+    // A 64-bit integer. (REG_QWORD)
+    ICKvpExchangeValueTypeQword = 11,
+} IC_KVP_EXCHANGE_VALUE_TYPE, *PIC_KVP_EXCHANGE_VALUE_TYPE;
+
+// A value request or response.
+typedef struct _IC_KVP_EXCHANGE_MSG_VALUE
+{
+    // The type of the value.
+    IC_KVP_EXCHANGE_VALUE_TYPE ValueType;
+    // The size of the key, in bytes (including the null terminator).
+    HV_UINT32 KeySize;
+    // The size of the value, in bytes.
+    HV_UINT32 ValueSize;
+    // The key, as a null-terminated UTF-16 string.
+    HV_WCHAR Key[IC_KVP_EXCHANGE_MAX_KEY_BYTES / 2];
+    // The value.
+    HV_UINT8 Value[IC_KVP_EXCHANGE_MAX_VALUE_BYTES];
+} IC_KVP_EXCHANGE_MSG_VALUE, *PIC_KVP_EXCHANGE_MSG_VALUE;
+
+// A message to get or set a key-value pair.
+typedef struct _IC_KVP_EXCHANGE_MSG_GET_SET
+{
+    // The value.
+    IC_KVP_EXCHANGE_MSG_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_GET_SET, *PIC_KVP_EXCHANGE_MSG_GET_SET;
+
+// A message to delete a key-value pair.
+typedef struct _IC_KVP_EXCHANGE_MSG_DELETE
+{
+    // The size of the key, in bytes (including the null terminator).
+    HV_UINT32 KeySize;
+    // The key, as a null-terminated UTF-16 string.
+    HV_WCHAR Key[IC_KVP_EXCHANGE_MAX_KEY_BYTES / 2];
+} IC_KVP_EXCHANGE_MSG_DELETE, *PIC_KVP_EXCHANGE_MSG_DELETE;
+
+// A message to enumerate key-value pairs.
+typedef struct _IC_KVP_EXCHANGE_MSG_ENUMERATE
+{
+    // The index of the enumeration.
+    HV_UINT32 Index;
+    // The value.
+    IC_KVP_EXCHANGE_MSG_VALUE Value;
+} IC_KVP_EXCHANGE_MSG_ENUMERATE, *PIC_KVP_EXCHANGE_MSG_ENUMERATE;
+
+#pragma pack(1)
+// A get, set, enumerate, or delete message.
+typedef struct _IC_KVP_EXCHANGE_MSG
+{
+    // The header.
+    IC_KVP_EXCHANGE_MSG_HDR Header;
+    // The body of the message. The actual message may start at a different
+    // offset, depending on alignment.
+    union
+    {
+        HV_UINT8 Data[2578];
+        IC_KVP_EXCHANGE_MSG_GET_SET Get;
+        IC_KVP_EXCHANGE_MSG_GET_SET Set;
+        IC_KVP_EXCHANGE_MSG_DELETE Delete;
+        IC_KVP_EXCHANGE_MSG_ENUMERATE Enumerate;
+    };
+} IC_KVP_EXCHANGE_MSG, *PIC_KVP_EXCHANGE_MSG;
+#pragma pack()
+
+// The address family of a network protocol, for specifying the scope of a
+// request.
+typedef enum _IC_KVP_EXCHANGE_ADDRESS_FAMILY
+{
+    // No protocol.
+    ICKvpExchangeAddressFamilyNone = 0,
+    // IPv4.
+    ICKvpExchangeAddressFamilyIpv4 = 1,
+    // IPv6.
+    ICKvpExchangeAddressFamilyIpv6 = 2,
+    // Both IPv4 and IPv6.
+    ICKvpExchangeAddressFamilyIpv4v6 = 3,
+} IC_KVP_EXCHANGE_ADDRESS_FAMILY, *PIC_KVP_EXCHANGE_ADDRESS_FAMILY;
+
+// IP address information, in UTF-16 string form.
+typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO
+{
+    // The adapter ID, as a null-terminated UTF-16 string.
+    HV_WCHAR AdapterId[128];
+    // The protocols this message applies to. (IC_KVP_EXCHANGE_ADDRESS_FAMILY)
+    HV_UINT8 AddressFamily;
+    // Whether DHCP is enabled for the adapter.
+    HV_UINT8 DHCPEnabled;
+    // The IP addresses, as a semicolon-delimited, null-terminated UTF-16
+    // string.
+    HV_WCHAR IPAddress[1024];
+    // The subnets, as a semicolon-delimited, null-terminated UTF-16 string.
+    HV_WCHAR Subnet[1024];
+    // The gateways, as a semicolon-delimited, null-terminated UTF-16 string.
+    HV_WCHAR Gateway[512];
+    // The DNS server addresses, as a semicolon-delimited, null-terminated
+    // UTF-16 string.
+    HV_WCHAR DNSServerAddresses[1024];
+} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO;
+
+// The origin of an IP address.
+typedef enum _IC_KVP_EXCHANGE_IP_ADDRESS_ORIGIN
+{
+    // Unknown origin.
+    ICKvpExchangeIpAddressOriginUnknown = 0,
+    // Non-static assignment (probably DHCP).
+    ICKvpExchangeIpAddressOriginOther = 1,
+    // Static assignment.
+    ICKvpExchangeIpAddressOriginStatic = 2,
+} IC_KVP_EXCHANGE_IP_ADDRESS_ORIGIN, * PIC_KVP_EXCHANGE_IP_ADDRESS_ORIGIN;
+
+// An IPv4 address, encoded as four octets in network byte order.
+typedef struct _IC_KVP_EXCHANGE_IPV4_ADDRESS
+{
+    HV_UINT8 Octets[4];
+} IC_KVP_EXCHANGE_IPV4_ADDRESS, *PIC_KVP_EXCHANGE_IPV4_ADDRESS;
+
+// An IPv6 address, encoded as sixteen octets in network byte order.
+typedef struct _IC_KVP_EXCHANGE_IPV6_ADDRESS
+{
+    HV_UINT8 Octets[16];
+} IC_KVP_EXCHANGE_IPV6_ADDRESS, *PIC_KVP_EXCHANGE_IPV6_ADDRESS;
+
+// IP address information, in binary form.
+typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY
+{
+    // The number of IPv4 addresses.
+    HV_UINT32 IPv4AddressCount;
+    // The number of IPv6 addresses.
+    HV_UINT32 IPv6AddressCount;
+    // The number of IPv4 gateways.
+    HV_UINT32 IPv4GatewayCount;
+    // The number of IPv6 gateways.
+    HV_UINT32 IPv6GatewayCount;
+    // The number of IPv4 DNS servers.
+    HV_UINT32 IPv4DNSServerCount;
+    // The number of IPv6 DNS servers.
+    HV_UINT32 IPv6DNSServerCount;
+    // The adapter ID, as a null-terminated UTF-16 string.
+    HV_WCHAR AdapterId[128];
+    // The protocols this message applies to. (IC_KVP_EXCHANGE_ADDRESS_FAMILY)
+    HV_UINT8 AddressFamily;
+    // Whether DHCP is enabled for the adapter.
+    HV_UINT8 DHCPEnabled;
+    // Zero padding.
+    HV_UINT16 Padding;
+    // The IPv4 addresses.
+    IC_KVP_EXCHANGE_IPV4_ADDRESS IPv4Addresses[64];
+    // The IPv6 addresses.
+    IC_KVP_EXCHANGE_IPV6_ADDRESS IPv6Addresses[64];
+    // The IPv4 subnets.
+    IC_KVP_EXCHANGE_IPV4_ADDRESS IPv4Subnets[64];
+    // The IPv6 subnets.
+    HV_UINT32 IPv6Subnets[64];
+    // The IPv4 gateways.
+    IC_KVP_EXCHANGE_IPV4_ADDRESS IPv4Gateways[5];
+    // The IPv6 gateways.
+    IC_KVP_EXCHANGE_IPV6_ADDRESS IPv6Gateways[5];
+    // The IPv4 DNS servers.
+    IC_KVP_EXCHANGE_IPV4_ADDRESS IPv4DNSServers[64];
+    // The IPv6 DNS servers.
+    IC_KVP_EXCHANGE_IPV6_ADDRESS IPv6DNSServers[64];
+    // The IPv4 and IPv6 address origins. This is flattened into a single array,
+    // without gaps between the IPv4 and IPv6 addresses.
+    // (IC_KVP_EXCHANGE_IP_ADDRESS_ORIGIN)
+    HV_UINT16 IPAddressOrigins[128];
+} IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY;
+
+#pragma pack(1)
+// The message for exchanging IP address information.
+typedef struct _IC_KVP_EXCHANGE_MSG2
+{
+    // The message header.
+    IC_KVP_EXCHANGE_MSG_HDR Header;
+    // The body of the message. The actual message may start at a different
+    // offset, depending on alignment.
+    union
+    {
+        HV_UINT8 Data[7426];
+        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO IpAddressInfo;
+        IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY IpAddressInfoBinary;
+    };
+} IC_KVP_EXCHANGE_MSG2, *PIC_KVP_EXCHANGE_MSG2;
+#pragma pack()
+
+// Whether the shutdown operation is being forced.
+#define IC_SHUTDOWN_FLAG_FORCE 0x1
+// Flag indicating the shutdown behavior is guest restart.
+#define IC_SHUTDOWN_FLAG_RESTART 0x2
+// Flag indicating the shutdown behavior is guest hibernate.
+#define IC_SHUTDOWN_FLAG_HIBERNATE 0x4
+
+// Reason code for IC_SHUTDOWN_MSG_DATA.
+// The value is as same as SHTDN_REASON_FLAG_PLANNED in Windows SDK.
+#define IC_SHUTDOWN_REASON_FLAG_PLANNED 0x80000000
+
+// The message for shutdown initiated from the host.
+typedef struct _IC_SHUTDOWN_MSG_DATA
+{
+    // The shutdown reason.
+    HV_UINT32 ReasonCode;
+    // The maximum amount of time allotted to the guest to perform the shutdown.
+    HV_UINT32 TimeoutInSeconds;
+    // Flags for the shutdown request. (IC_SHUTDOWN_FLAG_*)
+    HV_UINT32 Flags;
+    // Friendly text string for the shutdown request.
+    HV_UINT8 Message[2048];
+} IC_SHUTDOWN_MSG_DATA, *PIC_SHUTDOWN_MSG_DATA;
 
 // *****************************************************************************
 // Unknown VMBus devices
