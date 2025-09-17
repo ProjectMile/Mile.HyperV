@@ -59,8 +59,10 @@ folder which you actually needed to your C/C++ projects.
     - vm\devices\hyperv_ic_protocol\src\shutdown.rs
     - vm\devices\hyperv_ic_protocol\src\timesync.rs
     - vm\devices\hyperv_ic_protocol\src\vss.rs
+    - vm\devices\uidevices\src\video\protocol.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
+  - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0

@@ -36,8 +36,10 @@
 //   - vm\devices\hyperv_ic_protocol\src\shutdown.rs
 //   - vm\devices\hyperv_ic_protocol\src\timesync.rs
 //   - vm\devices\hyperv_ic_protocol\src\vss.rs
+//   - vm\devices\uidevices\src\video\protocol.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
+// - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -796,15 +798,125 @@ const HV_GUID SYNTHVID_CLASS_ID =
     { 0x8E, 0x77, 0x05, 0x58, 0xEB, 0x10, 0x73, 0xF8 }
 };
 
+#define SYNTHVID_MAX_VMBUS_PACKET_SIZE 0x4000
+
+// The maximum amount of data we'll send for a cursor in one packet is 8 k.
+#define SYNTHVID_CURSOR_MAX_PAYLOAD_SIZE (SYNTHVID_MAX_VMBUS_PACKET_SIZE / 2)
+
+// Maximum supported cursor is 96 pixels x 96 pixels in ARGB 32-bit format.
+
+#define SYNTHVID_CURSOR_MAX_X 96
+#define SYNTHVID_CURSOR_MAX_Y 96
+#define SYNTHVID_CURSOR_ARGB_PIXEL_SIZE 4
+#define SYNTHVID_CURSOR_MAX_SIZE ( \
+    SYNTHVID_CURSOR_MAX_X * \
+    SYNTHVID_CURSOR_MAX_Y * \
+    SYNTHVID_CURSOR_ARGB_PIXEL_SIZE)
+
+// Only use bottom 24bits of target id to be compatible with WDDM 2.0 and DWM
+// clone
+
+#define HVD_CHILD_ID 0x00545648
+#define HVD_CHILD_ID2 0x00325648
+#define HVD_CHILD_ID3 0x00335648
+
+const HV_UINT8 SYNTHVID_EDID_BLOCK[] =
+{
+    0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00,
+    0x36, 0x68, 0x2E, 0x06, 0x00, 0x00, 0x00, 0x00,
+    0xFF, 0x15, 0x01, 0x04, 0x80, 0x00, 0x00, 0x78,
+    0x22, 0xEE, 0x95, 0xA3, 0x54, 0x4C, 0x99, 0x26,
+    0x0F, 0x50, 0x54, 0x00, 0x00, 0x00, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x6C, 0x20,
+    0x00, 0x30, 0x42, 0x00, 0x32, 0x30, 0x40, 0xC0,
+    0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1E,
+    0x00, 0x00, 0x00, 0xFC, 0x00, 0x48, 0x79, 0x70,
+    0x65, 0x72, 0x56, 0x4D, 0x6F, 0x6E, 0x69, 0x74,
+    0x6F, 0x72, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC6,
+};
+
+// Maximum supported number of dirty regions in a single dirt message
+#define SYNTHVID_MAX_DIRTY_REGIONS 255
+
+#pragma pack(push, 1)
+
+typedef struct _HVD_SCREEN_INFO
+{
+    HV_UINT16 Width;
+    HV_UINT16 Height;
+} HVD_SCREEN_INFO, *PHVD_SCREEN_INFO;
+
+// Maximum number of resolutions supported. Please refer to StandardResolutions
+// in VideoSynthDevice.cpp (vm\dv\video\core) for list of standard resolutions
+// supported.
+#define SYNTHVID_MAXIMUM_RESOLUTIONS_COUNT 64
+
+// Emergency reset notification I/O Port
+#define SYNTHVID_EMERGENCY_RESET_IO_PORT 0x100
+
+typedef union
+{
+    struct
+    {
+        HV_UINT16 MajorVersion;
+        HV_UINT16 MinorVersion;
+    };
+    HV_UINT32 AsDWORD;
+} SYNTHVID_VERSION, *PSYNTHVID_VERSION;
+
+#define SYNTHVID_MAKE_VERSION(Major, Minor) (((Minor) << 16) | (Major))
+#define SYNTHVID_MAKE_VERSION_MAJOR(Version) ((Version) & 0x0000FFFF)
+#define SYNTHVID_MAKE_VERSION_MINOR(Version) (((Version) & 0xFFFF0000) >> 16)
+
 // Latest version of the SynthVid protocol.
+
 #define SYNTHVID_VERSION_MAJOR 3
 #define SYNTHVID_VERSION_MINOR 5
+
+#define SYNTHVID_VERSION_MAJOR_THRESHOLD 3;
+#define SYNTHVID_VERSION_MINOR_BLUE 3;
+#define SYNTHVID_VERSION_MINOR_THRESHOLD_M1 4;
+#define SYNTHVID_VERSION_MINOR_THRESHOLD_M2 5;
 
 #define SYNTHVID_VERSION_CURRENT \
     ((SYNTHVID_VERSION_MINOR << 16) | (SYNTHVID_VERSION_MAJOR))
 #define TRUE_WITH_VERSION_EXCHANGE (TRUE + 1)
 
-#pragma pack(push, 1)
+// Mask to be applied to the minor version to determine feature support.
+#define SYNTHVID_FEATURE_MINOR_MASK 0xFF
+
+#define SYNTHVID_MAKE_FEATURE(Major, Minor) \
+    (((Major) << 16) | (Minor & SYNTHVID_FEATURE_MINOR_MASK))
+
+#define SYNTHVID_EDID_BLOCK_SIZE 128
+
+// SynthVid features by version.
+typedef enum _SYNTHVID_FEATURE
+{
+    // Win7 RTM.
+    SynthVidFeatureWin7Rtm = SYNTHVID_MAKE_FEATURE(3, 0),
+    SynthVidFeatureBasic = SynthVidFeatureWin7Rtm,
+    // Win8 RTM.
+    SynthVidFeatureWin8Rtm = SYNTHVID_MAKE_FEATURE(3, 2),
+    // Support for resolutions above 1600W or 1200H.
+    SynthVidFeatureHighResolutions = SynthVidFeatureWin8Rtm,
+    // Support for protocol version reinitialization.
+    SynthVidFeatureSupportsReinit = SynthVidFeatureWin8Rtm,
+    // Win BLUE
+    SynthVidFeatureWinBlue = SYNTHVID_MAKE_FEATURE(3, 3),
+    SynthVidFeatureQueryBiosInfo = SynthVidFeatureWinBlue,
+    // Win THRESHOLD M1
+    SynthVidFeatureWinThresholdM1 = SYNTHVID_MAKE_FEATURE(3, 4),
+    SynthVidFeatureResolutionSetByHost = SynthVidFeatureWinThresholdM1,
+    // Win THRESHOLD M2
+    SynthVidFeatureWinThresholdM2 = SYNTHVID_MAKE_FEATURE(3, 5),
+    SynthVidFeatureLockOnDisconnect = SynthVidFeatureWinThresholdM2,
+} SYNTHVID_FEATURE, *PSYNTHVID_FEATURE;
 
 // SynthVid Message Types
 typedef enum
@@ -822,7 +934,11 @@ typedef enum
     SynthvidDirt = 10,
     SynthvidBiosInfoRequest = 11,
     SynthvidBiosInfoResponse = 12,
-    SynthvidMax = 13
+    SynthvidSupportedResolutionsRequest = 13,
+    SynthvidSupportedResolutionsResponse = 14,
+    SynthvidCapabilityRequest = 15,
+    SynthvidCapabilityResponse = 16,
+    SynthvidMax = 17,
 } SYNTHVID_MESSAGE_TYPE;
 
 // Basic message structures.
@@ -840,16 +956,6 @@ typedef struct
     // Enclosed message
     HV_UINT8 Data[HV_ANYSIZE_ARRAY];
 } SYNTHVID_MESSAGE, *PSYNTHVID_MESSAGE;
-
-typedef union
-{
-    struct
-    {
-        HV_UINT16 MajorVersion;
-        HV_UINT16 MinorVersion;
-    };
-    HV_UINT32 AsDWORD;
-} SYNTHVID_VERSION, *PSYNTHVID_VERSION;
 
 // The following messages are listed in order of occurance during startup and
 // handshaking.
