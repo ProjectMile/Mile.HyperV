@@ -168,3 +168,5 @@ https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce
 - vm\devices\hyperv_ic_protocol\src\heartbeat.rs
 - vm\devices\hyperv_ic_protocol\src\kvp.rs
 - vm\devices\hyperv_ic_protocol\src\shutdown.rs
+- vm\devices\hyperv_ic_protocol\src\timesync.rs
+- vm\devices\hyperv_ic_protocol\src\vss.rs

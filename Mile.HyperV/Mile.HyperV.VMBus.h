@@ -689,15 +689,6 @@ const HV_GUID IC_HEARTBEAT_INSTANCE_ID =
     { 0xAF, 0xA6, 0x2A, 0x41, 0x66, 0xCB, 0xD7, 0xC0 }
 };
 
-// {2DD1CE17-079E-403C-B352-A1921EE207EE}
-const HV_GUID IC_TIMESYNC_INSTANCE_ID =
-{
-    0x2DD1CE17,
-    0x079E,
-    0x403C,
-    { 0xB3, 0x52, 0xA1, 0x92, 0x1E, 0xE2, 0x07, 0xEE }
-};
-
 // {2450EE40-33BF-4FBD-892E-9FB06E9214CF}
 const HV_GUID IC_VSS_INSTANCE_ID =
 {
@@ -746,68 +737,10 @@ const HV_GUID IC_GUESTSVC_INSTANCE_ID =
 #define IC_HEARTBEAT_VERSION_3 { 3, 0 }
 #define IC_HEARTBEAT_VERSION_31 { 3, 1 }
 
-#define IC_TIMESYNC_VERSION_1 { 1, 0 }
-#define IC_TIMESYNC_VERSION_3 { 3, 0 }
-#define IC_TIMESYNC_VERSION_4 { 4, 0 }
-
-#define IC_VSS_VERSION_6 { 6, 0 }
-#define IC_VSS_VERSION_7 { 7, 0 }
-
 #define IC_RDV_VERSION_1 { 1, 0 }
 #define IC_RDV_VERSION_3 { 3, 0 }
 
 #define IC_GUESTIFACE_VERSION_11 { 1, 1 }
-
-typedef enum _IC_VSS_OPERATION
-{
-    ICVssOperationCreate = 0,
-    ICVssOperationDelete = 1,
-    ICVssOperationCheckHotBackup = 2,
-    ICVssOperationGetDirectMappedDevicesInfo = 3,
-    ICVssOperationBackupComplete = 4,
-    ICVssOperationFreezeApplications = 5,
-    ICVssOperationThawApplications = 6,
-    ICVssOperationAutoRecover = 7,
-    ICVssOperationQueryGuestClusterInformation = 8,
-    ICVssOperationCount = 9,
-} IC_VSS_OPERATION, *PIC_VSS_OPERATION;
-
-typedef struct _IC_VSS_MSG_HDR
-{
-    HV_UINT8 Operation; // IC_VSS_OPERATION
-    HV_UINT8 Reserved[4];
-} IC_VSS_MSG_HDR, *PIC_VSS_MSG_HDR;
-
-typedef struct _IC_VSS_MSG_DELETE
-{
-    HV_GUID SnapshotSetId;
-} IC_VSS_MSG_DELETE, *PIC_VSS_MSG_DELETE;
-
-typedef struct _IC_VSS_MSG_CHECK_HOT_BACKUP
-{
-    HV_UINT32 Flags;
-} IC_VSS_MSG_CHECK_HOT_BACKUP, *PIC_VSS_MSG_CHECK_HOT_BACKUP;
-
-typedef struct _IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO
-{
-    HV_UINT32 Flags;
-} IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO, *PIC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO;
-
-typedef struct _IC_VSS_MSG_BACKUP_COMPLETE
-{
-    HV_UINT32 Flags;
-} IC_VSS_MSG_BACKUP_COMPLETE, *PIC_VSS_MSG_BACKUP_COMPLETE;
-
-typedef struct _IC_VSS_MSG_CREATE_V2
-{
-    HV_GUID SnapshotSetId;
-    HV_UINT32 BackupType;
-} IC_VSS_MSG_CREATE_V2, *PIC_VSS_MSG_CREATE_V2;
-
-typedef struct _IC_VSS_MSG_THAW_APPLICATIONS
-{
-    HV_UINT32 Flags;
-} IC_VSS_MSG_THAW_APPLICATIONS, *PIC_VSS_MSG_THAW_APPLICATIONS;
 
 typedef enum _IC_VSS_LUN_INFO_BUS_TYPE
 {
@@ -815,15 +748,6 @@ typedef enum _IC_VSS_LUN_INFO_BUS_TYPE
     IcVssLunInfoBusTypeSCSI = 1,
     IcVssLunInfoBusTypeIDE = 2,
 } IC_VSS_LUN_INFO_BUS_TYPE, *PIC_VSS_LUN_INFO_BUS_TYPE;
-
-typedef struct _IC_VSS_LUN_INFO
-{
-    HV_UINT8 BusType; // IC_VSS_LUN_INFO_BUS_TYPE
-    HV_GUID Controller;
-    HV_UINT8 Port;
-    HV_UINT8 Target;
-    HV_UINT8 Lun;
-} IC_VSS_LUN_INFO, *PIC_VSS_LUN_INFO;
 
 typedef struct _IC_VSS_LUN_OFFSET
 {
@@ -909,80 +833,9 @@ typedef struct _IC_TIMESYNC_PROVIDER_MSG_DATA
     HV_UINT8 Reserved[3];
 } IC_TIMESYNC_PROVIDER_MSG_DATA, *PIC_TIMESYNC_PROVIDER_MSG_DATA;
 
-typedef struct _IC_TIMESYNC_MSG_DATA
-{
-    HV_UINT64 ParentTime; // FILETIME
-    HV_UINT64 ChildTime; // FILETIME
-    HV_UINT64 RoundTripTime; // FILETIME
-    HV_UINT8 Flags;
-} IC_TIMESYNC_MSG_DATA, *PIC_TIMESYNC_MSG_DATA;
-
-typedef struct _IC_TIMESYNC_REFERENCE_MSG_DATA
-{
-    HV_UINT64 ParentTime; // FILETIME
-    HV_UINT64 VmReferenceTime;
-    HV_UINT8 Flags;
-    HV_UINT8 LeapFlags;
-    HV_UINT8 Stratum;
-    HV_UINT8 Reserved[3];
-} IC_TIMESYNC_REFERENCE_MSG_DATA, *PIC_TIMESYNC_REFERENCE_MSG_DATA;
-
 /* ICFeatureIdxVss | 5 */
 
-typedef struct _IC_VSS_MSG
-{
-    IC_VSS_MSG_HDR Header;
-    union
-    {
-        IC_VSS_MSG_DELETE Delete;
-        IC_VSS_MSG_CHECK_HOT_BACKUP CheckHotBackup;
-        IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO DirectMapInfo;
-        IC_VSS_MSG_BACKUP_COMPLETE BackupComplete;
-        IC_VSS_MSG_CREATE_V2 CreateV2;
-        IC_VSS_MSG_THAW_APPLICATIONS ThawApplications;
-    } Body;
-    HV_UINT8 Reserved[4];
-} IC_VSS_MSG, *PIC_VSS_MSG;
-
-typedef struct _IC_VSS_MSG2
-{
-    IC_VSS_MSG_HDR Header;
-    HV_UINT32 BackupType;
-    HV_UINT32 Flags;
-    HV_UINT32 LunCount;
-    IC_VSS_LUN_INFO Luns[260];
-} IC_VSS_MSG2, *PIC_VSS_MSG2;
-
-typedef struct _IC_VSS_MSG2_EX
-{
-    IC_VSS_MSG_HDR Header;
-    HV_UINT32 BackupType;
-    HV_UINT32 Flags;
-    HV_UINT32 LunCount;
-    IC_VSS_LUN_INFO Luns[260];
-    IC_VSS_LUN_INFO ShadowLuns[260];
-} IC_VSS_MSG2_EX, *PIC_VSS_MSG2_EX;
-
-typedef struct _IC_VSS_MSG3
-{
-    IC_VSS_MSG_HDR Header;
-    HV_GUID ClusterId;
-    HV_UINT32 ClusterSize;
-    HV_UINT32 LunCount;
-    IC_VSS_LUN_INFO SharedLuns[260];
-    HV_UINT32 SharedLunStatus[260];
-} IC_VSS_MSG3, *PIC_VSS_MSG3;
-
-typedef struct _IC_VSS_MSG3_EX
-{
-    IC_VSS_MSG_HDR Header;
-    HV_GUID ClusterId;
-    HV_UINT32 ClusterSize;
-    HV_UINT32 LunCount;
-    IC_VSS_LUN_INFO SharedLuns[260];
-    HV_UINT32 SharedLunStatus[260];
-    HV_UINT64 LastMoveTime;
-} IC_VSS_MSG3_EX, *PIC_VSS_MSG3_EX;
+// Already defined in Mile.HyperV.Guest.Protocols.h.
 
 /* ICFeatureIdxRdv | 6 */
 

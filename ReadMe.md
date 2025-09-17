@@ -57,6 +57,8 @@ folder which you actually needed to your C/C++ projects.
     - vm\devices\hyperv_ic_protocol\src\heartbeat.rs
     - vm\devices\hyperv_ic_protocol\src\kvp.rs
     - vm\devices\hyperv_ic_protocol\src\shutdown.rs
+    - vm\devices\hyperv_ic_protocol\src\timesync.rs
+    - vm\devices\hyperv_ic_protocol\src\vss.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
 - Mile.HyperV.TLFS.h

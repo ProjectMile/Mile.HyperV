@@ -34,6 +34,8 @@
 //   - vm\devices\hyperv_ic_protocol\src\heartbeat.rs
 //   - vm\devices\hyperv_ic_protocol\src\kvp.rs
 //   - vm\devices\hyperv_ic_protocol\src\shutdown.rs
+//   - vm\devices\hyperv_ic_protocol\src\timesync.rs
+//   - vm\devices\hyperv_ic_protocol\src\vss.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 
@@ -2721,6 +2723,15 @@ const HV_GUID IC_TIMESYNC_CLASS_ID =
     { 0xAD, 0xCE, 0xE8, 0x0A, 0xB0, 0x17, 0x5C, 0xAF }
 };
 
+// {2DD1CE17-079E-403C-B352-A1921EE207EE}
+const HV_GUID IC_TIMESYNC_INSTANCE_ID =
+{
+    0x2DD1CE17,
+    0x079E,
+    0x403C,
+    { 0xB3, 0x52, 0xA1, 0x92, 0x1E, 0xE2, 0x07, 0xEE }
+};
+
 // {35FA2E29-EA23-4236-96AE-3A6EBACBA440}
 const HV_GUID IC_VSS_CLASS_ID =
 {
@@ -2764,6 +2775,15 @@ typedef struct _IC_VERSION
 #define IC_SHUTDOWN_VERSION_3 { 3, 0 }
 #define IC_SHUTDOWN_VERSION_31 { 3, 1 }
 #define IC_SHUTDOWN_VERSION_32 { 3, 2 }
+
+#define IC_TIMESYNC_VERSION_1 { 1, 0 }
+#define IC_TIMESYNC_VERSION_3 { 3, 0 }
+#define IC_TIMESYNC_VERSION_4 { 4, 0 }
+
+#define IC_VSS_VERSION_4 { 4, 0 }
+#define IC_VSS_VERSION_5 { 5, 0 }
+#define IC_VSS_VERSION_6 { 6, 0 }
+#define IC_VSS_VERSION_7 { 7, 0 }
 
 // Type of message
 typedef enum _IC_FEATURE_IDX
@@ -2971,7 +2991,6 @@ typedef struct _IC_KVP_EXCHANGE_MSG_ENUMERATE
     IC_KVP_EXCHANGE_MSG_VALUE Value;
 } IC_KVP_EXCHANGE_MSG_ENUMERATE, *PIC_KVP_EXCHANGE_MSG_ENUMERATE;
 
-#pragma pack(1)
 // A get, set, enumerate, or delete message.
 typedef struct _IC_KVP_EXCHANGE_MSG
 {
@@ -2981,14 +3000,12 @@ typedef struct _IC_KVP_EXCHANGE_MSG
     // offset, depending on alignment.
     union
     {
-        HV_UINT8 Data[2578];
         IC_KVP_EXCHANGE_MSG_GET_SET Get;
         IC_KVP_EXCHANGE_MSG_GET_SET Set;
         IC_KVP_EXCHANGE_MSG_DELETE Delete;
         IC_KVP_EXCHANGE_MSG_ENUMERATE Enumerate;
     };
 } IC_KVP_EXCHANGE_MSG, *PIC_KVP_EXCHANGE_MSG;
-#pragma pack()
 
 // The address family of a network protocol, for specifying the scope of a
 // request.
@@ -3093,7 +3110,6 @@ typedef struct _IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY
     HV_UINT16 IPAddressOrigins[128];
 } IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY, *PIC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY;
 
-#pragma pack(1)
 // The message for exchanging IP address information.
 typedef struct _IC_KVP_EXCHANGE_MSG2
 {
@@ -3103,12 +3119,10 @@ typedef struct _IC_KVP_EXCHANGE_MSG2
     // offset, depending on alignment.
     union
     {
-        HV_UINT8 Data[7426];
         IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO IpAddressInfo;
         IC_KVP_EXCHANGE_MSG_IP_ADDRESS_INFO_BINARY IpAddressInfoBinary;
     };
 } IC_KVP_EXCHANGE_MSG2, *PIC_KVP_EXCHANGE_MSG2;
-#pragma pack()
 
 // Whether the shutdown operation is being forced.
 #define IC_SHUTDOWN_FLAG_FORCE 0x1
@@ -3133,6 +3147,184 @@ typedef struct _IC_SHUTDOWN_MSG_DATA
     // Friendly text string for the shutdown request.
     HV_UINT8 Message[2048];
 } IC_SHUTDOWN_MSG_DATA, *PIC_SHUTDOWN_MSG_DATA;
+
+// Flags for timesync messages.
+
+// This is a sync message.
+#define IC_TIMESYNC_FLAG_SYNC 0x1
+// This is a sample message.
+#define IC_TIMESYNC_FLAG_SAMPLE 0x2
+
+#pragma pack(4)
+// Timesync messages used before version 4.0.
+typedef struct _IC_TIMESYNC_MSG_DATA
+{
+    // The wall clock time measured in the parent, in UTC (without leap
+    // seconds), measured in 100ns units since 1 Jan 1601. (FILETIME)
+    HV_UINT64 ParentTime;
+    // Unused. (FILETIME)
+    HV_UINT64 ChildTime;
+    // The measured round trip time by the parent. (FILETIME)
+    HV_UINT64 RoundTripTime;
+    // Flags indicating the message's purpose.
+    HV_UINT8 Flags;
+    // Reserved.
+    HV_UINT8 Reserved[3];
+} IC_TIMESYNC_MSG_DATA, *PIC_TIMESYNC_MSG_DATA;
+#pragma pack()
+
+// Timesync messages used in version 4.0 and later.
+typedef struct _IC_TIMESYNC_REFERENCE_MSG_DATA
+{
+    // The wall clock time measured in the parent, in UTC (without leap
+    // seconds), measured in 100ns units since 1 Jan 1601. (FILETIME)
+    HV_UINT64 ParentTime;
+    // The VM reference time of the child, at the time the parent measured the
+    // wall clock time.
+    HV_UINT64 VmReferenceTime;
+    // Flags indicating the message's purpose.
+    HV_UINT8 Flags;
+    // The NTP leap indicator.
+    HV_UINT8 LeapFlags;
+    // The NTP stratum.
+    HV_UINT8 Stratum;
+    // Reserved.
+    HV_UINT8 Reserved[5];
+} IC_TIMESYNC_REFERENCE_MSG_DATA, *PIC_TIMESYNC_REFERENCE_MSG_DATA;
+
+#define IC_VSS_MAX_VHD_COUNT 260
+
+typedef enum _IC_VSS_OPERATION
+{
+    ICVssOperationCreate = 0,
+    ICVssOperationDelete = 1,
+    ICVssOperationCheckHotBackup = 2,
+    ICVssOperationGetDirectMappedDevicesInfo = 3,
+
+    // Messages below this are only valid for message version >= 4.0
+
+    ICVssOperationBackupComplete = 4,
+
+    // Messages below this are only valid for message version >= 5.0
+
+    ICVssOperationFreezeApplications = 5,
+    ICVssOperationThawApplications = 6,
+    ICVssOperationAutoRecover = 7,
+
+    // Messages below this are only valid for message version >= 6.0
+
+    ICVssOperationQueryGuestClusterInformation = 8,
+
+    ICVssOperationCount = 9,
+} IC_VSS_OPERATION, *PIC_VSS_OPERATION;
+
+typedef struct _IC_VSS_MSG_HDR
+{
+    HV_UINT8 Operation; // IC_VSS_OPERATION
+    HV_UINT8 Reserved[4];
+} IC_VSS_MSG_HDR, *PIC_VSS_MSG_HDR;
+
+typedef struct _IC_VSS_MSG_CHECK_HOT_BACKUP
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_CHECK_HOT_BACKUP, *PIC_VSS_MSG_CHECK_HOT_BACKUP;
+
+typedef struct _IC_VSS_MSG_CREATE
+{
+    HV_GUID SnapshotSetId;
+} IC_VSS_MSG_CREATE, *PIC_VSS_MSG_CREATE;
+
+typedef struct _IC_VSS_MSG_CREATE_V2
+{
+    HV_GUID SnapshotSetId;
+    HV_UINT32 BackupType;
+} IC_VSS_MSG_CREATE_V2, *PIC_VSS_MSG_CREATE_V2;
+
+typedef struct _IC_VSS_MSG_DELETE
+{
+    HV_GUID SnapshotSetId;
+} IC_VSS_MSG_DELETE, *PIC_VSS_MSG_DELETE;
+
+typedef struct _IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO, *PIC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO;
+
+typedef struct _IC_VSS_MSG_BACKUP_COMPLETE
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_BACKUP_COMPLETE, *PIC_VSS_MSG_BACKUP_COMPLETE;
+
+typedef struct _IC_VSS_MSG_THAW_APPLICATIONS
+{
+    HV_UINT32 Flags;
+} IC_VSS_MSG_THAW_APPLICATIONS, *PIC_VSS_MSG_THAW_APPLICATIONS;
+
+typedef struct _IC_VSS_MSG
+{
+    IC_VSS_MSG_HDR Header;
+    union
+    {
+        IC_VSS_MSG_DELETE Delete;
+        IC_VSS_MSG_CHECK_HOT_BACKUP CheckHotBackup;
+        IC_VSS_MSG_DIRECT_MAPPED_DEVICES_INFO DirectMapInfo;
+        IC_VSS_MSG_BACKUP_COMPLETE BackupComplete;
+        IC_VSS_MSG_CREATE_V2 CreateV2;
+        IC_VSS_MSG_THAW_APPLICATIONS ThawApplications;
+    } Body;
+    HV_UINT8 Reserved[4];
+} IC_VSS_MSG, *PIC_VSS_MSG;
+
+typedef struct _IC_VSS_LUN_INFO
+{
+    HV_UINT8 BusType; // IC_VSS_LUN_INFO_BUS_TYPE
+    HV_UINT8 Reserved[3];
+    HV_GUID Controller;
+    HV_UINT8 Port;
+    HV_UINT8 Target;
+    HV_UINT8 Lun;
+    HV_UINT8 Reserved2;
+} IC_VSS_LUN_INFO, *PIC_VSS_LUN_INFO;
+
+typedef struct _IC_VSS_MSG2
+{
+    IC_VSS_MSG_HDR Header;
+    HV_UINT32 BackupType;
+    HV_UINT32 Flags;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO Luns[IC_VSS_MAX_VHD_COUNT];
+} IC_VSS_MSG2, *PIC_VSS_MSG2;
+
+typedef struct _IC_VSS_MSG2_EX
+{
+    IC_VSS_MSG_HDR Header;
+    HV_UINT32 BackupType;
+    HV_UINT32 Flags;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO Luns[IC_VSS_MAX_VHD_COUNT];
+    IC_VSS_LUN_INFO ShadowLuns[IC_VSS_MAX_VHD_COUNT];
+} IC_VSS_MSG2_EX, *PIC_VSS_MSG2_EX;
+
+typedef struct _IC_VSS_MSG3
+{
+    IC_VSS_MSG_HDR Header;
+    HV_GUID ClusterId;
+    HV_UINT32 ClusterSize;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO SharedLuns[IC_VSS_MAX_VHD_COUNT];
+    HV_UINT32 SharedLunStatus[IC_VSS_MAX_VHD_COUNT];
+} IC_VSS_MSG3, *PIC_VSS_MSG3;
+
+typedef struct _IC_VSS_MSG3_EX
+{
+    IC_VSS_MSG_HDR Header;
+    HV_GUID ClusterId;
+    HV_UINT32 ClusterSize;
+    HV_UINT32 LunCount;
+    IC_VSS_LUN_INFO SharedLuns[IC_VSS_MAX_VHD_COUNT];
+    HV_UINT32 SharedLunStatus[IC_VSS_MAX_VHD_COUNT];
+    HV_UINT64 LastMoveTime;
+} IC_VSS_MSG3_EX, *PIC_VSS_MSG3_EX;
 
 // *****************************************************************************
 // Unknown VMBus devices
