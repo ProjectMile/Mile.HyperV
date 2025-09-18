@@ -23,12 +23,12 @@ folder which you actually needed to your C/C++ projects.
     - MsvmPkg\Include\Hv\HvGuestMsr.h
     - MsvmPkg\Include\Hv\HvGuestSyntheticInterrupts.h
     - MsvmPkg\Include\Hv\HvGuestHypercall.h
-  - Include definitions from MIT-licensed Hyper-V headers from Microsoft mshv 
-    Linux kernel module
-    - https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv
   - Include Hyper-V related definitions from
     https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
     - src\windows\inc\wdk.h
+  - Include Hyper-V related definitions from
+    https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94
+    - vm\hv1\hvdef\src\lib.rs
 - Mile.HyperV.Guest.Protocols.h
   - Include Hyper-V related definitions from
     https://github.com/microsoft/mu_msvm/tree/9337285a977fbf1682e21c17800c4809ce5bcd19
@@ -75,6 +75,7 @@ folder which you actually needed to your C/C++ projects.
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0
   - Include definitions from MIT-licensed Hyper-V headers from Microsoft mshv 
     Linux kernel module
+    - https://github.com/microsoft/OHCL-Linux-Kernel/tree/e9017243ba9b424f6516c4b206f454a1c2585fd2/include/uapi/hyperv
   - Include definitions from gerhart01's archive of Hypervisor (Windows Drivers)
     documentation from Microsoft in 2013
   - Include Hyper-V related definitions from https://github.com/rust-vmm/mshv

@@ -140,9 +140,7 @@ typedef struct _HV_LOADER_BLOCK *PHV_LOADER_BLOCK;
 #define HV_STATUS_PROCESSOR_FEATURE_XSAVE_AVX_NOT_SUPPORTED ((HV_STATUS)0x0034)
 #define HV_STATUS_PROCESSOR_FEATURE_XSAVE_UNKNOWN_FEATURE_NOT_SUPPORTED ((HV_STATUS)0x0035)
 #define HV_STATUS_PROCESSOR_XSAVE_SAVE_AREA_INCOMPATIBLE ((HV_STATUS)0x0036)
-#define HV_STATUS_EVENT_BUFFER_ALREADY_FREED ((HV_STATUS)0x0074)
 #define HV_STATUS_CALL_PENDING ((HV_STATUS)0x0079)
-#define HV_STATUS_VTL_ALREADY_ENABLED ((HV_STATUS)0x0086)
 
 #if defined(_M_AMD64) || defined(_M_IX86)
 typedef union _HV_X64_FP_REGISTER
@@ -1832,18 +1830,6 @@ typedef HV_UINT32 HV_SAVE_RESTORE_STATE_FLAGS, *PHV_SAVE_RESTORE_STATE_FLAGS;
 #define HV_SAVE_RESTORE_STATE_START 0x00000001
 #define HV_SAVE_RESTORE_STATE_SUMMARY 0x00000002
 
-typedef union _HV_PARTITION_PRIVILEGE_MASK_PRIVATE
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 Reserved0 : 15;
-        HV_UINT64 AccessTscInvariantControls : 1;
-        HV_UINT64 Reserved1 : 16;
-        HV_UINT64 Reserved2 : 32;
-    };
-} HV_PARTITION_PRIVILEGE_MASK_PRIVATE, *PHV_PARTITION_PRIVILEGE_MASK_PRIVATE;
-
 typedef enum _HV_PROCESSOR_VENDOR
 {
     HvProcessorVendorAmd = 0x0,
@@ -2630,7 +2616,6 @@ typedef union _HV_GVA_RANGE
 
 // Define index of synthetic interrupt source that receives intercept messages.
 
-#define HV_SYNIC_INTERCEPTION_SINT_INDEX ((HV_SYNIC_SINT_INDEX)0)
 #define HV_SYNIC_IOMMU_FAULT_SINT_INDEX ((HV_SYNIC_SINT_INDEX)1)
 #define HV_SYNIC_VMBUS_SINT_INDEX ((HV_SYNIC_SINT_INDEX)2)
 #define HV_SYNIC_FIRST_UNUSED_SINT_INDEX ((HV_SYNIC_SINT_INDEX)5)
@@ -2645,7 +2630,6 @@ typedef union _HV_GVA_RANGE
 // Define synthetic interrupt controller message constants.
 
 #define HV_ANY_VP (0xFFFFFFFF)
-#define HV_VP_INDEX_SELF (0xFFFFFFFE)
 
 // Define lowest permissible vector that can be sent or received by the local
 // APIC.
@@ -2655,17 +2639,10 @@ typedef union _HV_GVA_RANGE
 // SynIC messages encode the message type as a 32-bit number.
 typedef enum _HV_MESSAGE_TYPE_PRIVATE
 {
-    HvMessageTypeEnablePartitionVtlIntercept = 0x80000005,
-
     // Opaque intercept message. The original intercept message is only
     // accessible from the mapped intercept message page.
 
     HvMessageTypeOpaqueIntercept = 0x8000003F,
-
-    // SynIC intercepts
-
-    HvMessageTypeSynicSintIntercept = 0x80000061,
-    HvMessageTypeSynicSintDeliverable = 0x80000062,
 
     HvMessageInsufficientMemory = 0x80000071,
     HvMessageMirroringNotification = 0x80000072,
@@ -2679,9 +2656,6 @@ typedef enum _HV_MESSAGE_TYPE_PRIVATE
 
 #if defined(_M_AMD64) || defined(_M_IX86)
     HvMessageTypeX64LegacyFpError = 0x80010005,
-    HvMessageTypeX64ProxyInterruptIntercept = 0x8001000f,
-#elif defined(_M_ARM64)
-    HvMessageTypeArm64ResetInterceptUndocumented = 0x8001000C,
 #endif
 } HV_MESSAGE_TYPE_PRIVATE, *PHV_MESSAGE_TYPE_PRIVATE;
 
@@ -4070,10 +4044,6 @@ typedef enum _HV_PARTITION_PROPERTY_CODE
 // External names used to manupulate registers
 typedef enum _HV_REGISTER_NAME_PRIVATE
 {
-    // Suspend Registers
-
-    HvRegisterInternalActivityState = 0x00000004,
-
     // Feature Access (registers are 128 bits)
 
     HvRegisterIptFeaturesInfo = 0x00000208,
@@ -4084,14 +4054,12 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
 
     // Pending Event Register
 
-    HvRegisterDeliverabilityNotifications = 0x00010006,
     HvRegisterPendingEvent2 = 0x00010008,
     HvRegisterPendingEvent3 = 0x00010009,
 
     // Synthetic VSM registers
 
     HvRegisterVsmVpVtlControl = 0x000D0000,
-    HvRegisterGuestVsmPartitionConfig = 0x000D0008,
 
     HvRegisterHvptControl = 0xD0000009,
 
@@ -4172,13 +4140,6 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
 
     HvX64RegisterVpRuntime = 0x00090000,
 
-    // Virtual APIC registers MSRs
-
-    HvRegisterReferenceTsc = 0x00090017,
-    HvRegisterVpConfig = 0x00090018,
-    HvRegisterGhcb = 0x00090019,
-    HvRegisterReferenceTscSequence = 0x0009001A,
-    HvRegisterGuestSchedulerEvent = 0x0009001B,
     HvX64RegisterRegPage = 0x0009001C,
 
     // AMD SEV SNP configuration register
@@ -9233,30 +9194,13 @@ typedef enum _HV_SERVICE_BRANCH
 } HV_SERVICE_BRANCH, *PHV_SERVICE_BRANCH;
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef struct _HV_X64_HYPERVISOR_FEATURES_PRIVATE
-{
-    HV_PARTITION_PRIVILEGE_MASK_PRIVATE PartitionPrivileges;
-    HV_UINT32 Reserved0 : 5;
-    HV_UINT32 InvariantMperfAvailable : 1;
-    HV_UINT32 SupervisorShadowStackAvailable : 1;
-    HV_UINT32 ArchPmuAvailable : 1;
-    HV_UINT32 ExceptionTrapInterceptAvailable : 1;
-    HV_UINT32 Reserved1 : 23;
-    HV_UINT32 Reserved2 : 26;
-    HV_UINT32 LbrAvailable : 1;
-    HV_UINT32 IptAvailable : 1;
-    HV_UINT32 CrossVtlFlushAvailable : 1;
-    HV_UINT32 IdleSpecCtrlAvailable : 1;
-    HV_UINT32 TranslateGvaFlagsAvailable : 1;
-    HV_UINT32 ApicEoiInterceptAvailable : 1;
-} HV_X64_HYPERVISOR_FEATURES_PRIVATE, *PHV_X64_HYPERVISOR_FEATURES_PRIVATE;
-typedef HV_X64_HYPERVISOR_FEATURES_PRIVATE _HV_HYPERVISOR_FEATURES_PRIVATE;
-typedef HV_X64_HYPERVISOR_FEATURES_PRIVATE HV_HYPERVISOR_FEATURES_PRIVATE;
-typedef PHV_X64_HYPERVISOR_FEATURES_PRIVATE PHV_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_FEATURES _HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef HV_X64_HYPERVISOR_FEATURES HV_HYPERVISOR_FEATURES_PRIVATE;
+typedef PHV_X64_HYPERVISOR_FEATURES PHV_HYPERVISOR_FEATURES_PRIVATE;
 #elif defined(_M_ARM64)
 typedef struct _HV_ARM64_HYPERVISOR_FEATURES_PRIVATE
 {
-    HV_PARTITION_PRIVILEGE_MASK_PRIVATE PartitionPrivileges;
+    HV_PARTITION_PRIVILEGE_MASK PartitionPrivileges;
     HV_UINT32 Reserved0 : 16;
     HV_UINT32 CrossVtlFlushAvailable : 1;
     HV_UINT32 S1ExtendedAsidsAvailable : 1;
@@ -9268,26 +9212,9 @@ typedef PHV_ARM64_HYPERVISOR_FEATURES_PRIVATE PHV_HYPERVISOR_FEATURES_PRIVATE;
 #endif
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE
-{
-    HV_UINT32 Reserved0 : 16;
-    HV_UINT32 CoreSchedulerRequested : 1;
-    HV_UINT32 Reserved1 : 1;
-    HV_UINT32 NoNonArchitecturalCoreSharing : 1;
-    HV_UINT32 UseX2Apic : 1;
-    HV_UINT32 RestoreTimeOnResume : 1;
-    HV_UINT32 UseHypercallForMmioAccess : 1;
-    HV_UINT32 UseGpaPinningHypercall : 1;
-    HV_UINT32 WakeVps : 1;
-    HV_UINT32 Reserved : 8;
-    HV_UINT32 Reserved2;
-    HV_UINT32 ImplementedPhysicalAddressBits : 7;
-    HV_UINT32 ReservedEcx : 25;
-    HV_UINT32 ReservedEdx;
-} HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE, *PHV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE;
-typedef HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE _HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
-typedef HV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
-typedef PHV_X64_ENLIGHTENMENT_INFORMATION_PRIVATE PHV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_X64_ENLIGHTENMENT_INFORMATION _HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef HV_X64_ENLIGHTENMENT_INFORMATION HV_ENLIGHTENMENT_INFORMATION_PRIVATE;
+typedef PHV_X64_ENLIGHTENMENT_INFORMATION PHV_ENLIGHTENMENT_INFORMATION_PRIVATE;
 #elif defined(_M_ARM64)
 typedef struct _HV_ARM64_ENLIGHTENMENT_INFORMATION_PRIVATE
 {
@@ -9312,9 +9239,7 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES_PRIVATE
     HV_UINT32 Reserved0 : 18;
     HV_UINT32 L3CachePartitioningSupported : 1;
     HV_UINT32 L3CacheMonitoringSupported : 1;
-    HV_UINT32 Reserved1 : 7;
-    HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
-    HV_UINT32 Reserved2 : 4;
+    HV_UINT32 Reserved1 : 12;
     HV_UINT32 ReservedEbx;
     HV_UINT32 ReservedEcx;
     HV_UINT32 ReservedEdx;
@@ -10150,8 +10075,6 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallFlushCache = 0x001D, // Symbols
     HvCallLaunchHypervisor = 0x008F, // Symbols
     HvCallReserved0098 = 0x0098, // Reserved
-    HvCallSignalEventDirect = 0x00C0, // Undocumented
-    HvCallPostMessageDirect = 0x00C1, // Undocumented
     HvCallReserved00d5 = 0x00D5, // Symbols
     HvCallQueryDeviceInterruptTarget = 0x00E0, // Symbols
     HvCallMapVpStatePage = 0x00E1, // Undocumented
@@ -10191,8 +10114,6 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallRestorePartitionTime = 0x0103, // Symbols
     HvCallQueryAssociatedLpsForMcaEx = 0x0104, // Symbols
     HvCallQueryPartitionReservedPages = 0x0105, // Symbols
-    HvCallMemoryMappedIoRead = 0x0106, // Symbols
-    HvCallMemoryMappedIoWrite = 0x0107, // Symbols
     HvCallMapDmaRange = 0x0108, // Symbols
     HvCallUnmapDmaRange = 0x0109, // Symbols
     HvCallSetPartitionPropertyEx = 0x010A, // Symbols
@@ -10203,8 +10124,6 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallDisableHypervisorEx = 0x010F, // Symbols
     HvCallInstallInterceptEx = 0x0110, // Symbols
     HvCallMapVpStatePageEx = 0x0111, // Symbols
-    HvCallPinGpaPageRanges = 0x0112, // Symbols
-    HvCallUnpinGpaPageRanges = 0x0113, // Symbols
     HvCallWakeVps = 0x0114, // Symbols
     HvCallSetCpuGroupAffinity = 0x0115, // Symbols
     HvCallMapPartitionEventLogBuffer = 0x0116, // Symbols

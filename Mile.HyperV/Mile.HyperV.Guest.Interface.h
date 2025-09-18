@@ -18,6 +18,8 @@
 //   - MsvmPkg\Include\Hv\HvGuestHypercall.h
 // - Windows Subsystem for Linux
 //   - src\windows\inc\wdk.h
+// - OpenVMM
+//   - vm\hv1\hvdef\src\lib.rs
 
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
@@ -227,6 +229,18 @@ typedef HV_UINT16 HV_STATUS, *PHV_STATUS;
 // operation.
 #define HV_STATUS_INSUFFICIENT_ROOT_MEMORY ((HV_STATUS)0x0073)
 
+// Event buffer already freed.
+#define HV_STATUS_EVENT_BUFFER_ALREADY_FREED ((HV_STATUS)0x0074)
+
+// The specified timeout expired before the operation completed.
+#define HV_STATUS_TIMEOUT ((HV_STATUS)0x0078)
+
+// The VTL specified for the operation is already in an enabled state.
+#define HV_STATUS_VTL_ALREADY_ENABLED ((HV_STATUS)0x0086)
+
+// Unknown register name
+#define HV_STATUS_UNKNOWN_REGISTER_NAME ((HV_STATUS)0x0087)
+
 // *****************************************************************************
 // Basic Type Definitions
 //
@@ -283,6 +297,10 @@ typedef HV_UINT64 HV_PARTITION_ID, *PHV_PARTITION_ID;
 
 #define HV_PARTITION_ID_INVALID ((HV_PARTITION_ID)0x0)
 #define HV_PARTITION_ID_SELF ((HV_PARTITION_ID)-1)
+
+// Define synthetic interrupt controller message constants.
+
+#define HV_VP_INDEX_SELF 0xFFFFFFFE
 
 // Time in the hypervisor is measured in 100 nanosecond units.
 
@@ -441,7 +459,8 @@ typedef union _HV_PARTITION_PRIVILEGE_MASK
         HV_UINT64 AccessDebugRegs : 1;
         HV_UINT64 AccessReenlightenmentControls : 1;
         HV_UINT64 AccessRootSchedulerReg : 1;
-        HV_UINT64 Reserved1 : 17;
+        HV_UINT64 AccessTscInvariantControls : 1;
+        HV_UINT64 Reserved1 : 16;
 
         // Access to hypercalls
 
@@ -597,7 +616,11 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES
 
     HV_UINT32 MaxSupportedCState : 4;
     HV_UINT32 HpetNeededForC3PowerState_Deprecated : 1;
-    HV_UINT32 Reserved : 27;
+    HV_UINT32 InvariantMperfAvailable : 1;
+    HV_UINT32 SupervisorShadowStackAvailable : 1;
+    HV_UINT32 ArchPmuAvailable : 1;
+    HV_UINT32 ExceptionTrapInterceptAvailable : 1;
+    HV_UINT32 Reserved : 23;
 
     // Edx
 
@@ -627,7 +650,12 @@ typedef struct _HV_X64_HYPERVISOR_FEATURES
     HV_UINT32 SyntheticTimeUnhaltedTimerAvailable : 1;
     HV_UINT32 DeviceDomainsAvailable : 1; // HDK only.
     HV_UINT32 S1DeviceDomainsAvailable : 1; // HDK only.
-    HV_UINT32 Reserved1 : 6;
+    HV_UINT32 LbrAvailable : 1;
+    HV_UINT32 IptAvailable : 1;
+    HV_UINT32 CrossVtlFlushAvailable : 1;
+    HV_UINT32 IdleSpecCtrlAvailable : 1;
+    HV_UINT32 TranslateGvaFlagsAvailable : 1;
+    HV_UINT32 ApicEoiInterceptAvailable : 1;
 } HV_X64_HYPERVISOR_FEATURES, *PHV_X64_HYPERVISOR_FEATURES;
 typedef HV_X64_HYPERVISOR_FEATURES _HV_HYPERVISOR_FEATURES;
 typedef HV_X64_HYPERVISOR_FEATURES HV_HYPERVISOR_FEATURES;
@@ -683,15 +711,22 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
     HV_UINT32 UseVmcsEnlightenments : 1;
     HV_UINT32 UseSyncedTimeline : 1;
     // Was UseReferencePageForSyncedTimeline but never consumed.
-    HV_UINT32 Available : 1;
+    HV_UINT32 CoreSchedulerRequested : 1;
     HV_UINT32 UseDirectLocalFlushEntire : 1;
-    HV_UINT32 Reserved : 14;
+    HV_UINT32 NoNonArchitecturalCoreSharing : 1;
+    HV_UINT32 UseX2Apic : 1;
+    HV_UINT32 RestoreTimeOnResume : 1;
+    HV_UINT32 UseHypercallForMmioAccess : 1;
+    HV_UINT32 UseGpaPinningHypercall : 1;
+    HV_UINT32 WakeVps : 1;
+    HV_UINT32 Reserved : 8;
 
     // Ebx
     HV_UINT32 LongSpinWaitCount;
 
     // Ecx
-    HV_UINT32 ReservedEcx;
+    HV_UINT32 ImplementedPhysicalAddressBits : 7;
+    HV_UINT32 ReservedEcx : 25;
 
     // Edx
     HV_UINT32 ReservedEdx;
@@ -770,7 +805,8 @@ typedef struct _HV_X64_HYPERVISOR_HARDWARE_FEATURES
     HV_UINT32 ChildX2ApicRecommended : 1;
     HV_UINT32 HardwareWatchdogReserved : 1;
     HV_UINT32 DeviceAccessTrackingSupported : 1;
-    HV_UINT32 Reserved : 5;
+    HV_UINT32 HardwareGpaAccessTrackingSupported : 1;
+    HV_UINT32 Reserved : 4;
 
     // Ebx
     HV_UINT32 DeviceDomainInputWidth : 8;
@@ -1162,8 +1198,18 @@ typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
     };
 } HV_X64_MSR_HYPERCALL_CONTENTS, *PHV_X64_MSR_HYPERCALL_CONTENTS;
 
+// Hyper-V guest crash notification MSR's
+
+#define HV_X64_MSR_GUEST_CRASH_P0 HvSyntheticMsrCrashP0
+#define HV_X64_MSR_GUEST_CRASH_P1 HvSyntheticMsrCrashP1
+#define HV_X64_MSR_GUEST_CRASH_P2 HvSyntheticMsrCrashP2
+#define HV_X64_MSR_GUEST_CRASH_P3 HvSyntheticMsrCrashP3
+#define HV_X64_MSR_GUEST_CRASH_P4 HvSyntheticMsrCrashP4
+#define HV_X64_MSR_GUEST_CRASH_CTL HvSyntheticMsrCrashCtl
+
 #define HV_CRASH_MAXIMUM_MESSAGE_SIZE 4096ull
 
+// The contents of `HV_X64_MSR_GUEST_CRASH_CTL`
 typedef union _HV_CRASH_CTL_REG_CONTENTS
 {
     HV_UINT64 AsUINT64;
@@ -1175,7 +1221,8 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
         HV_UINT64 PreOSId : 3;
         // Crash dump will not be captured
         HV_UINT64 NoCrashDump : 1;
-        // P3 is the PA of the message, P4 is the length in bytes
+        // `HV_X64_MSR_GUEST_CRASH_P3` is the GPA of the message,
+        // `HV_X64_MSR_GUEST_CRASH_P4` is its length in bytes
         HV_UINT64 CrashMessage : 1;
         // Log contents of crash parameter system registers
         HV_UINT64 CrashNotify : 1;
@@ -1221,6 +1268,10 @@ typedef union _HV_PORT_ID
 // Define the synthetic interrupt source index type.
 typedef HV_UINT32 HV_SYNIC_SINT_INDEX, *PHV_SYNIC_SINT_INDEX;
 
+// Define index of synthetic interrupt source that receives intercept messages.
+
+#define HV_SYNIC_INTERCEPTION_SINT_INDEX ((HV_SYNIC_SINT_INDEX)0)
+
 // Define the number of synthetic interrupt sources.
 #define HV_SYNIC_SINT_COUNT (16)
 
@@ -1230,9 +1281,7 @@ typedef HV_UINT32 HV_SYNIC_SINT_INDEX, *PHV_SYNIC_SINT_INDEX;
 #define HV_MESSAGE_PAYLOAD_BYTE_COUNT (240)
 #define HV_MESSAGE_PAYLOAD_QWORD_COUNT (30)
 
-//
 // Define hypervisor message types.
-//
 typedef enum _HV_MESSAGE_TYPE
 {
     HvMessageTypeNone = 0x00000000,
@@ -1246,6 +1295,7 @@ typedef enum _HV_MESSAGE_TYPE
 #endif
     HvMessageTypeUnacceptedGpa = 0x80000003,
     HvMessageTypeGpaAttributeIntercept = 0x80000004,
+    HvMessageTypeEnablePartitionVtlIntercept = 0x80000005,
 
     // Timer notifications messages
     HvMessageTimerExpired = 0x80000010,
@@ -1267,6 +1317,13 @@ typedef enum _HV_MESSAGE_TYPE
     // SynIC intercepts
     HvMessageTypeSynicEventIntercept = 0x80000060,
 
+    // SynIC intercepts
+
+    HvMessageTypeSynicSintIntercept = 0x80000061,
+    HvMessageTypeSynicSintDeliverable = 0x80000062,
+
+    HvMessageTypeAsyncCallCompletion = 0x80000070,
+
     // Integrated (root) scheduler signal VP-backing thread(s) messages.
     // N.B. Message id range [0x80000100, 0x800001FF] inclusively is reserved
     //      for the integrated (root) scheduler messages.
@@ -1285,12 +1342,23 @@ typedef enum _HV_MESSAGE_TYPE
     HvMessageTypeX64IoPortIntercept = 0x80010000,
     HvMessageTypeX64CpuidIntercept = 0x80010002,
     HvMessageTypeX64ApicEoi = 0x80010004,
-    HvMessageTypeX64IommuPrq = 0x80010006,
+    HvMessageTypeX64IommuPrq = 0x80010005,
+    HvMessageTypeX64IommuPrq_ProjectMuMsvm = 0x80010006,
     HvMessageTypeX64Halt = 0x80010007,
     HvMessageTypeX64InterruptionDeliverable = 0x80010008,
     HvMessageTypeX64SipiIntercept = 0x80010009,
+    HvMessageTypeX64RdtscIntercept = 0x8001000A,
+    HvMessageTypeX64ApicSmiIntercept = 0x8001000B,
+    HvMessageTypeX64ApicInitSipiIntercept = 0x8001000D,
+    HvMessageTypeX64ApicWriteIntercept = 0x8001000E,
+    HvMessageTypeX64ProxyInterruptIntercept = 0x8001000F,
+    HvMessageTypeX64IsolationCtrlRegIntercept = 0x80010010,
+    HvMessageTypeX64SnpGuestRequestIntercept = 0x80010011,
+    HvMessageTypeX64ExceptionTrapIntercept = 0x80010012,
+    HvMessageTypeX64SevVmgexitIntercept = 0x80010013,
 #elif defined(_M_ARM64)
-    HvMessageTypeArm64ResetIntercept = 0x80010000,
+    HvMessageTypeArm64ResetIntercept = 0x8001000C,
+    HvMessageTypeArm64ResetIntercept_ProjectMuMsvm = 0x80010000,
 #endif
 } HV_MESSAGE_TYPE, *PHV_MESSAGE_TYPE;
 
@@ -1888,6 +1956,11 @@ typedef enum _HV_CALL_CODE
     HvCallConfigureVirtualInterruptLine = 0x00C0,
     HvCallSetVirtualInterruptLineState = 0x00C1,
 
+    // Direct Port IDs
+
+    HvCallSignalEventDirect = 0x00C0,
+    HvCallPostMessageDirect = 0x00C1,
+
     // V6 Integrated (Root) Scheduler
 
     HvCallDispatchVp = 0x00C2,
@@ -1948,6 +2021,17 @@ typedef enum _HV_CALL_CODE
 
     // V8 Intercept Completion.
     HvCallGetInterceptData = 0x00DF,
+
+    // Memory Mapped IO
+
+    HvCallMemoryMappedIoRead = 0x0106,
+    HvCallMemoryMappedIoWrite = 0x0107,
+
+    // Isolated VM (IVM)
+
+    HvCallPinGpaPageRanges = 0x0112,
+    HvCallUnpinGpaPageRanges = 0x0113,
+    HvCallQuerySparseGpaPageHostVisibility = 0x011C,
 
     // Total of all hypercalls
     HvCallCount
@@ -2019,6 +2103,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterInterceptSuspend = 0x00000001,
     HvRegisterInstructionEmulationHints = 0x00000002,
     HvRegisterDispatchSuspend = 0x00000003,
+    HvRegisterInternalActivityState = 0x00000004,
 
     // Version
     // 128-bit result same as CPUID 0x40000002
@@ -2087,6 +2172,7 @@ typedef enum _HV_REGISTER_NAME
 
     HvRegisterPendingEvent0 = 0x00010004,
     HvRegisterPendingEvent1 = 0x00010005,
+    HvRegisterDeliverabilityNotifications = 0x00010006,
 
     // Misc
 
@@ -2097,6 +2183,14 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterCpuManagementVersion = 0x00090007,
     HvRegisterVpAssistPage = 0x00090013,
     HvRegisterVpRootSignalCount = 0x00090014,
+
+    // Virtual APIC registers MSRs
+
+    HvRegisterReferenceTsc = 0x00090017,
+    HvRegisterVpConfig = 0x00090018,
+    HvRegisterGhcb = 0x00090019,
+    HvRegisterReferenceTscSequence = 0x0009001A,
+    HvRegisterGuestSchedulerEvent = 0x0009001B,
 
     // Performance statistics Registers
 
@@ -2175,6 +2269,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterVsmVina = 0x000D0005,
     HvRegisterVsmCapabilities = 0x000D0006,
     HvRegisterVsmPartitionConfig = 0x000D0007,
+    HvRegisterGuestVsmPartitionConfig = 0x000D0008,
     HvRegisterVsmVpSecureConfigVtl0 = 0x000D0010,
     HvRegisterVsmVpSecureConfigVtl1 = 0x000D0011,
     HvRegisterVsmVpSecureConfigVtl2 = 0x000D0012,
@@ -2409,6 +2504,7 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterLbrInfo0 = 0x00083300,
 
     // Hypervisor-defined registers (Misc)
+
     HvX64RegisterHypercall = 0x00090001,
 
     // X64 Virtual APIC registers MSRs
@@ -2639,6 +2735,10 @@ typedef enum _HV_REGISTER_NAME
 
     // Address to use for synthetic exceptions
     HvArm64RegisterSyntheticException = 0x00040400,
+
+    // GIC Registers
+
+    HvArm64RegisterGicrBaseGpa = 0x00063000,
 
     // Misc
 
