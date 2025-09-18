@@ -1,6 +1,6 @@
 ﻿# Mile.HyperV Release Notes
 
-**Mile.HyperV 1.2.729.0**
+**Mile.HyperV 1.2.730.0**
 
 - Revise all Mile.HyperV definitions via
   https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94.
