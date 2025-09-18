@@ -1322,6 +1322,7 @@ typedef enum _HV_MESSAGE_TYPE
     HvMessageTypeSynicSintIntercept = 0x80000061,
     HvMessageTypeSynicSintDeliverable = 0x80000062,
 
+    // Async call completion intercept
     HvMessageTypeAsyncCallCompletion = 0x80000070,
 
     // Integrated (root) scheduler signal VP-backing thread(s) messages.
@@ -2127,6 +2128,7 @@ typedef enum _HV_REGISTER_NAME
     HvRegisterSkipLevelFeaturesInfo = 0x00000206,
     // 128-bit result same as CPUID 0x4000000A
     HvRegisterNestedVirtFeaturesInfo = 0x00000207,
+    HvRegisterIptFeaturesInfo = 0x00000208,
     // 128-bit result same as CPUID 0x4000000C
     HvRegisterIsolationConfiguration = 0x00000209,
 
@@ -2354,6 +2356,7 @@ typedef enum _HV_REGISTER_NAME
     // X64 Intermediate Control Registers
 
     HvX64RegisterIntermediateCr0 = 0x00041000,
+    HvX64RegisterIntermediateCr3 = 0x00041002,
     HvX64RegisterIntermediateCr4 = 0x00041003,
     HvX64RegisterIntermediateCr8 = 0x00041004,
 
@@ -2448,6 +2451,8 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterTscAux = 0x0008007B,
     HvX64RegisterBndcfgs = 0x0008007C,
     HvX64RegisterDebugCtl = 0x0008007D,
+    HvX64RegisterMCount = 0x0008007E,
+    HvX64RegisterACount = 0x0008007F,
 
     // Available
 
@@ -2459,6 +2464,27 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterSgxLaunchControl3 = 0x00080083,
     HvX64RegisterSpecCtrl = 0x00080084,
     HvX64RegisterPredCmd = 0x00080085,
+    HvX64RegisterVirtSpecCtrl = 0x00080086,
+    HvX64RegisterTscVirtualOffset = 0x00080087,
+    HvX64RegisterTsxCtrl = 0x00080088,
+    HvX64RegisterMsrMcUpdatePatchLevel = 0x00080089,
+    HvX64RegisterAvailable1 = 0x0008008A,
+    HvX64RegisterXss = 0x0008008B,
+    HvX64RegisterUCet = 0x0008008C,
+    HvX64RegisterSCet = 0x0008008D,
+    HvX64RegisterSsp = 0x0008008E,
+    HvX64RegisterPl0Ssp = 0x0008008F,
+    HvX64RegisterPl1Ssp = 0x00080090,
+    HvX64RegisterPl2Ssp = 0x00080091,
+    HvX64RegisterPl3Ssp = 0x00080092,
+    HvX64RegisterInterruptSspTableAddr = 0x00080093,
+    HvX64RegisterTscVirtualMultiplier = 0x00080094,
+    HvX64RegisterTscDeadline = 0x00080095,
+    HvX64RegisterTscAdjust = 0x00080096,
+    HvX64RegisterPasid = 0x00080097,
+    HvX64RegisterUmwaitControl = 0x00080098,
+    HvX64RegisterXfd = 0x00080099,
+    HvX64RegisterXfdErr = 0x0008009A,
 
     // Other MSRs
 
@@ -2506,6 +2532,7 @@ typedef enum _HV_REGISTER_NAME
     // Hypervisor-defined registers (Misc)
 
     HvX64RegisterHypercall = 0x00090001,
+    HvX64RegisterRegisterPage = 0x0009001C,
 
     // X64 Virtual APIC registers MSRs
 
@@ -2518,6 +2545,9 @@ typedef enum _HV_REGISTER_NAME
     HvX64RegisterEmulatedTimerPeriod = 0x00090030,
     HvX64RegisterEmulatedTimerControl = 0x00090031,
     HvX64RegisterPmTimerAssist = 0x00090032,
+
+    // AMD SEV SNP configuration register
+	HvX64RegisterSevControl = 0x00090040,
 
     // Intercept Control Registers
 
@@ -2565,6 +2595,8 @@ typedef enum _HV_REGISTER_NAME
     HvArm64RegisterXSpElx = 0x00020021,
     HvArm64RegisterXPc = 0x00020022,
     HvArm64RegisterCpsr = 0x00020023,
+    HvArm64RegisterSpsrEl2 = 0x00021002,
+
     HvArm64RegisterQ0 = 0x00030000,
     HvArm64RegisterQ1 = 0x00030001,
     HvArm64RegisterQ2 = 0x00030002,
@@ -2672,16 +2704,22 @@ typedef enum _HV_REGISTER_NAME
     HvArm64RegisterMidr = 0x00040000,
     HvArm64RegisterMpidr = 0x00040001,
     HvArm64RegisterSctlr = 0x00040002,
+    HvArm64RegisterSctlrEl1 = 0x00040002,
     HvArm64RegisterActlr = 0x00040003,
     HvArm64RegisterCpacr = 0x00040004,
     HvArm64RegisterTtbr0 = 0x00040005,
+    HvArm64RegisterTtbr0El1 = 0x00040005,
     HvArm64RegisterTtbr1 = 0x00040006,
+    HvArm64RegisterTtbr1El1 = 0x00040006,
     HvArm64RegisterTcr = 0x00040007,
+    HvArm64RegisterTcrEl1 = 0x00040007,
     HvArm64RegisterEsrEl1 = 0x00040008,
     HvArm64RegisterFarEl1 = 0x00040009,
     HvArm64RegisterParEl1 = 0x0004000A,
     HvArm64RegisterMair = 0x0004000B,
+    HvArm64RegisterMairEl1 = 0x0004000B,
     HvArm64RegisterVbar = 0x0004000C,
+    HvArm64RegisterVbarEl1 = 0x0004000C,
     HvArm64RegisterContextIdr = 0x0004000D,
     HvArm64RegisterTpidr = 0x0004000E,
     HvArm64RegisterCntkctl = 0x0004000F,

@@ -2648,10 +2648,6 @@ typedef enum _HV_MESSAGE_TYPE_PRIVATE
     HvMessageMirroringNotification = 0x80000072,
     HvMessageRestartCompletionNotification = 0x80000073,
 
-    // Async call completion intercept
-
-    HvMessageTypeAsyncCallCompletion = 0x80000070,
-
     // Platform-specific processor intercept messages
 
 #if defined(_M_AMD64) || defined(_M_IX86)
@@ -4044,10 +4040,6 @@ typedef enum _HV_PARTITION_PROPERTY_CODE
 // External names used to manupulate registers
 typedef enum _HV_REGISTER_NAME_PRIVATE
 {
-    // Feature Access (registers are 128 bits)
-
-    HvRegisterIptFeaturesInfo = 0x00000208,
-
     // System Reset
 
     HvRegisterSystemReset = 0x00000230,
@@ -4112,38 +4104,12 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
     HvX64RegisterMtrrFix4kE8000 = 0x00080078,
     HvX64RegisterMtrrFix4kF0000 = 0x00080079,
     HvX64RegisterMtrrFix4kF8000 = 0x0008007A,
-    HvX64RegisterMCount = 0x0008007E,
-    HvX64RegisterACount = 0x0008007F,
-    HvX64RegisterVirtSpecCtrl = 0x00080086,
-    HvX64RegisterTscVirtualOffset = 0x00080087,
-    HvX64RegisterTsxCtrl = 0x00080088,
-    HvX64RegisterMsrMcUpdatePatchLevel = 0x00080089,
-    HvX64RegisterAvailable1 = 0x0008008A,
-    HvX64RegisterXss = 0x0008008B,
-    HvX64RegisterUCet = 0x0008008C,
-    HvX64RegisterSCet = 0x0008008D,
-    HvX64RegisterSsp = 0x0008008E,
-    HvX64RegisterPl0Ssp = 0x0008008F,
-    HvX64RegisterPl1Ssp = 0x00080090,
-    HvX64RegisterPl2Ssp = 0x00080091,
-    HvX64RegisterPl3Ssp = 0x00080092,
-    HvX64RegisterInterruptSspTableAddr = 0x00080093,
-    HvX64RegisterTscVirtualMultiplier = 0x00080094,
-    HvX64RegisterTscDeadline = 0x00080095,
-    HvX64RegisterTscAdjust = 0x00080096,
-    HvX64RegisterPasid = 0x00080097,
-    HvX64RegisterUmwaitControl = 0x00080098,
-    HvX64RegisterXfd = 0x00080099,
-    HvX64RegisterXfdErr = 0x0008009A,
 
     // Hypervisor-defined MSRs (Misc)
 
     HvX64RegisterVpRuntime = 0x00090000,
 
     HvX64RegisterRegPage = 0x0009001C,
-
-    // AMD SEV SNP configuration register
-	HvX64RegisterSevControl = 0x00090040,
 
     // XSAVE/XRSTOR register names.
 
@@ -4190,7 +4156,6 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
 
     HvArm64RegisterSpEl2 = 0x00021000,
     HvArm64RegisterElrEl2 = 0x00021001,
-    HvArm64RegisterSpsrEl2 = 0x00021002,
     HvArm64RegisterCurrentEl = 0x00021003,
     HvArm64RegisterDaif = 0x00021004,
     HvArm64RegisterDit = 0x00021005,
@@ -4387,14 +4352,8 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
     // Arm64 Control Registers
 
     HvArm64RegisterMpidrEl1 = 0x00040001,
-    HvArm64RegisterSctlrEl1 = 0x00040002,
     HvArm64RegisterActlrEl1 = 0x00040003,
     HvArm64RegisterCpacrEl1 = 0x00040004,
-    HvArm64RegisterTtbr0El1 = 0x00040005,
-    HvArm64RegisterTtbr1El1 = 0x00040006,
-    HvArm64RegisterTcrEl1 = 0x00040007,
-    HvArm64RegisterMairEl1 = 0x0004000B,
-    HvArm64RegisterVbarEl1 = 0x0004000C,
     HvArm64RegisterContextidrEl1 = 0x0004000D,
     HvArm64RegisterTpidrEl1 = 0x0004000E,
     HvArm64RegisterFpcr = 0x00040012,
