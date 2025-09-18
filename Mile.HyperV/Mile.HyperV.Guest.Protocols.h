@@ -37,9 +37,16 @@
 //   - vm\devices\hyperv_ic_protocol\src\timesync.rs
 //   - vm\devices\hyperv_ic_protocol\src\vss.rs
 //   - vm\devices\uidevices\src\video\protocol.rs
+//   - vm\devices\uidevices\src\keyboard\protocol.rs
+//   - vm\devices\uidevices\src\mouse\protocol.rs
+//   - vm\devices\storage\storvsp_protocol\src\lib.rs
+//   - vm\devices\net\netvsp\src\protocol.rs
+//   - vm\devices\net\netvsp\src\rndisprot.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 // - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
+// - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
+// - Symbols in Windows version 10.0.14347.0's netvsc.sys
 
 #ifndef MILE_HYPERV_GUEST_PROTOCOLS
 #define MILE_HYPERV_GUEST_PROTOCOLS
@@ -53,6 +60,7 @@
 #if (_MSC_VER >= 1200)
 #pragma warning(push)
 #endif
+#pragma warning(disable:4200) // zero length array
 #pragma warning(disable:4201) // nameless struct/union
 #endif
 
@@ -74,20 +82,147 @@ typedef long NTSTATUS;
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
 #endif // !STATUS_SUCCESS
 
+#ifndef STATUS_PENDING
+// The operation that was requested is pending completion.
+#define STATUS_PENDING ((NTSTATUS)0x00000103L)
+#endif // !STATUS_PENDING
+
+#ifndef STATUS_BUFFER_OVERFLOW
+// The data was too large to fit into the specified buffer.
+#define STATUS_BUFFER_OVERFLOW ((NTSTATUS)0x80000005L)
+#endif // !STATUS_BUFFER_OVERFLOW
+
+#ifndef STATUS_DEVICE_BUSY
+// The device is currently busy.
+#define STATUS_DEVICE_BUSY ((NTSTATUS)0x80000011L)
+#endif // !STATUS_DEVICE_BUSY
+
 #ifndef STATUS_UNSUCCESSFUL
 // The requested operation was unsuccessful.
 #define STATUS_UNSUCCESSFUL ((NTSTATUS)0xC0000001L)
 #endif // !STATUS_UNSUCCESSFUL
+
+#ifndef STATUS_INVALID_PARAMETER
+// An invalid parameter was passed to a service or function.
+#define STATUS_INVALID_PARAMETER ((NTSTATUS)0xC000000DL)
+#endif // !STATUS_INVALID_PARAMETER
+
+#ifndef STATUS_INVALID_DEVICE_REQUEST
+// The specified request is not a valid operation for the target device.
+#define STATUS_INVALID_DEVICE_REQUEST ((NTSTATUS)0xC0000010L)
+#endif // !STATUS_INVALID_DEVICE_REQUEST
 
 #ifndef STATUS_REVISION_MISMATCH
 // Indicates two revision levels are incompatible.
 #define STATUS_REVISION_MISMATCH ((NTSTATUS)0xC0000059L)
 #endif // !STATUS_REVISION_MISMATCH
 
+#ifndef STATUS_INSUFFICIENT_RESOURCES
+// Insufficient system resources exist to complete the API.
+#define STATUS_INSUFFICIENT_RESOURCES ((NTSTATUS)0xC000009AL)
+#endif // !STATUS_INSUFFICIENT_RESOURCES
+
+#ifndef STATUS_DEVICE_NOT_CONNECTED
+#define STATUS_DEVICE_NOT_CONNECTED ((NTSTATUS)0xC000009DL)
+#endif // !STATUS_DEVICE_NOT_CONNECTED
+
+#ifndef STATUS_IO_TIMEOUT
+// The specified I/O operation on %hs was not completed before the time-out
+// period expired.
+#define STATUS_IO_TIMEOUT ((NTSTATUS)0xC00000B5L)
+#endif // !STATUS_IO_TIMEOUT
+
+#ifndef STATUS_NOT_SUPPORTED
+// The request is not supported.
+#define STATUS_NOT_SUPPORTED ((NTSTATUS)0xC00000BBL)
+#endif // !STATUS_NOT_SUPPORTED
+
+#ifndef STATUS_DEVICE_DOES_NOT_EXIST
+// This device does not exist.
+#define STATUS_DEVICE_DOES_NOT_EXIST ((NTSTATUS)0xC00000C0L)
+#endif // !STATUS_DEVICE_DOES_NOT_EXIST
+
+#ifndef STATUS_CANCELLED
+// The I/O request was canceled.
+#define STATUS_CANCELLED ((NTSTATUS)0xC0000120L)
+#endif // !STATUS_CANCELLED
+
+#ifndef STATUS_INVALID_DEVICE_STATE
+// The device is not in a valid state to perform this request.
+#define STATUS_INVALID_DEVICE_STATE ((NTSTATUS)0xC0000184L)
+#endif // !STATUS_INVALID_DEVICE_STATE
+
+#ifndef STATUS_IO_DEVICE_ERROR
+// The I/O device reported an I/O error.
+#define STATUS_IO_DEVICE_ERROR ((NTSTATUS)0xC0000185L)
+#endif // !STATUS_IO_DEVICE_ERROR
+
 #ifndef STATUS_CONNECTION_REFUSED
 // The transport connection attempt was refused by the remote system.
 #define STATUS_CONNECTION_REFUSED ((NTSTATUS)0xC0000236L)
 #endif // !STATUS_CONNECTION_REFUSED
+
+// Definition from Windows Software Development Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_RECT
+{
+    HV_INT32 Left;
+    HV_INT32 Top;
+    HV_INT32 Right;
+    HV_INT32 Bottom;
+} HV_RECT, *PHV_RECT;
+
+// HID Protocol Structs
+
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_HID_DEVICE_ATTRIBUTES
+{
+    // sizeof (struct _HV_HID_DEVICE_ATTRIBUTES)
+
+    HV_UINT32 Size;
+
+    // Vendor ids of this hid device
+
+    HV_UINT16 VendorID;
+    HV_UINT16 ProductID;
+    HV_UINT16 VersionNumber;
+    HV_UINT16 Reserved[11];
+} HV_HID_DEVICE_ATTRIBUTES, *PHV_HID_DEVICE_ATTRIBUTES;
+
+#pragma pack(1)
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_HID_DESCRIPTOR_DESC_LIST
+{
+    HV_UINT8 bReportType;
+    HV_UINT16 wReportLength;
+} HV_HID_DESCRIPTOR_DESC_LIST, *PHV_HID_DESCRIPTOR_DESC_LIST;
+#pragma pack()
+
+#pragma pack(1)
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_HID_DESCRIPTOR
+{
+    HV_UINT8 bLength;
+    HV_UINT8 bDescriptorType;
+    HV_UINT16 bcdHID;
+    HV_UINT8 bCountry;
+    HV_UINT8 bNumDescriptors;
+    // An array of one OR MORE descriptors.
+    HV_HID_DESCRIPTOR_DESC_LIST DescriptorList[HV_ANYSIZE_ARRAY];
+} HV_HID_DESCRIPTOR, *PHV_HID_DESCRIPTOR;
+#pragma pack()
+
+// Definition from Windows Driver Kit
+// Note: Add HV_ prefix to avoid conflict
+typedef struct _HV_GROUP_AFFINITY
+{
+    HV_UINT32 Mask;
+    HV_UINT16 Group;
+    HV_UINT16 Reserved[3];
+} HV_GROUP_AFFINITY, *PHV_GROUP_AFFINITY;
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus
@@ -859,7 +994,7 @@ typedef struct _HVD_SCREEN_INFO
 // Emergency reset notification I/O Port
 #define SYNTHVID_EMERGENCY_RESET_IO_PORT 0x100
 
-typedef union
+typedef union _SYNTHVID_VERSION
 {
     struct
     {
@@ -878,10 +1013,10 @@ typedef union
 #define SYNTHVID_VERSION_MAJOR 3
 #define SYNTHVID_VERSION_MINOR 5
 
-#define SYNTHVID_VERSION_MAJOR_THRESHOLD 3;
-#define SYNTHVID_VERSION_MINOR_BLUE 3;
-#define SYNTHVID_VERSION_MINOR_THRESHOLD_M1 4;
-#define SYNTHVID_VERSION_MINOR_THRESHOLD_M2 5;
+#define SYNTHVID_VERSION_MAJOR_THRESHOLD 3
+#define SYNTHVID_VERSION_MINOR_BLUE 3
+#define SYNTHVID_VERSION_MINOR_THRESHOLD_M1 4
+#define SYNTHVID_VERSION_MINOR_THRESHOLD_M2 5
 
 #define SYNTHVID_VERSION_CURRENT \
     ((SYNTHVID_VERSION_MINOR << 16) | (SYNTHVID_VERSION_MAJOR))
@@ -919,7 +1054,7 @@ typedef enum _SYNTHVID_FEATURE
 } SYNTHVID_FEATURE, *PSYNTHVID_FEATURE;
 
 // SynthVid Message Types
-typedef enum
+typedef enum _SYNTHVID_MESSAGE_TYPE
 {
     SynthvidError = 0,
     SynthvidVersionRequest = 1,
@@ -939,10 +1074,10 @@ typedef enum
     SynthvidCapabilityRequest = 15,
     SynthvidCapabilityResponse = 16,
     SynthvidMax = 17,
-} SYNTHVID_MESSAGE_TYPE;
+} SYNTHVID_MESSAGE_TYPE, *PSYNTHVID_MESSAGE_TYPE;
 
 // Basic message structures.
-typedef struct
+typedef struct _SYNTHVID_MESSAGE_HEADER
 {
     // Type of the enclosed message
     SYNTHVID_MESSAGE_TYPE Type;
@@ -950,7 +1085,7 @@ typedef struct
     HV_UINT32 Size;
 } SYNTHVID_MESSAGE_HEADER, *PSYNTHVID_MESSAGE_HEADER;
 
-typedef struct
+typedef struct _SYNTHVID_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     // Enclosed message
@@ -961,14 +1096,14 @@ typedef struct
 // handshaking.
 
 // VSC to VSP
-typedef struct
+typedef struct _SYNTHVID_VERSION_REQUEST_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     SYNTHVID_VERSION Version;
 } SYNTHVID_VERSION_REQUEST_MESSAGE, *PSYNTHVID_VERSION_REQUEST_MESSAGE;
 
 // VSP to VSC
-typedef struct
+typedef struct _SYNTHVID_VERSION_RESPONSE_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     SYNTHVID_VERSION Version;
@@ -979,13 +1114,47 @@ typedef struct
 } SYNTHVID_VERSION_RESPONSE_MESSAGE, *PSYNTHVID_VERSION_RESPONSE_MESSAGE;
 
 // VSC to VSP
-typedef struct
+typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 MaximumResolutionCount;
+} SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE;
+
+// VSP to VSC
+typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 EdidBlock[SYNTHVID_EDID_BLOCK_SIZE];
+    HV_UINT8 ResolutionCount;
+    HV_UINT8 DefaultResolutionIndex;
+    HV_UINT8 IsStandard;
+    // Max legal value is SYNTHVID_MAXIMUM_RESOLUTIONS_COUNT.
+    HVD_SCREEN_INFO SupportedResolution[HV_ANYSIZE_ARRAY];
+} SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
+
+// VSC to VSP
+typedef struct _SYNTHVID_CAPABILITY_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+} SYNTHVID_CAPABILITY_REQUEST_MESSAGE, *PSYNTHVID_CAPABILITY_REQUEST_MESSAGE;
+
+// VSP to VSC
+typedef struct _SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT32 LockOnDisconnect : 1;
+    HV_UINT32 Reserved : 31;
+    HV_UINT32 Reserved2[15];
+} SYNTHVID_CAPABILITY_RESPONSE_MESSAGE, *PSYNTHVID_CAPABILITY_RESPONSE_MESSAGE;
+
+// VSC to VSP
+typedef struct _SYNTHVID_VRAM_LOCATION_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT64 UserContext;
     // BOOLEAN
     HV_UINT8 IsVramGpaAddressSpecified;
-    HV_UINT64 VramGpaAddress;
+    HV_GPA VramGpaAddress;
 } SYNTHVID_VRAM_LOCATION_MESSAGE, *PSYNTHVID_VRAM_LOCATION_MESSAGE;
 
 // VSP to VSC
@@ -993,7 +1162,7 @@ typedef struct
 // that the new physical address location is backed with a memory block
 // that the guest can safely write to, knowing that the writes will actually
 // be reflected in the VRAM memory block.
-typedef struct
+typedef struct _SYNTHVID_VRAM_LOCATION_ACK_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT64 UserContext;
@@ -1001,19 +1170,26 @@ typedef struct
 
 // These messages are used to communicate "situation updates" or changes in the
 // layout of the primary surface.
-typedef struct
+typedef struct _VIDEO_OUTPUT_SITUATION
 {
-    // BOOLEAN
+    // Determine if the device is active or not. (BOOLEAN)
     HV_UINT8 Active;
+    // Removed in Threshold -- must be zero.
     HV_UINT32 PrimarySurfaceVramOffset;
+    // Number of bits used for each color component.
     HV_UINT8 DepthBits;
+    // Number of pixels that represent the width of the image.
     HV_UINT32 WidthPixels;
+    // Number of pixels that represent the height of the image.
     HV_UINT32 HeightPixels;
+    // Number of bytes from one row of pixels in memory to the next row of
+    // pixels in memory. Also called stride. If padding bytes are present after
+    // the WidthPixels, the stride/pitch is wider than the width of the image.
     HV_UINT32 PitchBytes;
 } VIDEO_OUTPUT_SITUATION, *PVIDEO_OUTPUT_SITUATION;
 
 // VSC to VSP
-typedef struct
+typedef struct _SYNTHVID_SITUATION_UPDATE_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT64 UserContext;
@@ -1023,11 +1199,130 @@ typedef struct
 } SYNTHVID_SITUATION_UPDATE_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_MESSAGE;
 
 // VSP to VSC
-typedef struct
+typedef struct _SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE
 {
     SYNTHVID_MESSAGE_HEADER Header;
     HV_UINT64 UserContext;
 } SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE, *PSYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
+
+// These messages are used to communicate the BIOS Information of the VM.
+
+// VSC to VSP
+typedef struct _SYNTHVID_BIOS_INFO_REQUEST_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+} SYNTHVID_BIOS_INFO_REQUEST_MESSAGE, *PSYNTHVID_BIOS_INFO_REQUEST_MESSAGE;
+
+// VSP to VSC
+// Note that the BiosFlags field used to just contain a UINT32 that indicated
+// the VmGeneration.  For compatibility, we know that VM generations (0,1) map
+// to the least significant bit and generation 2 (value 1) maps functionally to
+// the StopDeviceSupported flag below.
+typedef struct _SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT32 VmGeneration;
+    HV_UINT32 ReservedInt32;
+    HV_UINT64 ReservedInt64;
+} SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE, *PSYNTHVID_BIOS_INFO_RESPONSE_MESSAGE;
+
+// These messages are used to communicate changes in the pointer position or
+// shape.
+
+// VSC to VSP
+// This message is ignored unless we're in relative mouse mode.
+typedef struct _SYNTHVID_POINTER_POSITION_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    // LDDM may specify FALSE here, XDDM generally will probably always specify
+    // TRUE.
+    HV_UINT8 IsVisible;
+    // 0 is the only valid value for 2D Video VSP 1.0
+    HV_UINT8 VideoOutput;
+
+    // Coordinates of upper-left pixel of pointer image.
+
+    HV_INT32 ImageX;
+    HV_INT32 ImageY;
+} SYNTHVID_POINTER_POSITION_MESSAGE, *PSYNTHVID_POINTER_POSITION_MESSAGE;
+
+// VSC to VSP
+typedef struct _SYNTHVID_POINTER_SHAPE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    // When a cursor is larger than the maximum VMBus payload size, it is split
+    // up. This 0-based index indicates which portion of the cursor payload is
+    // in this message. -1 means final portion. If the cursor is not split, this
+    // field contains -1 as the completion sentinel value.
+    HV_UINT8 PartialIndex;
+    // VideoSynthDevice only support color cursor and monochrome cursor
+    // FALSE means monochrome cursor (2 bits per pixel),
+    // TRUE means color cursor (32 bits per pixel)
+    HV_UINT8 CursorFlags;
+    // Max legal value is SYNTHVID_CURSOR_MAX_X.
+    HV_UINT32 WidthPixels;
+    // Max legal value is SYNTHVID_CURSOR_MAX_Y.
+    HV_UINT32 HeightPixels;
+
+    // Stride is implicit based on smallest possible value given width in pixels
+    // and format. Pointer hotspot relative to upper-left of pointer image.
+
+    HV_UINT32 HotspotX;
+    HV_UINT32 HotspotY;
+
+    // Max length of pixel data is 16k based on CursorFlags,
+    // WidthPixels == SYNTHVID_CURSOR_MAX_X,
+    // HeightPixels == SYNTHVID_CURSOR_MAX_Y.
+    // At this time, we can send the whole cursor shape.
+    //
+    // Pointer data length can be calculated as follows:
+    // if (CursorFlags)
+    // {
+    //     pointerDataLength = WidthPixels * HeightPixels * 4
+    // }
+    // else
+    // {
+    //     pointerDataLength = (WidthPixels + 7) / 8 * HeightPixels * 2
+    // }
+    HV_UINT8 PixelData[HV_ANYSIZE_ARRAY];
+} SYNTHVID_POINTER_SHAPE_MESSAGE, *PSYNTHVID_POINTER_SHAPE_MESSAGE;
+
+#define SYNTHVID_CURSOR_COMPLETE 0xff
+
+// VSP to VSC
+// This message is used to squelch portions of the synthvid protocol. Can be
+// sent from VSP to VSC at any time after handshaking is complete. VSC
+// responsible for bringing VSP up-to-date with at least one message of the
+// relevant type if one of these goes from FALSE to TRUE.
+typedef struct _SYNTHVID_FEATURE_CHANGE_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 IsDirtNeeded;
+    HV_UINT8 IsPointerPositionUpdatesNeeded;
+    HV_UINT8 IsPointerShapeUpdatesNeeded;
+    HV_UINT8 IsVideoSituationUpdatesNeeded;
+} SYNTHVID_FEATURE_CHANGE_MESSAGE, *PSYNTHVID_FEATURE_CHANGE_MESSAGE;
+
+typedef struct _SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    HV_UINT8 IsDirtNeeded;
+    HV_UINT8 IsPointerPositionUpdatesNeeded;
+    HV_UINT8 IsPointerShapeUpdatesNeeded;
+    HV_UINT8 IsVideoSituationUpdatesNeeded;
+    HV_UINT8 EdidBlock[SYNTHVID_EDID_BLOCK_SIZE];
+} SYNTHVID_FEATURE_CHANGE_MESSAGE_V2, *PSYNTHVID_FEATURE_CHANGE_MESSAGE_V2;
+
+// VSC to VSP
+// This message is used to communicate dirty regions to the VSP.
+typedef struct _SYNTHVID_DIRT_MESSAGE
+{
+    SYNTHVID_MESSAGE_HEADER Header;
+    // 0 is the only valid value for 2D Video VSP 1.0
+    HV_UINT8 VideoOutput;
+    HV_UINT8 DirtCount;
+    HV_RECT Dirt[HV_ANYSIZE_ARRAY];
+} SYNTHVID_DIRT_MESSAGE, *PSYNTHVID_DIRT_MESSAGE;
 
 #pragma pack(pop)
 
@@ -1050,6 +1345,15 @@ const HV_GUID HK_CLASS_ID =
     { 0xBD, 0x65, 0xF9, 0x27, 0xA6, 0x1C, 0x76, 0x84 }
 };
 
+// {D34B2567-B9B6-42B9-8778-0A4EC0B955BF}
+const HV_GUID HK_INSTANCE_ID =
+{
+    0xD34B2567,
+    0xB9B6,
+    0x42B9,
+    { 0x87, 0x78, 0x0A, 0x4E, 0xC0, 0xB9, 0x55, 0xBF }
+};
+
 #define HK_MAKE_VERSION(Major, Minor) \
     ((HV_UINT32)(Major) << 16 | (HV_UINT32)(Minor))
 #define HK_VERSION_WIN8 HK_MAKE_VERSION(1, 0)
@@ -1060,7 +1364,7 @@ typedef enum _HK_MESSAGE_TYPE
     HkMessageProtocolResponse = 2,
     HkMessageEvent = 3,
     HkMessageSetLedIndicators = 4,
-} HK_MESSAGE_TYPE;
+} HK_MESSAGE_TYPE, *PHK_MESSAGE_TYPE;
 
 typedef struct _HK_MESSAGE_HEADER
 {
@@ -1100,6 +1404,210 @@ typedef struct _HK_MESSAGE_KEYSTROKE
 #define HK_MAXIMUM_MESSAGE_SIZE 256
 
 // *****************************************************************************
+// Microsoft Hyper-V Input
+//
+
+// {CFA8B69E-5B4A-4CC0-B98B-8BA1A1F3F95A}
+const HV_GUID SYNTHHID_CLASS_ID =
+{
+    0xCFA8B69E,
+    0x5B4A,
+    0x4CC0,
+    { 0xB9, 0x8B, 0x8B, 0xA1, 0xA1, 0xF3, 0xF9, 0x5A }
+};
+
+// {58F75A6D-D949-4320-99E1-A2A2576D581C}
+const HV_GUID SYNTHHID_INSTANCE_ID =
+{
+    0x58F75A6D,
+    0xD949,
+    0x4320,
+    { 0x99, 0xE1, 0xA2, 0xA2, 0x57, 0x6D, 0x58, 0x1C }
+};
+
+typedef union _SYNTHHID_VERSION
+{
+    HV_UINT32 AsDWord;
+    struct
+    {
+        HV_UINT16 Minor;
+        HV_UINT16 Major;
+    };
+} SYNTHHID_VERSION, *PSYNTHHID_VERSION;
+
+#define SYNTHHID_MAKE_VERSION(Major, Minor) \
+    ((HV_UINT32)(Major) << 16 | (HV_UINT32)(Minor))
+#define SYNTHHID_INPUT_VERSION SYNTHHID_MAKE_VERSION(2, 0)
+
+typedef enum _SYNTHHID_MESSAGE_TYPE
+{
+    SynthHidProtocolRequest = 0,
+    SynthHidProtocolResponse = 1,
+    SynthHidInitialDeviceInfo = 2,
+    SynthHidInitialDeviceInfoAck = 3,
+    SynthHidInputReport = 4,
+    SynthHidMax = 5,
+} SYNTHHID_MESSAGE_TYPE, *PSYNTHHID_MESSAGE_TYPE;
+
+#define SYNTHHID_HID_VENDOR_ID 0x045e
+#define SYNTHHID_HID_PRODUCT_ID 0x0621
+#define SYNTHHID_HID_VERSION_ID 0x0001
+
+#define SYNTHHID_INPUT_REPORT_SIZE 16
+#define SYNTHHID_MAX_HID_MESSAGE_SIZE 512
+#define SYNTHHID_MAX_HID_REPORT_DESCRIPTOR 256
+
+typedef struct _SYNTHHID_MESSAGE_HEADER
+{
+    SYNTHHID_MESSAGE_TYPE Type;
+    HV_UINT32 Size;
+} SYNTHHID_MESSAGE_HEADER, *PSYNTHHID_MESSAGE_HEADER;
+
+typedef struct _SYNTHHID_PROTOCOL_REQUEST
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    SYNTHHID_VERSION VersionRequested;
+} SYNTHHID_PROTOCOL_REQUEST, *PSYNTHHID_PROTOCOL_REQUEST;
+
+#pragma pack(1)
+typedef struct _SYNTHHID_PROTOCOL_RESPONSE
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    SYNTHHID_VERSION VersionRequested;
+    HV_UINT8 Approved;
+} SYNTHHID_PROTOCOL_RESPONSE, *PSYNTHHID_PROTOCOL_RESPONSE;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct _SYNTHHID_DEVICE_INFO
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    HV_HID_DEVICE_ATTRIBUTES HidDeviceAttributes;
+    HV_HID_DESCRIPTOR HidDescriptorInformation;
+    HV_UINT8 HidReportDescriptorInformation[128];
+} SYNTHHID_DEVICE_INFO, *PSYNTHHID_DEVICE_INFO;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct _SYNTHHID_DEVICE_INFO_ACK
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    HV_UINT8 Acknowledged;
+} SYNTHHID_DEVICE_INFO_ACK, *PSYNTHHID_DEVICE_INFO_ACK;
+#pragma pack()
+
+#define SYNTHHID_HID_MOUSE_BUTTON_LEFT 0x01
+#define SYNTHHID_HID_MOUSE_BUTTON_RIGHT 0x02
+#define SYNTHHID_HID_MOUSE_BUTTON_MIDDLE 0x04
+
+#define SYNTHHID_MOUSE_NUMBER_BUTTONS 5
+
+typedef enum _SYNTHHID_MOUSE_BUTTON
+{
+    SynthHidMouseButtonLeft = 0,
+    SynthHidMouseButtonRight = 1,
+    SynthHidMouseButtonMiddle = 2,
+    SynthHidMouseButtonFourth = 3,
+    SynthHidMouseButtonFifth = 4,
+} SYNTHHID_MOUSE_BUTTON, *PSYNTHHID_MOUSE_BUTTON;
+
+typedef enum _SYNTHHID_SCROLL_TYPE
+{
+    // we use -1, 1, because we want to increment the z-value (i16) in the
+    // corresponding direction
+
+    SynthHidScrollTypeDown = -1,
+    SynthHidScrollTypeNoChange = 0,
+    SynthHidScrollTypeUp = 1,
+} SYNTHHID_SCROLL_TYPE, *PSYNTHHID_SCROLL_TYPE;
+
+#define SYNTHHID_MOUSE_EVENT_FLAG_XY_ABSOLUTE (1 << 0)
+
+#define SYNTHHID_MOUSE_EVENT_NO_CHANGE(Button) (1 << (((HV_UINT32)Button) + 1))
+
+#define SYNTHHID_MOUSE_EVENT_FLAG_LEFT_BUTTON_NO_CHANGE \
+    SYNTHHID_MOUSE_EVENT_NO_CHANGE(SynthHidMouseButtonLeft)
+#define SYNTHHID_MOUSE_EVENT_FLAG_RIGHT_BUTTON_NO_CHANGE \
+    SYNTHHID_MOUSE_EVENT_NO_CHANGE(SynthHidMouseButtonRight)
+#define SYNTHHID_MOUSE_EVENT_FLAG_MIDDLE_BUTTON_NO_CHANGE \
+    SYNTHHID_MOUSE_EVENT_NO_CHANGE(SynthHidMouseButtonMiddle)
+#define SYNTHHID_MOUSE_EVENT_FLAG_FOURTH_BUTTON_NO_CHANGE \
+    SYNTHHID_MOUSE_EVENT_NO_CHANGE(SynthHidMouseButtonFourth)
+#define SYNTHHID_MOUSE_EVENT_FLAG_FIFTH_BUTTON_NO_CHANGE \
+    SYNTHHID_MOUSE_EVENT_NO_CHANGE(SynthHidMouseButtonFifth)
+
+#define SYNTHHID_MOUSE_EVENT_FLAG_ALL_BUTTONS_NO_CHANGE ( \
+    SYNTHHID_MOUSE_EVENT_FLAG_LEFT_BUTTON_NO_CHANGE | \
+    SYNTHHID_MOUSE_EVENT_FLAG_MIDDLE_BUTTON_NO_CHANGE | \
+    SYNTHHID_MOUSE_EVENT_FLAG_RIGHT_BUTTON_NO_CHANGE | \
+    SYNTHHID_MOUSE_EVENT_FLAG_FOURTH_BUTTON_NO_CHANGE | \
+    SYNTHHID_MOUSE_EVENT_FLAG_FIFTH_BUTTON_NO_CHANGE)
+
+#define SYNTHHID_MOUSE_EVENT_SINGLE_CHANGE(Button) ( \
+    SYNTHHID_MOUSE_EVENT_FLAG_ALL_BUTTONS_NO_CHANGE & \
+    ~SYNTHHID_MOUSE_EVENT_NO_CHANGE(Button))
+
+#define SYNTHHID_MOUSE_EVENT_FLAG_FORCE_REPORT_EVENT (1 << 8)
+
+#pragma pack(1)
+typedef struct _SYNTHHID_MOUSE_PACKET
+{
+    HV_UINT8 ButtonData;
+    HV_INT16 X;
+    HV_INT16 Y;
+    HV_INT16 Z;
+} SYNTHHID_MOUSE_PACKET, *PSYNTHHID_MOUSE_PACKET;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct _SYNTHHID_INPUT_REPORT
+{
+    SYNTHHID_MESSAGE_HEADER Header;
+    SYNTHHID_MOUSE_PACKET InputReport;
+} SYNTHHID_INPUT_REPORT, *PSYNTHHID_INPUT_REPORT;
+#pragma pack()
+
+const HV_UINT8 SYNTHHID_REPORT_DESCRIPTOR[] =
+{
+    0x05, 0x01, // USAGE_PAGE (Generic Desktop)
+    0x09, 0x02, // USAGE (Mouse)
+    0xA1, 0x01, // COLLECTION (Application)
+    0x09, 0x01, //   USAGE (Pointer)
+    0xA1, 0x00, //   COLLECTION (Physical)
+    0x05, 0x09, //     USAGE_PAGE (Buttons)
+    0x19, 0x01, //     Usage Minimum (01)
+    0x29, 0x05, //     Usage Maximum (05)
+    0x15, 0x00, //     Logical Minimum (00)
+    0x25, 0x01, //     Logical Maximum (01)
+    0x95, 0x05, //     Report Count (5)
+    0x75, 0x01, //     Report Size (1)
+    0x81, 0x02, //     Input (Data, Variable, Absolute) ;
+    //         5 button bits
+    0x95, 0x01, //     Report Count (1)
+    0x75, 0x03, //     Report Size (3)
+    0x81, 0x01, //     Input (Constant) ; 3 bit padding
+    0x05, 0x01, //     USAGE_PAGE (Generic Desktop)
+    0x09, 0x30, //     USAGE (X)
+    0x09, 0x31, //     USAGE (Y)
+    0x15, 0x00, //     Logical Minimum (0)
+    0x26, 0xFF, 0x7F, //     Logical Maximum (32767)
+    0x75, 0x10, //     Report Size (16)
+    0x95, 0x02, //     Report Count (2)
+    0x81, 0x02, //     Input (Data, Variable, Absolute) ;
+    //         2 Axes absolute data.
+    0x05, 0x01, //     USAGE_PAGE (Generic Desktop)
+    0x09, 0x38, //     USAGE (Wheel)
+    0x16, 0x01, 0x80, //     Logical Minimum (-32767)
+    0x26, 0xFF, 0x7F, //     Logical Maximum (32767)
+    0x75, 0x10, //     Report Size (16)
+    0x95, 0x01, //     Report Count (1)
+    0x81, 0x06, //     Input (Data, Variable, Relative) ;
+    //         1 Axes relative data.
+    0xC0, //   END_COLLECTION
+    0xC0, // END_COLLECTION
+};
+
+// *****************************************************************************
 // Microsoft Hyper-V SCSI Controller
 //
 
@@ -1110,6 +1618,15 @@ const HV_GUID VMSCSI_CLASS_ID =
     0x04A1,
     0x4D29,
     { 0xB6, 0x05, 0x72, 0xE2, 0xFF, 0xB1, 0xDC, 0x7F }
+};
+
+// {32412632-86CB-44A2-9B5C-50D1417354F5}
+const HV_GUID VMIDE_ACCELERATOR_CLASS_ID =
+{
+    0x32412632,
+    0x86CB,
+    0x44A2,
+    { 0x9B, 0x5C, 0x50, 0xD1, 0x41, 0x73, 0x54, 0xF5 }
 };
 
 // Public interface to the server
@@ -1149,18 +1666,19 @@ const HV_GUID VMSCSI_CLASS_ID =
 #define VMSTOR_PROTOCOL_VERSION_WIN7 VMSTOR_PROTOCOL_VERSION(4, 2)
 #define VMSTOR_PROTOCOL_VERSION_WIN8 VMSTOR_PROTOCOL_VERSION(5, 1)
 #define VMSTOR_PROTOCOL_VERSION_BLUE VMSTOR_PROTOCOL_VERSION(6, 0)
+#define VMSTOR_PROTOCOL_VERSION_THRESHOLD VMSTOR_PROTOCOL_VERSION(6, 2)
 #define VMSTOR_PROTOCOL_VERSION_CURRENT VMSTOR_PROTOCOL_VERSION_BLUE
 
 // The max transfer length will be published when we offer a vmbus channel.
 // Max transfer bytes - this determines the reserved MDL size and how large
 // requests can be that the clients will forward.
-#define MAX_TRANSFER_LENGTH (8*1024*1024)
+#define MAX_TRANSFER_LENGTH (8 * 1024 * 1024)
 
 // Indicates that the device supports Asynchronous Notifications (AN)
 #define VMSTOR_PROPERTY_AN_CAPABLE 0x1
 
 // Packet structure describing virtual storage requests.
-typedef enum
+typedef enum _VSTOR_PACKET_OPERATION
 {
     VStorOperationCompleteIo = 1,
     VStorOperationRemoveDevice = 2,
@@ -1177,7 +1695,7 @@ typedef enum
     VStorOperationCreateSubChannels = 13,
     VStorOperationEventNotification = 14,
     VStorOperationMaximum = 14,
-} VSTOR_PACKET_OPERATION;
+} VSTOR_PACKET_OPERATION, *PVSTOR_PACKET_OPERATION;
 
 // Platform neutral description of a SCSI request
 
@@ -1190,6 +1708,9 @@ typedef enum
 #define VMSCSI_SENSE_BUFFER_SIZE_REVISION_1 0x12
 #define VMSCSI_SENSE_BUFFER_SIZE 0x14
 
+#define VMSCSI_IOCTL_DATA_OUT 0
+#define VMSCSI_IOCTL_DATA_IN 1
+
 typedef struct _VMSCSI_REQUEST
 {
     HV_UINT16 Length;
@@ -1201,6 +1722,7 @@ typedef struct _VMSCSI_REQUEST
     HV_UINT8 Lun;
     HV_UINT8 CdbLength;
     HV_UINT8 SenseInfoExLength;
+    // VMSCSI_IOCTL_DATA_OUT or VMSCSI_IOCTL_DATA_IN
     HV_UINT8 DataIn;
     HV_UINT8 Properties;
     HV_UINT32 DataTransferLength;
@@ -1255,7 +1777,7 @@ HV_STATIC_ASSERT((sizeof(VMSTORAGE_CHANNEL_PROPERTIES) % 4) == 0);
 
 // This structure is sent as part of the channel offer. It exists for old
 // versions of the VSC that used this to determine the IDE channel that matched
-// up with the VMBus channel.
+// up with the VMBus channel. Newer drivers and Linux just look at instance ID.
 // The reserved properties are not guaranteed to be zero.
 typedef struct _VMSTORAGE_OFFER_PROPERTIES
 {
@@ -1334,7 +1856,7 @@ typedef struct _VSTOR_PACKET
     // Flags - see below for values
     HV_UINT32 Flags;
     // Status of the request returned from the server side.
-    HV_UINT32 Status;
+    NTSTATUS Status;
     // Data payload area
     union
     {
@@ -1445,6 +1967,8 @@ const HV_GUID NVSP_CLASS_ID =
 #define NVSP_PROTOCOL_VERSION_2 NVSP_PROTOCOL_VERSION(3, 2)
 #define NVSP_PROTOCOL_VERSION_4 NVSP_PROTOCOL_VERSION(4, 0)
 #define NVSP_PROTOCOL_VERSION_5 NVSP_PROTOCOL_VERSION(5, 0)
+#define NVSP_PROTOCOL_VERSION_6 NVSP_PROTOCOL_VERSION(6, 0)
+#define NVSP_PROTOCOL_VERSION_61 NVSP_PROTOCOL_VERSION(6, 1)
 #define NVSP_PROTOCOL_VERSION_CURRENT NVSP_PROTOCOL_VERSION_5
 
 #define NVSP_PROTOCOL_VERSION_IS_VALID(_Version_) ( \
@@ -1452,6 +1976,12 @@ const HV_GUID NVSP_CLASS_ID =
     (_Version_) == NVSP_PROTOCOL_VERSION_4 || \
     (_Version_) == NVSP_PROTOCOL_VERSION_2 || \
     (_Version_) == NVSP_PROTOCOL_VERSION_1)
+
+#define NVSP_PACKET_SIZE_V1 0x1c
+#define NVSP_PACKET_SIZE_V61 0x28
+
+#define NVSP_DATA_CHANNEL_TYPE 0
+#define NVSP_CONTROL_CHANNEL_TYPE 1
 
 #define NVSP_OPERATIONAL_STATUS_OK ((HV_UINT32)0x00000000)
 #define NVSP_OPERATIONAL_STATUS_DEGRADED ((HV_UINT32)0x00000001)
@@ -1463,11 +1993,37 @@ const HV_GUID NVSP_CLASS_ID =
 // receive
 #define NVSP_MAX_PACKETS_PER_RECEIVE 375
 
+#define NVSP_MAX_IPV4_PACKET 65535
+#define NVSP_IPV4_MIN_MINIMUM_MTU 352
+
+// The maximum number of transfer pages (packets) the VSP will use on a receive
+// when RSC Over VMBus is enabled. (Should be 562)
+#define NVSP_MAX_PACKETS_PER_RECEIVE_RSC_OVER_VMBUS ( \
+    NVSP_MAX_PACKETS_PER_RECEIVE + \
+    (NVSP_MAX_IPV4_PACKET / NVSP_IPV4_MIN_MINIMUM_MTU) \
+    + 1)
+
 // Defines the maximum number of processors that can be used by a single VMQ's
 // traffic. We are storing this value here because both the VM and host needs it
 // to manage the vRSS indirection table (VM needs it for send and host needs it
 // for receive).
 #define VMS_SWITCH_RSS_MAX_RSS_PROC_COUNT 16
+
+// Defines the maximum number of indirection table entries that can be used by a
+// single VMQ's traffic. We are storing this value here because both the VM and
+// host needs it to manage the vRSS indirection table (VM needs it for send and
+// host needs it for receive).
+#define VMS_SWITCH_RSS_MAX_INDIRECTION_TABLE_ENTRIES 128
+
+// For vmNic, this defines the maximum number of send indirection table entries
+// that can be used by a single VMQ. We are separating out the max table size
+// for send and recv side indirection table, as updating send side indirection
+// table size will require a bump in nvsp version.
+#define VMS_SWITCH_RSS_MAX_SEND_INDIRECTION_TABLE_ENTRIES 16
+
+// Specified the minimum number of indirection table entries that can be used by
+// a single VMQ's traffic.
+#define VMS_SWITCH_RSS_MIN_INDIRECTION_TABLE_ENTRIES 16
 
 typedef enum _NVSP_MESSAGE_TYPE
 {
@@ -1534,7 +2090,14 @@ typedef enum _NVSP_MESSAGE_TYPE
     NvspMessage5TypeSubChannel,
     NvspMessage5TypeSendIndirectionTable,
     // The maximum allowed message ID for the v5 protocol.
-    NvspMessage5Max = NvspMessage5TypeSendIndirectionTable
+    NvspMessage5Max = NvspMessage5TypeSendIndirectionTable,
+
+    // Version 6 messages
+
+    NvspMessage6TypePdApi,
+    NvspMessage6TypePdPostBatch,
+    // The maximum allowed message ID for the v6 protocol.
+    NvspMessage6Max = NvspMessage6TypePdPostBatch
 } NVSP_MESSAGE_TYPE, *PNVSP_MESSAGE_TYPE;
 
 #define NVSP_PROTOCOL_VERSION_1_HANDLER_COUNT \
@@ -1549,6 +2112,16 @@ typedef enum _NVSP_MESSAGE_TYPE
 #define NVSP_PROTOCOL_VERSION_5_HANDLER_COUNT \
     ((NvspMessage5Max - NvspVersionMessageStart) + 1)
 
+// Unfortunately, KDNET MiniVSC took a dependency on buggy version 6 of protocol
+// (which has number of messages as in protocol version 5). Since all VMs with
+// kdnet debugger are be out there, we must handle this version as well.
+
+#define NVSP_PROTOCOL_VERSION_6_HANDLER_COUNT \
+    ((NvspMessage5Max - NvspVersionMessageStart) + 1)
+
+#define NVSP_PROTOCOL_VERSION_61_HANDLER_COUNT \
+    ((NvspMessage6Max - NvspVersionMessageStart) + 1)
+
 typedef enum _NVSP_STATUS
 {
     NvspStatusNone = 0,
@@ -1560,6 +2133,7 @@ typedef enum _NVSP_STATUS
     NvspStatusDeprecated2,
     NvspStatusInvalidRndisPacket,
     NvspStatusBusy,
+    // not actually used
     NvspStatusProtocolVersionUnsupported,
     NvspStatusMax,
 } NVSP_STATUS, *PNVSP_STATUS;
@@ -1583,6 +2157,7 @@ typedef struct _HV_NDIS_OBJECT_HEADER
 } HV_NDIS_OBJECT_HEADER, *PHV_NDIS_OBJECT_HEADER;
 
 // Init Messages
+
 // This message is used by the VSC to initialize the channel after the channels
 // has been opened. This message should never include anything other then
 // versioning (i.e. this message will be the same for ever).
@@ -1612,15 +2187,14 @@ typedef struct _NVSP_MESSAGE_INIT_COMPLETE
     // was NegotiatedProtocolVersion (2) in Win6
     HV_UINT32 Deprecated;
     HV_UINT32 MaximumMdlChainLength;
-    // NVSP_STATUS
-    HV_UINT32 Status;
+    NVSP_STATUS Status;
 } NVSP_MESSAGE_INIT_COMPLETE, *PNVSP_MESSAGE_INIT_COMPLETE;
 
 typedef union _NVSP_MESSAGE_INIT_UBER
 {
     NVSP_MESSAGE_INIT Init;
     NVSP_MESSAGE_INIT_COMPLETE InitComplete;
-} NVSP_MESSAGE_INIT_UBER;
+} NVSP_MESSAGE_INIT_UBER, *PNVSP_MESSAGE_INIT_UBER;
 
 // Version 1 Messages
 
@@ -1654,8 +2228,7 @@ typedef struct _NVSP_1_RECEIVE_BUFFER_SECTION
 // buffer.
 typedef struct _NVSP_1_MESSAGE_SEND_RECEIVE_BUFFER_COMPLETE
 {
-    // NVSP_STATUS
-    HV_UINT32 Status;
+    NVSP_STATUS Status;
     HV_UINT32 NumSections;
     // The receive buffer is split into two parts, a large suballocation section
     // and a small suballocation section. These sections are then suballocated
@@ -1691,8 +2264,7 @@ typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER
 // This message must be sent by the VSP before the VSP uses the sent buffer.
 typedef struct _NVSP_1_MESSAGE_SEND_SEND_BUFFER_COMPLETE
 {
-    // NVSP_STATUS
-    HV_UINT32 Status;
+    NVSP_STATUS Status;
     // The VSC gets to choose the size of the send buffer and the VSP gets to
     // choose the sections size of the buffer. This was done to enable dynamic
     // reconfigurations when the cost of GPA-direct buffers decreases.
@@ -1727,8 +2299,7 @@ typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET
 // message cannot use any resources associated with the original RNDIS packet.
 typedef struct _NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE
 {
-    // NVSP_STATUS
-    HV_UINT32 Status;
+    NVSP_STATUS Status;
 } NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE, *PNVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE;
 
 // This message is used by the VSC to send the NDIS version to the VSP. The VSP
@@ -1747,6 +2318,8 @@ typedef struct _NVSP_2_NETVSC_CAPABILITIES
             HV_UINT64 CorrelationId : 1;
             HV_UINT64 Teaming : 1;
             HV_UINT64 VirtualSubnetId : 1;
+            HV_UINT64 RscOverVmbus : 1;
+            HV_UINT64 Reserved : 56;
         };
     };
 } NVSP_2_NETVSC_CAPABILITIES, *PNVSP_2_NETVSC_CAPABILITIES;
@@ -1801,21 +2374,21 @@ typedef struct _NVSP_4_MESSAGE_SWITCH_DATA_PATH
     NVSP_VM_DATA_PATH ActiveDataPath;
 } NVSP_4_MESSAGE_SWITCH_DATA_PATH, *PNVSP_4_MESSAGE_SWITCH_DATA_PATH;
 
+typedef HV_UINT32 NDIS_OID, *PNDIS_OID;
+
 // NvspMessage5TypeOidQueryEx
 typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX
 {
     // Header information for the Query OID
     HV_NDIS_OBJECT_HEADER Header;
     // OID being queried
-    // NDIS_OID
-    HV_UINT32 Oid;
+    NDIS_OID Oid;
 } NVSP_5_MESSAGE_OID_QUERY_EX, *PNVSP_5_MESSAGE_OID_QUERY_EX;
 
 // NvspMessage5TypeOidQueryExComplete
 typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX_COMPLETE
 {
-    // Result of the query.
-    // NDIS_STATUS
+    // Result of the query. (NDIS_STATUS)
     HV_UINT32 Status;
     union
     {
@@ -1867,6 +2440,163 @@ typedef struct _NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE
     HV_UINT32 TableOffset;
 } NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE, *PNVSP_5_MESSAGE_SEND_INDIRECTION_TABLE;
 
+// NvspMessage6TypePdApi
+
+typedef enum _NVSP_6_MESSAGE_PD_API_OPERATION
+{
+    PdApiOpConfiguration = 1,
+    PdApiOpSwitchDatapath,
+    PdApiOpOpenProvider,
+    PdApiOpCloseProvider,
+    PdApiOpCreateQueue,
+    PdApiOpFlushQueue,
+    PdApiOpFreeQueue,
+    PdApiOpAllocateCommonBuffer,
+    PdApiOpFreeCommonBuffer,
+    PdApiOpMax
+} NVSP_6_MESSAGE_PD_API_OPERATION, *PNVSP_6_MESSAGE_PD_API_OPERATION;
+
+typedef struct _NVSP_6_MESSAGE_PD_API_REQUEST
+{
+    HV_UINT32 Operation; // NVSP_6_MESSAGE_PD_API_OPERATION
+    union
+    {
+        struct
+        {
+            // MMIO information is sent from the VM to VSP.
+
+            HV_INT64 MmioPhysicalAddress;
+            HV_UINT32 MmioLength;
+
+            // This is a hint to NVSP: how many PD queues a VM can support.
+            HV_UINT16 NumPdQueues;
+        } Configuration;
+        struct
+        {
+            HV_UINT8 HostDatapathIsPacketDirect; // BOOLEAN
+            HV_UINT8 GuestPacketDirectIsEnabled; // BOOLEAN
+        } SwitchDatapath;
+        struct
+        {
+            HV_UINT32 ProviderId;
+            // This are the flags from OPEN_PROVIDER structure.
+            HV_UINT32 Flags;
+        } OpenProvider;
+        struct
+        {
+            HV_UINT32 ProviderId;
+        } CloseProvider;
+        struct
+        {
+            HV_UINT32 ProviderId;
+            HV_UINT16 QueueId;
+            HV_UINT16 QueueSize;
+            HV_UINT8 IsReceiveQueue;
+            HV_UINT8 IsRssQueue;
+            HV_UINT32 ReceiveDataLength;
+            HV_GROUP_AFFINITY Affinity;
+        } CreateQueue;
+        struct
+        {
+            HV_UINT32 ProviderId;
+            HV_UINT16 QueueId;
+        } DeleteQueue;
+        struct
+        {
+            HV_UINT32 ProviderId;
+            HV_UINT16 QueueId;
+        } FlushQueue;
+        struct
+        {
+            HV_UINT32 Length;
+            HV_UINT32 PreferredNode;
+            HV_UINT16 RegionId;
+        } AllocateCommonBuffer;
+        struct
+        {
+            HV_UINT32 Length;
+            HV_UINT64 PhysicalAddress;
+            HV_UINT32 PreferredNode;
+            HV_UINT16 RegionId;
+            HV_UINT8 CacheType;
+        } FreeCommonBuffer;
+    };
+} NVSP_6_MESSAGE_PD_API_REQUEST, *PNVSP_6_MESSAGE_PD_API_REQUEST;
+
+typedef struct _NVSP_6_MESSAGE_PD_API_COMPLETE
+{
+    HV_UINT32 Operation; // NVSP_6_MESSAGE_PD_API_OPERATION
+    // The status of the PD operation in NT STATUS code
+    HV_UINT32 Status;
+    // Operation specific completion data.
+    union
+    {
+        struct
+        {
+            // This is the actual number of PD queues allocated to the VM.
+            HV_UINT16 NumPdQueues;
+            HV_UINT8 NumReceiveRssPDQueues;
+            HV_UINT8 IsSupportedByVSP;
+            HV_UINT8 IsEnabledByVSP;
+        } Configuration;
+        struct
+        {
+            HV_UINT32 ProviderId;
+        } OpenProvider;
+        struct
+        {
+            HV_UINT32 ProviderId;
+            HV_UINT16 QueueId;
+            HV_UINT16 QueueSize;
+            HV_UINT32 ReceiveDataLength;
+            HV_GROUP_AFFINITY Affinity;
+        } CreateQueue;
+        struct
+        {
+            HV_UINT64 PhysicalAddress;
+            HV_UINT32 Length;
+            HV_UINT32 PreferredNode;
+            HV_UINT16 RegionId;
+            HV_UINT8 CacheType;
+        } AllocateCommonBuffer;
+    };
+} NVSP_6_MESSAGE_PD_API_COMPLETE, *PNVSP_6_MESSAGE_PD_API_COMPLETE;
+
+typedef struct _NVSP_6_PD_BUFFER
+{
+    HV_UINT32 RegionOffset;
+    HV_UINT16 RegionId;
+    HV_UINT16 IsPartial : 1;
+    HV_UINT16 ReservedMbz : 15;
+} NVSP_6_PD_BUFFER, *PNVSP_6_PD_BUFFER;
+HV_STATIC_ASSERT(sizeof(NVSP_6_PD_BUFFER) == sizeof(HV_UINT64));
+
+typedef struct _NVSP_6_MESSAGE_PD_BATCH_MESSAGE
+{
+    NVSP_MESSAGE_HEADER Header;
+    HV_UINT16 Count;
+    HV_UINT16 GuestToHost : 1;
+    HV_UINT16 IsReceive : 1;
+    HV_UINT16 ReservedMbz : 14;
+    NVSP_6_PD_BUFFER PdBuffer[0];
+} NVSP_6_MESSAGE_PD_BATCH_MESSAGE, *PNVSP_6_MESSAGE_PD_BATCH_MESSAGE;
+HV_STATIC_ASSERT(sizeof(NVSP_6_MESSAGE_PD_BATCH_MESSAGE) == sizeof(HV_UINT64));
+
+// Request from the VSC to switch over to NvIo protocol. VSP can reject the
+// request.
+typedef struct _NVSP_7_MESSAGE_USE_NVIO_REQUEST
+{
+    NVSP_MESSAGE_HEADER Header; // Type == NvspMessage7TypeUseNvIo
+    HV_UINT32 ReservedMbz1;
+    HV_UINT64 ReservedMbz2;
+} NVSP_7_MESSAGE_USE_NVIO_REQUEST, *PNVSP_7_MESSAGE_USE_NVIO_REQUEST;
+
+typedef struct _NVSP_7_MESSAGE_USE_NVIO_COMPLETE
+{
+    HV_UINT32 Status;
+    HV_UINT32 ControlChannelIndex;
+} NVSP_7_MESSAGE_USE_NVIO_COMPLETE, *PNVSP_7_MESSAGE_USE_NVIO_COMPLETE;
+
 // NVSP Messages
 
 typedef union _NVSP_MESSAGE_1_UBER
@@ -1880,18 +2610,18 @@ typedef union _NVSP_MESSAGE_1_UBER
     NVSP_1_MESSAGE_REVOKE_SEND_BUFFER RevokeSendBuffer;
     NVSP_1_MESSAGE_SEND_RNDIS_PACKET SendRNDISPacket;
     NVSP_1_MESSAGE_SEND_RNDIS_PACKET_COMPLETE SendRNDISPacketComplete;
-} NVSP_1_MESSAGE_UBER;
+} NVSP_1_MESSAGE_UBER, *PNVSP_1_MESSAGE_UBER;
 
 typedef union _NVSP_MESSAGE_2_UBER
 {
     NVSP_2_MESSAGE_SEND_NDIS_CONFIG SendNdisConfig;
-} NVSP_2_MESSAGE_UBER;
+} NVSP_2_MESSAGE_UBER, *PNVSP_2_MESSAGE_UBER;
 
 typedef union _NVSP_MESSAGE_4_UBER
 {
     NVSP_4_MESSAGE_SEND_VF_ASSOCIATION VFAssociation;
     NVSP_4_MESSAGE_SWITCH_DATA_PATH SwitchDataPath;
-} NVSP_4_MESSAGE_UBER;
+} NVSP_4_MESSAGE_UBER, *PNVSP_4_MESSAGE_UBER;
 
 typedef union _NVSP_MESSAGE_5_UBER
 {
@@ -1900,7 +2630,19 @@ typedef union _NVSP_MESSAGE_5_UBER
     NVSP_5_MESSAGE_SUBCHANNEL_REQUEST SubChannelRequest;
     NVSP_5_MESSAGE_SUBCHANNEL_COMPLETE SubChannelRequestComplete;
     NVSP_5_MESSAGE_SEND_INDIRECTION_TABLE SendTable;
-} NVSP_5_MESSAGE_UBER;
+} NVSP_5_MESSAGE_UBER, *PNVSP_5_MESSAGE_UBER;
+
+typedef union _NVSP_MESSAGE_6_UBER
+{
+    NVSP_6_MESSAGE_PD_API_REQUEST PdApiRequest;
+    NVSP_6_MESSAGE_PD_API_COMPLETE PdApiComplete;
+} NVSP_6_MESSAGE_UBER, *PNVSP_6_MESSAGE_UBER;
+
+typedef union _NVSP_MESSAGE_7_UBER
+{
+    NVSP_7_MESSAGE_USE_NVIO_REQUEST UseNvIoRequest;
+    NVSP_7_MESSAGE_USE_NVIO_COMPLETE UseNvIoComplete;
+} NVSP_7_MESSAGE_UBER, *PNVSP_7_MESSAGE_UBER;
 
 typedef union _NVSP_ALL_MESSAGES
 {
@@ -1909,7 +2651,9 @@ typedef union _NVSP_ALL_MESSAGES
     NVSP_2_MESSAGE_UBER Version2Messages;
     NVSP_4_MESSAGE_UBER Version4Messages;
     NVSP_5_MESSAGE_UBER Version5Messages;
-} NVSP_ALL_MESSAGES;
+    NVSP_6_MESSAGE_UBER Version6Messages;
+    NVSP_7_MESSAGE_UBER Version7Messages;
+} NVSP_ALL_MESSAGES, *PNVSP_ALL_MESSAGES;
 
 // ALL Messages
 typedef struct _NVSP_MESSAGE
@@ -1921,40 +2665,213 @@ typedef struct _NVSP_MESSAGE
 
 HV_STATIC_ASSERT(sizeof(NVSP_MESSAGE) % 8 == 0);
 
+// Message of the protocol version 1 is the biggest of all the legacy messages.
+#define NVSP_LEGACY_MESSAGE_SIZE \
+    (sizeof(NVSP_MESSAGE_HEADER) + sizeof(NVSP_1_MESSAGE_UBER))
+
+// Version 6.1 of protocol is the first one that increases the message size.
+#define NVSP_61_MESSAGE_SIZE \
+    (sizeof(NVSP_MESSAGE_HEADER) + sizeof(NVSP_6_MESSAGE_UBER))
+
+HV_STATIC_ASSERT(NVSP_61_MESSAGE_SIZE > NVSP_LEGACY_MESSAGE_SIZE);
+
+// Version 7 of protocol
+#define NVSP_7_MESSAGE_SIZE NVSP_61_MESSAGE_SIZE
+HV_STATIC_ASSERT(NVSP_7_MESSAGE_SIZE == NVSP_61_MESSAGE_SIZE);
+
+typedef struct _NVSP_SEND_INDIRECTION_TABLE_MESSAGE
+{
+    NVSP_MESSAGE NvspMessage;
+    HV_UINT32 SendIndirectionTable[VMS_SWITCH_RSS_MAX_SEND_INDIRECTION_TABLE_ENTRIES];
+} NVSP_SEND_INDIRECTION_TABLE_MESSAGE, *PNVSP_SEND_INDIRECTION_TABLE_MESSAGE;
+
+// The indirection table message is the largest message we send right now
+// without using an external MDL. VMBUS requires us to specify the max packet
+// size using VmbChannelInitSetMaximumPacketSize. We will not be able to receive
+// packets that are larger than this.
+#define NVSP_MAX_VMBUS_MESSAGE_SIZE (sizeof(NVSP_SEND_INDIRECTION_TABLE_MESSAGE))
+
+// Ensure the send indirection table size is equal to 16. This defines the
+// legacy NVSP message size (which cannot be changed).
+// Increasing VMS_SWITCH_RSS_MAX_SEND_INDIRECTION_TABLE_ENTRIES will also
+// increase the size of NVSP_SEND_INDIRECTION_TABLE_MESSAGE, which is the
+// largest message we currently send without using an external MDL.
+HV_STATIC_ASSERT(VMS_SWITCH_RSS_MAX_SEND_INDIRECTION_TABLE_ENTRIES == 16);
+
 #pragma pack(pop)
 
 // Basic types
 
-typedef HV_UINT32 RNDIS_REQUEST_ID;
-typedef HV_UINT32 RNDIS_HANDLE;
-typedef HV_UINT32 RNDIS_STATUS;
-typedef HV_UINT32 RNDIS_REQUEST_TYPE;
-typedef HV_UINT32 RNDIS_OID;
-typedef HV_UINT32 RNDIS_CLASS_ID;
-typedef HV_UINT32 RNDIS_MEDIUM;
-typedef HV_UINT32 *PRNDIS_REQUEST_ID;
-typedef HV_UINT32 *PRNDIS_HANDLE;
-typedef HV_UINT32 *PRNDIS_STATUS;
-typedef HV_UINT32 *PRNDIS_REQUEST_TYPE;
-typedef HV_UINT32 *PRNDIS_OID;
-typedef HV_UINT32 *PRNDIS_CLASS_ID;
-typedef HV_UINT32 *PRNDIS_MEDIUM;
+typedef HV_UINT32 RNDIS_REQUEST_ID, *PRNDIS_REQUEST_ID;
+typedef HV_UINT32 RNDIS_HANDLE, *PRNDIS_HANDLE;
+typedef HV_UINT32 RNDIS_STATUS, *PRNDIS_STATUS;
+typedef HV_UINT32 RNDIS_REQUEST_TYPE, *PRNDIS_REQUEST_TYPE;
+typedef HV_UINT32 RNDIS_OID, *PRNDIS_OID;
+typedef HV_UINT32 RNDIS_CLASS_ID, *PRNDIS_CLASS_ID;
+typedef HV_UINT32 RNDIS_MEDIUM, *PRNDIS_MEDIUM;
+typedef HV_UINT32 RNDIS_AF, *PRNDIS_AF;
 
 // Status codes
 
-#define RNDIS_STATUS_SUCCESS ((RNDIS_STATUS)0x00000000L)
+#define RNDIS_STATUS_SUCCESS ((RNDIS_STATUS)STATUS_SUCCESS)
+#define RNDIS_STATUS_PENDING ((RNDIS_STATUS)STATUS_PENDING)
+#define RNDIS_STATUS_NOT_RECOGNIZED ((RNDIS_STATUS)0x00010001L)
+#define RNDIS_STATUS_NOT_COPIED ((RNDIS_STATUS)0x00010002L)
+#define RNDIS_STATUS_NOT_ACCEPTED ((RNDIS_STATUS)0x00010003L)
+#define RNDIS_STATUS_CALL_ACTIVE ((RNDIS_STATUS)0x00010007L)
+#define RNDIS_STATUS_ONLINE ((RNDIS_STATUS)0x40010003L)
+#define RNDIS_STATUS_RESET_START ((RNDIS_STATUS)0x40010004L)
+#define RNDIS_STATUS_RESET_END ((RNDIS_STATUS)0x40010005L)
+#define RNDIS_STATUS_RING_STATUS ((RNDIS_STATUS)0x40010006L)
+#define RNDIS_STATUS_CLOSED ((RNDIS_STATUS)0x40010007L)
+#define RNDIS_STATUS_WAN_LINE_UP ((RNDIS_STATUS)0x40010008L)
+#define RNDIS_STATUS_WAN_LINE_DOWN ((RNDIS_STATUS)0x40010009L)
+#define RNDIS_STATUS_WAN_FRAGMENT ((RNDIS_STATUS)0x4001000AL)
 #define RNDIS_STATUS_MEDIA_CONNECT ((RNDIS_STATUS)0x4001000BL)
 #define RNDIS_STATUS_MEDIA_DISCONNECT ((RNDIS_STATUS)0x4001000CL)
+#define RNDIS_STATUS_HARDWARE_LINE_UP ((RNDIS_STATUS)0x4001000DL)
+#define RNDIS_STATUS_HARDWARE_LINE_DOWN ((RNDIS_STATUS)0x4001000EL)
+#define RNDIS_STATUS_INTERFACE_UP ((RNDIS_STATUS)0x4001000FL)
+#define RNDIS_STATUS_INTERFACE_DOWN ((RNDIS_STATUS)0x40010010L)
+#define RNDIS_STATUS_MEDIA_BUSY ((RNDIS_STATUS)0x40010011L)
+#define RNDIS_STATUS_MEDIA_SPECIFIC_INDICATION ((RNDIS_STATUS)0x40010012L)
+#define RNDIS_STATUS_WW_INDICATION RNDIS_STATUS_MEDIA_SPECIFIC_INDICATION
+#define RNDIS_STATUS_LINK_SPEED_CHANGE ((RNDIS_STATUS)0x40010013L)
 // NDIS Status value for REMOTE_NDIS_INDICATE_STATUS_MSG messages (NDIS_STATUS)
-#define NDIS_STATUS_NETWORK_CHANGE ((HV_UINT32)0x40010018L)
+#define RNDIS_STATUS_NETWORK_CHANGE ((RNDIS_STATUS)0x40010018L)
+#define RNDIS_STATUS_TASK_OFFLOAD_CURRENT_CONFIG ((RNDIS_STATUS)0x40020006L)
+#define RNDIS_STATUS_NOT_RESETTABLE ((RNDIS_STATUS)0x80010001L)
+#define RNDIS_STATUS_SOFT_ERRORS ((RNDIS_STATUS)0x80010003L)
+#define RNDIS_STATUS_HARD_ERRORS ((RNDIS_STATUS)0x80010004L)
+#define RNDIS_STATUS_BUFFER_OVERFLOW ((RNDIS_STATUS)STATUS_BUFFER_OVERFLOW)
+#define RNDIS_STATUS_FAILURE ((RNDIS_STATUS)STATUS_UNSUCCESSFUL)
+#define RNDIS_STATUS_RESOURCES ((RNDIS_STATUS)STATUS_INSUFFICIENT_RESOURCES)
+#define RNDIS_STATUS_CLOSING ((RNDIS_STATUS)0xC0010002L)
+#define RNDIS_STATUS_BAD_VERSION ((RNDIS_STATUS)0xC0010004L)
+#define RNDIS_STATUS_BAD_CHARACTERISTICS ((RNDIS_STATUS)0xC0010005L)
+#define RNDIS_STATUS_ADAPTER_NOT_FOUND ((RNDIS_STATUS)0xC0010006L)
+#define RNDIS_STATUS_OPEN_FAILED ((RNDIS_STATUS)0xC0010007L)
+#define RNDIS_STATUS_DEVICE_FAILED ((RNDIS_STATUS)0xC0010008L)
+#define RNDIS_STATUS_MULTICAST_FULL ((RNDIS_STATUS)0xC0010009L)
+#define RNDIS_STATUS_MULTICAST_EXISTS ((RNDIS_STATUS)0xC001000AL)
+#define RNDIS_STATUS_MULTICAST_NOT_FOUND ((RNDIS_STATUS)0xC001000BL)
+#define RNDIS_STATUS_REQUEST_ABORTED ((RNDIS_STATUS)0xC001000CL)
+#define RNDIS_STATUS_RESET_IN_PROGRESS ((RNDIS_STATUS)0xC001000DL)
+#define RNDIS_STATUS_CLOSING_INDICATING ((RNDIS_STATUS)0xC001000EL)
+#define RNDIS_STATUS_NOT_SUPPORTED ((RNDIS_STATUS)STATUS_NOT_SUPPORTED)
+#define RNDIS_STATUS_INVALID_PACKET ((RNDIS_STATUS)0xC001000FL)
+#define RNDIS_STATUS_OPEN_LIST_FULL ((RNDIS_STATUS)0xC0010010L)
+#define RNDIS_STATUS_ADAPTER_NOT_READY ((RNDIS_STATUS)0xC0010011L)
+#define RNDIS_STATUS_ADAPTER_NOT_OPEN ((RNDIS_STATUS)0xC0010012L)
+#define RNDIS_STATUS_NOT_INDICATING ((RNDIS_STATUS)0xC0010013L)
+#define RNDIS_STATUS_INVALID_LENGTH ((RNDIS_STATUS)0xC0010014L)
+#define RNDIS_STATUS_INVALID_DATA ((RNDIS_STATUS)0xC0010015L)
+#define RNDIS_STATUS_BUFFER_TOO_SHORT ((RNDIS_STATUS)0xC0010016L)
+#define RNDIS_STATUS_INVALID_OID ((RNDIS_STATUS)0xC0010017L)
+#define RNDIS_STATUS_ADAPTER_REMOVED ((RNDIS_STATUS)0xC0010018L)
+#define RNDIS_STATUS_UNSUPPORTED_MEDIA ((RNDIS_STATUS)0xC0010019L)
+#define RNDIS_STATUS_GROUP_ADDRESS_IN_USE ((RNDIS_STATUS)0xC001001AL)
+#define RNDIS_STATUS_FILE_NOT_FOUND ((RNDIS_STATUS)0xC001001BL)
+#define RNDIS_STATUS_ERROR_READING_FILE ((RNDIS_STATUS)0xC001001CL)
+#define RNDIS_STATUS_ALREADY_MAPPED ((RNDIS_STATUS)0xC001001DL)
+#define RNDIS_STATUS_RESOURCE_CONFLICT ((RNDIS_STATUS)0xC001001EL)
+#define RNDIS_STATUS_NO_CABLE ((RNDIS_STATUS)0xC001001FL)
+#define RNDIS_STATUS_INVALID_SAP ((RNDIS_STATUS)0xC0010020L)
+#define RNDIS_STATUS_SAP_IN_USE ((RNDIS_STATUS)0xC0010021L)
+#define RNDIS_STATUS_INVALID_ADDRESS ((RNDIS_STATUS)0xC0010022L)
+#define RNDIS_STATUS_VC_NOT_ACTIVATED ((RNDIS_STATUS)0xC0010023L)
+#define RNDIS_STATUS_DEST_OUT_OF_ORDER ((RNDIS_STATUS)0xC0010024L)
+#define RNDIS_STATUS_VC_NOT_AVAILABLE ((RNDIS_STATUS)0xC0010025L)
+#define RNDIS_STATUS_CELLRATE_NOT_AVAILABLE ((RNDIS_STATUS)0xC0010026L)
+#define RNDIS_STATUS_INCOMPATIBLE_QOS ((RNDIS_STATUS)0xC0010027L)
+#define RNDIS_STATUS_AAL_PARAMS_UNSUPPORTED ((RNDIS_STATUS)0xC0010028L)
+#define RNDIS_STATUS_NO_ROUTE_TO_DESTINATION ((RNDIS_STATUS)0xC0010029L)
+#define RNDIS_STATUS_TOKEN_RING_OPEN_ERROR ((RNDIS_STATUS)0xC0011000L)
 
-// General Objects
+// Object Identifiers used by NdisRequest Query/Set Information
 
+#define RNDIS_OID_GEN_SUPPORTED_LIST 0x00010101
+#define RNDIS_OID_GEN_HARDWARE_STATUS 0x00010102
+#define RNDIS_OID_GEN_MEDIA_SUPPORTED 0x00010103
+#define RNDIS_OID_GEN_MEDIA_IN_USE 0x00010104
+#define RNDIS_OID_GEN_MAXIMUM_LOOKAHEAD 0x00010105
+#define RNDIS_OID_GEN_MAXIMUM_FRAME_SIZE 0x00010106
+#define RNDIS_OID_GEN_LINK_SPEED 0x00010107
+#define RNDIS_OID_GEN_TRANSMIT_BUFFER_SPACE 0x00010108
+#define RNDIS_OID_GEN_RECEIVE_BUFFER_SPACE 0x00010109
+#define RNDIS_OID_GEN_TRANSMIT_BLOCK_SIZE 0x0001010A
+#define RNDIS_OID_GEN_RECEIVE_BLOCK_SIZE 0x0001010B
+#define RNDIS_OID_GEN_VENDOR_ID 0x0001010C
+#define RNDIS_OID_GEN_VENDOR_DESCRIPTION 0x0001010D
 #define RNDIS_OID_GEN_CURRENT_PACKET_FILTER 0x0001010E
-
-// 802.3 Objects (Ethernet)
-
+#define RNDIS_OID_GEN_CURRENT_LOOKAHEAD 0x0001010F
+#define RNDIS_OID_GEN_DRIVER_VERSION 0x00010110
+#define RNDIS_OID_GEN_MAXIMUM_TOTAL_SIZE 0x00010111
+#define RNDIS_OID_GEN_PROTOCOL_OPTIONS 0x00010112
+#define RNDIS_OID_GEN_MAC_OPTIONS 0x00010113
+#define RNDIS_OID_GEN_MEDIA_CONNECT_STATUS 0x00010114
+#define RNDIS_OID_GEN_MAXIMUM_SEND_PACKETS 0x00010115
+#define RNDIS_OID_GEN_VENDOR_DRIVER_VERSION 0x00010116
+#define RNDIS_OID_GEN_NETWORK_LAYER_ADDRESSES 0x00010118 // Set only
+#define RNDIS_OID_GEN_TRANSPORT_HEADER_OFFSET 0x00010119 // Set only
+#define RNDIS_OID_GEN_RECEIVE_SCALE_CAPABILITIES 0x00010203 // query only
+#define RNDIS_OID_GEN_RECEIVE_SCALE_PARAMETERS 0x00010204 // query and set
+#define RNDIS_OID_GEN_MAX_LINK_SPEED 0x00010206 // query only
+#define RNDIS_OID_GEN_LINK_STATE 0x00010207 // query only
+#define RNDIS_OID_GEN_LINK_PARAMETERS 0x00010208 // set only
+#define RNDIS_OID_GEN_INTERRUPT_MODERATION 0x00010209 // query and set
+#define RNDIS_OID_GEN_MACHINE_NAME 0x0001021A // set only
+#define RNDIS_OID_GEN_RNDIS_CONFIG_PARAMETER 0x0001021B // Set only
+#define RNDIS_OID_GEN_XMIT_OK 0x00020101
+#define RNDIS_OID_GEN_RCV_OK 0x00020102
+#define RNDIS_OID_GEN_XMIT_ERROR 0x00020103
+#define RNDIS_OID_GEN_RCV_ERROR 0x00020104
+#define RNDIS_OID_GEN_RCV_NO_BUFFER 0x00020105
+#define RNDIS_OID_GEN_DIRECTED_BYTES_XMIT 0x00020201
+#define RNDIS_OID_GEN_DIRECTED_FRAMES_XMIT 0x00020202
+#define RNDIS_OID_GEN_MULTICAST_BYTES_XMIT 0x00020203
+#define RNDIS_OID_GEN_MULTICAST_FRAMES_XMIT 0x00020204
+#define RNDIS_OID_GEN_BROADCAST_BYTES_XMIT 0x00020205
+#define RNDIS_OID_GEN_BROADCAST_FRAMES_XMIT 0x00020206
+#define RNDIS_OID_GEN_DIRECTED_BYTES_RCV 0x00020207
+#define RNDIS_OID_GEN_DIRECTED_FRAMES_RCV 0x00020208
+#define RNDIS_OID_GEN_MULTICAST_BYTES_RCV 0x00020209
+#define RNDIS_OID_GEN_MULTICAST_FRAMES_RCV 0x0002020A
+#define RNDIS_OID_GEN_BROADCAST_BYTES_RCV 0x0002020B
+#define RNDIS_OID_GEN_BROADCAST_FRAMES_RCV 0x0002020C
+#define RNDIS_OID_GEN_RCV_CRC_ERROR 0x0002020D
+#define RNDIS_OID_GEN_TRANSMIT_QUEUE_LENGTH 0x0002020E
+#define RNDIS_OID_GEN_GET_TIME_CAPS 0x0002020F
+#define RNDIS_OID_GEN_GET_NETCARD_TIME 0x00020210
+#define RNDIS_OID_GEN_FRIENDLY_NAME 0x00020216
+#define RNDIS_OID_GEN_BYTES_RCV 0x00020219
+#define RNDIS_OID_GEN_BYTES_XMIT 0x0002021A
+#define RNDIS_OID_GEN_RCV_DISCARDS 0x0002021B
+#define RNDIS_OID_GEN_XMIT_DISCARDS 0x0002021C
+#define RNDIS_OID_TCP_RSC_STATISTICS 0x0002021D
+#define RNDIS_OID_802_3_PERMANENT_ADDRESS 0x01010101
 #define RNDIS_OID_802_3_CURRENT_ADDRESS 0x01010102
+#define RNDIS_OID_802_3_MULTICAST_LIST 0x01010103
+#define RNDIS_OID_802_3_MAXIMUM_LIST_SIZE 0x01010104
+#define RNDIS_OID_802_3_MAC_OPTIONS 0x01010105 // deprecated
+#define RNDIS_OID_OFFLOAD_ENCAPSULATION 0x0101010A
+#define RNDIS_OID_802_3_ADD_MULTICAST_ADDRESS 0x01010208
+#define RNDIS_OID_802_3_DELETE_MULTICAST_ADDRESS 0x01010209
+#define RNDIS_OID_802_3_RCV_ERROR_ALIGNMENT 0x01020101
+#define RNDIS_OID_802_3_XMIT_ONE_COLLISION 0x01020102
+#define RNDIS_OID_802_3_XMIT_MORE_COLLISIONS 0x01020103
+#define RNDIS_OID_802_3_XMIT_DEFERRED 0x01020201
+#define RNDIS_OID_802_3_XMIT_MAX_COLLISIONS 0x01020202
+#define RNDIS_OID_802_3_RCV_OVERRUN 0x01020203
+#define RNDIS_OID_802_3_XMIT_UNDERRUN 0x01020204
+#define RNDIS_OID_802_3_XMIT_HEARTBEAT_FAILURE 0x01020205
+#define RNDIS_OID_802_3_XMIT_TIMES_CRS_LOST 0x01020206
+#define RNDIS_OID_802_3_XMIT_LATE_COLLISIONS 0x01020207
+#define RNDIS_OID_TCP_OFFLOAD_CURRENT_CONFIG 0xFC01020B
+#define RNDIS_OID_TCP_OFFLOAD_PARAMETERS 0xFC01020C
+#define RNDIS_OID_TCP_OFFLOAD_HARDWARE_CAPABILITIES 0xFC01020D
+#define RNDIS_OID_TCP_CONNECTION_OFFLOAD_CURRENT_CONFIG 0xFC01020E
+#define RNDIS_OID_TCP_CONNECTION_OFFLOAD_HARDWARE_CAPABILITIES 0xFC01020F
 
 // Remote NDIS message types
 
@@ -1978,6 +2895,9 @@ typedef HV_UINT32 *PRNDIS_MEDIUM;
 #define REMOTE_NDIS_INITIALIZE_CMPLT 0x80000002
 #define REMOTE_NDIS_QUERY_CMPLT 0x80000004
 #define REMOTE_NDIS_SET_CMPLT 0x80000005
+#define REMOTE_NDIS_RESET_CMPLT 0x80000006
+#define REMOTE_NDIS_KEEPALIVE_CMPLT 0x80000008
+#define REMOTE_NDIS_SET_EX_CMPLT 0x80000009
 
 // Reserved message type for private communication between lower-layer host
 // driver and remote device, if necessary.
@@ -3449,6 +4369,7 @@ const HV_GUID INHERITED_ACTIVATION_CLASS_ID =
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
 #else
+#pragma warning(default:4200) // zero length array
 #pragma warning(default:4201) // nameless struct/union
 #endif
 #endif

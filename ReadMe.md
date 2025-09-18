@@ -60,9 +60,16 @@ folder which you actually needed to your C/C++ projects.
     - vm\devices\hyperv_ic_protocol\src\timesync.rs
     - vm\devices\hyperv_ic_protocol\src\vss.rs
     - vm\devices\uidevices\src\video\protocol.rs
+    - vm\devices\uidevices\src\keyboard\protocol.rs
+    - vm\devices\uidevices\src\mouse\protocol.rs
+    - vm\devices\storage\storvsp_protocol\src\lib.rs
+    - vm\devices\net\netvsp\src\protocol.rs
+    - vm\devices\net\netvsp\src\rndisprot.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
   - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
+  - Definitions conform with Windows 10 Build 14347's VMBusHID.sys
+  - Definitions conform with Windows 10 Build 14347's netvsc.sys
 - Mile.HyperV.TLFS.h
   - Definitions conform with Hypervisor Top Level Functional Specification 6.0b
   - Include definitions from hvgdk.h from Windows Driver Kit version 7.1.0
@@ -85,7 +92,6 @@ folder which you actually needed to your C/C++ projects.
   - Include Hyper-V related definitions from symbols in Windows version
     10.0.14347.0's vmbuspipe.dll
 - Mile.HyperV.VMBus.h
-  - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
   - Definitions conform with Windows 10 Build 14347's VMBusHID.sys
   - Definitions conform with Windows 10 Build 14347's netvsc.sys
   - Definitions conform with Windows 10 Build 14347's fcvsc.sys

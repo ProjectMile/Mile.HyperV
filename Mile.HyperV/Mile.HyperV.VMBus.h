@@ -9,7 +9,6 @@
  */
 
 // References
-// - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
 // - Symbols in Windows version 10.0.14347.0's VMBusHID.sys
 // - Symbols in Windows version 10.0.14347.0's netvsc.sys
 // - Symbols in Windows version 10.0.14347.0's fcvsc.sys
@@ -37,24 +36,11 @@
 #pragma warning(disable:4324) // structure was padded due to __declspec(align())
 #endif
 
-typedef struct _HV_RECT
-{
-    HV_INT32 Left;
-    HV_INT32 Top;
-    HV_INT32 Right;
-    HV_INT32 Bottom;
-} HV_RECT, *PHV_RECT;
-
 // *****************************************************************************
 // Microsoft Hyper-V Video
 //
 
 #define SYNTHVID_CONTROL_CLASS_ID SYNTHVID_CLASS_ID
-
-typedef SYNTHVID_MESSAGE_TYPE _SYNTHVID_MESSAGE_TYPE;
-typedef SYNTHVID_MESSAGE_TYPE *PSYNTHVID_MESSAGE_TYPE;
-
-typedef SYNTHVID_MESSAGE_HEADER _SYNTHVID_MESSAGE_HEADER;
 
 #define SYNTHVID_VERSION_WIN7 SYNTHVID_MAKE_VERSION(3, 0)
 #define SYNTHVID_VERSION_WIN8 SYNTHVID_MAKE_VERSION(3, 2)
@@ -63,154 +49,11 @@ typedef SYNTHVID_MESSAGE_HEADER _SYNTHVID_MESSAGE_HEADER;
 #define SYNTHVID_VERSION_WINTHRESHOLD_M2 SYNTHVID_MAKE_VERSION(3, 5)
 #define SYNTHVID_VERSION_WIN10 SYNTHVID_VERSION_WINTHRESHOLD_M2
 
-typedef SYNTHVID_VERSION _SYNTHVID_VERSION;
-
-typedef VIDEO_OUTPUT_SITUATION _VIDEO_OUTPUT_SITUATION;
-
-// SynthvidError | 0
-
-// SynthvidVersionRequest | 1
-
-typedef SYNTHVID_VERSION_REQUEST_MESSAGE _SYNTHVID_VERSION_REQUEST_MESSAGE;
-
-// SynthvidVersionResponse | 2
-
-typedef SYNTHVID_VERSION_RESPONSE_MESSAGE _SYNTHVID_VERSION_RESPONSE_MESSAGE;
-
-// SynthvidVramLocation | 3
-
-typedef SYNTHVID_VRAM_LOCATION_MESSAGE _SYNTHVID_VRAM_LOCATION_MESSAGE;
-
-// SynthvidVramLocationAck | 4
-
-typedef SYNTHVID_VRAM_LOCATION_ACK_MESSAGE _SYNTHVID_VRAM_LOCATION_ACK_MESSAGE;
-
-// SynthvidSituationUpdate | 5
-
-typedef SYNTHVID_SITUATION_UPDATE_MESSAGE _SYNTHVID_SITUATION_UPDATE_MESSAGE;
-
-// SynthvidSituationUpdateAck | 6
-
-typedef SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE _SYNTHVID_SITUATION_UPDATE_ACK_MESSAGE;
-
-// SynthvidPointerPosition | 7
-
-#pragma pack(1)
-typedef struct _SYNTHVID_POINTER_POSITION_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 IsVisible;
-    HV_UINT8 VideoOutput;
-    HV_INT32 ImageX;
-    HV_INT32 ImageY;
-} SYNTHVID_POINTER_POSITION_MESSAGE, *PSYNTHVID_POINTER_POSITION_MESSAGE;
-#pragma pack()
-
-// SynthvidPointerShape | 8
-
-#pragma pack(1)
-typedef struct _SYNTHVID_POINTER_SHAPE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 PartialIndex;
-    HV_UINT8 CursorFlags;
-    HV_UINT32 WidthPixels;
-    HV_UINT32 HeightPixels;
-    HV_UINT32 HotspotX;
-    HV_UINT32 HotspotY;
-    HV_UINT8 PixelData[HV_ANYSIZE_ARRAY];
-} SYNTHVID_POINTER_SHAPE_MESSAGE, *PSYNTHVID_POINTER_SHAPE_MESSAGE;
-#pragma pack()
-
-// SynthvidFeatureChange | 9
-
-typedef struct _SYNTHVID_FEATURE_CHANGE_MESSAGE_V2
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 IsDirtNeeded;
-    HV_UINT8 IsPointerPositionUpdatesNeeded;
-    HV_UINT8 IsPointerShapeUpdatesNeeded;
-    HV_UINT8 IsVideoSituationUpdatesNeeded;
-    HV_UINT8 EdidBlock[128];
-} SYNTHVID_FEATURE_CHANGE_MESSAGE_V2, *PSYNTHVID_FEATURE_CHANGE_MESSAGE_V2;
-
-// SynthvidDirt | 10
-
-#pragma pack(1)
-typedef struct _SYNTHVID_DIRT_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 VideoOutput;
-    HV_UINT8 DirtCount;
-    HV_RECT Dirt[HV_ANYSIZE_ARRAY];
-} SYNTHVID_DIRT_MESSAGE, *PSYNTHVID_DIRT_MESSAGE;
-#pragma pack()
-
-// SynthvidBiosInfoRequest | 11
-
-typedef struct _SYNTHVID_BIOS_INFO_REQUEST_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-} SYNTHVID_BIOS_INFO_REQUEST_MESSAGE, *PSYNTHVID_BIOS_INFO_REQUEST_MESSAGE;
-
-// SynthvidBiosInfoResponse | 12
-
-typedef struct _SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT32 VmGeneration;
-    HV_UINT32 ReservedInt32;
-    HV_UINT64 ReservedInt64;
-} SYNTHVID_BIOS_INFO_RESPONSE_MESSAGE, *PSYNTHVID_BIOS_INFO_RESPONSE_MESSAGE;
-
-// SynthvidSupportedResolutionsRequest | 13
-
-#pragma pack(1)
-typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 MaximumResolutionCount;
-} SYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_REQUEST_MESSAGE;
-#pragma pack()
-
-// SynthvidSupportedResolutionsResponse | 14
-
-#pragma pack(1)
-typedef struct _SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT8 EdidBlock[128];
-    HV_UINT8 ResolutionCount;
-    HV_UINT8 DefaultResolutionIndex;
-    HV_UINT8 IsStandard;
-    HVD_SCREEN_INFO SupportedResolution[HV_ANYSIZE_ARRAY];
-} SYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE, *PSYNTHVID_SUPPORTED_RESOLUTIONS_RESPONSE_MESSAGE;
-#pragma pack()
-
-// SynthvidCapabilityRequest | 15
-
-typedef struct _SYNTHVID_CAPABILITY_REQUEST_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-} SYNTHVID_CAPABILITY_REQUEST_MESSAGE, *PSYNTHVID_CAPABILITY_REQUEST_MESSAGE;
-
-// SynthvidCapabilityResponse | 16
-
-typedef struct _SYNTHVID_CAPABILITY_RESPONSE_MESSAGE
-{
-    SYNTHVID_MESSAGE_HEADER Header;
-    HV_UINT32 LockOnDisconnect : 1;
-    HV_UINT32 Reserved : 31;
-    HV_UINT32 Reserved2[15];
-} SYNTHVID_CAPABILITY_RESPONSE_MESSAGE, *PSYNTHVID_CAPABILITY_RESPONSE_MESSAGE;
-
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Keyboard
 //
 
 #define HK_CONTROL_CLASS_ID HK_CLASS_ID
-
-typedef HK_MESSAGE_TYPE *PHK_MESSAGE_TYPE;
 
 #define HK_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
 #define HK_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
@@ -221,131 +64,12 @@ typedef HK_MESSAGE_TYPE *PHK_MESSAGE_TYPE;
 // Microsoft Hyper-V Input
 //
 
-// {CFA8B69E-5B4A-4CC0-B98B-8BA1A1F3F95A}
-const HV_GUID SYNTHHID_CLASS_ID =
-{
-    0xCFA8B69E,
-    0x5B4A,
-    0x4CC0,
-    { 0xB9, 0x8B, 0x8B, 0xA1, 0xA1, 0xF3, 0xF9, 0x5A }
-};
-
 #define SYNTHHID_CONTROL_CLASS_ID SYNTHHID_CLASS_ID
 
-typedef enum _SYNTHHID_MESSAGE_TYPE
-{
-    SynthHidProtocolRequest = 0,
-    SynthHidProtocolResponse = 1,
-    SynthHidInitialDeviceInfo = 2,
-    SynthHidInitialDeviceInfoAck = 3,
-    SynthHidInputReport = 4,
-    SynthHidMax = 5,
-} SYNTHHID_MESSAGE_TYPE, *PSYNTHHID_MESSAGE_TYPE;
-
-typedef struct _SYNTHHID_MESSAGE_HEADER
-{
-    SYNTHHID_MESSAGE_TYPE Type;
-    HV_UINT32 Size;
-} SYNTHHID_MESSAGE_HEADER, *PSYNTHHID_MESSAGE_HEADER;
-
-#define SYNTHHID_MAKE_VERSION(Major, Minor) ((Major) << 16 | (Minor))
 #define SYNTHHID_VERSION_MAJOR(Version) (((Version) & 0xFFFF0000) >> 16)
 #define SYNTHHID_VERSION_MINOR(Version) ((Version) & 0x0000FFFF)
 
 #define SYNTHHID_VERSION_CURRENT SYNTHHID_MAKE_VERSION(2, 0)
-
-typedef union _SYNTHHID_VERSION
-{
-    HV_UINT32 AsDWord;
-    struct
-    {
-        HV_UINT16 Minor;
-        HV_UINT16 Major;
-    };
-} SYNTHHID_VERSION, *PSYNTHHID_VERSION;
-
-// Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_HID_DEVICE_ATTRIBUTES
-{
-    // sizeof (struct _HV_HID_DEVICE_ATTRIBUTES)
-
-    HV_UINT32 Size;
-
-    // Vendor ids of this hid device
-
-    HV_UINT16 VendorID;
-    HV_UINT16 ProductID;
-    HV_UINT16 VersionNumber;
-    HV_UINT16 Reserved[11];
-} HV_HID_DEVICE_ATTRIBUTES, *PHV_HID_DEVICE_ATTRIBUTES;
-
-#pragma pack(1)
-// Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_HID_DESCRIPTOR_DESC_LIST
-{
-    HV_UINT8 bReportType;
-    HV_UINT16 wReportLength;
-} HV_HID_DESCRIPTOR_DESC_LIST, *PHV_HID_DESCRIPTOR_DESC_LIST;
-#pragma pack()
-
-#pragma pack(1)
-// Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_HID_DESCRIPTOR
-{
-    HV_UINT8 bLength;
-    HV_UINT8 bDescriptorType;
-    HV_UINT16 bcdHID;
-    HV_UINT8 bCountry;
-    HV_UINT8 bNumDescriptors;
-    // An array of one OR MORE descriptors.
-    HV_HID_DESCRIPTOR_DESC_LIST DescriptorList[HV_ANYSIZE_ARRAY];
-} HV_HID_DESCRIPTOR, *PHV_HID_DESCRIPTOR;
-#pragma pack()
-
-// SynthHidProtocolRequest | 0
-
-typedef struct _SYNTHHID_PROTOCOL_REQUEST
-{
-    SYNTHHID_MESSAGE_HEADER Header;
-    SYNTHHID_VERSION VersionRequested;
-} SYNTHHID_PROTOCOL_REQUEST, *PSYNTHHID_PROTOCOL_REQUEST;
-
-// SynthHidProtocolResponse | 1
-
-#pragma pack(1)
-typedef struct _SYNTHHID_PROTOCOL_RESPONSE
-{
-    SYNTHHID_MESSAGE_HEADER Header;
-    SYNTHHID_VERSION VersionRequested;
-    HV_UINT8 Approved;
-} SYNTHHID_PROTOCOL_RESPONSE, *PSYNTHHID_PROTOCOL_RESPONSE;
-#pragma pack()
-
-// SynthHidInitialDeviceInfo | 2
-
-#pragma pack(1)
-typedef struct _SYNTHHID_DEVICE_INFO
-{
-    SYNTHHID_MESSAGE_HEADER Header;
-    HV_HID_DEVICE_ATTRIBUTES HidDeviceAttributes;
-    HV_UINT8 HidDescriptorInformation[HV_ANYSIZE_ARRAY];
-} SYNTHHID_DEVICE_INFO, *PSYNTHHID_DEVICE_INFO;
-#pragma pack()
-
-// SynthHidInitialDeviceInfoAck | 3
-
-#pragma pack(1)
-typedef struct _SYNTHHID_DEVICE_INFO_ACK
-{
-    SYNTHHID_MESSAGE_HEADER Header;
-    HV_UINT8 Reserved;
-} SYNTHHID_DEVICE_INFO_ACK, *PSYNTHHID_DEVICE_INFO_ACK;
-#pragma pack()
-
-// SynthHidInputReport | 4
 
 #pragma pack(1)
 typedef struct _SYNTHHID_MESSAGE
@@ -375,9 +99,6 @@ const HV_GUID VMFC_CLASS_ID =
 #define VSTOR_SCSI_CONTROL_CLASS_ID VMSCSI_CONTROL_CLASS_ID
 #define VSTOR_FC_CONTROL_CLASS_ID VMFC_CONTROL_CLASS_ID
 
-typedef VSTOR_PACKET_OPERATION _VSTOR_PACKET_OPERATION;
-typedef VSTOR_PACKET_OPERATION *PVSTOR_PACKET_OPERATION;
-
 #define VMSTORAGE_MAKE_VERSION VMSTOR_PROTOCOL_VERSION
 #define VMSTORAGE_VERSION_MAJOR VMSTOR_PROTOCOL_MAJOR
 #define VMSTORAGE_VERSION_MINOR VMSTOR_PROTOCOL_MINOR
@@ -386,51 +107,13 @@ typedef VSTOR_PACKET_OPERATION *PVSTOR_PACKET_OPERATION;
 #define VMSTORAGE_VERSION_WIN7 VMSTOR_PROTOCOL_VERSION_WIN7
 #define VMSTORAGE_VERSION_WIN8 VMSTOR_PROTOCOL_VERSION_WIN8
 #define VMSTORAGE_VERSION_WINBLUE VMSTOR_PROTOCOL_VERSION_BLUE
-#define VMSTORAGE_VERSION_WIN10 VMSTOR_PROTOCOL_VERSION(6, 2)
+#define VMSTORAGE_VERSION_WIN10 VMSTOR_PROTOCOL_VERSION_THRESHOLD
 
 // *****************************************************************************
 // Microsoft Hyper-V Network Adapter
 //
 
 #define NVSP_CONTROL_CLASS_ID NVSP_CLASS_ID
-
-typedef enum _NVSP_MESSAGE_TYPE_PRIVATE
-{
-    NvspMessage6TypePdApi = 135,
-    NvspMessage6TypePdPostBatch = 136,
-    NvspMessage6Max = 136,
-} NVSP_MESSAGE_TYPE_PRIVATE, *PNVSP_MESSAGE_TYPE_PRIVATE;
-
-typedef enum _NVSP_6_MESSAGE_PD_API_OPERATION
-{
-    PdApiOpConfiguration = 0x1,
-    PdApiOpSwitchDatapath = 0x2,
-    PdApiOpOpenProvider = 0x3,
-    PdApiOpCloseProvider = 0x4,
-    PdApiOpCreateQueue = 0x5,
-    PdApiOpFlushQueue = 0x6,
-    PdApiOpFreeQueue = 0x7,
-    PdApiOpAllocateCommonBuffer = 0x8,
-    PdApiOpFreeCommonBuffer = 0x9,
-    PdApiOpMax = 0xA,
-} NVSP_6_MESSAGE_PD_API_OPERATION, *PNVSP_6_MESSAGE_PD_API_OPERATION;
-
-// Definition from Windows Driver Kit
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_GROUP_AFFINITY
-{
-    HV_UINT32 Mask;
-    HV_UINT16 Group;
-    HV_UINT16 Reserved[3];
-} HV_GROUP_AFFINITY, *PHV_GROUP_AFFINITY;
-
-typedef struct _NVSP_6_PD_BUFFER
-{
-    HV_UINT32 RegionOffset;
-    HV_UINT16 RegionId;
-    HV_UINT16 IsPartial : 1;
-    HV_UINT16 ReservedMbz : 15;
-} NVSP_6_PD_BUFFER, *PNVSP_6_PD_BUFFER;
 
 #define NVSP_MAKE_VERSION NVSP_PROTOCOL_VERSION
 #define NVSP_VERSION_MAJOR NVSP_PROTOCOL_MAJOR
@@ -440,153 +123,8 @@ typedef struct _NVSP_6_PD_BUFFER
 #define NVSP_VERSION_2 NVSP_PROTOCOL_VERSION_2
 #define NVSP_VERSION_4 NVSP_PROTOCOL_VERSION_4
 #define NVSP_VERSION_5 NVSP_PROTOCOL_VERSION_5
-#define NVSP_VERSION_6 NVSP_PROTOCOL_VERSION(6, 0)
-#define NVSP_VERSION_61 NVSP_PROTOCOL_VERSION(6, 1)
-
-// NvspMessage6TypePdApi | 135
-
-#pragma pack(1)
-typedef struct _NVSP_6_MESSAGE_PD_API_REQUEST
-{
-    NVSP_6_MESSAGE_PD_API_OPERATION Operation;
-    union
-    {
-        struct
-        {
-            HV_INT64 MmioPhysicalAddress;
-            HV_UINT32 MmioLength;
-            HV_UINT16 NumPdQueues;
-        } Configuration;
-        struct
-        {
-            HV_UINT8 HostDatapathIsPacketDirect;
-            HV_UINT8 GuestPacketDirectIsEnabled;
-        } SwitchDatapath;
-        struct
-        {
-            HV_UINT32 ProviderId;
-            HV_UINT32 Flags;
-        } OpenProvider;
-        struct
-        {
-            HV_UINT32 ProviderId;
-        } CloseProvider;
-        struct
-        {
-            HV_UINT32 ProviderId;
-            HV_UINT16 QueueId;
-            HV_UINT16 QueueSize;
-            HV_UINT8 IsReceiveQueue;
-            HV_UINT8 IsRssQueue;
-            HV_UINT32 ReceiveDataLength;
-            HV_GROUP_AFFINITY Affinity;
-        } CreateQueue;
-        struct
-        {
-            HV_UINT32 ProviderId;
-            HV_UINT16 QueueId;
-        } DeleteQueue;
-        struct
-        {
-            HV_UINT32 ProviderId;
-            HV_UINT16 QueueId;
-        } FlushQueue;
-        struct
-        {
-            HV_UINT32 Length;
-            HV_UINT32 PreferredNode;
-            HV_UINT16 RegionId;
-        } AllocateCommonBuffer;
-        struct
-        {
-            HV_UINT32 Length;
-            HV_UINT64 PhysicalAddress;
-            HV_UINT32 PreferredNode;
-            HV_UINT16 RegionId;
-            HV_UINT8 CacheType;
-        } FreeCommonBuffer;
-    };
-} NVSP_6_MESSAGE_PD_API_REQUEST, *PNVSP_6_MESSAGE_PD_API_REQUEST;
-#pragma pack()
-
-#pragma pack(1)
-typedef struct _NVSP_6_MESSAGE_PD_API_COMPLETE
-{
-    NVSP_6_MESSAGE_PD_API_OPERATION Operation;
-    NVSP_STATUS Status;
-    union
-    {
-        struct
-        {
-            HV_UINT16 NumPdQueues;
-            HV_UINT8 NumReceiveRssPDQueues;
-            HV_UINT8 IsSupportedByVSP;
-            HV_UINT8 IsEnabledByVSP;
-        } Configuration;
-        struct
-        {
-            HV_UINT32 ProviderId;
-        } OpenProvider;
-        struct
-        {
-            HV_UINT32 ProviderId;
-            HV_UINT16 QueueId;
-            HV_UINT16 QueueSize;
-            HV_UINT32 ReceiveDataLength;
-            HV_GROUP_AFFINITY Affinity;
-        } CreateQueue;
-        struct
-        {
-            HV_UINT64 PhysicalAddress;
-            HV_UINT32 Length;
-            HV_UINT32 PreferredNode;
-            HV_UINT16 RegionId;
-            HV_UINT8 CacheType;
-        } AllocateCommonBuffer;
-    };
-} NVSP_6_MESSAGE_PD_API_COMPLETE, *PNVSP_6_MESSAGE_PD_API_COMPLETE;
-#pragma pack()
-
-// NvspMessage6TypePdPostBatch | 136
-
-typedef struct _NVSP_6_MESSAGE_PD_BATCH_MESSAGE
-{
-    NVSP_MESSAGE_HEADER Header;
-    HV_UINT16 Count;
-    HV_UINT16 GuestToHost : 1;
-    HV_UINT16 IsReceive : 1;
-    HV_UINT16 ReservedMbz : 14;
-    NVSP_6_PD_BUFFER PdBuffer[];
-} NVSP_6_MESSAGE_PD_BATCH_MESSAGE, *PNVSP_6_MESSAGE_PD_BATCH_MESSAGE;
-
-typedef NVSP_MESSAGE_INIT_UBER *PNVSP_MESSAGE_INIT_UBER;
-
-typedef NVSP_1_MESSAGE_UBER NVSP_MESSAGE_1_UBER, *PNVSP_MESSAGE_1_UBER;
-
-typedef NVSP_2_MESSAGE_UBER NVSP_MESSAGE_2_UBER, *PNVSP_MESSAGE_2_UBER;
-
-typedef NVSP_4_MESSAGE_UBER NVSP_MESSAGE_4_UBER, *PNVSP_MESSAGE_4_UBER;
-
-typedef NVSP_5_MESSAGE_UBER NVSP_MESSAGE_5_UBER, *PNVSP_MESSAGE_5_UBER;
-
-typedef union _NVSP_MESSAGE_6_UBER
-{
-    NVSP_6_MESSAGE_PD_API_REQUEST PdApiRequest;
-    NVSP_6_MESSAGE_PD_API_COMPLETE PdApiComplete;
-} NVSP_MESSAGE_6_UBER, *PNVSP_MESSAGE_6_UBER;
-
-typedef NVSP_ALL_MESSAGES *PNVSP_ALL_MESSAGES;
-
-typedef union _NVSP_ALL_MESSAGES_PRIVATE
-{
-    NVSP_MESSAGE_6_UBER Version6Messages;
-} NVSP_ALL_MESSAGES_PRIVATE, *PNVSP_ALL_MESSAGES_PRIVATE;
-
-typedef struct _NVSP_MESSAGE_PRIVATE
-{
-    NVSP_MESSAGE_HEADER Header;
-    NVSP_ALL_MESSAGES_PRIVATE Messages;
-} NVSP_MESSAGE_PRIVATE, *PNVSP_MESSAGE_PRIVATE;
+#define NVSP_VERSION_6 NVSP_PROTOCOL_VERSION_6
+#define NVSP_VERSION_61 NVSP_PROTOCOL_VERSION_61
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual PCI Bus
