@@ -1,5 +1,12 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.729.0**
+
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce94.
+- Update Mile.Project.Configurations to 1.0.1766.
+- Update Mile.Mobility to 1.0.306.
+
 **Mile.HyperV 1.2.688.0**
 
 - Revise the Mile.HyperV.TLFS definitions via symbols in Windows version
