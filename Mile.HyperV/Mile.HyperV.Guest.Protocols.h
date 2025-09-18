@@ -71,7 +71,11 @@
 #endif // !TRUE
 
 #ifndef _NTDEF_
+#ifdef _WIN32
 typedef long NTSTATUS;
+#else
+typedef HV_INT32 NTSTATUS;
+#endif
 #endif // !_NTDEF_
 
 #ifndef NT_SUCCESS
