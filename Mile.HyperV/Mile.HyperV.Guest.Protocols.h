@@ -622,7 +622,7 @@ typedef struct _VMBUS_CHANNEL_INITIATE_CONTACT
         };
     };
     HV_GPA ParentToChildMonitorPageGpa;
-    HV_GPA ChildToParentMonitorPageGpa; 
+    HV_GPA ChildToParentMonitorPageGpa;
     // Used with `VMBUS_FEATURE_FLAG_CLIENT_ID` when the feature is supported
     // (Copper and above).
     HV_GUID ClientId;
@@ -2152,13 +2152,13 @@ typedef struct _NVSP_MESSAGE_HEADER
 
 // The following base NDIS type is referenced by nvspprotocol.h. See
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/objectheader/ns-objectheader-ndis_object_header
-// Note: Add HV_ prefix to avoid conflict
-typedef struct _HV_NDIS_OBJECT_HEADER
+// Note: Use RNDIS prefix instead of NDIS prefix to avoid conflict.
+typedef struct _RNDIS_OBJECT_HEADER
 {
     HV_UINT8 Type;
     HV_UINT8 Revision;
     HV_UINT16 Size;
-} HV_NDIS_OBJECT_HEADER, *PHV_NDIS_OBJECT_HEADER;
+} RNDIS_OBJECT_HEADER, *PRNDIS_OBJECT_HEADER;
 
 // Init Messages
 
@@ -2384,7 +2384,7 @@ typedef HV_UINT32 NDIS_OID, *PNDIS_OID;
 typedef struct _NVSP_5_MESSAGE_OID_QUERY_EX
 {
     // Header information for the Query OID
-    HV_NDIS_OBJECT_HEADER Header;
+    RNDIS_OBJECT_HEADER Header;
     // OID being queried
     NDIS_OID Oid;
 } NVSP_5_MESSAGE_OID_QUERY_EX, *PNVSP_5_MESSAGE_OID_QUERY_EX;
@@ -2959,6 +2959,25 @@ typedef HV_UINT32 RNDIS_AF, *PRNDIS_AF;
 #define RNDIS_MAC_OPTION_RECEIVE_AT_DPC 0x00000100
 #define RNDIS_MAC_OPTION_8021Q_VLAN 0x00000200
 
+typedef struct _RNDIS_LINK_STATE
+{
+    RNDIS_OBJECT_HEADER Header;
+    HV_UINT32 MediaConnectState;
+    HV_UINT32 MediaDuplexState;
+    HV_UINT64 XmitLinkSpeed;
+    HV_UINT64 RcvLinkSpeed;
+    HV_UINT32 PauseFunctions;
+    HV_UINT32 AutoNegotiationFlags;
+} RNDIS_LINK_STATE, *PRNDIS_LINK_STATE;
+
+// The following structure is used in OID_GEN_LINK_SPEED_EX for interfaces and
+// is expressed in bits per second.
+typedef struct _RNDIS_LINK_SPEED
+{
+    HV_UINT64 XmitLinkSpeed;
+    HV_UINT64 RcvLinkSpeed;
+} RNDIS_LINK_SPEED, *PRNDIS_LINK_SPEED;
+
 // NdisInitialize message
 typedef struct _RNDIS_INITIALIZE_REQUEST
 {
@@ -2983,6 +3002,15 @@ typedef struct _RNDIS_INITIALIZE_COMPLETE
     HV_UINT32 AFListOffset;
     HV_UINT32 AFListSize;
 } RNDIS_INITIALIZE_COMPLETE, *PRNDIS_INITIALIZE_COMPLETE;
+
+// Call manager devices only: Information about an address family supported by
+// the device is appended to the response to NdisInitialize.
+typedef struct _RCONDIS_ADDRESS_FAMILY
+{
+    RNDIS_AF AddressFamily;
+    HV_UINT32 MajorVersion;
+    HV_UINT32 MinorVersion;
+} RCONDIS_ADDRESS_FAMILY, *PRCONDIS_ADDRESS_FAMILY;
 
 // NdisHalt message
 typedef struct _RNDIS_HALT_REQUEST
@@ -3103,10 +3131,119 @@ typedef struct _RNDIS_PACKET
     HV_UINT32 Reserved;
 } RNDIS_PACKET, *PRNDIS_PACKET;
 
+// Optional Out of Band data associated with a Data message.
+typedef struct _RNDIS_OOBD
+{
+    HV_UINT32 Size;
+    RNDIS_CLASS_ID Type;
+    HV_UINT32 ClassInformationOffset;
+} RNDIS_OOBD, *PRNDIS_OOBD;
+
+#define RNDIS_PACKET_INFO_FLAGS_MULTI_SUBALLOC 1
+#define RNDIS_PACKET_INFO_FLAGS_MULTI_SUBALLOC_FIRST_FRAGMENT 2
+#define RNDIS_PACKET_INFO_FLAGS_MULTI_SUBALLOC_LAST_FRAGMENT 4
+
+#define RNDIS_PACKET_INFO_ID_VERSION_V1 1
+
+typedef struct _RNDIS_PACKET_ID_INFO
+{
+    HV_UINT8 Version;
+    HV_UINT8 Flags;
+    HV_UINT16 PacketId;
+} RNDIS_PACKET_ID_INFO, *PRNDIS_PACKET_ID_INFO;
+
+#define RNDIS_PACKET_INFO_ID 1
+
+// Packet extension field contents associated with a Data message.
+typedef struct _RNDIS_PER_PACKET_INFO
+{
+    HV_UINT32 Size;
+    HV_UINT32 Type; // high bit means internal
+    HV_UINT32 PerPacketInformationOffset;
+} RNDIS_PER_PACKET_INFO, *PRNDIS_PER_PACKET_INFO;
+
+// Per-NetBufferList information for TcpIpChecksumNetBufferListInfo.
+typedef struct _RNDIS_TCP_IP_CHECKSUM_NET_BUFFER_LIST_INFO
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 IsIPv4 : 1;
+            HV_UINT32 IsIPv6 : 1;
+            HV_UINT32 TcpChecksum : 1;
+            HV_UINT32 UdpChecksum : 1;
+            HV_UINT32 IpHeaderChecksum : 1;
+            HV_UINT32 Reserved : 11;
+            HV_UINT32 TcpHeaderOffset : 10;
+        } Transmit;
+        struct
+        {
+            HV_UINT32 TcpChecksumFailed : 1;
+            HV_UINT32 UdpChecksumFailed : 1;
+            HV_UINT32 IpChecksumFailed : 1;
+            HV_UINT32 TcpChecksumSucceeded : 1;
+            HV_UINT32 UdpChecksumSucceeded : 1;
+            HV_UINT32 IpChecksumSucceeded : 1;
+            HV_UINT32 Loopback : 1;
+            HV_UINT32 TcpChecksumValueInvalid : 1;
+            HV_UINT32 IpChecksumValueInvalid : 1;
+        } Receive;
+        HV_UINT32 Value;
+    };
+} RNDIS_TCP_IP_CHECKSUM_NET_BUFFER_LIST_INFO, *PRNDIS_TCP_IP_CHECKSUM_NET_BUFFER_LIST_INFO;
+
+// Per-NetBufferList information for TcpLargeSendNetBufferListInfo.
+typedef struct _RNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 Unused : 30;
+            HV_UINT32 Type : 1;
+            HV_UINT32 Reserved2 : 1;
+        } Transmit;
+        struct
+        {
+            HV_UINT32 MSS : 20;
+            HV_UINT32 TcpHeaderOffset : 10;
+            HV_UINT32 Type : 1;
+            HV_UINT32 Reserved2 : 1;
+        } LsoV1Transmit;
+        struct
+        {
+            HV_UINT32 TcpPayload : 30;
+            HV_UINT32 Type : 1;
+            HV_UINT32 Reserved2 : 1;
+        } LsoV1TransmitComplete;
+        struct
+        {
+            HV_UINT32 MSS : 20;
+            HV_UINT32 TcpHeaderOffset : 10;
+            HV_UINT32 Type : 1;
+            HV_UINT32 IPVersion : 1;
+        } LsoV2Transmit;
+        struct
+        {
+            HV_UINT32 Reserved : 30;
+            HV_UINT32 Type : 1;
+            HV_UINT32 Reserved2 : 1;
+        } LsoV2TransmitComplete;
+        HV_UINT32 Value;
+    };
+} RNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO, *PRNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO;
+
+#define RNDIS_PPI_TCP_IP_CHECKSUM 0
+#define RNDIS_PPI_LARGE_SEND_OFFLOAD 2
+
 // Values for ParameterType in ConfigParameterInfo
 
 #define RNDIS_CONFIG_PARAM_TYPE_INTEGER 0
+#define RNDIS_CONFIG_PARAM_TYPE_HEX_INTEGER 1
 #define RNDIS_CONFIG_PARAM_TYPE_STRING 2
+#define RNDIS_CONFIG_PARAM_TYPE_MULTI_STRING 3
+#define RNDIS_CONFIG_PARAM_TYPE_BINARY 4
 
 // Format of Information buffer passed in a SetRequest for the OID
 // OID_GEN_RNDIS_CONFIG_PARAMETER.
@@ -3299,6 +3436,416 @@ typedef struct _RNDIS_MESSAGE
 #define RNDIS_MESSAGE_SIZE(Message) ( \
     sizeof(Message) + (sizeof(RNDIS_MESSAGE) - sizeof(RNDIS_MESSAGE_CONTAINER)))
 
+// Used in RNDIS_OBJECT_HEADER
+
+#define RNDIS_OBJECT_TYPE_DEFAULT 0x80
+#define RNDIS_OBJECT_TYPE_RSS_CAPABILITIES 0x88
+#define RNDIS_OBJECT_TYPE_RSS_PARAMETERS 0x89
+#define RNDIS_OBJECT_TYPE_REQUEST_EX 0x96
+#define RNDIS_OBJECT_TYPE_OFFLOAD 0xA7
+#define RNDIS_OBJECT_TYPE_OFFLOAD_ENCAPSULATION 0xA8
+
+typedef struct _RNDIS_RECEIVE_SCALE_CAPABILITIES
+{
+    RNDIS_OBJECT_HEADER Header;
+    HV_UINT32 CapabilitiesFlags;
+    HV_UINT32 NumberOfInterruptMessages;
+    HV_UINT32 NumberOfReceiveQueues;
+    HV_UINT16 NumberOfIndirectionTableEntries;
+} RNDIS_RECEIVE_SCALE_CAPABILITIES, *PRNDIS_RECEIVE_SCALE_CAPABILITIES;
+
+#define RNDIS_SIZEOF_RECEIVE_SCALE_CAPABILITIES_REVISION_2 \
+    HV_FIELD_SIZE_THROUGH( \
+        RNDIS_RECEIVE_SCALE_CAPABILITIES, \
+        NumberOfIndirectionTableEntries)
+
+typedef struct _RNDIS_RECEIVE_SCALE_PARAMETERS
+{
+    RNDIS_OBJECT_HEADER Header;
+    // Qualifies the rest of the information.
+    HV_UINT16 Flags;
+    // The base CPU number to do receive processing. not used.
+    HV_UINT16 BaseCpuNumber;
+    // This describes the hash function and type being enabled.
+    HV_UINT32 HashInformation;
+    // The size of indirection table array.
+    HV_UINT16 IndirectionTableSize;
+    // The offset of the indirection table from the beginning of this structure.
+    HV_UINT32 IndirectionTableOffset;
+    // The size of the secret key.
+    HV_UINT16 HashSecretKeySize;
+    // The offset of the secret key from the beginning of this structure.
+    HV_UINT32 HashSecretKeyOffset;
+
+    // Array of type GROUP_AFFINITY representing procs used in the indirection
+    // table
+
+    HV_UINT32 ProcessorMasksOffset;
+    HV_UINT32 NumberOfProcessorMasks;
+    HV_UINT32 ProcessorMasksEntrySize;
+
+    // The hash map table is a CCHAR array for Revision 1.
+    // It is a PROCESSOR_NUMBER array for Revision 2
+
+    // Specifies default RSS processor.
+    HV_UINT32 DefaultProcessorNumber;
+} RNDIS_RECEIVE_SCALE_PARAMETERS, *PRNDIS_RECEIVE_SCALE_PARAMETERS;
+
+#define RNDIS_SIZEOF_RECEIVE_SCALE_PARAMETERS_REVISION_1 \
+    HV_FIELD_SIZE_THROUGH( \
+        RNDIS_RECEIVE_SCALE_PARAMETERS, \
+        HashSecretKeyOffset)
+#define RNDIS_SIZEOF_RECEIVE_SCALE_PARAMETERS_REVISION_2 \
+    HV_FIELD_SIZE_THROUGH( \
+        RNDIS_RECEIVE_SCALE_PARAMETERS, \
+        ProcessorMasksEntrySize)
+#define RNDIS_SIZEOF_RECEIVE_SCALE_PARAMETERS_REVISION_3 \
+    HV_FIELD_SIZE_THROUGH( \
+        RNDIS_RECEIVE_SCALE_PARAMETERS, \
+        DefaultProcessorNumber)
+
+// Flags to denote the parameters that are kept unmodified.
+
+#define RNDIS_RSS_PARAM_FLAG_BASE_CPU_UNCHANGED 0x0001
+#define RNDIS_RSS_PARAM_FLAG_HASH_INFO_UNCHANGED 0x0002
+#define RNDIS_RSS_PARAM_FLAG_ITABLE_UNCHANGED 0x0004
+#define RNDIS_RSS_PARAM_FLAG_HASH_KEY_UNCHANGED 0x0008
+#define RNDIS_RSS_PARAM_FLAG_DISABLE_RSS 0x0010
+#define RNDIS_RSS_PARAM_FLAG_DEFAULT_PROCESSOR_UNCHANGED 0x0020
+
+#define RNDIS_RSS_INDIRECTION_TABLE_SIZE_REVISION_1 128
+#define RNDIS_RSS_HASH_SECRET_KEY_SIZE_REVISION_1 40
+
+#define RNDIS_RSS_INDIRECTION_TABLE_MAX_SIZE_REVISION_1 128
+
+#define RNDIS_HASH_FUNCTION_MASK 0x000000FF
+#define RNDIS_HASH_FUNCTION_TOEPLITZ 0x00000001
+
+#define RNDIS_HASH_IPV4 0x00000100
+#define RNDIS_HASH_TCP_IPV4 0x00000200
+#define RNDIS_HASH_IPV6 0x00000400
+#define RNDIS_HASH_IPV6_EX 0x00000800
+#define RNDIS_HASH_TCP_IPV6 0x00001000
+#define RNDIS_HASH_TCP_IPV6_EX 0x00002000
+#define RNDIS_HASH_UDP_IPV4 0x00004000
+#define RNDIS_HASH_UDP_IPV6 0x00008000
+#define RNDIS_HASH_UDP_IPV6_EX 0x00010000
+
+#define RNDIS_RSS_CAPS_HASH_TYPE_TCP_IPV4 0x00000100
+#define RNDIS_RSS_CAPS_HASH_TYPE_TCP_IPV6 0x00000200
+#define RNDIS_RSS_CAPS_HASH_TYPE_TCP_IPV6_EX 0x00000400
+#define RNDIS_RSS_CAPS_HASH_TYPE_UDP_IPV4 0x00000800
+#define RNDIS_RSS_CAPS_HASH_TYPE_UDP_IPV6 0x00001000
+#define RNDIS_RSS_CAPS_HASH_TYPE_UDP_IPV6_EX 0x00002000
+#define RNDIS_RSS_CAPS_MESSAGE_SIGNALED_INTERRUPTS 0x01000000
+#define RNDIS_RSS_CAPS_CLASSIFICATION_AT_ISR 0x02000000
+#define RNDIS_RSS_CAPS_CLASSIFICATION_AT_DPC 0x04000000
+#define RNDIS_RSS_CAPS_USING_MSI_X 0x08000000
+#define RNDIS_RSS_CAPS_RSS_AVAILABLE_ON_PORTS 0x10000000
+#define RNDIS_RSS_CAPS_SUPPORTS_MSI_X 0x20000000
+#define RNDIS_RSS_CAPS_SUPPORTS_INDEPENDENT_ENTRY_MOVE 0x40000000
+
+#define RNDIS_ENCAPSULATION_IEEE_802_3 2
+
+typedef struct _RNDIS_TCP_IP_CHECKSUM_OFFLOAD
+{
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 IpOptionsSupported : 2;
+        HV_UINT32 TcpOptionsSupported : 2;
+        HV_UINT32 TcpChecksum : 2;
+        HV_UINT32 UdpChecksum : 2;
+        HV_UINT32 IpChecksum : 2;
+    } IPv4Transmit;
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 IpOptionsSupported : 2;
+        HV_UINT32 TcpOptionsSupported : 2;
+        HV_UINT32 TcpChecksum : 2;
+        HV_UINT32 UdpChecksum : 2;
+        HV_UINT32 IpChecksum : 2;
+    } IPv4Receive;
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 IpExtensionHeadersSupported : 2;
+        HV_UINT32 TcpOptionsSupported : 2;
+        HV_UINT32 TcpChecksum : 2;
+        HV_UINT32 UdpChecksum : 2;
+    } IPv6Transmit;
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 IpExtensionHeadersSupported : 2;
+        HV_UINT32 TcpOptionsSupported : 2;
+        HV_UINT32 TcpChecksum : 2;
+        HV_UINT32 UdpChecksum : 2;
+    } IPv6Receive;
+} RNDIS_TCP_IP_CHECKSUM_OFFLOAD, *PRNDIS_TCP_IP_CHECKSUM_OFFLOAD;
+
+typedef struct _RNDIS_TCP_LARGE_SEND_OFFLOAD_V1
+{
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 MaxOffLoadSize;
+        HV_UINT32 MinSegmentCount;
+        HV_UINT32 TcpOptions : 2;
+        HV_UINT32 IpOptions : 2;
+    } IPv4;
+} RNDIS_TCP_LARGE_SEND_OFFLOAD_V1, *PRNDIS_TCP_LARGE_SEND_OFFLOAD_V1;
+
+typedef struct _RNDIS_IPSEC_OFFLOAD_V1
+{
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 AhEspCombined;
+        HV_UINT32 TransportTunnelCombined;
+        HV_UINT32 IPv4Options;
+        HV_UINT32 Flags;
+    } Supported;
+    struct
+    {
+        HV_UINT32 Md5 : 2;
+        HV_UINT32 Sha_1 : 2;
+        HV_UINT32 Transport : 2;
+        HV_UINT32 Tunnel : 2;
+        HV_UINT32 Send : 2;
+        HV_UINT32 Receive : 2;
+    } IPv4AH;
+    struct
+    {
+        HV_UINT32 Des : 2;
+        HV_UINT32 Reserved : 2;
+        HV_UINT32 TripleDes : 2;
+        HV_UINT32 NullEsp : 2;
+        HV_UINT32 Transport : 2;
+        HV_UINT32 Tunnel : 2;
+        HV_UINT32 Send : 2;
+        HV_UINT32 Receive : 2;
+    } IPv4ESP;
+} RNDIS_IPSEC_OFFLOAD_V1, *PRNDIS_IPSEC_OFFLOAD_V1;
+
+typedef struct _RNDIS_TCP_LARGE_SEND_OFFLOAD_V2
+{
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 MaxOffLoadSize;
+        HV_UINT32 MinSegmentCount;
+    } IPv4;
+    struct
+    {
+        HV_UINT32 Encapsulation;
+        HV_UINT32 MaxOffLoadSize;
+        HV_UINT32 MinSegmentCount;
+        HV_UINT32 IpExtensionHeadersSupported : 2;
+        HV_UINT32 TcpOptionsSupported : 2;
+    } IPv6;
+} RNDIS_TCP_LARGE_SEND_OFFLOAD_V2, *PRNDIS_TCP_LARGE_SEND_OFFLOAD_V2;
+
+typedef struct _RNDIS_IPSEC_OFFLOAD_V2
+{
+    HV_UINT32 Encapsulation;
+    HV_UINT8 IPv6Supported; // BOOLEAN
+    HV_UINT8 IPv4Options; // BOOLEAN
+    HV_UINT8 IPv6NonIPsecExtensionHeaders; // BOOLEAN
+    HV_UINT8 Ah; // BOOLEAN
+    HV_UINT8 Esp; // BOOLEAN
+    HV_UINT8 AhEspCombined; // BOOLEAN
+    HV_UINT8 Transport; // BOOLEAN
+    HV_UINT8 Tunnel; // BOOLEAN
+    HV_UINT8 TransportTunnelCombined; // BOOLEAN
+    HV_UINT8 LsoSupported; // BOOLEAN
+    HV_UINT8 ExtendedSequenceNumbers; // BOOLEAN
+    HV_UINT32 UdpEsp;
+    HV_UINT32 AuthenticationAlgorithms;
+    HV_UINT32 EncryptionAlgorithms;
+    HV_UINT32 SaOffloadCapacity;
+} RNDIS_IPSEC_OFFLOAD_V2, *PRNDIS_IPSEC_OFFLOAD_V2;
+
+typedef struct _RNDIS_TCP_RECV_SEG_COALESCE_OFFLOAD
+{
+    struct
+    {
+        HV_UINT8 Enabled; // BOOLEAN
+    } IPv4;
+    struct
+    {
+        HV_UINT8 Enabled; // BOOLEAN
+    } IPv6;
+} RNDIS_TCP_RECV_SEG_COALESCE_OFFLOAD, *PRNDIS_TCP_RECV_SEG_COALESCE_OFFLOAD;
+
+typedef struct _RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD
+{
+    HV_UINT32 TransmitChecksumOffloadSupported : 4;
+    HV_UINT32 ReceiveChecksumOffloadSupported : 4;
+    HV_UINT32 LsoV2Supported : 4;
+    HV_UINT32 RssSupported : 4;
+    HV_UINT32 VmqSupported : 4;
+    HV_UINT32 MaxHeaderSizeSupported;
+} RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD, *PRNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD;
+
+typedef struct _RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD_V2
+{
+    HV_UINT32 TransmitChecksumOffloadSupported : 4;
+    HV_UINT32 ReceiveChecksumOffloadSupported : 4;
+    HV_UINT32 LsoV2Supported : 4;
+    HV_UINT32 RssSupported : 4;
+    HV_UINT32 VmqSupported : 4;
+    HV_UINT32 Reserved : 12;
+    HV_UINT32 MaxHeaderSizeSupported;
+    union _ENCAPSULATION_PROTOCOL_INFO
+    {
+        struct _VXLAN_INFO
+        {
+            HV_UINT16 VxlanUDPPortNumber;
+            HV_UINT16 VxlanUDPPortNumberConfigurable : 1;
+        } VxlanInfo;
+        HV_UINT32 Value;
+    } EncapsulationProtocolInfo;
+    HV_UINT32 Reserved1;
+    HV_UINT32 Reserved2;
+} RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD_V2, *PRNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD_V2;
+
+typedef struct _RNDIS_OFFLOAD
+{
+    RNDIS_OBJECT_HEADER Header;
+    // Checksum Offload information
+    RNDIS_TCP_IP_CHECKSUM_OFFLOAD Checksum;
+    // Large Send Offload information
+    RNDIS_TCP_LARGE_SEND_OFFLOAD_V1 LsoV1;
+    // IPsec Offload Information
+    RNDIS_IPSEC_OFFLOAD_V1 IPsecV1;
+    // Large Send Offload version 2 Information
+    RNDIS_TCP_LARGE_SEND_OFFLOAD_V2 LsoV2;
+    HV_UINT32 Flags;
+    // IPsec offload V2
+    RNDIS_IPSEC_OFFLOAD_V2 IPsecV2;
+    // Receive Segment Coalescing information
+    RNDIS_TCP_RECV_SEG_COALESCE_OFFLOAD Rsc;
+    // NVGRE Encapsulated packet task offload information
+    RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD EncapsulatedPacketTaskOffloadGre;
+    // VXLAN Encapsulated packet task offload information
+    RNDIS_ENCAPSULATED_PACKET_TASK_OFFLOAD_V2 EncapsulatedPacketTaskOffloadVxlan;
+    // Enabled encapsulation types for Encapsulated packet task offload
+    HV_UINT8 EncapsulationTypes;
+} RNDIS_OFFLOAD, *PRNDIS_OFFLOAD;
+
+#define RNDIS_SIZEOF_NDIS_OFFLOAD_REVISION_1 \
+    HV_FIELD_SIZE_THROUGH(RNDIS_OFFLOAD, Flags)
+#define RNDIS_SIZEOF_NDIS_OFFLOAD_REVISION_3 \
+    HV_FIELD_SIZE_THROUGH(RNDIS_OFFLOAD, EncapsulatedPacketTaskOffloadGre)
+
+typedef struct _RNDIS_OFFLOAD_ENCAPSULATION
+{
+    RNDIS_OBJECT_HEADER Header;
+    struct
+    {
+        HV_UINT32 Enabled;
+        HV_UINT32 EncapsulationType;
+        HV_UINT32 HeaderSize;
+    } IPv4;
+    struct
+    {
+        HV_UINT32 Enabled;
+        HV_UINT32 EncapsulationType;
+        HV_UINT32 HeaderSize;
+    } IPv6;
+} RNDIS_OFFLOAD_ENCAPSULATION, *PRNDIS_OFFLOAD_ENCAPSULATION;
+
+#define RNDIS_SIZEOF_OFFLOAD_ENCAPSULATION_REVISION_1 \
+    HV_FIELD_SIZE_THROUGH(RNDIS_OFFLOAD_ENCAPSULATION, IPv6.HeaderSize)
+
+#define RNDIS_OFFLOAD_NOT_SUPPORTED 0
+#define RNDIS_OFFLOAD_SUPPORTED 1
+
+#define RNDIS_OFFLOAD_PARAMETERS_NO_CHANGE 0
+#define RNDIS_OFFLOAD_PARAMETERS_TX_RX_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_TX_ENABLED_RX_DISABLED 2
+#define RNDIS_OFFLOAD_PARAMETERS_RX_ENABLED_TX_DISABLED 3
+#define RNDIS_OFFLOAD_PARAMETERS_TX_RX_ENABLED 4
+
+#define RNDIS_OFFLOAD_PARAMETERS_LSOV1_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_LSOV1_ENABLED 2
+
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV1_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV1_AH_ENABLED 2
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV1_ESP_ENABLED 3
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV1_AH_AND_ESP_ENABLED 4
+
+#define RNDIS_OFFLOAD_PARAMETERS_LSOV2_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_LSOV2_ENABLED 2
+
+#define RNDIS_OFFLOAD_PARAMETERS_SKIP_REGISTRY_UPDATE 0x00000001
+
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV2_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV2_AH_ENABLED 2
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV2_ESP_ENABLED 3
+#define RNDIS_OFFLOAD_PARAMETERS_IPSECV2_AH_AND_ESP_ENABLED 4
+
+#define RNDIS_OFFLOAD_PARAMETERS_RSC_DISABLED 1
+#define RNDIS_OFFLOAD_PARAMETERS_RSC_ENABLED 2
+
+#define RNDIS_OFFLOAD_SET_NO_CHANGE 0
+#define RNDIS_OFFLOAD_SET_ON 1
+#define RNDIS_OFFLOAD_SET_OFF 2
+
+#define RNDIS_ENCAPSULATION_TYPE_GRE_MAC 0x00000001
+#define RNDIS_ENCAPSULATION_TYPE_VXLAN 0x00000002
+
+// Every field can use the RNDIS_OFFLOAD_PARAMETERS_* values also can use
+// RNDIS_OFFLOAD_PARAMETERS_NO_CHANGE to leave the field unchanged.
+typedef struct _RNDIS_OFFLOAD_PARAMETERS
+{
+    RNDIS_OBJECT_HEADER Header;
+    HV_UINT8 IPv4Checksum; // RNDIS_OFFLOAD_PARAMETERS_*
+    HV_UINT8 TCPIPv4Checksum; // RNDIS_OFFLOAD_PARAMETERS_*
+    HV_UINT8 UDPIPv4Checksum; // RNDIS_OFFLOAD_PARAMETERS_*
+    HV_UINT8 TCPIPv6Checksum; // RNDIS_OFFLOAD_PARAMETERS_*
+    HV_UINT8 UDPIPv6Checksum; // RNDIS_OFFLOAD_PARAMETERS_*
+    HV_UINT8 LsoV1; // RNDIS_OFFLOAD_PARAMETERS_LSOV1_*
+    HV_UINT8 IPsecV1; // RNDIS_OFFLOAD_PARAMETERS_IPSECV1_*
+    HV_UINT8 LsoV2IPv4; // RNDIS_OFFLOAD_PARAMETERS_LSOV2_*
+    HV_UINT8 LsoV2IPv6; // RNDIS_OFFLOAD_PARAMETERS_LSOV2_*
+    HV_UINT8 TcpConnectionIPv4; // NDIS_OFFLOAD_PARAMETERS_NO_CHANGE only
+    HV_UINT8 TcpConnectionIPv6; // NDIS_OFFLOAD_PARAMETERS_NO_CHANGE only
+    HV_UINT32 Flags; // RNDIS_OFFLOAD_PARAMETERS_SKIP_REGISTRY_UPDATE
+    HV_UINT8 IPsecV2; // RNDIS_OFFLOAD_PARAMETERS_IPSECV2_*
+    HV_UINT8 IPsecV2IPv4; // RNDIS_OFFLOAD_PARAMETERS_IPSECV2_*
+    HV_UINT8 RscIPv4; // RNDIS_OFFLOAD_PARAMETERS_RSC_*
+    HV_UINT8 RscIPv6; // RNDIS_OFFLOAD_PARAMETERS_RSC_*
+    HV_UINT8 EncapsulatedPacketTaskOffload; // RNDIS_OFFLOAD_SET_*
+    HV_UINT8 EncapsulationTypes; // RNDIS_ENCAPSULATION_TYPE_*
+    union _ENCAPSULATION_PROTOCOL_PARAMETERS
+    {
+        struct _VXLAN_PARAMETERS
+        {
+            HV_UINT16 VxlanUDPPortNumber;
+        } VxlanParameters;
+        HV_UINT32 Value;
+    } EncapsulationProtocolParameters;
+} RNDIS_OFFLOAD_PARAMETERS, *PRNDIS_OFFLOAD_PARAMETERS;
+
+#define RNDIS_SIZEOF_OFFLOAD_PARAMETERS_REVISION_1 \
+    HV_FIELD_SIZE_THROUGH(RNDIS_OFFLOAD_PARAMETERS, Flags)
+
+// Rndis Packet Filter Flags (OID_GEN_CURRENT_PACKET_FILTER)
+
+#define RNDIS_PACKET_TYPE_NONE 0x00000000
+#define RNDIS_PACKET_TYPE_DIRECTED 0x00000001
+#define RNDIS_PACKET_TYPE_MULTICAST 0x00000002
+#define RNDIS_PACKET_TYPE_ALL_MULTICAST 0x00000004
+#define RNDIS_PACKET_TYPE_BROADCAST 0x00000008
+#define RNDIS_NPROTO_PACKET_FILTER ( \
+    RNDIS_PACKET_TYPE_DIRECTED | \
+    RNDIS_PACKET_TYPE_MULTICAST | \
+    RNDIS_PACKET_TYPE_ALL_MULTICAST | \
+    RNDIS_PACKET_TYPE_BROADCAST)
+
 // *****************************************************************************
 // Microsoft Hyper-V Virtual PCI Bus
 //
@@ -3375,7 +3922,7 @@ typedef struct _PCI_SLOT_NUMBER
             HV_UINT32 FunctionNumber : 3;
             HV_UINT32 Reserved : 24;
         } bits;
-        HV_UINT32 AsULONG;
+        HV_UINT32 AsHV_UINT32;
     } u;
 } PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 #endif // !_WDMDDK_
