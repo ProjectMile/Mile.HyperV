@@ -42,6 +42,7 @@
 //   - vm\devices\storage\storvsp_protocol\src\lib.rs
 //   - vm\devices\net\netvsp\src\protocol.rs
 //   - vm\devices\net\netvsp\src\rndisprot.rs
+//   - vm\devices\pci\vpci_protocol\src\lib.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
 // - Symbols in Windows version 10.0.14347.0's HyperVideo.sys
@@ -3940,6 +3941,21 @@ typedef struct _PCI_SLOT_NUMBER
 #define PCI_MAX_BAR 0x0006
 #endif // !PCI_MAX_BAR
 
+// The MMIO page the guest uses to write the target slot number. This page is
+// used by the guest to identify which PCI slot it wants to communicate with.
+#define VPCI_MMIO_PAGE_SLOT_NUMBER 0
+
+// The MMIO page the guest uses to read and write the current slot's config
+// space. After selecting a slot with `VPCI_MMIO_PAGE_SLOT_NUMBER`, the guest
+// can interact with the selected device's PCI configuration space through this
+// page.
+#define VPCI_MMIO_PAGE_CONFIG_SPACE 0x1000
+
+// The mask to apply to an MMIO address to get the page number. MMIO operations
+// are aligned to page boundaries, and this mask extracts the page component
+// from an address, zeroing out the offset within the page.
+#define VPCI_MMIO_PAGE_MASK 0xfff
+
 typedef struct _VPCI_PNP_ID
 {
     HV_UINT16 VendorID;
@@ -3960,34 +3976,69 @@ static const HV_UINT32 VscSupportedVersions[] =
     VPCI_PROTOCOL_VERSION_RS1
 };
 
-// Messages between the Virtual PCI driver and its VSP
+// Message types used in the Virtual PCI protocol communication. These values
+// identify the type of operation being requested or notification being sent.
+// The message type is included in the header of each protocol message.
 typedef enum _VPCI_MESSAGE
 {
+    // Bus relations information sent from the VSP to the VSC
     VpciMsgBusRelations = 0x42490000,
+    // Request to query bus relations information
     VpciMsgQueryBusRelations,
+    // Invalidate a specific device
     VpciMsgInvalidateDevice,
+    // Invalidate the entire bus
     VpciMsgInvalidateBus,
+    // Request to change a device's power state
     VpciMsgDevicePowerStateChange,
+    // Query current resource requirements for a device
     VpciMsgCurrentResourceRequirements,
+    // Get the resources currently assigned to a device
     VpciMsgGetResources,
+    // Notification that a device is entering D0 (powered on) state
     VpciMsgFdoD0Entry,
+    // Notification that a device is exiting D0 state
     VpciMsgFdoD0Exit,
+    // Read a block of data from a device
     VpciMsgReadBlock,
+    // Write a block of data to a device
     VpciMsgWriteBlock,
+    // Request to eject a device
     VpciMsgEject,
+    // Query if a device can be stopped
     VpciMsgQueryStop,
+    // Re-enable a device that was stopped
     VpciMsgReEnable,
+    // Notification that a query stop operation failed
     VpciMsgQueryStopFailed,
+    // Notification that a device ejection is complete
     VpciMsgEjectComplete,
+    // Assigned resources notification for a device
     VpciMsgAssignedResources,
+    // Request to release resources for a device
     VpciMsgReleaseResources,
+    // Invalidate a block of data
     VpciMsgInvalidateBlock,
+    // Query the protocol version supported
     VpciMsgQueryProtocolVersion,
+    // Create an interrupt for a device
     VpciMsgCreateInterruptMessage,
+    // Delete an interrupt for a device
     VpciMsgDeleteInterruptMessage,
+    // Assigned resources notification (version 2)
     VpciMsgAssignedResources2,
+    // Create an interrupt for a device (version 2)
     VpciMsgCreateInterruptMessage2,
-    VpciMsgDeleteInterruptMessage2
+    // Delete an interrupt for a device (version 2)
+    VpciMsgDeleteInterruptMessage2,
+    // Bus relations information (version 2)
+    VpciMsgBusRelations2,
+    // Assigned resources notification (version 3)
+    VpciMsgAssignedResources3,
+    // Create an interrupt for a device (version 3)
+    VpciMsgCreateInterruptMessage3,
+    // Reset a device
+    VpciMsgResetDevice,
 } VPCI_MESSAGE, *PVPCI_MESSAGE;
 
 typedef struct _VPCI_PACKET_HEADER

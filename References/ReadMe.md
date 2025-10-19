@@ -177,3 +177,4 @@ https://github.com/microsoft/openvmm/tree/0ed9ebc1d05b342aa708ef9bbbb8f8f6887cce
 - vm\devices\net\netvsp\src\protocol.rs
 - vm\devices\net\netvsp\src\rndisprot.rs
 - vm\hv1\hvdef\src\lib.rs
+- vm\devices\pci\vpci_protocol\src\lib.rs
