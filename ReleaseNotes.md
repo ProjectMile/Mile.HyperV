@@ -12,7 +12,7 @@
 - Revise the Mile.HyperV.TLFS definitions via symbols in Windows version
   10.0.26100.0's securekernel.exe. (Thanks to Mezone.)
 - Revise all Mile.HyperV definitions via
-  https://github.com/microsoft/mu_msvm/tree/9337285a977fbf1682e21c17800c4809ce5bcd19.
+  https://github.com/microsoft/mu_msvm/tree/9dd44d82aaa513e58913616f3a5a567112039574.
 - Fix the source code file header comment format.
 - Introduce Mile.HyperV.Test project for testing the definitions.
 
