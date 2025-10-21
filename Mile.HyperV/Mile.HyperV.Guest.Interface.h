@@ -1039,6 +1039,15 @@ typedef enum _HV_GUEST_OS_MICROSOFT_IDS
     HvGuestOsMicrosoftWindowsCE = 0x05
 } HV_GUEST_OS_MICROSOFT_IDS, *PHV_GUEST_OS_MICROSOFT_IDS;
 
+typedef enum _HV_GUEST_OS_OPENSOURCE_IDS
+{
+    HvGuestOsOpenSourceUndefined = 0x0,
+    HvGuestOsOpenSourceLinux = 0x1,
+    HvGuestOsOpenSourceFreeBSD = 0x2,
+    HvGuestOsOpenSourceXen = 0x3,
+    HvGuestOsOpenSourceIllumos = 0x4,
+} HV_GUEST_OS_OPENSOURCE_IDS, *PHV_GUEST_OS_OPENSOURCE_IDS;
+
 // This enumeration collates MSR indices for ease of maintainability.
 #if defined(_M_AMD64) || defined(_M_IX86)
 typedef enum _HV_X64_SYNTHETIC_MSR
@@ -1198,36 +1207,80 @@ typedef union _HV_X64_MSR_HYPERCALL_CONTENTS
     };
 } HV_X64_MSR_HYPERCALL_CONTENTS, *PHV_X64_MSR_HYPERCALL_CONTENTS;
 
-// Hyper-V guest crash notification MSR's
+// MSR used to provide vcpu index
 
-#define HV_X64_MSR_GUEST_CRASH_P0 HvSyntheticMsrCrashP0
-#define HV_X64_MSR_GUEST_CRASH_P1 HvSyntheticMsrCrashP1
-#define HV_X64_MSR_GUEST_CRASH_P2 HvSyntheticMsrCrashP2
-#define HV_X64_MSR_GUEST_CRASH_P3 HvSyntheticMsrCrashP3
-#define HV_X64_MSR_GUEST_CRASH_P4 HvSyntheticMsrCrashP4
-#define HV_X64_MSR_GUEST_CRASH_CTL HvSyntheticMsrCrashCtl
+#define HV_X64_MSR_VP_INDEX HvSyntheticMsrVpIndex
 
-#define HV_CRASH_MAXIMUM_MESSAGE_SIZE 4096ull
+// MSR used to read the per-partition time reference counter
 
-// The contents of `HV_X64_MSR_GUEST_CRASH_CTL`
-typedef union _HV_CRASH_CTL_REG_CONTENTS
+#define HV_X64_MSR_TIME_REF_COUNT HvSyntheticMsrTimeRefCount
+
+// A partition's reference time stamp counter (TSC) page
+
+#define HV_X64_MSR_REFERENCE_TSC HvSyntheticMsrReferenceTsc
+
+typedef union _HV_X64_MSR_REFERENCE_TSC_CONTENTS
 {
     HV_UINT64 AsUINT64;
     struct
     {
-        // Reserved bits
-        HV_UINT64 Reserved : 58;
-        // Crash occurred in the preOS environment
-        HV_UINT64 PreOSId : 3;
-        // Crash dump will not be captured
-        HV_UINT64 NoCrashDump : 1;
-        // `HV_X64_MSR_GUEST_CRASH_P3` is the GPA of the message,
-        // `HV_X64_MSR_GUEST_CRASH_P4` is its length in bytes
-        HV_UINT64 CrashMessage : 1;
-        // Log contents of crash parameter system registers
-        HV_UINT64 CrashNotify : 1;
+        HV_UINT64 Enable : 1;
+        HV_UINT64 ReservedP : 11;
+        HV_UINT64 GpaPageNumber : 52;
     };
-} HV_CRASH_CTL_REG_CONTENTS, *PHV_CRASH_CTL_REG_CONTENTS;
+} HV_X64_MSR_REFERENCE_TSC_CONTENTS, *PHV_X64_MSR_REFERENCE_TSC_CONTENTS;
+
+// Define invalid and maximum values of the reference TSC sequence.
+#define HV_REFERENCE_TSC_SEQUENCE_INVALID (0x00000000)
+
+typedef struct _HV_REFERENCE_TSC_PAGE
+{
+    volatile HV_UINT32 TscSequence;
+    HV_UINT32 Reserved1;
+    volatile HV_UINT64 TscScale;
+    volatile HV_INT64 TscOffset;
+    volatile HV_UINT64 TimelineBias;
+    volatile HV_UINT64 TscMultiplier;
+    HV_UINT64 Reserved2[507];
+} HV_REFERENCE_TSC_PAGE, *PHV_REFERENCE_TSC_PAGE;
+
+// MSR used to retrieve the TSC frequency
+
+#define HV_X64_MSR_TSC_FREQUENCY HvSyntheticMsrTscFrequency
+
+// MSR used to retrieve the local APIC timer frequency
+
+#define HV_X64_MSR_APIC_FREQUENCY HvSyntheticMsrApicFrequency
+
+// Define the virtual APIC registers (Part 1)
+
+#define HV_X64_MSR_EOI HvSyntheticMsrEoi
+#define HV_X64_MSR_ICR HvSyntheticMsrIcr
+#define HV_X64_MSR_TPR HvSyntheticMsrTpr
+
+// Define synthetic interrupt controller model specific registers.
+
+#define HV_X64_MSR_SCONTROL HvSyntheticMsrSControl
+#define HV_X64_MSR_SVERSION HvSyntheticMsrSVersion
+#define HV_X64_MSR_SIEFP HvSyntheticMsrSiefp
+#define HV_X64_MSR_SIMP HvSyntheticMsrSimp
+#define HV_X64_MSR_EOM HvSyntheticMsrEom
+#define HV_X64_MSR_SINT0 HvSyntheticMsrSint0
+#define HV_X64_MSR_SINT1 HvSyntheticMsrSint1
+#define HV_X64_MSR_SINT2 HvSyntheticMsrSint2
+#define HV_X64_MSR_SINT3 HvSyntheticMsrSint3
+#define HV_X64_MSR_SINT4 HvSyntheticMsrSint4
+#define HV_X64_MSR_SINT5 HvSyntheticMsrSint5
+#define HV_X64_MSR_SINT6 HvSyntheticMsrSint6
+#define HV_X64_MSR_SINT7 HvSyntheticMsrSint7
+#define HV_X64_MSR_SINT8 HvSyntheticMsrSint8
+#define HV_X64_MSR_SINT9 HvSyntheticMsrSint9
+#define HV_X64_MSR_SINT10 HvSyntheticMsrSint10
+#define HV_X64_MSR_SINT11 HvSyntheticMsrSint11
+#define HV_X64_MSR_SINT12 HvSyntheticMsrSint12
+#define HV_X64_MSR_SINT13 HvSyntheticMsrSint13
+#define HV_X64_MSR_SINT14 HvSyntheticMsrSint14
+#define HV_X64_MSR_SINT15 HvSyntheticMsrSint15
 
 // Define synthetic interrupt source.
 typedef union _HV_SYNIC_SINT
@@ -1251,8 +1304,40 @@ typedef union _HV_SYNIC_SINT
     };
 } HV_SYNIC_SINT, *PHV_SYNIC_SINT;
 
-// Define the number of synthetic timers.
-#define HV_SYNIC_STIMER_COUNT (4)
+// Define SynIC control register.
+typedef union _HV_SYNIC_SCONTROL
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 Enable : 1;
+        HV_UINT64 Preserved : 63;
+    };
+} HV_SYNIC_SCONTROL, *PHV_SYNIC_SCONTROL;
+
+// Define the format of the SIEFP register
+typedef union _HV_SYNIC_SIEFP
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 SiefpEnabled : 1;
+        HV_UINT64 ReservedP : 11;
+        HV_UINT64 BaseSiefpGpa : 52;
+    };
+} HV_SYNIC_SIEFP, *PHV_SYNIC_SIEFP;
+
+// Define the format of the SIMP register
+typedef union _HV_SYNIC_SIMP
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 SimpEnabled : 1;
+        HV_UINT64 Preserved : 11;
+        HV_UINT64 BaseSimpGpa : 52;
+    };
+} HV_SYNIC_SIMP, *PHV_SYNIC_SIMP;
 
 // Define port identifier type.
 typedef union _HV_PORT_ID
@@ -1407,39 +1492,6 @@ typedef struct _HV_SYNIC_EVENT_FLAGS_PAGE
     volatile HV_SYNIC_EVENT_FLAGS SintEventFlags[HV_SYNIC_SINT_COUNT];
 } HV_SYNIC_EVENT_FLAGS_PAGE, *PHV_SYNIC_EVENT_FLAGS_PAGE;
 
-// Define the synthetic timer configuration structure
-typedef struct _HV_X64_MSR_STIMER_CONFIG_CONTENTS
-{
-    union
-    {
-        HV_UINT64 AsUINT64;
-        struct
-        {
-            HV_UINT64 Enable : 1;
-            HV_UINT64 Periodic : 1;
-            HV_UINT64 Lazy : 1;
-            HV_UINT64 AutoEnable : 1;
-            HV_UINT64 ApicVector : 8;
-            HV_UINT64 DirectMode : 1;
-            HV_UINT64 ReservedZ1 : 3;
-            HV_UINT64 SINTx : 4;
-            HV_UINT64 ReservedZ2 : 44;
-        };
-    };
-} HV_X64_MSR_STIMER_CONFIG_CONTENTS, *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
-
-// Define the format of the SIMP register
-typedef union _HV_SYNIC_SIMP
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 SimpEnabled : 1;
-        HV_UINT64 Preserved : 11;
-        HV_UINT64 BaseSimpGpa : 52;
-    };
-} HV_SYNIC_SIMP, *PHV_SYNIC_SIMP;
-
 // Define the trace buffer index type.
 typedef HV_UINT32 HV_EVENTLOG_BUFFER_INDEX, *PHV_EVENTLOG_BUFFER_INDEX;
 
@@ -1543,17 +1595,186 @@ typedef struct _HV_MESSAGE_PAGE
     volatile HV_MESSAGE SintMessage[HV_SYNIC_SINT_COUNT];
 } HV_MESSAGE_PAGE, *PHV_MESSAGE_PAGE;
 
-// Define the format of the SIEFP register
-typedef union _HV_SYNIC_SIEFP
+// Define the virtual APIC registers (Part 2)
+
+#define HV_X64_MSR_VP_ASSIST_PAGE HvSyntheticMsrVpAssistPage
+
+typedef union _HV_REGISTER_VP_ASSIST_PAGE
 {
     HV_UINT64 AsUINT64;
     struct
     {
-        HV_UINT64 SiefpEnabled : 1;
+        HV_UINT64 Enable : 1;
         HV_UINT64 ReservedP : 11;
-        HV_UINT64 BaseSiefpGpa : 52;
+        HV_UINT64 GpaPageNumber : 52;
     };
-} HV_SYNIC_SIEFP, *PHV_SYNIC_SIEFP;
+} HV_REGISTER_VP_ASSIST_PAGE, *PHV_REGISTER_VP_ASSIST_PAGE;
+
+typedef enum _HV_VTL_ENTRY_REASON
+{
+    // This reason is reserved and is not used.
+    HvVtlEntryReserved = 0,
+    // Indicates entry due to a VTL call from a lower VTL.
+    HvVtlEntryVtlCall = 1,
+    // Indicates entry due to an interrupt targeted to the VTL.
+    HvVtlEntryInterrupt = 2,
+    // Indicates an entry due to an intercept delivered via the intercept page.
+    HvVtlEntryIntercept = 3,
+} HV_VTL_ENTRY_REASON, *PHV_VTL_ENTRY_REASON;
+
+typedef struct _HV_VP_VTL_CONTROL
+{
+    // The hypervisor updates the entry reason with an indication as to why the
+    // VTL was entered on the virtual processor.
+    HV_VTL_ENTRY_REASON EntryReason;
+    // This flag determines whether the VINA interrupt line is asserted.
+    HV_UINT8 VinaStatus;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+    // A guest updates the VtlReturn* fields to provide the register values to
+    // restore on VTL return. The specific register values that are restored
+    // will vary based on whether the VTL is 32-bit or 64-bit: rax and rcx or
+    // eax, ecx, and edx.
+    HV_UINT64 Registers[2];
+} HV_VP_VTL_CONTROL, *PHV_VP_VTL_CONTROL;
+
+typedef union _HV_REGISTER_VSM_VINA
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 Vector : 8;
+        HV_UINT64 Enabled : 1;
+        HV_UINT64 AutoReset : 1;
+        HV_UINT64 AutoEoi : 1;
+        HV_UINT64 ReservedP : 53;
+    };
+} HV_REGISTER_VSM_VINA, *PHV_REGISTER_VSM_VINA;
+
+typedef struct _HV_VP_ASSIST_PAGE
+{
+    // APIC assist for optimized EOI processing.
+    HV_UINT32 ApicAssist;
+    HV_UINT32 ReservedZ0;
+    // VP-VTL control information
+    HV_VP_VTL_CONTROL VtlControl;
+    HV_UINT64 NestedEnlightenmentsControl;
+    HV_UINT8 EnlightenVmEntry;
+    HV_UINT8 ReservedZ1[7];
+    HV_GPA CurrentNestedVmcs;
+    HV_UINT8 SyntheticTimeUnhaltedTimerExpired;
+    HV_UINT8 ReservedZ2[7];
+    HV_UINT8 VirtualizationFaultInformation[40];
+    HV_UINT64 ReservedZ3;
+    HV_MESSAGE InterceptMessage;
+    HV_UINT8 VtlReturnActions[256];
+} HV_VP_ASSIST_PAGE, *PHV_VP_ASSIST_PAGE;
+
+typedef union _HV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT
+{
+    HV_UINT64 AsUINT64[2];
+    struct
+    {
+        HV_UINT64 ActionType;
+        HV_VP_INDEX TargetVp;
+        HV_VTL TargetVtl;
+        HV_UINT8 TargetSint;
+        HV_UINT16 FlagNumber;
+    };
+} HV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT, *PHV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT;
+
+// Synthetic Timer MSRs. Four timers per vcpu.
+
+#define HV_X64_MSR_STIMER0_CONFIG HvSyntheticMsrSTimer0Config
+#define HV_X64_MSR_STIMER0_COUNT HvSyntheticMsrSTimer0Count
+#define HV_X64_MSR_STIMER1_CONFIG HvSyntheticMsrSTimer1Config
+#define HV_X64_MSR_STIMER1_COUNT HvSyntheticMsrSTimer1Count
+#define HV_X64_MSR_STIMER2_CONFIG HvSyntheticMsrSTimer2Config
+#define HV_X64_MSR_STIMER2_COUNT HvSyntheticMsrSTimer2Count
+#define HV_X64_MSR_STIMER3_CONFIG HvSyntheticMsrSTimer3Config
+#define HV_X64_MSR_STIMER3_COUNT HvSyntheticMsrSTimer3Count
+
+// Define the number of synthetic timers.
+#define HV_SYNIC_STIMER_COUNT (4)
+
+// Define the synthetic timer configuration structure
+typedef struct _HV_X64_MSR_STIMER_CONFIG_CONTENTS
+{
+    union
+    {
+        HV_UINT64 AsUINT64;
+        struct
+        {
+            HV_UINT64 Enable : 1;
+            HV_UINT64 Periodic : 1;
+            HV_UINT64 Lazy : 1;
+            HV_UINT64 AutoEnable : 1;
+            // Note: On ARM64 the top 3 bits of ApicVector are reserved.
+            HV_UINT64 ApicVector : 8;
+            HV_UINT64 DirectMode : 1;
+            HV_UINT64 ReservedZ1 : 3;
+            HV_UINT64 SINTx : 4;
+            HV_UINT64 ReservedZ2 : 44;
+        };
+    };
+} HV_X64_MSR_STIMER_CONFIG_CONTENTS, *PHV_X64_MSR_STIMER_CONFIG_CONTENTS;
+
+typedef struct _HV_STIMER_STATE
+{
+    HV_UINT32 UndeliveredMessagePending;
+    HV_UINT32 Reserved;
+    HV_UINT64 Config;
+    HV_UINT64 Count;
+    HV_UINT64 Adjustment;
+    HV_UINT64 UndeliveredExpirationTime;
+} HV_STIMER_STATE, *PHV_STIMER_STATE;
+
+typedef struct _HV_SYNTHETIC_TIMERS_STATE
+{
+    HV_STIMER_STATE Timers[HV_SYNIC_STIMER_COUNT];
+    HV_UINT64 Reserved[5];
+} HV_SYNTHETIC_TIMERS_STATE, *PHV_SYNTHETIC_TIMERS_STATE;
+
+// Define guest idle MSR. A guest virtual processor can enter idle state by
+// reading this MSR, and will be waken up when an interrupt arrives regardless
+// interrupt is enabled or not.
+// N.B. The guest idle MSR is only used by guests to enter idle state. Root uses
+//      the power trigger MSRs defined above to enter idle states.
+
+#define HV_X64_MSR_GUEST_IDLE HvSyntheticMsrGuestIdle
+
+// Hyper-V guest crash notification MSR's
+
+#define HV_X64_MSR_GUEST_CRASH_P0 HvSyntheticMsrCrashP0
+#define HV_X64_MSR_GUEST_CRASH_P1 HvSyntheticMsrCrashP1
+#define HV_X64_MSR_GUEST_CRASH_P2 HvSyntheticMsrCrashP2
+#define HV_X64_MSR_GUEST_CRASH_P3 HvSyntheticMsrCrashP3
+#define HV_X64_MSR_GUEST_CRASH_P4 HvSyntheticMsrCrashP4
+#define HV_X64_MSR_GUEST_CRASH_CTL HvSyntheticMsrCrashCtl
+
+#define HV_X64_GUEST_CRASH_PARAMETER_MSRS 5
+
+#define HV_CRASH_MAXIMUM_MESSAGE_SIZE 4096ull
+
+// The contents of `HV_X64_MSR_GUEST_CRASH_CTL`
+typedef union _HV_CRASH_CTL_REG_CONTENTS
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // Reserved bits
+        HV_UINT64 Reserved : 58;
+        // Crash occurred in the preOS environment
+        HV_UINT64 PreOSId : 3;
+        // Crash dump will not be captured
+        HV_UINT64 NoCrashDump : 1;
+        // `HV_X64_MSR_GUEST_CRASH_P3` is the GPA of the message,
+        // `HV_X64_MSR_GUEST_CRASH_P4` is its length in bytes
+        HV_UINT64 CrashMessage : 1;
+        // Log contents of crash parameter system registers
+        HV_UINT64 CrashNotify : 1;
+    };
+} HV_CRASH_CTL_REG_CONTENTS, *PHV_CRASH_CTL_REG_CONTENTS;
 
 // *****************************************************************************
 // Hypercall Definitions
@@ -2041,20 +2262,26 @@ typedef enum _HV_CALL_CODE
 // Declare constants and structures for submitting hypercalls.
 #define HV_X64_MAX_HYPERCALL_ELEMENTS ((1<<12) - 1)
 
-// Input: The call code, argument sizes and calling convention
+// The hypercall input value.
 typedef union _HV_HYPERCALL_INPUT
 {
+    // Input: The call code, argument sizes and calling convention
     struct
     {
-        // Least significant bits
+        // The hypercall code. (Least significant bits)
         HV_UINT32 CallCode : 16;
-        // Uses the register based form
+        // If this hypercall is a fast hypercall. (Uses the register based form)
         HV_UINT32 IsFast : 1;
-        HV_UINT32 Reserved1 : 14;
-        // The outer hypervisor handles this call.
+        // The variable header size, in qwords.
+        HV_UINT32 VariableHeaderSize : 10;
+        HV_UINT32 Reserved1 : 4;
+        // Specifies that the hypercall should be handled by the L0 hypervisor
+        // in a nested environment. (The outer hypervisor handles this call.)
         HV_UINT32 IsNested : 1;
+        // The element count for rep hypercalls.
         HV_UINT32 CountOfElements : 12;
         HV_UINT32 Reserved2 : 4;
+        // The first element to start processing in a rep hypercall.
         HV_UINT32 RepStartIndex : 12;
         // Most significant bits
         HV_UINT32 Reserved3 : 4;
@@ -2062,13 +2289,14 @@ typedef union _HV_HYPERCALL_INPUT
     HV_UINT64 AsUINT64;
 } HV_HYPERCALL_INPUT, *PHV_HYPERCALL_INPUT;
 
-// Output: The result and returned data size
+// The hypercall output value returned to the guest.
 typedef union _HV_HYPERCALL_OUTPUT
 {
+    // Output: The result and returned data size
     struct
     {
         // Least significant bits
-        HV_UINT16 CallStatus;
+        HV_STATUS CallStatus;
         HV_UINT16 Reserved1;
         HV_UINT32 ElementsProcessed : 12;
         // Most significant bits

@@ -3883,15 +3883,6 @@ typedef enum _HV_GUEST_OS_VENDOR_PRIVATE
     HvGuestOsVendorLANCOM = 0x0200,
 } HV_GUEST_OS_VENDOR_PRIVATE, *PHV_GUEST_OS_VENDOR_PRIVATE;
 
-typedef enum _HV_GUEST_OS_OPENSOURCE_IDS
-{
-    HvGuestOsOpenSourceUndefined = 0x0,
-    HvGuestOsOpenSourceLinux = 0x1,
-    HvGuestOsOpenSourceFreeBSD = 0x2,
-    HvGuestOsOpenSourceXen = 0x3,
-    HvGuestOsOpenSourceIllumos = 0x4,
-} HV_GUEST_OS_OPENSOURCE_IDS, *PHV_GUEST_OS_OPENSOURCE_IDS;
-
 // Partition Properties
 
 typedef HV_UINT64 HV_PARTITION_PROPERTY, *PHV_PARTITION_PROPERTY;
@@ -5259,19 +5250,6 @@ typedef union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
     };
 } HV_REGISTER_VSM_CODE_PAGE_OFFSETS, *PHV_REGISTER_VSM_CODE_PAGE_OFFSETS;
 
-typedef union _HV_REGISTER_VSM_VINA
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 Vector : 8;
-        HV_UINT64 Enabled : 1;
-        HV_UINT64 AutoReset : 1;
-        HV_UINT64 AutoEoi : 1;
-        HV_UINT64 ReservedP : 53;
-    };
-} HV_REGISTER_VSM_VINA, *PHV_REGISTER_VSM_VINA;
-
 typedef union _HV_REGISTER_CR_INTERCEPT_CONTROL
 {
     HV_UINT64 AsUINT64;
@@ -6074,7 +6052,7 @@ typedef struct _HV_LOCAL_INTERRUPT_CONTROLLER_STATE
     HV_UINT32 ApicRemoteRead;
 } HV_LOCAL_INTERRUPT_CONTROLLER_STATE, *PHV_LOCAL_INTERRUPT_CONTROLLER_STATE;
 
-typedef struct _HV_STIMER_STATE
+typedef struct _HV_STIMER_STATE_PRIVATE
 {
     struct
     {
@@ -6090,14 +6068,14 @@ typedef struct _HV_STIMER_STATE
     HV_UINT64 Adjustment;
     // Expiration time of the undelivered message.
     HV_UINT64 UndeliveredExpirationTime;
-} HV_STIMER_STATE, *PHV_STIMER_STATE;
+} HV_STIMER_STATE_PRIVATE, *PHV_STIMER_STATE_PRIVATE;
 
-typedef struct _HV_SYNTHETIC_TIMERS_STATE
+typedef struct _HV_SYNTHETIC_TIMERS_STATE_PRIVATE
 {
-    HV_STIMER_STATE Timers[HV_SYNIC_STIMER_COUNT];
+    HV_STIMER_STATE_PRIVATE Timers[HV_SYNIC_STIMER_COUNT];
     // Reserved space for time unhalted timer.
     HV_UINT64 Reserved[5];
-} HV_SYNTHETIC_TIMERS_STATE, *PHV_SYNTHETIC_TIMERS_STATE;
+} HV_SYNTHETIC_TIMERS_STATE_PRIVATE, *PHV_SYNTHETIC_TIMERS_STATE_PRIVATE;
 
 #if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_REGISTER_X64_CPUID_RESULT_PARAMETERS
@@ -8798,20 +8776,6 @@ typedef struct _HV_LOADER_PCI_SEGMENT_ENTRY
     } Intel;
 } HV_LOADER_PCI_SEGMENT_ENTRY, *PHV_LOADER_PCI_SEGMENT_ENTRY;
 
-typedef union _HV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT
-{
-    HV_UINT64 AsUINT64[2];
-    struct
-    {
-        HV_UINT64 Type : 8;
-        HV_UINT64 Reserved : 56;
-        HV_UINT32 TargetVp;
-        HV_UINT8 TargetVtl;
-        HV_UINT8 TargetSint;
-        HV_UINT16 FlagNumber;
-    };
-} HV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT, *PHV_VP_ASSIST_PAGE_ACTION_SIGNAL_EVENT;
-
 typedef struct _HV_SYNIC_EVENT_INTERCEPT_MESSAGE
 {
     HV_VP_INDEX VpIndex;
@@ -9366,8 +9330,6 @@ typedef enum _HV_X64_SYNTHETIC_MSR_PRIVATE
 
 // MSR used to provide vcpu index
 
-#define HV_X64_MSR_VP_INDEX HvSyntheticMsrVpIndex
-
 typedef const HV_VP_INDEX* PCHV_VP_INDEX;
 
 typedef union _HV_X64_MSR_SYNMC_STATUS_CONTENTS
@@ -9475,47 +9437,6 @@ typedef union _HV_ARM64_MSR_RESET_CONTENTS
 /* XbSyntheticMsrPauseElementsCount | 0x40000019 */
 /* XbSyntheticMsrTbFlushAll | 0x4000001A */
 
-// MSR used to read the per-partition time reference counter
-
-#define HV_X64_MSR_TIME_REF_COUNT HvSyntheticMsrTimeRefCount
-
-// A partition's reference time stamp counter (TSC) page
-
-#define HV_X64_MSR_REFERENCE_TSC HvSyntheticMsrReferenceTsc
-
-typedef union _HV_X64_MSR_REFERENCE_TSC_CONTENTS
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 Enable : 1;
-        HV_UINT64 ReservedP : 11;
-        HV_UINT64 GpaPageNumber : 52;
-    };
-} HV_X64_MSR_REFERENCE_TSC_CONTENTS, *PHV_X64_MSR_REFERENCE_TSC_CONTENTS;
-
-// Define invalid and maximum values of the reference TSC sequence.
-#define HV_REFERENCE_TSC_SEQUENCE_INVALID (0x00000000)
-
-typedef struct _HV_REFERENCE_TSC_PAGE
-{
-    volatile HV_UINT32 TscSequence;
-    HV_UINT32 Reserved1;
-    volatile HV_UINT64 TscScale;
-    volatile HV_INT64 TscOffset;
-    volatile HV_UINT64 TimelineBias;
-    volatile HV_UINT64 TscMultiplier;
-    HV_UINT64 Reserved2[507];
-} HV_REFERENCE_TSC_PAGE, *PHV_REFERENCE_TSC_PAGE;
-
-// MSR used to retrieve the TSC frequency
-
-#define HV_X64_MSR_TSC_FREQUENCY HvSyntheticMsrTscFrequency
-
-// MSR used to retrieve the local APIC timer frequency
-
-#define HV_X64_MSR_APIC_FREQUENCY HvSyntheticMsrApicFrequency
-
 // Non-Privileged Instruction Execution Prevention
 
 #define HV_X64_MSR_NPIEP_CONFIG HvSyntheticMsrNpiepConfig
@@ -9524,23 +9445,7 @@ typedef struct _HV_REFERENCE_TSC_PAGE
 
 // Define the virtual APIC registers
 
-#define HV_X64_MSR_EOI HvSyntheticMsrEoi
-#define HV_X64_MSR_ICR HvSyntheticMsrIcr
-#define HV_X64_MSR_TPR HvSyntheticMsrTpr
-#define HV_X64_MSR_VP_ASSIST_PAGE HvSyntheticMsrVpAssistPage
-
-typedef enum _HV_VTL_ENTRY_REASON
-{
-    // This reason is reserved and is not used.
-    HvVtlEntryReserved = 0,
-    // Indicates entry due to a VTL call from a lower VTL.
-    HvVtlEntryVtlCall = 1,
-    // Indicates entry due to an interrupt targeted to the VTL.
-    HvVtlEntryInterrupt = 2,
-    HvVtlEntryIntercept = 3,
-} HV_VTL_ENTRY_REASON, *PHV_VTL_ENTRY_REASON;
-
-typedef struct _HV_VP_VTL_CONTROL
+typedef struct _HV_VP_VTL_CONTROL_PRIVATE
 {
     // The hypervisor updates the entry reason with an indication as to why the
     // VTL was entered on the virtual processor.
@@ -9583,7 +9488,7 @@ typedef struct _HV_VP_VTL_CONTROL
         };
 #endif
     };
-} HV_VP_VTL_CONTROL, *PHV_VP_VTL_CONTROL;
+} HV_VP_VTL_CONTROL_PRIVATE, *PHV_VP_VTL_CONTROL_PRIVATE;
 
 // Control structure that allows a hypervisor to indicate to its parent
 // hypervisor which nested enlightenment privileges are to be granted to the
@@ -9635,7 +9540,7 @@ typedef struct _HV_MINIMAL_INTERCEPT_INFORMATION
     HV_MESSAGE_TYPE MessageType;
 } HV_MINIMAL_INTERCEPT_INFORMATION, *PHV_MINIMAL_INTERCEPT_INFORMATION;
 
-typedef union _HV_VP_ASSIST_PAGE
+typedef union _HV_VP_ASSIST_PAGE_PRIVATE
 {
     struct
     {
@@ -9643,7 +9548,7 @@ typedef union _HV_VP_ASSIST_PAGE
         HV_VIRTUAL_APIC_ASSIST ApicAssist;
         HV_UINT32 ReservedZ0;
         // VP-VTL control information
-        HV_VP_VTL_CONTROL VtlControl;
+        HV_VP_VTL_CONTROL_PRIVATE VtlControl;
         HV_NESTED_ENLIGHTENMENTS_CONTROL NestedEnlightenmentsControl;
         HV_BOOLEAN EnlightenVmEntry;
         HV_UINT8 ReservedZ1[7];
@@ -9662,65 +9567,11 @@ typedef union _HV_VP_ASSIST_PAGE
         HV_UINT8 Padding[112];
         HV_MINIMAL_INTERCEPT_INFORMATION MinimalIntercept;
     };
-} HV_VP_ASSIST_PAGE, *PHV_VP_ASSIST_PAGE;
-
-typedef union _HV_REGISTER_VP_ASSIST_PAGE
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 Enable : 1;
-        HV_UINT64 ReservedP : 11;
-        HV_UINT64 GpaPageNumber : 52;
-    };
-} HV_REGISTER_VP_ASSIST_PAGE, *PHV_REGISTER_VP_ASSIST_PAGE;
+} HV_VP_ASSIST_PAGE_PRIVATE, *PHV_VP_ASSIST_PAGE_PRIVATE;
 
 // Define synthetic interrupt controller model specific registers.
 
-#define HV_X64_MSR_SCONTROL HvSyntheticMsrSControl
-#define HV_X64_MSR_SVERSION HvSyntheticMsrSVersion
-#define HV_X64_MSR_SIEFP HvSyntheticMsrSiefp
-#define HV_X64_MSR_SIMP HvSyntheticMsrSimp
-#define HV_X64_MSR_EOM HvSyntheticMsrEom
 #define HV_X64_MSR_SIRBP HvSyntheticMsrSirb
-#define HV_X64_MSR_SINT0 HvSyntheticMsrSint0
-#define HV_X64_MSR_SINT1 HvSyntheticMsrSint1
-#define HV_X64_MSR_SINT2 HvSyntheticMsrSint2
-#define HV_X64_MSR_SINT3 HvSyntheticMsrSint3
-#define HV_X64_MSR_SINT4 HvSyntheticMsrSint4
-#define HV_X64_MSR_SINT5 HvSyntheticMsrSint5
-#define HV_X64_MSR_SINT6 HvSyntheticMsrSint6
-#define HV_X64_MSR_SINT7 HvSyntheticMsrSint7
-#define HV_X64_MSR_SINT8 HvSyntheticMsrSint8
-#define HV_X64_MSR_SINT9 HvSyntheticMsrSint9
-#define HV_X64_MSR_SINT10 HvSyntheticMsrSint10
-#define HV_X64_MSR_SINT11 HvSyntheticMsrSint11
-#define HV_X64_MSR_SINT12 HvSyntheticMsrSint12
-#define HV_X64_MSR_SINT13 HvSyntheticMsrSint13
-#define HV_X64_MSR_SINT14 HvSyntheticMsrSint14
-#define HV_X64_MSR_SINT15 HvSyntheticMsrSint15
-
-// Define SynIC control register.
-typedef union _HV_SYNIC_SCONTROL
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 Enable : 1;
-        HV_UINT64 Preserved : 63;
-    };
-} HV_SYNIC_SCONTROL, *PHV_SYNIC_SCONTROL;
-
-// Synthetic Timer MSRs. Four timers per vcpu.
-
-#define HV_X64_MSR_STIMER0_CONFIG HvSyntheticMsrSTimer0Config
-#define HV_X64_MSR_STIMER0_COUNT HvSyntheticMsrSTimer0Count
-#define HV_X64_MSR_STIMER1_CONFIG HvSyntheticMsrSTimer1Config
-#define HV_X64_MSR_STIMER1_COUNT HvSyntheticMsrSTimer1Count
-#define HV_X64_MSR_STIMER2_CONFIG HvSyntheticMsrSTimer2Config
-#define HV_X64_MSR_STIMER2_COUNT HvSyntheticMsrSTimer2Count
-#define HV_X64_MSR_STIMER3_CONFIG HvSyntheticMsrSTimer3Config
-#define HV_X64_MSR_STIMER3_COUNT HvSyntheticMsrSTimer3Count
 
 #if defined(_M_AMD64) || defined(_M_IX86)
 #define HV_MSR_EOM HV_X64_MSR_EOM
@@ -9810,14 +9661,6 @@ typedef union _HV_X64_MSR_POWER_STATE_CONFIG
 #define HV_X64_MSR_STATS_PARTITION_INTERNAL_PAGE 0x400000E1
 #define HV_X64_MSR_STATS_VP_RETAIL_PAGE 0x400000E2
 #define HV_X64_MSR_STATS_VP_INTERNAL_PAGE 0x400000E3
-
-// Define guest idle MSR. A guest virtual processor can enter idle state by
-// reading this MSR, and will be waken up when an interrupt arrives regardless
-// interrupt is enabled or not.
-// N.B. The guest idle MSR is only used by guests to enter idle state. Root uses
-//      the power trigger MSRs defined above to enter idle states.
-
-#define HV_X64_MSR_GUEST_IDLE HvSyntheticMsrGuestIdle
 
 /* HvSyntheticMsrSynthDebugControl | 0x400000F1 */
 /* HvSyntheticMsrSynthDebugStatus | 0x400000F2 */
