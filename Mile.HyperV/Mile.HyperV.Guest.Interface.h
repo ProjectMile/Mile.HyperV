@@ -324,6 +324,160 @@ typedef HV_UINT8 HV_VTL, *PHV_VTL;
 // Flags to describe the access a partition has to a GPA page.
 typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
 
+// Address spaces presented by the guest.
+typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
+
+// Address space flush flags.
+typedef HV_UINT64 HV_FLUSH_FLAGS, * PHV_FLUSH_FLAGS;
+
+#define HV_FLUSH_ALL_PROCESSORS (0x00000001)
+#define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES (0x00000002)
+#define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY (0x00000004)
+#define HV_FLUSH_USE_EXTENDED_RANGE_FORMAT (0x00000008)
+#define HV_FLUSH_USE_TARGET_VTL (0x00000010)
+#define HV_FLUSH_TARGET_VTL0 (0x00000100)
+#define HV_FLUSH_TARGET_VTL1 (0x00000200)
+#define HV_FLUSH_MASK ( \
+    HV_FLUSH_ALL_PROCESSORS | \
+    HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | \
+    HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY | \
+    HV_FLUSH_USE_EXTENDED_RANGE_FORMAT | \
+    HV_FLUSH_USE_TARGET_VTL | \
+    HV_FLUSH_TARGET_VTL0 | \
+    HV_FLUSH_TARGET_VTL1)
+
+typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
+{
+    HV_ADDRESS_SPACE_ID AddressSpace;
+    HV_FLUSH_FLAGS Flags;
+    HV_UINT64 ProcessorMask;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
+
+typedef struct _HV_GENERIC_SET
+{
+    HV_UINT64 Format;
+    HV_UINT64 ValidBanksMask;
+    HV_UINT64 BankContents[HV_ANYSIZE_ARRAY];
+} HV_GENERIC_SET, *PHV_GENERIC_SET, HV_VP_SET, *PHV_VP_SET;
+
+typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX
+{
+    HV_ADDRESS_SPACE_ID AddressSpace;
+    HV_FLUSH_FLAGS Flags;
+    HV_GENERIC_SET ProcessorSet;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX;
+
+typedef union _HV_GVA_RANGE_SIMPLE
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 12;
+        // The top 52 most significant bits of the guest virtual address.
+        HV_UINT64 GvaPageNumber : 52;
+    };
+} HV_GVA_RANGE_SIMPLE, *PHV_GVA_RANGE_SIMPLE;
+
+typedef union _HV_GVA_RANGE_EXTENDED
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 11;
+        // Is page size greater than 4 KB.
+        HV_UINT64 LargePage : 1;
+        union
+        {
+            // The top 52 most significant bits of the guest virtual address
+            // when `LargePage` is clear.
+            HV_UINT64 GvaPageNumber : 52;
+            struct
+            {
+                // The page size when `large_page`` is set.
+                // false: 2 MB
+                // true: 1 GB
+                HV_UINT64 PageSize : 1;
+                HV_UINT64 Reserved : 8;
+                // The top 43 most significant bits of the guest virtual address
+                // when `LargePage` is set.
+                HV_UINT64 GvaLargePageNumber : 43;
+            };
+        };
+    };
+} HV_GVA_RANGE_EXTENDED, *PHV_GVA_RANGE_EXTENDED;
+
+typedef union _HV_GVA_RANGE
+{
+    HV_UINT64 AsUINT64;
+    HV_GVA_RANGE_SIMPLE Simple;
+    HV_GVA_RANGE_EXTENDED Extended;
+} HV_GVA_RANGE, *PHV_GVA_RANGE;
+
+typedef union _HV_GPA_RANGE_SIMPLE
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 12;
+        // The top 52 most significant bits of the guest physical address.
+        HV_UINT64 GpaPageNumber : 52;
+    };
+} HV_GPA_RANGE_SIMPLE, *PHV_GPA_RANGE_SIMPLE;
+
+typedef union _HV_GPA_RANGE_EXTENDED
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 11;
+        // Is page size greater than 4 KB.
+        HV_UINT64 LargePage : 1;
+        union
+        {
+            // The top 52 most significant bits of the guest physical address
+            // when `LargePage` is clear.
+            HV_UINT64 GpaPageNumber : 52;
+            struct
+            {
+                // The page size when `large_page`` is set.
+                // false: 2 MB
+                // true: 1 GB
+                HV_UINT64 PageSize : 1;
+                HV_UINT64 Reserved : 8;
+                // The top 43 most significant bits of the guest physical address
+                // when `LargePage` is set.
+                HV_UINT64 GpaLargePageNumber : 43;
+            };
+        };
+    };
+} HV_GPA_RANGE_EXTENDED, *PHV_GPA_RANGE_EXTENDED;
+
+typedef union _HV_GPA_RANGE
+{
+    HV_UINT64 AsUINT64;
+    HV_GPA_RANGE_SIMPLE Simple;
+    HV_GPA_RANGE_EXTENDED Extended;
+} HV_GPA_RANGE, *PHV_GPA_RANGE;
+
+// Define interrupt vector type.
+typedef HV_UINT32 HV_INTERRUPT_VECTOR, *PHV_INTERRUPT_VECTOR;
+
+// Input for targeting a specific VTL.
+typedef union _HV_INPUT_VTL
+{
+    HV_UINT8 AsUINT8;
+    struct
+    {
+        HV_UINT8 TargetVtl : 4;
+        HV_UINT8 UseTargetVtl : 1;
+        HV_UINT8 ReservedZ : 3;
+    };
+} HV_INPUT_VTL, *PHV_INPUT_VTL;
+
 #if defined(_M_AMD64) || defined(_M_IX86)
 typedef struct _HV_X64_SEGMENT_REGISTER
 {
@@ -402,14 +556,52 @@ typedef struct _HV_INITIAL_VP_CONTEXT
 #endif
 } HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
 
+// The number of VTLs for which permissions can be specified in a VTL permission
+// set.
+#define HV_VTL_PERMISSION_SET_SIZE 2
+
+typedef union _HV_VTL_PERMISSION_SET
+{
+    HV_UINT32 AsUINT32;
+    // VTL permissions for the GPA page, starting from VTL 1.
+    HV_UINT16 VtlPermissionFrom1[HV_VTL_PERMISSION_SET_SIZE];
+} HV_VTL_PERMISSION_SET, *PHV_VTL_PERMISSION_SET;
+
+#define HV_ACCEPT_MEMORY_TYPE_ANY 0
+#define HV_ACCEPT_MEMORY_TYPE_RAM 1
+
 // HV Map GPA (Guest Physical Address) Flags
 // Definitions of flags to describe the access a partition has to a GPA page.
 // (used with HV_MAP_GPA_FLAGS).
 // The first byte is reserved for permissions.
+//
+// Notes from OpenVMM:
+// 
 
 #define HV_MAP_GPA_PERMISSIONS_NONE 0x0
 #define HV_MAP_GPA_READABLE 0x1
 #define HV_MAP_GPA_WRITABLE 0x2
+#define HV_MAP_GPA_KERNEL_EXECUTABLE 0x4
+#define HV_MAP_GPA_USER_EXECUTABLE 0x8
+#define HV_MAP_GPA_SUPERVISOR_SHADOW_STACK 0x10
+#define HV_MAP_GPA_PAGING_WRITABILITY 0x20
+#define HV_MAP_GPA_VERIFY_PAGING_WRITABILITY 0x40
+#define HV_MAP_GPA_ADJUSTABLE 0x8000
+
+#define HV_MAP_GPA_PERMISSIONS_ALL ( \
+    HV_MAP_GPA_READABLE | \
+    HV_MAP_GPA_WRITABLE | \
+    HV_MAP_GPA_KERNEL_EXECUTABLE | \
+    HV_MAP_GPA_USER_EXECUTABLE)
+
+// Host visibility used in hypercall inputs.
+// NOTE: While this is a 2 bit set with the lower bit representing host read
+// access and upper bit representing host write access, hardware platforms do
+// not support that form of isolation. Only support private or full shared in
+// this definition.
+
+#define HV_HOST_VISIBILITY_PRIVATE HV_MAP_GPA_PERMISSIONS_NONE
+#define HV_HOST_VISIBILITY_SHARED (HV_MAP_GPA_READABLE | HV_MAP_GPA_WRITABLE)
 
 // *****************************************************************************
 // CPUID Definitions
@@ -1796,16 +1988,6 @@ typedef union HV_DECLSPEC_ALIGN(16) _HV_UINT128
 #define HV_CALL_ALIGNMENT 8
 #define HV_CALL_ATTRIBUTES HV_DECLSPEC_ALIGN(HV_CALL_ALIGNMENT)
 
-// Address spaces presented by the guest.
-typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
-
-// Definition of the HvCallSwitchVirtualAddressSpace hypercall input structure.
-// This call switches the guest's virtual address space.
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE
-{
-    HV_ADDRESS_SPACE_ID AddressSpace;
-} HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE;
-
 // Define connection identifier type.
 typedef union _HV_CONNECTION_ID
 {
@@ -2304,24 +2486,6 @@ typedef union _HV_HYPERCALL_OUTPUT
     };
     HV_UINT64 AsUINT64;
 } HV_HYPERCALL_OUTPUT, *PHV_HYPERCALL_OUTPUT;
-
-// Definition of the HvPostMessage hypercall input structure.
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE
-{
-    HV_CONNECTION_ID ConnectionId;
-    HV_UINT32 Reserved;
-    HV_MESSAGE_TYPE MessageType;
-    HV_UINT32 PayloadSize;
-    HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
-} HV_INPUT_POST_MESSAGE, *PHV_INPUT_POST_MESSAGE;
-
-// Definition of the HvSignalEvent hypercall input structure.
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
-{
-    HV_CONNECTION_ID ConnectionId;
-    HV_UINT16 FlagNumber;
-    HV_UINT16 RsvdZ[3];
-} HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
 
 // Hypervisor register names for accessing a virtual processor's registers.
 typedef enum _HV_REGISTER_NAME
@@ -3024,6 +3188,166 @@ typedef union _HV_REGISTER_VALUE
     HV_UINT8 Reg8;
 } HV_REGISTER_VALUE, *PHV_REGISTER_VALUE;
 
+// HvCallSwitchVirtualAddressSpace | 0x0001
+
+// Definition of the HvCallSwitchVirtualAddressSpace hypercall input structure.
+// This call switches the guest's virtual address space.
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE
+{
+    HV_ADDRESS_SPACE_ID AddressSpace;
+} HV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_SWITCH_VIRTUAL_ADDRESS_SPACE;
+
+// HvCallFlushVirtualAddressSpace | 0x0002
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE
+{
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE;
+
+// HvCallFlushVirtualAddressList | 0x0003
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST
+{
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
+    // According to OpenVMM, GvaList seems to be HV_GVA_RANGE.
+    HV_GVA GvaList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
+
+// HvCallSendSyntheticClusterIpi | 0x000B
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI
+{
+    HV_INTERRUPT_VECTOR Vector;
+    HV_INPUT_VTL TargetVtl;
+    HV_UINT8 Flags;
+    HV_UINT16 Reserved;
+    HV_UINT64 ProcessorMask;
+} HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI;
+
+// HvCallModifyVtlProtectionMask | 0x000C
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_VTL_PROTECTION_MASK
+{
+    HV_PARTITION_ID TargetPartitionId;
+    HV_MAP_GPA_FLAGS MapFlags;
+    HV_INPUT_VTL TargetVtl;
+    HV_UINT8 RsvdZ8;
+    HV_UINT16 RsvdZ16;
+    HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_MODIFY_VTL_PROTECTION_MASK, *PHV_INPUT_MODIFY_VTL_PROTECTION_MASK;
+
+// HvCallEnablePartitionVtl | 0x000D
+
+typedef union _HV_ENABLE_PARTITION_VTL_FLAGS
+{
+    HV_UINT8 AsUINT8;
+    struct
+    {
+        HV_UINT8 EnableMbec : 1;
+        HV_UINT8 EnableSupervisorShadowStack : 1;
+        HV_UINT8 EnableHardwareHvpt : 1;
+        HV_UINT8 Reserved : 5;
+    };
+} HV_ENABLE_PARTITION_VTL_FLAGS, *PHV_ENABLE_PARTITION_VTL_FLAGS;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PARTITION_VTL
+{
+    HV_PARTITION_ID TargetPartitionId;
+    HV_VTL TargetVtl;
+    HV_ENABLE_PARTITION_VTL_FLAGS Flags;
+    HV_UINT16 ReservedZ0;
+    HV_UINT32 ReservedZ1;
+} HV_INPUT_ENABLE_PARTITION_VTL, *PHV_INPUT_ENABLE_PARTITION_VTL;
+
+// HvCallEnableVpVtl | 0x000F
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL TargetVtl;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+    HV_INITIAL_VP_CONTEXT VpVtlContext;
+} HV_INPUT_ENABLE_VP_VTL, *PHV_INPUT_ENABLE_VP_VTL;
+
+// HvCallVtlCall | 0x0011
+
+// This hypercall doesn't have input and output parameters.
+
+// HvCallVtlReturn | 0x0012
+
+// This hypercall doesn't have input and output parameters.
+
+// HvCallFlushVirtualAddressSpaceEx | 0x0013
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX
+{
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
+
+// HvCallFlushVirtualAddressListEx | 0x0014
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX
+{
+    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
+    // According to OpenVMM, followed by the variable-sized part of an
+    // HV_GVA_RANGE.
+} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
+
+// HvCallSendSyntheticClusterIpiEx | 0x0015
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX
+{
+    HV_INTERRUPT_VECTOR Vector;
+    HV_INPUT_VTL TargetVtl;
+    HV_UINT8 Flags;
+    HV_UINT16 Reserved;
+    HV_GENERIC_SET ProcessorSet;
+} HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX;
+
+// HvCallInstallIntercept | 0x004D
+
+// HvCallGetVpRegisters | 0x0050
+
+// HvCallSetVpRegisters | 0x0051
+
+// HvCallTranslateVirtualAddress | 0x0052
+
+// HvCallPostMessage | 0x005C
+
+// Definition of the HvPostMessage hypercall input structure.
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE
+{
+    HV_CONNECTION_ID ConnectionId;
+    HV_UINT32 Reserved;
+    HV_MESSAGE_TYPE MessageType;
+    HV_UINT32 PayloadSize;
+    HV_UINT64 Payload[HV_MESSAGE_PAYLOAD_QWORD_COUNT];
+} HV_INPUT_POST_MESSAGE, *PHV_INPUT_POST_MESSAGE;
+
+// HvCallSignalEvent | 0x005D
+
+// Definition of the HvSignalEvent hypercall input structure.
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
+{
+    HV_CONNECTION_ID ConnectionId;
+    HV_UINT16 FlagNumber;
+    HV_UINT16 RsvdZ;
+} HV_INPUT_SIGNAL_EVENT, *PHV_INPUT_SIGNAL_EVENT;
+
+// HvCallOutputDebugCharacter | 0x0071
+
+// HvCallGetSystemProperty | 0x007B
+
+// HvCallRetargetDeviceInterrupt | 0x007E
+
+// HvCallNotifyPartitionEvent | 0x0087
+
+// HvCallAssertVirtualInterrupt | 0x0094
+
+// HvCallStartVirtualProcessor | 0x0099
+
 // Definition for HvStartVirtualProcessor hypercall input structure.
 // This sets the values provided in VpContext and makes the said Vp runnable.
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
@@ -3036,18 +3360,119 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
     HV_INITIAL_VP_CONTEXT VpContext;
 } HV_INPUT_START_VIRTUAL_PROCESSOR, *PHV_INPUT_START_VIRTUAL_PROCESSOR;
 
+// HvCallGetVpIndexFromApicId | 0x009A
+
+// HvCallTranslateVirtualAddressEx | 0x00AC
+
+// HvCallCheckForIoIntercept | 0x00AD
+
+// HvCallFlushGuestPhysicalAddressSpace | 0x00AF
+
+// HvCallFlushGuestPhysicalAddressList | 0x00B0
+
+// HvCallSignalEventDirect | 0x00C0
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT_DIRECT
+{
+    HV_UINT64 TargetPartition;
+    HV_VP_INDEX TargetVp;
+    HV_VTL TargetVtl;
+    HV_UINT8 TargetSint;
+    HV_UINT16 FlagNumber;
+} HV_INPUT_SIGNAL_EVENT_DIRECT, *PHV_INPUT_SIGNAL_EVENT_DIRECT;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_SIGNAL_EVENT_DIRECT
+{
+    HV_UINT8 NewlySignaled;
+    HV_UINT8 Reserved[7];
+} HV_OUTPUT_SIGNAL_EVENT_DIRECT, *PHV_OUTPUT_SIGNAL_EVENT_DIRECT;
+
+// HvCallPostMessageDirect | 0x00C1
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE_DIRECT
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VP_INDEX VpIndex;
+    HV_VTL Vtl;
+    HV_UINT32 SintIndex;
+    HV_UINT8 Message[HV_MESSAGE_SIZE];
+} HV_INPUT_POST_MESSAGE_DIRECT, *PHV_INPUT_POST_MESSAGE_DIRECT;
+
+// HvCallCheckSparseGpaPageVtlAccess | 0x00D4
+
+// HvCallAcceptGpaPages | 0x00D9
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ACCEPT_GPA_PAGES
+{
+    // Supplies the partition ID of the partition this request is for.
+    HV_PARTITION_ID TargetPartitionId;
+
+    // Supplies attributes of the pages being accepted, such as whether they
+    // should be made host visible.
+
+    // Supplies the expected memory type. (HV_ACCEPT_MEMORY_TYPE_*)
+    HV_UINT32 MemoryType : 6;
+    // Supplies the initial host visibility (exclusive, shared read-only,
+    // shared read-write). (HV_HOST_VISIBILITY_*)
+    HV_UINT32 HostVisibility : 2;
+    // Supplies the set of VTLs for which initial VTL permissions will be set.
+    HV_UINT32 VtlSet : 3;
+    HV_UINT32 Reserved : 21;
+
+    // Supplies the set of initial VTL permissions.
+    HV_VTL_PERMISSION_SET VtlPermissionSet;
+    // Supplies the GPA page number of the first page to modify.
+    HV_GPA_PAGE_NUMBER GpaPageBase;
+} HV_INPUT_ACCEPT_GPA_PAGES, *PHV_INPUT_ACCEPT_GPA_PAGES;
+
+// HvCallUnacceptGpaPages | 0x00DA
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNACCEPT_GPA_PAGES
+{
+    // Supplies the partition ID of the partition this request is for.
+    HV_PARTITION_ID TargetPartitionId;
+
+    // Supplies the set of VTLs for which VTL permissions will be checked.
+
+    HV_UINT32 VtlSet : 3;
+    HV_UINT32 Reserved : 29;
+
+    //  Supplies the set of VTL permissions to check against.
+    HV_VTL_PERMISSION_SET VtlPermissionSet;
+    // Supplies the GPA page number of the first page to modify.
+    HV_GPA_PAGE_NUMBER GpaPageBase;
+} HV_INPUT_UNACCEPT_GPA_PAGES, *PHV_INPUT_UNACCEPT_GPA_PAGES;
+
+// HvCallModifySparseGpaPageHostVisibility | 0x00DB
+
 // Definitions for the HvCallModifySparseGpaPageHostVisibility hypercall.
 typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY
 {
     // Supplies the partition ID of the partition this request is for.
     HV_PARTITION_ID TargetPartitionId;
-    // Supplies the new host visibility.
+    // Supplies the new host visibility. (HV_HOST_VISIBILITY_*)
     HV_UINT32 HostVisibility : 2;
     HV_UINT32 Reserved0 : 30;
     HV_UINT32 Reserved1;
     // Supplies an array of GPA page numbers to modify.
     HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
 } HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
+
+// HvCallMemoryMappedIoRead | 0x0106
+
+// HvCallMemoryMappedIoWrite | 0x0107
+
+// HvCallPinGpaPageRanges | 0x0112
+
+// HvCallUnpinGpaPageRanges | 0x0113
+
+// HvCallQuerySparseGpaPageHostVisibility | 0x011C
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILITY
+{
+    HV_PARTITION_ID TargetPartitionId;
+    HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)

@@ -1048,9 +1048,6 @@ typedef enum _HV_INTERRUPT_TYPE
 #endif
 } HV_INTERRUPT_TYPE, *PHV_INTERRUPT_TYPE;
 
-// Define interrupt vector type.
-typedef HV_UINT32 HV_INTERRUPT_VECTOR, *PHV_INTERRUPT_VECTOR;
-
 // Define special "no interrupt vector" value used by hypercalls that indicate
 // whether the previous virtual interrupt was acknowledged.
 #define HV_INTERRUPT_VECTOR_NONE 0xFFFFFFFF
@@ -2439,18 +2436,6 @@ typedef const HV_INTERCEPT_DESCRIPTOR* PCHV_INTERCEPT_DESCRIPTOR;
 
 #define HV_MAX_VP_INDEX (HV_MAXIMUM_PROCESSORS - 1)
 
-// Address space flush flags.
-typedef HV_UINT64 HV_FLUSH_FLAGS, *PHV_FLUSH_FLAGS;
-
-#define HV_FLUSH_ALL_PROCESSORS (0x00000001)
-#define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES (0x00000002)
-#define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY (0x00000004)
-#define HV_FLUSH_USE_EXTENDED_RANGE_FORMAT (0x00000008)
-#define HV_FLUSH_MASK (HV_FLUSH_ALL_PROCESSORS | \
-                       HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | \
-                       HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY | \
-                       HV_FLUSH_USE_EXTENDED_RANGE_FORMAT)
-
 // The call HvTranslateVirtualAddress takes a collection of input control flags
 // and returns a result code and a collection of output flags. The input control
 // flags are defined as follows:
@@ -2504,18 +2489,6 @@ typedef union _HV_TRANSLATE_GVA_RESULT
     };
 } HV_TRANSLATE_GVA_RESULT, *PHV_TRANSLATE_GVA_RESULT;
 
-// Input for targeting a specific VTL.
-typedef union _HV_INPUT_VTL
-{
-    HV_UINT8 AsUINT8;
-    struct
-    {
-        HV_UINT8 TargetVtl : 4;
-        HV_UINT8 UseTargetVtl : 1;
-        HV_UINT8 ReservedZ : 3;
-    };
-} HV_INPUT_VTL, *PHV_INPUT_VTL;
-
 // Read and write GPA access flags.
 typedef union _HV_ACCESS_GPA_CONTROL_FLAGS
 {
@@ -2567,52 +2540,8 @@ typedef enum _HV_CACHE_TYPE
 
 // HV Map GPA (Guest Physical Address) Flags
 
-#define HV_MAP_GPA_KERNEL_EXECUTABLE 0x00000004
-#define HV_MAP_GPA_USER_EXECUTABLE 0x00000008
 #define HV_MAP_GPA_EXECUTABLE 0x0000000C
 #define HV_MAP_GPA_PERMISSIONS_MASK 0x0000000F
-
-typedef union _HV_GVA_RANGE_SIMPLE
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        // Additional pages supplies the number of pages beyond one.
-        HV_UINT64 AdditionalPages : 12;
-        // GvaPageNumber supplies the top 54 most significant bits of the guest
-        // virtual address space.
-        HV_UINT64 GvaPageNumber : 52;
-    };
-} HV_GVA_RANGE_SIMPLE, *PHV_GVA_RANGE_SIMPLE;
-
-typedef union _HV_GVA_RANGE_EXTENDED
-{
-    HV_UINT64 AsUINT64;
-    struct
-    {
-        HV_UINT64 AdditionalPages : 11;
-        HV_UINT64 LargePage : 1;
-        union
-        {
-            HV_UINT64 GvaPageNumber : 52;
-            struct
-            {
-                HV_UINT64 PageSize : 1;
-                HV_UINT64 Reserved : 8;
-                HV_UINT64 GvaLargePageNumber : 43;
-            };
-        };
-    };
-} HV_GVA_RANGE_EXTENDED, *PHV_GVA_RANGE_EXTENDED;
-
-// Gva Range
-// The GVA range is a compressed range of GVA used by the TLB flush routines.
-typedef union _HV_GVA_RANGE
-{
-    HV_UINT64 AsUINT64;
-    HV_GVA_RANGE_SIMPLE Simple;
-    HV_GVA_RANGE_EXTENDED Extended;
-} HV_GVA_RANGE, *PHV_GVA_RANGE;
 
 // Define index of synthetic interrupt source that receives intercept messages.
 
@@ -4860,13 +4789,6 @@ typedef struct _HV_GENERIC_SET_HEADER
     HV_UINT64 ValidBanksMask;
 } HV_GENERIC_SET_HEADER, *PHV_GENERIC_SET_HEADER;
 
-typedef struct _HV_GENERIC_SET
-{
-    HV_UINT64 Format;
-    HV_UINT64 ValidBanksMask;
-    HV_UINT64 BankContents[HV_ANYSIZE_ARRAY];
-} HV_GENERIC_SET, *PHV_GENERIC_SET, HV_VP_SET, *PHV_VP_SET;
-
 typedef HV_UINT32 HV_APIC_ID;
 typedef HV_APIC_ID* PHV_APIC_ID;
 typedef const HV_APIC_ID* PCHV_APIC_ID;
@@ -6276,20 +6198,6 @@ typedef enum _HV_SUBNODE_TYPE
     HvSubnodeCount = 0x4,
     HvSubnodeInvalid = 0xFFFFFFFF,
 } HV_SUBNODE_TYPE, *PHV_SUBNODE_TYPE;
-
-typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
-{
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_UINT64 ProcessorMask;
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
-
-typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX
-{
-    HV_ADDRESS_SPACE_ID AddressSpace;
-    HV_FLUSH_FLAGS Flags;
-    HV_GENERIC_SET ProcessorSet;
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX;
 
 typedef union _HV_GPA_PAGE_ATTRIBUTES
 {
@@ -8323,12 +8231,6 @@ typedef struct _HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE
     HV_UINT32 Count;
 } HV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE, *PHV_PHYSICAL_DEVICE_PROPERTY_IRT_RANGE;
 
-typedef union _HV_VTL_PERMISSION_SET
-{
-    HV_UINT32 AsUINT32;
-    HV_UINT16 VtlPermissionFrom1[2];
-} HV_VTL_PERMISSION_SET, *PHV_VTL_PERMISSION_SET;
-
 typedef union _HV_GPA_PAGE_MAPPING_DATA
 {
     HV_UINT64 AsUINT64;
@@ -9964,18 +9866,11 @@ typedef HV_HYPERCALL_OUTPUT(*PHVCALL_HYPERCALL_ROUTINE)(
 
 // HvCallFlushVirtualAddressSpace | 0x0002
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE
-{
-    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallFlushVirtualAddressList | 0x0003
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST
-{
-    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER Header;
-    HV_GVA GvaList[];
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallGetLogicalProcessorRunTime | 0x0004
 
@@ -10038,49 +9933,15 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_INVOKE_HYPERVISOR_DEBUGGER
 
 // HvCallSendSyntheticClusterIpi | 0x000B
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI
-{
-    HV_INTERRUPT_VECTOR Vector;
-    HV_INPUT_VTL TargetVtl;
-    HV_UINT8 RsvdZ0;
-    HV_UINT16 RsvdZ1;
-    HV_UINT64 ProcessorMask;
-} HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallModifyVtlProtectionMask | 0x000C
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_VTL_PROTECTION_MASK
-{
-    HV_PARTITION_ID TargetPartitionId;
-    HV_MAP_GPA_FLAGS MapFlags;
-    HV_INPUT_VTL TargetVtl;
-    HV_UINT8 RsvdZ8;
-    HV_UINT16 RsvdZ16;
-    HV_GPA_PAGE_NUMBER GpaPageList[];
-} HV_INPUT_MODIFY_VTL_PROTECTION_MASK, *PHV_INPUT_MODIFY_VTL_PROTECTION_MASK;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallEnablePartitionVtl | 0x000D
 
-typedef union _HV_ENABLE_PARTITION_VTL_FLAGS
-{
-    HV_UINT8 AsUINT8;
-    struct
-    {
-        HV_UINT8 EnableMbec : 1;
-        HV_UINT8 EnableSupervisorShadowStack : 1;
-        HV_UINT8 EnableHardwareHvpt : 1;
-        HV_UINT8 Reserved : 5;
-    };
-} HV_ENABLE_PARTITION_VTL_FLAGS, *PHV_ENABLE_PARTITION_VTL_FLAGS;
-
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_PARTITION_VTL
-{
-    HV_PARTITION_ID TargetPartitionId;
-    HV_VTL TargetVtl;
-    HV_ENABLE_PARTITION_VTL_FLAGS Flags;
-    HV_UINT16 ReservedZ0;
-    HV_UINT32 ReservedZ1;
-} HV_INPUT_ENABLE_PARTITION_VTL, *PHV_INPUT_ENABLE_PARTITION_VTL;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallDisablePartitionVtl | 0x000E
 
@@ -10105,15 +9966,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_PARTITION_VTL
 
 // HvCallEnableVpVtl | 0x000F
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ENABLE_VP_VTL
-{
-    HV_PARTITION_ID PartitionId;
-    HV_VP_INDEX VpIndex;
-    HV_VTL TargetVtl;
-    HV_UINT8 ReservedZ0;
-    HV_UINT16 ReservedZ1;
-    HV_INITIAL_VP_CONTEXT VpVtlContext;
-} HV_INPUT_ENABLE_VP_VTL, *PHV_INPUT_ENABLE_VP_VTL;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallDisableVpVtl | 0x0010
 
@@ -10138,36 +9991,23 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DISABLE_VP_VTL
 
 // HvCallVtlCall | 0x0011
 
-/* This hypercall doesn't have input and output parameters. */
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallVtlReturn | 0x0012
 
-/* This hypercall doesn't have input and output parameters. */
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallFlushVirtualAddressSpaceEx | 0x0013
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX
-{
-    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallFlushVirtualAddressListEx | 0x0014
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX
-{
-    HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER_EX Header;
-} HV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_LIST_EX;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallSendSyntheticClusterIpiEx | 0x0015
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX
-{
-    HV_INTERRUPT_VECTOR Vector;
-    HV_INPUT_VTL TargetVtl;
-    HV_UINT8 RsvdZ0;
-    HV_UINT16 RsvdZ1;
-    HV_GENERIC_SET ProcessorSet;
-} HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX, *PHV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI_EX;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallQueryImageInfo | 0x0016
 
@@ -11928,31 +11768,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNCOMMIT_GPA_PAGES
 
 // HvCallSignalEventDirect | 0x00C0
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT_DIRECT
-{
-    HV_UINT64 TargetPartition;
-    HV_VP_INDEX TargetVp;
-    HV_VTL TargetVtl;
-    HV_UINT8 TargetSint;
-    HV_UINT16 FlagNumber;
-} HV_INPUT_SIGNAL_EVENT_DIRECT, *PHV_INPUT_SIGNAL_EVENT_DIRECT;
-
-typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_SIGNAL_EVENT_DIRECT
-{
-    HV_UINT8 NewlySignaled;
-    HV_UINT8 Reserved[7];
-} HV_OUTPUT_SIGNAL_EVENT_DIRECT, *PHV_OUTPUT_SIGNAL_EVENT_DIRECT;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallPostMessageDirect | 0x00C1
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE_DIRECT
-{
-    HV_PARTITION_ID PartitionId;
-    HV_VP_INDEX VpIndex;
-    HV_VTL Vtl;
-    HV_UINT32 SintIndex;
-    HV_UINT8 Message[HV_MESSAGE_SIZE];
-} HV_INPUT_POST_MESSAGE_DIRECT, *PHV_INPUT_POST_MESSAGE_DIRECT;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallDispatchVp | 0x00C2
 
@@ -12156,27 +11976,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_SPA_PAGE_HOST_ACCESS
 
 // HvCallAcceptGpaPages | 0x00D9
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ACCEPT_GPA_PAGES
-{
-    HV_PARTITION_ID TargetPartitionId;
-    HV_UINT32 MemoryType : 6;
-    HV_UINT32 HostVisibility : 2;
-    HV_UINT32 VtlSet : 3;
-    HV_UINT32 Reserved : 21;
-    HV_VTL_PERMISSION_SET VtlPermissionSet;
-    HV_GPA_PAGE_NUMBER GpaPageBase;
-} HV_INPUT_ACCEPT_GPA_PAGES, *PHV_INPUT_ACCEPT_GPA_PAGES;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallUnacceptGpaPages | 0x00DA
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNACCEPT_GPA_PAGES
-{
-    HV_PARTITION_ID TargetPartitionId;
-    HV_UINT32 VtlSet : 3;
-    HV_UINT32 Reserved : 29;
-    HV_VTL_PERMISSION_SET VtlPermissionSet;
-    HV_GPA_PAGE_NUMBER GpaPageBase;
-} HV_INPUT_UNACCEPT_GPA_PAGES, *PHV_INPUT_UNACCEPT_GPA_PAGES;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallModifySparseGpaPageHostVisibility | 0x00DB
 
