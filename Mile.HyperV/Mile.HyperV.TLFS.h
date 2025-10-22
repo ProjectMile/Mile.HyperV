@@ -69,8 +69,6 @@ typedef struct HV_DECLSPEC_ALIGN(64) _HV_UINT512
     HV_UINT256 High128;
 } HV_UINT512, *PHV_UINT512;
 
-#define HV_CALL_ATTRIBUTES_ALIGNED(__alignment__) HV_DECLSPEC_ALIGN(__alignment__)
-
 // Memory Types
 //
 // System physical addresses (SPAs) define the physical address space of the
@@ -107,7 +105,6 @@ typedef HV_UINT64 HV_SPA, *PHV_SPA;
 #endif
 
 typedef HV_UINT64 HV_SPA_PAGE_NUMBER, *PHV_SPA_PAGE_NUMBER;
-typedef HV_UINT64 HV_GVA_PAGE_NUMBER, *PHV_GVA_PAGE_NUMBER;
 
 typedef const HV_SPA_PAGE_NUMBER *PCHV_SPA_PAGE_NUMBER;
 typedef const HV_GPA_PAGE_NUMBER *PCHV_GPA_PAGE_NUMBER;
@@ -2229,23 +2226,7 @@ typedef union _HV_X64_MSR_NPIEP_CONFIG_CONTENTS
     };
 } HV_X64_MSR_NPIEP_CONFIG_CONTENTS, *PHV_X64_MSR_NPIEP_CONFIG_CONTENTS;
 
-#if defined(_M_AMD64) || defined(_M_IX86)
-typedef union _HV_X64_PENDING_EXCEPTION_EVENT
-{
-    HV_UINT64 AsUINT64[2];
-    struct
-    {
-        HV_UINT32 EventPending : 1;
-        HV_UINT32 EventType : 3;
-        HV_UINT32 Reserved0 : 4;
-        HV_UINT32 DeliverErrorCode : 1;
-        HV_UINT32 Reserved1 : 7;
-        HV_UINT32 Vector : 16;
-        HV_UINT32 ErrorCode;
-        HV_UINT64 ExceptionParameter;
-    };
-} HV_X64_PENDING_EXCEPTION_EVENT, *PHV_X64_PENDING_EXCEPTION_EVENT;
-#elif defined(_M_ARM64)
+#if defined(_M_ARM64)
 typedef union _HV_ARM64_PENDING_EXCEPTION_EVENT
 {
     HV_UINT64 AsUINT64[3];
@@ -2259,21 +2240,6 @@ typedef union _HV_ARM64_PENDING_EXCEPTION_EVENT
     };
 } HV_ARM64_PENDING_EXCEPTION_EVENT, *PHV_ARM64_PENDING_EXCEPTION_EVENT;
 #endif
-
-typedef union _HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT
-{
-    HV_UINT64 AsUINT64[2];
-    struct
-    {
-        HV_UINT32 EventPending : 1;
-        HV_UINT32 EventType : 3;
-        HV_UINT32 Reserved0 : 4;
-        HV_UINT32 Reserved1 : 8;
-        HV_UINT32 Parameter0 : 16;
-        HV_UINT32 Code;
-        HV_UINT64 Parameter1;
-    };
-} HV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT, *PHV_X64_PENDING_VIRTUALIZATION_FAULT_EVENT;
 
 #if defined(_M_ARM64)
 typedef enum _HV_ARM64_PENDING_INTERRUPTION_TYPE
@@ -2331,8 +2297,6 @@ typedef union _HV_REGISTER_VALUE_PRIVATE
     HV_X64_FP_REGISTER Fp;
     HV_X64_FP_CONTROL_STATUS_REGISTER FpControlStatus;
     HV_X64_XMM_CONTROL_STATUS_REGISTER XmmControlStatus;
-    HV_X64_SEGMENT_REGISTER Segment;
-    HV_X64_TABLE_REGISTER Table;
     HV_X64_INTERRUPT_STATE_REGISTER InterruptState;
     HV_X64_PENDING_INTERRUPTION_REGISTER PendingInterruption;
     HV_X64_MSR_NPIEP_CONFIG_CONTENTS NpiepConfig;
@@ -2342,77 +2306,46 @@ typedef union _HV_REGISTER_VALUE_PRIVATE
 } HV_REGISTER_VALUE_PRIVATE, *PHV_REGISTER_VALUE_PRIVATE;
 typedef const HV_REGISTER_VALUE* PCHV_REGISTER_VALUE;
 
-// Define the intercept access types.
-
-#define HV_INTERCEPT_ACCESS_READ 0
-#define HV_INTERCEPT_ACCESS_WRITE 1
-#define HV_INTERCEPT_ACCESS_EXECUTE 2
-
-typedef HV_UINT32 HV_INTERCEPT_ACCESS_TYPE_MASK;
-
-// Access types for the install intercept hypercall parameter
-
-#define HV_INTERCEPT_ACCESS_MASK_NONE 0x00
-#define HV_INTERCEPT_ACCESS_MASK_READ 0x01
-#define HV_INTERCEPT_ACCESS_MASK_WRITE 0x02
-#define HV_INTERCEPT_ACCESS_MASK_EXECUTE 0x04
-
 // Define intercept types.
-typedef enum _HV_INTERCEPT_TYPE
+typedef enum _HV_INTERCEPT_TYPE_PRIVATE
 {
     // Platform-specific intercept types.
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-    HvInterceptTypeX64IoPort = 0x00000000,
-    HvInterceptTypeX64Msr = 0x00000001,
-    HvInterceptTypeX64Cpuid = 0x00000002,
     HvInterceptTypeX64Exception = 0x00000003,
     HvInterceptTypeRegister = 0x00000004,
     HvInterceptTypeMmio = 0x00000005,
     HvInterceptTypeX64GlobalCpuid = 0x00000006,
     HvInterceptTypeX64ApicSmi = 0x00000007,
-    HvInterceptTypeHypercall = 0x00000008,
     HvInterceptTypeX64ApicInitSipi = 0x00000009,
     HvInterceptTypeX64ApicWrite = 0x0000000B,
     HvInterceptTypeX64MsrIndex = 0x0000000C,
     HvInterceptTypeMax,
 #elif defined(_M_ARM64)
-    HvInterceptTypeException = 0x00000003,
     HvInterceptTypeReserved0 = 0x00000004,
     HvInterceptTypeMmio = 0x00000005,
-    HvInterceptTypeHypercall = 0x00000008,
-    HvInterceptTypeUnknownSynicConnection = 0x0000000D,
-    HvInterceptTypeRetargetInterruptWithUnknownDeviceId = 0x0000000F,
     HvInterceptTypeRegister = 0x00000012,
     HvInterceptTypeMax = 0x00000013,
 #endif
     HvInterceptTypeInvalid = 0xFFFFFFFF
-} HV_INTERCEPT_TYPE, *PHV_INTERCEPT_TYPE;
+} HV_INTERCEPT_TYPE_PRIVATE, *PHV_INTERCEPT_TYPE_PRIVATE;
 
 // Define IO port type.
 typedef HV_UINT16 HV_X64_IO_PORT, *PHV_X64_IO_PORT;
 
 // Define intercept parameters.
-typedef union _HV_INTERCEPT_PARAMETERS
+typedef union _HV_INTERCEPT_PARAMETERS_PRIVATE
 {
     // HV_INTERCEPT_PARAMETERS is defined to be an 8-byte field.
     HV_UINT64 AsUINT64;
 #if defined(_M_AMD64) || defined(_M_IX86)
-    // HvInterceptTypeX64IoPort.
-    HV_X64_IO_PORT IoPort;
-    // HvInterceptTypeX64Cpuid.
-    HV_UINT32 CpuidIndex;
     // HvInterceptTypeX64ApicWrite
     HV_UINT32 ApicWriteMask;
-    // HvInterceptTypeX64Exception.
-    HV_UINT16 ExceptionVector;
     // HvInterceptTypeX64MsrIndex
     HV_UINT32 MsrIndex;
     // N.B. Other intercept types do not have any paramaters.
-#elif defined(_M_ARM64)
-    HV_UINT16 ExceptionVector;
 #endif
-} HV_INTERCEPT_PARAMETERS, *PHV_INTERCEPT_PARAMETERS;
+} HV_INTERCEPT_PARAMETERS_PRIVATE, *PHV_INTERCEPT_PARAMETERS_PRIVATE;
 
 typedef union _HV_INTERCEPT_PARAMETERS_EX
 {
@@ -2435,59 +2368,6 @@ typedef struct _HV_INTERCEPT_DESCRIPTOR
 typedef const HV_INTERCEPT_DESCRIPTOR* PCHV_INTERCEPT_DESCRIPTOR;
 
 #define HV_MAX_VP_INDEX (HV_MAXIMUM_PROCESSORS - 1)
-
-// The call HvTranslateVirtualAddress takes a collection of input control flags
-// and returns a result code and a collection of output flags. The input control
-// flags are defined as follows:
-
-typedef HV_UINT64 HV_TRANSLATE_GVA_CONTROL_FLAGS, *PHV_TRANSLATE_GVA_CONTROL_FLAGS;
-
-#define HV_TRANSLATE_GVA_VALIDATE_READ 0x0001
-#define HV_TRANSLATE_GVA_VALIDATE_WRITE 0x0002
-#define HV_TRANSLATE_GVA_VALIDATE_EXECUTE 0x0004
-#define HV_TRANSLATE_GVA_PRIVILEGE_EXEMPT 0x0008
-#define HV_TRANSLATE_GVA_SET_PAGE_TABLE_BITS 0x0010
-#define HV_TRANSLATE_GVA_TLB_FLUSH_INHIBIT 0x0020
-#define HV_TRANSLATE_GVA_CONTROL_MASK (0x003F)
-#define HV_TRANSLATE_GVA_INPUT_VTL_MASK (0xFF00000000000000)
-
-typedef enum _HV_TRANSLATE_GVA_RESULT_CODE
-{
-    HvTranslateGvaSuccess = 0,
-
-    // Translation failures
-
-    HvTranslateGvaPageNotPresent = 1,
-    HvTranslateGvaPrivilegeViolation = 2,
-    HvTranslateGvaInvalidPageTableFlags = 3,
-
-    // GPA access failures
-
-    HvTranslateGvaGpaUnmapped = 4,
-    HvTranslateGvaGpaNoReadAccess = 5,
-    HvTranslateGvaGpaNoWriteAccess = 6,
-    HvTranslateGvaGpaIllegalOverlayAccess = 7,
-
-    // Intercept of the memory access by either
-    // - a higher VTL
-    // - a nested hypervisor (due to a violation of the nested page table)
-    HvTranslateGvaIntercept = 8,
-
-    HvTranslateGvaGpaUnaccepted = 9
-} HV_TRANSLATE_GVA_RESULT_CODE, *PHV_TRANSLATE_GVA_RESULT_CODE;
-
-typedef union _HV_TRANSLATE_GVA_RESULT
-{
-    HV_UINT64 AsUINT64;
-
-    struct
-    {
-        HV_TRANSLATE_GVA_RESULT_CODE ResultCode;
-        HV_UINT32 CacheType : 8;
-        HV_UINT32 OverlayPage : 1;
-        HV_UINT32 Reserved3 : 23;
-    };
-} HV_TRANSLATE_GVA_RESULT, *PHV_TRANSLATE_GVA_RESULT;
 
 // Read and write GPA access flags.
 typedef union _HV_ACCESS_GPA_CONTROL_FLAGS
@@ -4807,14 +4687,7 @@ typedef const HV_VTL* PCHV_VTL;
 #define HV_INVALID_VTL ((HV_VTL)-1)
 #define HV_VTL_ALL 0xF
 
-#if defined(_M_AMD64) || defined(_M_IX86)
-typedef enum _HV_X64_PENDING_EVENT_TYPE
-{
-    HvX64PendingEventException = 0x0,
-    HvX64PendingEventMemoryIntercept = 0x1,
-    HvX64PendingEventNestedMemoryIntercept = 0x2,
-} HV_X64_PENDING_EVENT_TYPE, *PHV_X64_PENDING_EVENT_TYPE;
-#elif defined(_M_ARM64)
+#if defined(_M_ARM64)
 typedef enum _HV_ARM64_PENDING_EVENT_TYPE
 {
     HvArm64PendingEventException = 0x0,
@@ -4824,25 +4697,6 @@ typedef enum _HV_ARM64_PENDING_EVENT_TYPE
 #endif
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef union _HV_X64_PENDING_MEMORY_INTERCEPT_EVENT
-{
-    HV_UINT64 AsUINT64[4];
-    struct
-    {
-        HV_UINT8 EventPending : 1;
-        HV_UINT8 EventType : 3;
-        HV_UINT8 Reserved0 : 4;
-        HV_VTL TargetVtl;
-        HV_UINT8 AccessType;
-        HV_UINT8 GuestLinearAddressValid : 1;
-        HV_UINT8 Reserved1 : 7;
-        HV_UINT32 Reserved2;
-        HV_UINT64 GuestLinearAddress;
-        HV_UINT64 GuestPhysicalAddress;
-        HV_UINT64 Reserved3;
-    };
-} HV_X64_PENDING_MEMORY_INTERCEPT_EVENT, *PHV_X64_PENDING_MEMORY_INTERCEPT_EVENT;
-
 typedef union _HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT
 {
     HV_UINT64 AsUINT64[4];
@@ -4882,24 +4736,10 @@ typedef union _HV_ARM64_PENDING_HYPERCALL_OUTPUT_EVENT
 #endif
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef union _HV_X64_PENDING_EVENT
+typedef union _HV_X64_PENDING_EVENT_PRIVATE
 {
-    struct
-    {
-        HV_UINT128 Reg0;
-        HV_UINT128 Reg1;
-    };
-    struct
-    {
-        HV_UINT8 EventPending : 1;
-        HV_UINT8 EventType : 3; // HV_X64_PENDING_EVENT_TYPE
-        HV_UINT8 Reserved : 4;
-        HV_UINT8 EventData[15];
-    };
-    HV_X64_PENDING_EXCEPTION_EVENT Exception;
-    HV_X64_PENDING_MEMORY_INTERCEPT_EVENT MemoryIntercept;
     HV_X64_PENDING_NESTED_MEMORY_INTERCEPT_EVENT NestedMemoryIntercept;
-} HV_X64_PENDING_EVENT, *PHV_X64_PENDING_EVENT;
+} HV_X64_PENDING_EVENT_PRIVATE, *PHV_X64_PENDING_EVENT_PRIVATE;
 #elif defined(_M_ARM64)
 typedef union _HV_ARM64_PENDING_EVENT
 {
@@ -4920,19 +4760,6 @@ typedef union _HV_ARM64_PENDING_EVENT
     HV_ARM64_PENDING_HYPERCALL_OUTPUT_EVENT HypercallOutput;
 } HV_ARM64_PENDING_EVENT, *PHV_ARM64_PENDING_EVENT;
 #endif
-
-typedef struct _HV_TRANSLATE_GVA_RESULT_EX
-{
-    HV_TRANSLATE_GVA_RESULT_CODE ResultCode;
-    HV_UINT32 CacheType : 8;
-    HV_UINT32 OverlayPage : 1;
-    HV_UINT32 Reserved : 23;
-#if defined(_M_AMD64) || defined(_M_IX86)
-    HV_X64_PENDING_EVENT EventInfo; // Not in TLFS
-#elif defined(_M_ARM64)
-    HV_ARM64_PENDING_EVENT EventInfo; // I guess should have that.
-#endif
-} HV_TRANSLATE_GVA_RESULT_EX, *PHV_TRANSLATE_GVA_RESULT_EX;
 
 /* Virtual Interrupt */
 
@@ -10385,13 +10212,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNMAP_GPA_PAGES
 
 // HvCallInstallIntercept | 0x004D
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_INSTALL_INTERCEPT
-{
-    HV_PARTITION_ID PartitionId;
-    HV_INTERCEPT_ACCESS_TYPE_MASK AccessType;
-    HV_INTERCEPT_TYPE InterceptType;
-    HV_INTERCEPT_PARAMETERS InterceptParameter;
-} HV_INPUT_INSTALL_INTERCEPT, *PHV_INPUT_INSTALL_INTERCEPT;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallCreateVp | 0x004E
 
@@ -10425,15 +10246,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_DELETE_VP
 
 // HvCallGetVpRegisters | 0x0050
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_REGISTERS
-{
-    HV_PARTITION_ID PartitionId;
-    HV_VP_INDEX VpIndex;
-    HV_INPUT_VTL InputVtl;
-    HV_UINT8 RsvdZ8;
-    HV_UINT16 RsvdZ16;
-    HV_REGISTER_NAME Names[];
-} HV_INPUT_GET_VP_REGISTERS, *PHV_INPUT_GET_VP_REGISTERS;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_OUTPUT_GET_VP_REGISTERS
 {
@@ -10442,46 +10255,11 @@ typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_OUTPUT_GET_VP_REGISTERS
 
 // HvCallSetVpRegisters | 0x0051
 
-typedef struct _HV_REGISTER_ASSOC
-{
-    HV_REGISTER_NAME Name;
-    HV_UINT32 Reserved1;
-    HV_UINT64 Reserved2;
-    HV_REGISTER_VALUE Value;
-} HV_REGISTER_ASSOC, *PHV_REGISTER_ASSOC;
-
-typedef struct HV_CALL_ATTRIBUTES_ALIGNED(16) _HV_INPUT_SET_VP_REGISTERS
-{
-    HV_PARTITION_ID PartitionId;
-    HV_VP_INDEX VpIndex;
-    HV_INPUT_VTL InputVtl;
-    HV_UINT8 RsvdZ8;
-    HV_UINT16 RsvdZ16;
-    HV_REGISTER_ASSOC Elements[];
-} HV_INPUT_SET_VP_REGISTERS, *PHV_INPUT_SET_VP_REGISTERS;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallTranslateVirtualAddress | 0x0052
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_TRANSLATE_VIRTUAL_ADDRESS
-{
-    // Supplies the partition ID of the partition in which the translation
-    // should take place.
-    HV_PARTITION_ID PartitionId;
-    // Supplies the virtual processor whose GVA space is to be accessed.
-    HV_VP_INDEX VpIndex;
-    // Supplies the control flags governing the access.
-    HV_TRANSLATE_GVA_CONTROL_FLAGS ControlFlags;
-    // Supplies the GVA page number to translate.
-    HV_GVA_PAGE_NUMBER GvaPage;
-} HV_INPUT_TRANSLATE_VIRTUAL_ADDRESS, *PHV_INPUT_TRANSLATE_VIRTUAL_ADDRESS;
-
-typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS
-{
-    // Flags to indicate the disposition of the translation.
-    HV_TRANSLATE_GVA_RESULT TranslationResult;
-    // The GPA to which the GVA translated.
-    HV_GPA_PAGE_NUMBER GpaPage;
-} HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS, *PHV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallReadGpa | 0x0053
 
@@ -11548,13 +11326,30 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SET_PHYSICAL_DEVICE_PROPERTY_HEADER
 
 // HvCallTranslateVirtualAddressEx | 0x00AC
 
-typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX
+// Input should be same as HvCallTranslateVirtualAddress hypercall.
+
+typedef struct _HV_TRANSLATE_GVA_RESULT_EX_PRIVATE
+{
+    HV_TRANSLATE_GVA_RESULT_CODE ResultCode;
+    HV_UINT32 CacheType : 8;
+    HV_UINT32 OverlayPage : 1;
+    HV_UINT32 Reserved : 23;
+#if defined(_M_AMD64) || defined(_M_IX86)
+    HV_X64_PENDING_EVENT EventInfo;
+#elif defined(_M_ARM64)
+    // I guess should have that. But both OpenVMM and 26100 securekernel don't
+    // have that.
+    HV_ARM64_PENDING_EVENT EventInfo;
+#endif
+} HV_TRANSLATE_GVA_RESULT_EX_PRIVATE, *PHV_TRANSLATE_GVA_RESULT_EX_PRIVATE;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX_PRIVATE
 {
     // Flags to indicate the disposition of the translation.
-    HV_TRANSLATE_GVA_RESULT_EX TranslationResult;
+    HV_TRANSLATE_GVA_RESULT_EX_PRIVATE TranslationResult;
     // The GPA to which the GVA translated.
     HV_GPA_PAGE_NUMBER GpaPage;
-} HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX, *PHV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX;
+} HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX_PRIVATE, *PHV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX_PRIVATE;
 
 // HvCallCheckForIoIntercept | 0x00AD
 
