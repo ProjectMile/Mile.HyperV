@@ -167,6 +167,11 @@ typedef HV_INT32 NTSTATUS;
 #define STATUS_CONNECTION_REFUSED ((NTSTATUS)0xC0000236L)
 #endif // !STATUS_CONNECTION_REFUSED
 
+#ifndef STATUS_BAD_DATA
+// Bad data.
+#define STATUS_BAD_DATA ((NTSTATUS)0xC000090BL)
+#endif
+
 // Definition from Windows Software Development Kit
 // Note: Add HV_ prefix to avoid conflict
 typedef struct _HV_RECT
@@ -3861,13 +3866,33 @@ const HV_GUID VPCI_CLASS_ID =
 };
 
 #ifndef _WDMDDK_
+
+// Types of resources that can be allocated to a PCI device.
+
+// No resource specified
 #define CmResourceTypeNull 0
+// I/O port resource
+#define CmResourceTypePort 1
+// Interrupt resource
+#define CmResourceTypeInterrupt 2
+// Memory resource
 #define CmResourceTypeMemory 3
+// DMA resource
+#define CmResourceTypeDma 4
+// Device-specific resource
+#define CmResourceTypeDeviceSpecific 5
+// PCI bus number resource
+#define CmResourceTypeBusNumber 6
+// Large memory resource (for memory regions larger than 4GB)
+#define CmResourceTypeMemoryLarge 7
 
 // Define the bit masks exclusive to type CmResourceTypeMemoryLarge.
 
+// Flag for 40-bit large memory
 #define CM_RESOURCE_MEMORY_LARGE_40 0x0200
+// Flag for 48-bit large memory
 #define CM_RESOURCE_MEMORY_LARGE_48 0x0400
+// Flag for 64-bit large memory
 #define CM_RESOURCE_MEMORY_LARGE_64 0x0800
 
 // Define limits for large memory resources
@@ -3878,17 +3903,24 @@ const HV_GUID VPCI_CLASS_ID =
 
 // Make sure alignment is made properly by compiler
 #pragma pack(4)
+// Descriptor for a device resource.
+// Contains information about a single resource allocated to a device, such as
+// memory, I/O ports, interrupts, etc.
 typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR
 {
+    // Type of resource (CmResourceType*)
     HV_UINT8 Type;
+    // Sharing disposition
     HV_UINT8 ShareDisposition;
+    // Resource-specific flags (CM_RESOURCE_MEMORY_LARGE_*)
     HV_UINT16 Flags;
     union
     {
         struct
         {
-            // PHYSICAL_ADDRESS
+            // Base address of the resource (native endian) (PHYSICAL_ADDRESS)
             HV_UINT64 Start;
+            // Adjusted length of the resource
             HV_UINT32 Length;
         } Generic;
         struct
@@ -3902,28 +3934,52 @@ typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR
 
 HV_STATIC_ASSERT(sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) == 0x14);
 
+// Resource list for a device.
+// Contains descriptors for all resources assigned to a device.
+typedef struct _CM_PARTIAL_RESOURCE_LIST
+{
+    // Version of the resource list format
+    HV_UINT16 Version;
+    // Revision of the resource list format
+    HV_UINT16 Revision;
+    // Number of descriptors in the list
+    HV_UINT32 Count;
+    // Resource descriptors for the device's PCI BARs
+    CM_PARTIAL_RESOURCE_DESCRIPTOR PartialDescriptors[HV_ANYSIZE_ARRAY];
+} CM_PARTIAL_RESOURCE_LIST, *PCM_PARTIAL_RESOURCE_LIST;
+
 #ifndef _WINNT_
-typedef enum _DEVICE_POWER_STATE {
+// Device power states.
+// Represents the different power states a device can be in.
+typedef enum _DEVICE_POWER_STATE
+{
     PowerDeviceUnspecified = 0,
+    // Device is fully powered and operational
     PowerDeviceD0,
     PowerDeviceD1,
     PowerDeviceD2,
+    // Device is powered off but still enumerated
     PowerDeviceD3,
     PowerDeviceMaximum
 } DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
 #endif // !_WINNT_
 
+// PCI slot number.
+// Identifies a specific device and function on the PCI bus.
 typedef struct _PCI_SLOT_NUMBER
 {
     union
     {
         struct
         {
+            // Device number (0-31)
             HV_UINT32 DeviceNumber : 5;
+            // Function number (0-7)
             HV_UINT32 FunctionNumber : 3;
+            // Reserved bits
             HV_UINT32 Reserved : 24;
         } bits;
-        HV_UINT32 AsHV_UINT32;
+        HV_UINT32 AsUINT32;
     } u;
 } PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 #endif // !_WDMDDK_
@@ -3968,9 +4024,27 @@ typedef struct _VPCI_PNP_ID
     HV_UINT16 SubSystemID;
 } VPCI_PNP_ID, *PVPCI_PNP_ID;
 
-#define VPCI_PROTOCOL_VERSION_RS1 0x00010002
-#define VPCI_PROTOCOL_VERSION_CURRENT VPCI_PROTOCOL_VERSION_RS1
+// Protocol versions supported by VPCI.
+// Each version corresponds to a specific Windows release or feature set.
 
+// Windows 8 version
+#define VPCI_PROTOCOL_VERSION_WIN8 0x00010000
+// Windows 10 version
+#define VPCI_PROTOCOL_VERSION_WIN10 0x00010001
+// Windows RS1 (Redstone 1) version
+#define VPCI_PROTOCOL_VERSION_RS1 0x00010002
+// Windows VB version
+#define VPCI_PROTOCOL_VERSION_VB 0x00010003
+// Windows FE version (adds wider vector types for ARM64 interrupts)
+#define VPCI_PROTOCOL_VERSION_FE 0x00010004
+// Windows GE version (adds device reset)
+#define VPCI_PROTOCOL_VERSION_GE 0x00010005
+// Windows DT version (allows Windows guests to dynamically map interrupts)
+#define VPCI_PROTOCOL_VERSION_DT 0x00010006
+
+// Some definitions in mu_msvm.
+
+#define VPCI_PROTOCOL_VERSION_CURRENT VPCI_PROTOCOL_VERSION_RS1
 static const HV_UINT32 VscSupportedVersions[] =
 {
     VPCI_PROTOCOL_VERSION_RS1
@@ -4067,30 +4141,135 @@ typedef struct _VPCI_QUERY_BUS_RELATIONS
 
 #define VPCI_MAX_DEVICES_PER_BUS 255
 
+// Interrupt delivery mode
+
+// Fixed priority delivery mode
+#define VPCI_DELIVERY_MODE_FIXED 0
+// Lowest priority delivery mode (x86 only)
+#define VPCI_DELIVERY_MODE_LOWEST_PRIORITY 1
+
+// MSI resource descriptor (version 1).
+// Used for legacy protocol versions before RS1.
+// Contains a union of either descriptor (request) or remapped (response) data.
+typedef struct _VPCI_MESSAGE_RESOURCE
+{
+    union
+    {
+        // Union of descriptor (request) and remap (response) data
+        HV_UINT64 ResourceData[2];
+        // Remapped MSI resource information.
+        // Contains the address and data values for a programmed MSI interrupt.
+        struct
+        {
+            // Reserved field
+            HV_UINT16 Reserved;
+            // Number of message slots
+            HV_UINT16 MessageCount;
+            // MSI data payload value
+            HV_UINT32 DataPayload;
+            // MSI address value
+            HV_UINT64 Address;
+        } Remapped;
+        // MSI resource descriptor information.
+        // Contains information about an MSI interrupt request.
+        struct
+        {
+            // Interrupt vector number
+            HV_UINT8 Vector;
+            // Interrupt delivery mode
+            HV_UINT8 DeliveryMode;
+            // Number of interrupt vectors requested
+            HV_UINT16 VectorCount;
+            // Reserved fields
+            HV_UINT16 Reserved[2];
+            // Processor mask for interrupt affinity
+            HV_UINT64 ProcessorMask;
+        } Descriptor;
+    };
+} VPCI_MESSAGE_RESOURCE, *PVPCI_MESSAGE_RESOURCE;
+
 #define VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT 32
 
+// MSI resource descriptor (version 2).
+// Enhanced version that supports specifying individual processors rather than
+// using a bit mask.
 typedef struct _VPCI_MESSAGE_RESOURCE_2
 {
     union
     {
+        // Union of descriptor (request) and remap (response) data
+        HV_UINT64 ResourceData[9];
+        // Remapped MSI resource information.
+        // Contains the address and data values for a programmed MSI interrupt.
         struct
         {
+            // Reserved field
             HV_UINT16 Reserved;
+            // Number of message slots
             HV_UINT16 MessageCount;
+            // MSI data payload value
             HV_UINT32 DataPayload;
+            // MSI address value
             HV_UINT64 Address;
-            HV_UINT16 Reserved2[27];
         } Remapped;
+        // MSI resource descriptor information.
+        // Contains information about an MSI interrupt request.
         struct
         {
+            // Interrupt vector number
             HV_UINT8 Vector;
+            // Interrupt delivery mode
             HV_UINT8 DeliveryMode;
+            // Number of interrupt vectors requested
             HV_UINT16 VectorCount;
+            // Number of processors in the ProcessorArray
             HV_UINT16 ProcessorCount;
+            // Array of processor IDs for interrupt affinity
             HV_UINT16 ProcessorArray[VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT];
         } Descriptor;
     };
 } VPCI_MESSAGE_RESOURCE_2, *PVPCI_MESSAGE_RESOURCE_2;
+
+// MSI resource descriptor (version 3).
+// Further enhanced version with a full 32-bit vector number.
+typedef struct _VPCI_MESSAGE_RESOURCE_3
+{
+    union
+    {
+        // Union of descriptor (request) and remap (response) data
+        HV_UINT64 ResourceData[10];
+        // Remapped MSI resource information.
+        // Contains the address and data values for a programmed MSI interrupt.
+        struct
+        {
+            // Reserved field
+            HV_UINT16 Reserved;
+            // Number of message slots
+            HV_UINT16 MessageCount;
+            // MSI data payload value
+            HV_UINT32 DataPayload;
+            // MSI address value
+            HV_UINT64 Address;
+        } Remapped;
+        // MSI resource descriptor information.
+        // Contains information about an MSI interrupt request.
+        struct
+        {
+            // 32-bit interrupt vector number
+            HV_UINT32 Vector;
+            // Interrupt delivery mode
+            HV_UINT8 DeliveryMode;
+            // Reserved field
+            HV_UINT8 Reserved;
+            // Number of interrupt vectors requested
+            HV_UINT16 VectorCount;
+            // Number of processors in the ProcessorArray
+            HV_UINT16 ProcessorCount;
+            // Array of processor IDs for interrupt affinity
+            HV_UINT16 ProcessorArray[VPCI_MESSAGE_RESOURCE_2_MAX_CPU_COUNT];
+        } Descriptor;
+    };
+} VPCI_MESSAGE_RESOURCE_3, *PVPCI_MESSAGE_RESOURCE_3;
 
 typedef struct _VPCI_QUERY_PROTOCOL_VERSION
 {
@@ -4116,16 +4295,49 @@ typedef struct _VPCI_RESOURCE_REQUIREMENTS_REPLY
     HV_UINT32 Bars[PCI_MAX_BAR];
 } VPCI_RESOURCE_REQUIREMENTS_REPLY, *PVPCI_RESOURCE_REQUIREMENTS_REPLY;
 
+// Message to change a device's power state.
 typedef struct _VPCI_DEVICE_POWER_CHANGE
 {
     union
     {
+        // Type of message (must be VpciMsgDevicePowerStateChange)
         VPCI_PACKET_HEADER Header;
         VPCI_REPLY_HEADER ReplyHeader;
     };
+    // PCI slot number of the target device
     PCI_SLOT_NUMBER Slot;
+    // Target power state
     DEVICE_POWER_STATE TargetState;
 } VPCI_DEVICE_POWER_CHANGE, *PVPCI_DEVICE_POWER_CHANGE;
+
+// This message indicates which resources the device is "decoding" within the
+// child partition at the moment that it is sent. It is valid for the device to
+// be decoding no resources. Mmio resources are configured using Base Address
+// Registers which are limited to 6. Unused registers and registers that are
+// used at the high part of 64-bit addresses are encoded as CmResourceTypeNull.
+// The completion packet uses the same structure to return the translated MSI
+// resources.
+typedef struct _VPCI_DEVICE_TRANSLATE
+{
+    union
+    {
+        // Type of message (must be VpciMsgAssignedResources,
+        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        VPCI_PACKET_HEADER Header;
+        // Status of the translation operation
+        VPCI_REPLY_HEADER ReplyHeader;
+    };
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Request: MMIO resource descriptors for the device's PCI BARs
+    // Reply: Translated MMIO resource descriptors
+    CM_PARTIAL_RESOURCE_DESCRIPTOR MmioResources[PCI_MAX_BAR];
+    // Request: Number of MSI resources to follow
+    // Reply: Number of MSI resources that follow
+    HV_UINT32 MsiResourceCount;
+    // Followed by array of VPCI_MESSAGE_RESOURCE.
+    VPCI_MESSAGE_RESOURCE MsiResources[HV_ANYSIZE_ARRAY];
+} VPCI_DEVICE_TRANSLATE, *PVPCI_DEVICE_TRANSLATE;
 
 // This message indicates which resources the device is "decoding" within the
 // child partition at the moment that it is sent. It is valid for the device to
@@ -4138,13 +4350,22 @@ typedef struct _VPCI_DEVICE_TRANSLATE_2
 {
     union
     {
-        VPCI_PACKET_HEADER         Header;
-        VPCI_REPLY_HEADER          ReplyHeader;
+        // Type of message (must be VpciMsgAssignedResources,
+        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        VPCI_PACKET_HEADER Header;
+        // Status of the translation operation
+        VPCI_REPLY_HEADER ReplyHeader;
     };
-    PCI_SLOT_NUMBER                Slot;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Request: MMIO resource descriptors for the device's PCI BARs
+    // Reply: Translated MMIO resource descriptors
     CM_PARTIAL_RESOURCE_DESCRIPTOR MmioResources[PCI_MAX_BAR];
-    HV_UINT32                         MsiResourceCount;
-    VPCI_MESSAGE_RESOURCE_2        MsiResources[HV_ANYSIZE_ARRAY];
+    // Request: Number of MSI resources to follow
+    // Reply: Number of MSI resources that follow
+    HV_UINT32 MsiResourceCount;
+    // Followed by array of VPCI_MESSAGE_RESOURCE_2.
+    VPCI_MESSAGE_RESOURCE_2 MsiResources[HV_ANYSIZE_ARRAY];
 } VPCI_DEVICE_TRANSLATE_2, *PVPCI_DEVICE_TRANSLATE_2;
 
 // NOTE: This doesn't exist in the windows header. Normally we'd use the the
@@ -4155,7 +4376,36 @@ typedef struct _VPCI_DEVICE_TRANSLATE_2_REPLY
 {
     VPCI_REPLY_HEADER Header;
     PCI_SLOT_NUMBER Slot;
-}  VPCI_DEVICE_TRANSLATE_2_REPLY, *PVPCI_DEVICE_TRANSLATE_2_REPLY;
+} VPCI_DEVICE_TRANSLATE_2_REPLY, *PVPCI_DEVICE_TRANSLATE_2_REPLY;
+
+// This message indicates which resources the device is "decoding" within the
+// child partition at the moment that it is sent. It is valid for the device to
+// be decoding no resources. Mmio resources are configured using Base Address
+// Registers which are limited to 6. Unused registers and registers that are
+// used at the high part of 64-bit addresses are encoded as CmResourceTypeNull.
+// The completion packet uses the same structure to return the translated MSI
+// resources.
+typedef struct _VPCI_DEVICE_TRANSLATE_3
+{
+    union
+    {
+        // Type of message (must be VpciMsgAssignedResources,
+        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        VPCI_PACKET_HEADER Header;
+        // Status of the translation operation
+        VPCI_REPLY_HEADER ReplyHeader;
+    };
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Request: MMIO resource descriptors for the device's PCI BARs
+    // Reply: Translated MMIO resource descriptors
+    CM_PARTIAL_RESOURCE_DESCRIPTOR MmioResources[PCI_MAX_BAR];
+    // Request: Number of MSI resources to follow
+    // Reply: Number of MSI resources that follow
+    HV_UINT32 MsiResourceCount;
+    // Followed by array of VPCI_MESSAGE_RESOURCE_3.
+    VPCI_MESSAGE_RESOURCE_3 MsiResources[HV_ANYSIZE_ARRAY];
+} VPCI_DEVICE_TRANSLATE_3, *PVPCI_DEVICE_TRANSLATE_3;
 
 typedef struct _VPCI_FDO_D0_ENTRY
 {
