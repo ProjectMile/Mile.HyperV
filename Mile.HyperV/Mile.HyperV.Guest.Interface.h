@@ -341,7 +341,7 @@ typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
 typedef HV_UINT64 HV_ADDRESS_SPACE_ID, *PHV_ADDRESS_SPACE_ID;
 
 // Address space flush flags.
-typedef HV_UINT64 HV_FLUSH_FLAGS, * PHV_FLUSH_FLAGS;
+typedef HV_UINT64 HV_FLUSH_FLAGS, *PHV_FLUSH_FLAGS;
 
 #define HV_FLUSH_ALL_PROCESSORS (0x00000001)
 #define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES (0x00000002)
@@ -366,9 +366,15 @@ typedef struct _HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER
     HV_UINT64 ProcessorMask;
 } HV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER, *PHV_INPUT_FLUSH_VIRTUAL_ADDRESS_SPACE_HEADER;
 
+typedef enum _HV_GENERIC_SET_FORMAT
+{
+    HvGenericSetSparse4k = 0,
+    HvGenericSetAll = 1,
+} HV_GENERIC_SET_FORMAT, *PHV_GENERIC_SET_FORMAT;
+
 typedef struct _HV_GENERIC_SET
 {
-    HV_UINT64 Format;
+    HV_UINT64 Format; // HV_GENERIC_SET_FORMAT
     HV_UINT64 ValidBanksMask;
     HV_UINT64 BankContents[HV_ANYSIZE_ARRAY];
 } HV_GENERIC_SET, *PHV_GENERIC_SET, HV_VP_SET, *PHV_VP_SET;
@@ -401,31 +407,36 @@ typedef union _HV_GVA_RANGE_EXTENDED
         HV_UINT64 AdditionalPages : 11;
         // Is page size greater than 4 KB.
         HV_UINT64 LargePage : 1;
-        union
-        {
-            // The top 52 most significant bits of the guest virtual address
-            // when `LargePage` is clear.
-            HV_UINT64 GvaPageNumber : 52;
-            struct
-            {
-                // The page size when `large_page`` is set.
-                // false: 2 MB
-                // true: 1 GB
-                HV_UINT64 PageSize : 1;
-                HV_UINT64 Reserved : 8;
-                // The top 43 most significant bits of the guest virtual address
-                // when `LargePage` is set.
-                HV_UINT64 GvaLargePageNumber : 43;
-            };
-        };
+        // The top 52 most significant bits of the guest virtual address when
+        // `LargePage` is clear.
+        HV_UINT64 GvaPageNumber : 52;
     };
 } HV_GVA_RANGE_EXTENDED, *PHV_GVA_RANGE_EXTENDED;
+
+typedef union _HV_GVA_RANGE_EXTENDED_LARGE_PAGE
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 11;
+        // Is page size greater than 4 KB.
+        HV_UINT64 LargePage : 1;
+        // The page size when `large_page`` is set. (false: 2 MB, true: 1 GB)
+        HV_UINT64 PageSize : 1;
+        HV_UINT64 Reserved : 8;
+        // The top 43 most significant bits of the guest virtual address when
+        // `LargePage` is set.
+        HV_UINT64 GvaLargePageNumber : 43;
+    };
+} HV_GVA_RANGE_EXTENDED_LARGE_PAGE, *PHV_GVA_RANGE_EXTENDED_LARGE_PAGE;
 
 typedef union _HV_GVA_RANGE
 {
     HV_UINT64 AsUINT64;
     HV_GVA_RANGE_SIMPLE Simple;
     HV_GVA_RANGE_EXTENDED Extended;
+    HV_GVA_RANGE_EXTENDED_LARGE_PAGE ExtendedLargePage;
 } HV_GVA_RANGE, *PHV_GVA_RANGE;
 
 typedef union _HV_GPA_RANGE_SIMPLE
@@ -449,31 +460,36 @@ typedef union _HV_GPA_RANGE_EXTENDED
         HV_UINT64 AdditionalPages : 11;
         // Is page size greater than 4 KB.
         HV_UINT64 LargePage : 1;
-        union
-        {
-            // The top 52 most significant bits of the guest physical address
-            // when `LargePage` is clear.
-            HV_UINT64 GpaPageNumber : 52;
-            struct
-            {
-                // The page size when `large_page`` is set.
-                // false: 2 MB
-                // true: 1 GB
-                HV_UINT64 PageSize : 1;
-                HV_UINT64 Reserved : 8;
-                // The top 43 most significant bits of the guest physical address
-                // when `LargePage` is set.
-                HV_UINT64 GpaLargePageNumber : 43;
-            };
-        };
+        // The top 52 most significant bits of the guest physical address when
+        // `LargePage` is clear.
+        HV_UINT64 GpaPageNumber : 52;
     };
 } HV_GPA_RANGE_EXTENDED, *PHV_GPA_RANGE_EXTENDED;
+
+typedef union _HV_GPA_RANGE_EXTENDED_LARGE_PAGE
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // The number of pages beyond one.
+        HV_UINT64 AdditionalPages : 11;
+        // Is page size greater than 4 KB.
+        HV_UINT64 LargePage : 1;
+        // The page size when `large_page`` is set. (false: 2 MB, true: 1 GB)
+        HV_UINT64 PageSize : 1;
+        HV_UINT64 Reserved : 8;
+        // The top 43 most significant bits of the guest physical address when
+        // `LargePage` is set.
+        HV_UINT64 GpaLargePageNumber : 43;
+    };
+} HV_GPA_RANGE_EXTENDED_LARGE_PAGE, *PHV_GPA_RANGE_EXTENDED_LARGE_PAGE;
 
 typedef union _HV_GPA_RANGE
 {
     HV_UINT64 AsUINT64;
     HV_GPA_RANGE_SIMPLE Simple;
     HV_GPA_RANGE_EXTENDED Extended;
+    HV_GPA_RANGE_EXTENDED_LARGE_PAGE ExtendedLargePage;
 } HV_GPA_RANGE, *PHV_GPA_RANGE;
 
 // Define interrupt vector type.
@@ -1387,6 +1403,85 @@ typedef enum _HV_TRANSLATE_GVA_RESULT_CODE
     HvTranslateGvaGpaUnaccepted = 9
 } HV_TRANSLATE_GVA_RESULT_CODE, *PHV_TRANSLATE_GVA_RESULT_CODE;
 
+typedef enum _HV_INTERRUPT_SOURCE
+{
+    HvInterruptSourceMsi = 1,
+    HvInterruptSourceIoApic = 2,
+} HV_INTERRUPT_SOURCE, *PHV_INTERRUPT_SOURCE;
+
+typedef struct _HV_INTERRUPT_ENTRY
+{
+    HV_INTERRUPT_SOURCE InterruptSource;
+    HV_UINT32 Reserved;
+    HV_UINT64 Data[2];
+} HV_INTERRUPT_ENTRY, *PHV_INTERRUPT_ENTRY;
+
+#define HV_DEVICE_INTERRUPT_TARGET_MULTICAST 1
+#define HV_DEVICE_INTERRUPT_TARGET_PROCESSOR_SET 2
+
+typedef union _HV_DEVICE_INTERRUPT_TARGET_FLAGS
+{
+    HV_UINT32 AsUINT32; // HV_DEVICE_INTERRUPT_TARGET_*
+    struct
+    {
+        HV_UINT32 Multicast : 1;
+        HV_UINT32 ProcessorSet : 1;
+        HV_UINT32 Reserved : 30;
+    };
+} HV_DEVICE_INTERRUPT_TARGET_FLAGS, *PHV_DEVICE_INTERRUPT_TARGET_FLAGS;
+
+typedef struct _HV_DEVICE_INTERRUPT_TARGET
+{
+    HV_INTERRUPT_VECTOR Vector;
+    HV_DEVICE_INTERRUPT_TARGET_FLAGS Flags;
+    // Mile.HyperV's note:
+    // According to OpenVMM, it only defines MaskOrFormat as UInt64 after this.
+    // Because they said that always use a generic processor set to simplify
+    // construction. This hypercall is invoked relatively infrequently, the
+    // overhead should be acceptable.
+    // It seems that if Flags.ProcessorSet is set, the value in the index 0 of
+    // ProcessorSet array should be HvGenericSetSparse4k when I read the source
+    // code of OpenVMM.
+    union
+    {
+        HV_UINT64 ProcessorMask;
+        HV_UINT64 ProcessorSet[HV_ANYSIZE_ARRAY];
+    };
+} HV_DEVICE_INTERRUPT_TARGET, *PHV_DEVICE_INTERRUPT_TARGET;
+
+typedef enum _HV_INTERRUPT_TYPE
+{
+    HvArm64InterruptTypeFixed = 0x0000,
+    HvX64InterruptTypeFixed = 0x0000,
+    HvX64InterruptTypeLowestPriority = 0x0001,
+    HvX64InterruptTypeSmi = 0x0002,
+    HvX64InterruptTypeRemoteRead = 0x0003,
+    HvX64InterruptTypeNmi = 0x0004,
+    HvX64InterruptTypeInit = 0x0005,
+    HvX64InterruptTypeSipi = 0x0006,
+    HvX64InterruptTypeExtInt = 0x0007,
+    HvX64InterruptTypeLocalInt0 = 0x0008,
+    HvX64InterruptTypeLocalInt1 = 0x0009,
+} HV_INTERRUPT_TYPE, *PHV_INTERRUPT_TYPE;
+
+// The declaration uses the fact the bits for the different architectures don't
+// intersect. When (if ever) they do, will need to come up with a more elaborate
+// abstraction. The other possible downside is the lack of the compile-time
+// checks as adding that will require `guest_arch` support and a large
+// refactoring. To sum up, choosing expediency.
+typedef union _HV_INTERRUPT_CONTROL
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_INTERRUPT_TYPE InterruptType;
+        HV_UINT32 X86LevelTriggered : 1;
+        HV_UINT32 X86LogicalDestinationMode : 1;
+        HV_UINT32 Arm64Asserted : 1;
+        HV_UINT32 Reserved : 29;
+    };
+} HV_INTERRUPT_CONTROL, *PHV_INTERRUPT_CONTROL;
+
 // Initial X64 VP context for a newly enabled VTL
 typedef struct _HV_INITIAL_VP_CONTEXT
 {
@@ -1430,6 +1525,12 @@ typedef struct _HV_INITIAL_VP_CONTEXT
     HV_UINT64 MsrCrPat;
 #endif
 } HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
+
+#if defined(_M_AMD64) || defined(_M_IX86)
+typedef HV_UINT32 HV_APIC_ID, *PHV_APIC_ID;
+#elif defined(_M_ARM64)
+typedef HV_UINT64 HV_PROCESSOR_HW_ID, *PHV_PROCESSOR_HW_ID;
+#endif
 
 // Define the intercept access types.
 
@@ -1584,6 +1685,12 @@ typedef union _HV_X64_PENDING_EVENT
 
 #endif
 
+typedef enum _HV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT_CODE
+{
+    HvCheckGpaPageVtlAccessSuccess = 0x0,
+    HvCheckGpaPageVtlAccessMemoryIntercept = 0x1,
+} HV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT_CODE, *PHV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT_CODE;
+
 // The number of VTLs for which permissions can be specified in a VTL permission
 // set.
 #define HV_VTL_PERMISSION_SET_SIZE 2
@@ -1606,6 +1713,8 @@ typedef union _HV_VTL_PERMISSION_SET
 
 #define HV_HOST_VISIBILITY_PRIVATE HV_MAP_GPA_PERMISSIONS_NONE
 #define HV_HOST_VISIBILITY_SHARED (HV_MAP_GPA_READABLE | HV_MAP_GPA_WRITABLE)
+
+#define HV_HYPERCALL_MMIO_MAX_DATA_LENGTH 64
 
 // *****************************************************************************
 // CPUID Definitions
@@ -3691,9 +3800,27 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_SIGNAL_EVENT
 
 // HvCallRetargetDeviceInterrupt | 0x007E
 
-// HvCallNotifyPartitionEvent | 0x0087
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RETARGET_DEVICE_INTERRUPT
+{
+    HV_PARTITION_ID PartitionId;
+    HV_UINT64 DeviceId; // It seems to be HV_DEVICE_ID.
+    HV_INTERRUPT_ENTRY InterruptEntry;
+    HV_UINT64 Reserved;
+    HV_DEVICE_INTERRUPT_TARGET InterruptTarget;
+} HV_INPUT_RETARGET_DEVICE_INTERRUPT, *PHV_INPUT_RETARGET_DEVICE_INTERRUPT;
 
 // HvCallAssertVirtualInterrupt | 0x0094
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_ASSERT_VIRTUAL_INTERRUPT
+{
+    HV_PARTITION_ID TargetPartition;
+    HV_INTERRUPT_CONTROL InterruptControl;
+    HV_UINT64 DestinationAddress;
+    HV_INTERRUPT_VECTOR RequestedVector;
+    HV_VTL TargetVtl;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+} HV_INPUT_ASSERT_VIRTUAL_INTERRUPT, *PHV_INPUT_ASSERT_VIRTUAL_INTERRUPT;
 
 // HvCallStartVirtualProcessor | 0x0099
 
@@ -3710,6 +3837,20 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_START_VIRTUAL_PROCESSOR
 } HV_INPUT_START_VIRTUAL_PROCESSOR, *PHV_INPUT_START_VIRTUAL_PROCESSOR;
 
 // HvCallGetVpIndexFromApicId | 0x009A
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_VP_INDEX_FROM_APIC_ID
+{
+    HV_PARTITION_ID PartitionId;
+    HV_VTL TargetVtl;
+    HV_UINT8 ReservedZ0;
+    HV_UINT16 ReservedZ1;
+    HV_UINT32 ReservedZ2;
+#if defined(_M_AMD64) || defined(_M_IX86)
+    HV_APIC_ID ApicIds[HV_ANYSIZE_ARRAY];
+#elif defined(_M_ARM64)
+    HV_PROCESSOR_HW_ID ProcHwIds[HV_ANYSIZE_ARRAY];
+#endif
+} HV_INPUT_GET_VP_INDEX_FROM_APIC_ID, *PHV_INPUT_GET_VP_INDEX_FROM_APIC_ID;
 
 // HvCallTranslateVirtualAddressEx | 0x00AC
 
@@ -3763,6 +3904,29 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_POST_MESSAGE_DIRECT
 } HV_INPUT_POST_MESSAGE_DIRECT, *PHV_INPUT_POST_MESSAGE_DIRECT;
 
 // HvCallCheckSparseGpaPageVtlAccess | 0x00D4
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_CHECK_SPARSE_GPA_PAGE_VTL_ACCESS
+{
+    HV_PARTITION_ID TargetPartitionId;
+    HV_INPUT_VTL TargetVtl;
+    HV_UINT8 DesiredAccess;
+    HV_UINT16 Reserved0;
+    HV_UINT32 Reserved1;
+    HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_CHECK_SPARSE_GPA_PAGE_VTL_ACCESS, *PHV_INPUT_CHECK_SPARSE_GPA_PAGE_VTL_ACCESS;
+
+typedef union HV_CALL_ATTRIBUTES _HV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT32 ResultCode : 8; // HV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT_CODE
+        HV_UINT32 DeniedAccess : 8;
+        HV_UINT32 InterceptingVtl : 4;
+        HV_UINT32 Reserved0 : 12;
+        HV_UINT32 Reserved1;
+    };
+} HV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT, *PHV_CHECK_GPA_PAGE_VTL_ACCESS_RESULT;
 
 // HvCallAcceptGpaPages | 0x00D9
 
@@ -3824,11 +3988,43 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
 
 // HvCallMemoryMappedIoRead | 0x0106
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MEMORY_MAPPED_IO_READ
+{
+    HV_GPA Gpa;
+    HV_UINT32 AccessWidth;
+    HV_UINT32 ReservedZ0;
+} HV_INPUT_MEMORY_MAPPED_IO_READ, *PHV_INPUT_MEMORY_MAPPED_IO_READ;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_OUTPUT_MEMORY_MAPPED_IO_READ
+{
+    HV_UINT8 Data[HV_HYPERCALL_MMIO_MAX_DATA_LENGTH];
+} HV_OUTPUT_MEMORY_MAPPED_IO_READ, *PHV_OUTPUT_MEMORY_MAPPED_IO_READ;
+
 // HvCallMemoryMappedIoWrite | 0x0107
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MEMORY_MAPPED_IO_WRITE
+{
+    HV_GPA Gpa;
+    HV_UINT32 AccessWidth;
+    HV_UINT32 ReservedZ0;
+    HV_UINT8 Data[HV_HYPERCALL_MMIO_MAX_DATA_LENGTH];
+} HV_INPUT_MEMORY_MAPPED_IO_WRITE, *PHV_INPUT_MEMORY_MAPPED_IO_WRITE;
 
 // HvCallPinGpaPageRanges | 0x0112
 
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_PIN_GPA_PAGE_RANGES
+{
+    HV_UINT64 Reserved;
+    HV_GPA_RANGE GpaRangeList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_PIN_GPA_PAGE_RANGES, *PHV_INPUT_PIN_GPA_PAGE_RANGES;
+
 // HvCallUnpinGpaPageRanges | 0x0113
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_UNPIN_GPA_PAGE_RANGES
+{
+    HV_UINT64 Reserved;
+    HV_GPA_RANGE GpaRangeList[HV_ANYSIZE_ARRAY];
+} HV_INPUT_UNPIN_GPA_PAGE_RANGES, *PHV_INPUT_UNPIN_GPA_PAGE_RANGES;
 
 // HvCallQuerySparseGpaPageHostVisibility | 0x011C
 
