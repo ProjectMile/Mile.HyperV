@@ -335,6 +335,10 @@ typedef HV_UINT32 HV_VP_INDEX, *PHV_VP_INDEX;
 // Define a virtual trust level (VTL)
 typedef HV_UINT8 HV_VTL, *PHV_VTL;
 
+#define HV_VTL_VTL0 0
+#define HV_VTL_VTL1 1
+#define HV_VTL_VTL2 2
+
 // Flags to describe the access a partition has to a GPA page.
 typedef HV_UINT32 HV_MAP_GPA_FLAGS, *PHV_MAP_GPA_FLAGS;
 
@@ -1266,6 +1270,34 @@ typedef enum _HV_REGISTER_NAME
 #endif
 } HV_REGISTER_NAME, *PHV_REGISTER_NAME;
 
+typedef union _HV_INTERNAL_ACTIVITY_REGISTER
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        HV_UINT64 StartupSuspend : 1;
+        HV_UINT64 HaltSuspend : 1;
+        HV_UINT64 IdleSuspend : 1;
+        HV_UINT64 RsvdZ : 61;
+    };
+} HV_INTERNAL_ACTIVITY_REGISTER, *PHV_INTERNAL_ACTIVITY_REGISTER;
+
+typedef union _HV_DELIVERABILITY_NOTIFICATIONS_REGISTER
+{
+    HV_UINT64 AsUINT64;
+    struct
+    {
+        // x86_64 only.
+        HV_UINT64 NmiNotification : 1;
+        // x86_64 only.
+        HV_UINT64 InterruptNotification : 1;
+        // Only used on x86_64.
+        HV_UINT64 InterruptPriority : 4;
+        HV_UINT64 RsvdZ : 42;
+        HV_UINT64 Sint : 16;
+    };
+} HV_DELIVERABILITY_NOTIFICATIONS_REGISTER, *PHV_DELIVERABILITY_NOTIFICATIONS_REGISTER;
+
 typedef union _HV_REGISTER_VSM_CODE_PAGE_OFFSETS
 {
     HV_UINT64 AsUINT64;
@@ -1490,6 +1522,8 @@ typedef union _HV_REGISTER_VALUE
     HV_UINT32 Reg32;
     HV_UINT16 Reg16;
     HV_UINT8 Reg8;
+    HV_INTERNAL_ACTIVITY_REGISTER InternalActivity;
+
     HV_REGISTER_VSM_CODE_PAGE_OFFSETS VsmCodePageOffsets;
     HV_REGISTER_VSM_VP_STATUS VsmVpStatus;
     HV_REGISTER_VSM_PARTITION_STATUS VsmPartitionStatus;
@@ -3938,6 +3972,30 @@ typedef union _HV_CRASH_CTL_REG_CONTENTS
         HV_UINT64 CrashNotify : 1;
     };
 } HV_CRASH_CTL_REG_CONTENTS, *PHV_CRASH_CTL_REG_CONTENTS;
+
+#define HV_VIRTUALIZATION_STACK_CPUID_VENDOR 0x40000080
+#define HV_VIRTUALIZATION_STACK_CPUID_INTERFACE 0x40000081
+#define HV_VIRTUALIZATION_STACK_CPUID_PROPERTIES 0x40000082
+
+// The result of querying the VIRTUALIZATION_STACK_CPUID_PROPERTIES leaf.
+// The current partition is considered "portable": the virtualization stack may
+// attempt to bring up the partition on another physical machine.
+#define HV_VS1_PARTITION_PROPERTIES_EAX_IS_PORTABLE 0x00000001
+// The current partition has a synthetic debug device available to it.
+#define HV_VS1_PARTITION_PROPERTIES_EAX_DEBUG_DEVICE_PRESENT 0x00000002
+// Extended I/O APIC RTEs are supported for the current partition.
+#define HV_VS1_PARTITION_PROPERTIES_EAX_EXTENDED_IOAPIC_RTE 0x00000004
+// Confidential VMBus is available.
+#define HV_VS1_PARTITION_PROPERTIES_EAX_CONFIDENTIAL_VMBUS_AVAILABLE 0x00000008
+
+// SMCCC UID for the Microsoft Hypervisor.
+const HV_UINT32 HV_VENDOR_HYP_UID_MS_HYPERVISOR[4] =
+{
+    0x4d32ba58,
+    0xcd244764,
+    0x8eef6c75,
+    0x16597024
+};
 
 // *****************************************************************************
 // Hypercall Definitions
