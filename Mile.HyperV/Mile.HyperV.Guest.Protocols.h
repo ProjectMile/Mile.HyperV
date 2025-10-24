@@ -4012,15 +4012,26 @@ typedef struct _PCI_SLOT_NUMBER
 // from an address, zeroing out the offset within the page.
 #define VPCI_MMIO_PAGE_MASK 0xfff
 
+// Plug and Play identifier for a PCI device.
+// Contains the vendor and device identification information, as well as the
+// device class, subclass, and programming interface information.
 typedef struct _VPCI_PNP_ID
 {
+    // PCI vendor ID
     HV_UINT16 VendorID;
+    // PCI device ID
     HV_UINT16 DeviceID;
+    // PCI revision ID
     HV_UINT8 RevisionID;
+    // PCI programming interface
     HV_UINT8 ProgIf;
+    // PCI sub-class code
     HV_UINT8 SubClass;
+    // PCI base class code
     HV_UINT8 BaseClass;
+    // PCI sub-vendor ID
     HV_UINT16 SubVendorID;
+    // PCI subsystem ID
     HV_UINT16 SubSystemID;
 } VPCI_PNP_ID, *PVPCI_PNP_ID;
 
@@ -4125,19 +4136,60 @@ typedef struct _VPCI_REPLY_HEADER
     HV_UINT32 Status;
 } VPCI_REPLY_HEADER, *PVPCI_REPLY_HEADER;
 
+// Description of a PCI device in the VPCI bus.
 typedef struct _VPCI_DEVICE_DESCRIPTION
 {
+    // Plug and Play identification information
     VPCI_PNP_ID IDs;
-    HV_UINT32 Slot;
+    // PCI slot number
+    PCI_SLOT_NUMBER Slot;
+    // Device serial number
     HV_UINT32 SerialNumber;
 } VPCI_DEVICE_DESCRIPTION, *PVPCI_DEVICE_DESCRIPTION;
 
+// Message for querying bus relations.
+// This message type is used to report information about devices present on the
+// bus.
 typedef struct _VPCI_QUERY_BUS_RELATIONS
 {
+    // Type of message (must be VpciMsgBusRelations)
     VPCI_PACKET_HEADER Header;
+    // Number of devices reported
     HV_UINT32 DeviceCount;
+    // Alignment for following devices.
     VPCI_DEVICE_DESCRIPTION Devices[HV_ANYSIZE_ARRAY];
 } VPCI_QUERY_BUS_RELATIONS, *PVPCI_QUERY_BUS_RELATIONS;
+
+// Extended device description (version 2).
+// This version adds support for NUMA node information and additional flags.
+typedef struct _VPCI_DEVICE_DESCRIPTION_2
+{
+    // Plug and Play identification information
+    VPCI_PNP_ID IDs;
+    // PCI slot number
+    PCI_SLOT_NUMBER Slot;
+    // Device serial number
+    HV_UINT32 SerialNumber;
+    // Device-specific flags
+    HV_UINT32 Flags;
+    // NUMA node the device is associated with
+    HV_UINT16 NumaNode;
+    // Reserved field
+    HV_UINT16 Reserved;
+} VPCI_DEVICE_DESCRIPTION_2, *PVPCI_DEVICE_DESCRIPTION_2;
+
+// Message for querying bus relations (version 2).
+// Extended version of the QueryBusRelations message with additional device
+// information.
+typedef struct _VPCI_QUERY_BUS_RELATIONS_2
+{
+    // Type of message (must be VpciMsgBusRelations2)
+    VPCI_PACKET_HEADER Header;
+    // Number of devices reported
+    HV_UINT32 DeviceCount;
+    // Alignment for following devices.
+    VPCI_DEVICE_DESCRIPTION_2 Devices[HV_ANYSIZE_ARRAY];
+} VPCI_QUERY_BUS_RELATIONS_2, *PVPCI_QUERY_BUS_RELATIONS_2;
 
 #define VPCI_MAX_DEVICES_PER_BUS 255
 
@@ -4271,27 +4323,41 @@ typedef struct _VPCI_MESSAGE_RESOURCE_3
     };
 } VPCI_MESSAGE_RESOURCE_3, *PVPCI_MESSAGE_RESOURCE_3;
 
+// Message used to query the protocol version.
 typedef struct _VPCI_QUERY_PROTOCOL_VERSION
 {
+    // Type of message (must be VpciMsgQueryProtocolVersion)
     VPCI_PACKET_HEADER Header;
+    // The protocol version being queried (VPCI_PROTOCOL_VERSION_*)
     HV_UINT32 ProtocolVersion;
 } VPCI_QUERY_PROTOCOL_VERSION, *PVPCI_QUERY_PROTOCOL_VERSION;
 
+// Response to a protocol version query.
 typedef struct _VPCI_PROTOCOL_VERSION_REPLY
 {
+    // Status of the version query operation
     VPCI_REPLY_HEADER Header;
+    // Protocol version supported by the responder
     HV_UINT32 ProtocolVersion;
 } VPCI_PROTOCOL_VERSION_REPLY, *PVPCI_PROTOCOL_VERSION_REPLY;
 
+// Message to query resource requirements for a device.
 typedef struct _VPCI_QUERY_RESOURCE_REQUIREMENTS
 {
+    // Type of message (must be VpciMsgCurrentResourceRequirements)
     VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
     PCI_SLOT_NUMBER Slot;
 } VPCI_QUERY_RESOURCE_REQUIREMENTS, *PVPCI_QUERY_RESOURCE_REQUIREMENTS;
 
+// Response to a resource requirements query.
+// Contains information about the BAR (Base Address Register) requirements of a
+// device.
 typedef struct _VPCI_RESOURCE_REQUIREMENTS_REPLY
 {
+    // Status of the query operation
     VPCI_REPLY_HEADER Header;
+    // BAR masks for the device's PCI BARs
     HV_UINT32 Bars[PCI_MAX_BAR];
 } VPCI_RESOURCE_REQUIREMENTS_REPLY, *PVPCI_RESOURCE_REQUIREMENTS_REPLY;
 
@@ -4321,8 +4387,7 @@ typedef struct _VPCI_DEVICE_TRANSLATE
 {
     union
     {
-        // Type of message (must be VpciMsgAssignedResources,
-        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        // Type of message (must be VpciMsgAssignedResources)
         VPCI_PACKET_HEADER Header;
         // Status of the translation operation
         VPCI_REPLY_HEADER ReplyHeader;
@@ -4350,8 +4415,7 @@ typedef struct _VPCI_DEVICE_TRANSLATE_2
 {
     union
     {
-        // Type of message (must be VpciMsgAssignedResources,
-        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        // Type of message (must be VpciMsgAssignedResources2)
         VPCI_PACKET_HEADER Header;
         // Status of the translation operation
         VPCI_REPLY_HEADER ReplyHeader;
@@ -4374,7 +4438,9 @@ typedef struct _VPCI_DEVICE_TRANSLATE_2
 // about the status, so this is a nice partial packet for that.
 typedef struct _VPCI_DEVICE_TRANSLATE_2_REPLY
 {
+    // Status of the translation operation
     VPCI_REPLY_HEADER Header;
+    // PCI slot number of the target device
     PCI_SLOT_NUMBER Slot;
 } VPCI_DEVICE_TRANSLATE_2_REPLY, *PVPCI_DEVICE_TRANSLATE_2_REPLY;
 
@@ -4389,8 +4455,7 @@ typedef struct _VPCI_DEVICE_TRANSLATE_3
 {
     union
     {
-        // Type of message (must be VpciMsgAssignedResources,
-        // VpciMsgAssignedResources2 or VpciMsgAssignedResources3)
+        // Type of message (must be VpciMsgAssignedResources3)
         VPCI_PACKET_HEADER Header;
         // Status of the translation operation
         VPCI_REPLY_HEADER ReplyHeader;
@@ -4407,10 +4472,27 @@ typedef struct _VPCI_DEVICE_TRANSLATE_3
     VPCI_MESSAGE_RESOURCE_3 MsiResources[HV_ANYSIZE_ARRAY];
 } VPCI_DEVICE_TRANSLATE_3, *PVPCI_DEVICE_TRANSLATE_3;
 
+// Maximum number of interrupt messages supported per device.
+// This is calculated as 500 total resources minus 6 for the BARs.
+#define VPCI_MAX_SUPPORTED_INTERRUPT_MESSAGES 494
+
+// Maximum size of a packet in the VPCI protocol.
+// This constant defines the maximum buffer size needed to hold a complete
+// protocol message, including the largest possible payload (a device translate
+// message with the maximum number of interrupt resources).
+#define VPCI_MAXIMUM_PACKET_SIZE ( \
+    sizeof(VPCI_DEVICE_TRANSLATE_3) + ( \
+        (VPCI_MAX_SUPPORTED_INTERRUPT_MESSAGES - 1) * \
+        sizeof(VPCI_MESSAGE_RESOURCE_3)))
+
+// Message to notify a device is entering D0 (powered on) state.
 typedef struct _VPCI_FDO_D0_ENTRY
 {
+    // Type of message (must be VpciMsgFdoD0Entry)
     VPCI_PACKET_HEADER Header;
+    // Padding field
     HV_UINT32 Padding;
+    // Base MMIO address for the device
     HV_UINT64 MmioStart;
 } VPCI_FDO_D0_ENTRY, *PVPCI_FDO_D0_ENTRY;
 
@@ -4446,6 +4528,89 @@ typedef struct _PCI_BAR_FORMAT
 } PCI_BAR_FORMAT;
 
 #define PCI_BAR_MEMORY_TYPE_64BIT 0x2
+
+// Message to get currently assigned resources.
+typedef struct _VPCI_GET_RESOURCES
+{
+    // Type of message (must be VpciMsgGetResources)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Reserved fields
+    HV_UINT64 Reserved[3];
+} VPCI_GET_RESOURCES, *PVPCI_GET_RESOURCES;
+
+// Note: MsiResourceDescriptor is VPCI_MESSAGE_RESOURCE
+//       MsiResourceDescriptor2 is VPCI_MESSAGE_RESOURCE_2
+//       MsiResourceDescriptor3 is VPCI_MESSAGE_RESOURCE_3
+
+// Message to create an interrupt for a device (version 1).
+typedef struct _VPCI_CREATE_INTERRUPT_MESSAGE
+{
+    // Type of message (must be VpciMsgCreateInterruptMessage)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // MSI descriptor for the requested interrupt (Descriptor field)
+    VPCI_MESSAGE_RESOURCE MsiResourceDescriptor;
+} VPCI_CREATE_INTERRUPT_MESSAGE, *PVPCI_CREATE_INTERRUPT_MESSAGE;
+
+// Response to an interrupt creation request.
+typedef struct _VPCI_CREATE_INTERRUPT_REPLY
+{
+    // Status of the creation operation
+    VPCI_REPLY_HEADER Header;
+    // Remapped MSI resource for the created interrupt (Remapped field)
+    VPCI_MESSAGE_RESOURCE RemappedMsiResource;
+} VPCI_CREATE_INTERRUPT_REPLY, *PVPCI_CREATE_INTERRUPT_REPLY;
+
+// Message to create an interrupt for a device (version 2).
+// Enhanced version that supports specifying individual processors rather than
+// using a bit mask.
+typedef struct _VPCI_CREATE_INTERRUPT_MESSAGE_2
+{
+    // Type of message (must be VpciMsgCreateInterruptMessage2)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // MSI descriptor for the requested interrupt (Descriptor field)
+    VPCI_MESSAGE_RESOURCE_2 MsiResourceDescriptor;
+} VPCI_CREATE_INTERRUPT_MESSAGE_2, *PVPCI_CREATE_INTERRUPT_MESSAGE_2;
+
+// Message to create an interrupt for a device (version 2).
+// Enhanced version that supports specifying individual processors rather than
+// using a bit mask.
+typedef struct _VPCI_CREATE_INTERRUPT_MESSAGE_3
+{
+    // Type of message (must be VpciMsgCreateInterruptMessage3)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // MSI descriptor for the requested interrupt (Descriptor field)
+    VPCI_MESSAGE_RESOURCE_3 MsiResourceDescriptor;
+} VPCI_CREATE_INTERRUPT_MESSAGE_3, *PVPCI_CREATE_INTERRUPT_MESSAGE_3;
+
+// Message to delete an interrupt for a device.
+typedef struct _VPCI_DELETE_INTERRUPT_MESSAGE
+{
+    // Type of message (must be VpciMsgDeleteInterruptMessage or
+    // VpciMsgDeleteInterruptMessage2)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Remapped MSI resource for the interrupt to delete (Remapped field)
+    VPCI_MESSAGE_RESOURCE RemappedMsiResource;
+} VPCI_DELETE_INTERRUPT_MESSAGE, *PVPCI_DELETE_INTERRUPT_MESSAGE;
+
+// Base message format for PDO (Physical Device Object) operations.
+// Used for operations like release resources.
+typedef struct _VPCI_PDO_MESSAGE
+{
+    // Type of message
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+} VPCI_PDO_MESSAGE, *PVPCI_PDO_MESSAGE;
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus File System
