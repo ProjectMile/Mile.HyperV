@@ -1,5 +1,14 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.764.0**
+
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/openvmm/tree/2366cbcb0c0e170f2158dcd03253a9ab8ff5c7ca.
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/mu_msvm/tree/9dd44d82aaa513e58913616f3a5a567112039574.
+- Update Mile.Project.Configurations to 1.0.1768.
+- Fix several definition and documentation issues.
+
 **Mile.HyperV 1.2.730.0**
 
 - Revise all Mile.HyperV definitions via
