@@ -66,6 +66,7 @@ needed to your C/C++ projects.
     - vm\devices\net\netvsp\src\protocol.rs
     - vm\devices\net\netvsp\src\rndisprot.rs
     - vm\devices\pci\vpci_protocol\src\lib.rs
+    - vm\hv1\hvdef\src\vbs.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
   - Definitions conform with Windows 10 Build 14347's HyperVideo.sys

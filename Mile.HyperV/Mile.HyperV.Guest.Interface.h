@@ -20,6 +20,7 @@
 //   - src\windows\inc\wdk.h
 // - OpenVMM
 //   - vm\hv1\hvdef\src\lib.rs
+//   - vm\hv1\hvdef\src\vbs.rs
 
 #ifndef MILE_HYPERV_GUEST_INTERFACE
 #define MILE_HYPERV_GUEST_INTERFACE
@@ -4033,6 +4034,126 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILIT
     HV_PARTITION_ID TargetPartitionId;
     HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
 } HV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_QUERY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
+
+// *****************************************************************************
+// Hypervisor Extended Hypercall Definitions
+//
+
+typedef enum _HV_EXT_CALL
+{
+    HvExtCallQueryCapabilities = 0x8001,
+} HV_EXT_CALL, *PHV_EXT_CALL;
+
+// *****************************************************************************
+// Hypervisor Virtualization-Based Security Hypercall Definitions
+//
+
+typedef enum _HV_VBS_CALL
+{
+    HvCallVbsVmCallReport = 0xC001,
+} HV_VBS_CALL, *PHV_VBS_CALL;
+
+// HvCallVbsVmCallReport | 0xC001
+
+#define HV_VBS_REPORT_SIZE 0x230
+
+typedef struct _HV_VBS_REPORT_PACKAGE_HEADER
+{
+    // Total size of the VBS report package, including this header.
+    HV_UINT32 PackageSize;
+    // Version of the VBS report package format.
+    HV_UINT32 Version;
+    // Signature scheme used for the report.
+    HV_UINT32 SignatureScheme;
+    // Size of the signature in bytes.
+    HV_UINT32 SignatureSize;
+    // Reserved for future use.
+    HV_UINT32 Reserved;
+} HV_VBS_REPORT_PACKAGE_HEADER, *PHV_VBS_REPORT_PACKAGE_HEADER;
+
+// Virtual Trust Level bitmap.
+typedef union _HV_VBS_VTL_BITMAP
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        // Indicates if Virtual Trust Level 0 is enabled.
+        HV_UINT32 Vtl0 : 1;
+        // Indicates if Virtual Trust Level 1 is enabled.
+        HV_UINT32 Vtl1 : 1;
+        // Indicates if Virtual Trust Level 2 is enabled.
+        HV_UINT32 Vtl2 : 1;
+        HV_UINT32 Reserved : 29;
+    };
+} HV_VBS_VTL_BITMAP, *PHV_VBS_VTL_BITMAP;
+
+// Security attributes for the VM.
+typedef union _HV_VBS_SECURITY_ATTRIBUTES
+{
+    HV_UINT32 AsUINT32;
+    struct
+    {
+        // Indicates if debugging is allowed on the VM.
+        HV_UINT32 DebugAllowed : 1;
+        HV_UINT32 Reserved : 31;
+    };
+} HV_VBS_SECURITY_ATTRIBUTES, *PHV_VBS_SECURITY_ATTRIBUTES;
+
+// VBS VM identity structure.
+typedef struct _HV_VBS_VM_IDENTITY
+{
+    // Owner ID of the VM.
+    HV_UINT8 OwnerId[32];
+    // Measurement of the VM.
+    HV_UINT8 Measurement[32];
+    // Signer of the VM.
+    HV_UINT8 Signer[32];
+    // Host-specific data.
+    HV_UINT8 HostData[32];
+    // Enabled Virtual Trust Levels bitmap.
+    HV_VBS_VTL_BITMAP EnabledVtl;
+    // Security policy attributes.
+    HV_VBS_SECURITY_ATTRIBUTES Policy;
+    // Guest Virtual Trust Level.
+    HV_UINT32 GuestVtl;
+    // Guest Security Version Number.
+    HV_UINT32 GuestSvn;
+    // Guest Product ID.
+    HV_UINT32 GuestProductId;
+    // Guest Module ID.
+    HV_UINT32 GuestModuleId;
+    // Reserved for future use.
+    HV_UINT8 Reserved[64];
+} HV_VBS_VM_IDENTITY, *PHV_VBS_VM_IDENTITY;
+
+// VBS report structure.
+typedef struct _HV_VBS_REPORT
+{
+    // Package header containing metadata about the report.
+    HV_VBS_REPORT_PACKAGE_HEADER Header;
+    // Version of the VBS report.
+    HV_UINT32 Version;
+    // Report data that is provided at the runtime.
+    HV_UINT8 ReportData[64];
+    // Identity information of the VM.
+    HV_VBS_VM_IDENTITY Identity;
+    // Signature of the report.
+    HV_UINT8 Signature[256];
+} HV_VBS_REPORT, *PHV_VBS_REPORT;
+HV_STATIC_ASSERT(sizeof(HV_VBS_REPORT) == HV_VBS_REPORT_SIZE);
+
+#define HV_VBS_VM_REPORT_DATA_SIZE 64
+#define HV_VBS_VM_MAX_REPORT_SIZE 2048
+
+typedef struct HV_CALL_ATTRIBUTES _HV_VBS_INPUT_VM_CALL_REPORT
+{
+    HV_UINT8 ReportData[HV_VBS_VM_REPORT_DATA_SIZE];
+} HV_VBS_INPUT_VM_CALL_REPORT, *PHV_VBS_INPUT_VM_CALL_REPORT;
+
+typedef struct HV_CALL_ATTRIBUTES _HV_VBS_OUTPUT_VM_CALL_REPORT
+{
+    HV_UINT8 Report[HV_VBS_VM_MAX_REPORT_SIZE];
+} HV_VBS_OUTPUT_VM_CALL_REPORT, *PHV_VBS_OUTPUT_VM_CALL_REPORT;
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)

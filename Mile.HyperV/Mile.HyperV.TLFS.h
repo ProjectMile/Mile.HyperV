@@ -12246,17 +12246,16 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MAP_PARTITION_EVENTLOG_BUFFER
 // Hypervisor Extended Hypercall Definitions
 //
 
-typedef enum _HV_EXT_CALL
+typedef enum _HV_EXT_CALL_PRIVATE
 {
     HvExtCallReserved = 0x8000,
-    HvExtCallQueryCapabilities = 0x8001,
     HvExtCallGetBootZeroedMemory = 0x8002,
     HvExtCallMemoryHeatHint = 0x8003,
     HvExtCallEpfSetup = 0x8004,
     HvExtCallSchedulerAssistSetup = 0x8005,
     HvExtCallMemoryHeatHintAsync = 0x8006,
     HvExtCallMax = 0x8007,
-} HV_EXT_CALL, *PHV_EXT_CALL;
+} HV_EXT_CALL_PRIVATE, *PHV_EXT_CALL_PRIVATE;
 
 // HvExtCallReserved | 0x8000
 
