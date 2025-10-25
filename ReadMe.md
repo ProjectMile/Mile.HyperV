@@ -29,6 +29,7 @@ needed to your C/C++ projects.
   - Include Hyper-V related definitions from
     https://github.com/microsoft/openvmm/tree/2366cbcb0c0e170f2158dcd03253a9ab8ff5c7ca
     - vm\hv1\hvdef\src\lib.rs
+    - vm\hv1\hvdef\src\vbs.rs
 - Mile.HyperV.Guest.Protocols.h
   - Include Hyper-V related definitions from
     https://github.com/microsoft/mu_msvm/tree/9dd44d82aaa513e58913616f3a5a567112039574
@@ -66,7 +67,6 @@ needed to your C/C++ projects.
     - vm\devices\net\netvsp\src\protocol.rs
     - vm\devices\net\netvsp\src\rndisprot.rs
     - vm\devices\pci\vpci_protocol\src\lib.rs
-    - vm\hv1\hvdef\src\vbs.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
   - Definitions conform with Windows 10 Build 14347's HyperVideo.sys
