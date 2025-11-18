@@ -4,5 +4,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Mile.HyperV.Test/Mile.HyperV.Test.vcxproj" />
+  <Project Path="Mile.HyperV.Test/Mile.HyperV.Test.vcxproj" Id="2b3cc3a9-a129-4ad2-9594-a87994145cfd" />
 </Solution>
