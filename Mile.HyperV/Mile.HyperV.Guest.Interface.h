@@ -1358,7 +1358,9 @@ typedef union _HV_REGISTER_VSM_CAPABILITIES
         HV_UINT64 InstallInterceptEx : 1;
         // Only available in VTL2.
         HV_UINT64 InterceptSystemResetAvailable : 1;
-        HV_UINT64 Reserved : 31;
+        HV_UINT64 Reserved1 : 1;
+        HV_UINT64 ProxyInterruptRedirectAvailable : 1;
+        HV_UINT64 Reserved1 : 29;
     };
 } HV_REGISTER_VSM_CAPABILITIES, *PHV_REGISTER_VSM_CAPABILITIES;
 
@@ -1647,6 +1649,7 @@ typedef struct _HV_INTERRUPT_ENTRY
 
 #define HV_DEVICE_INTERRUPT_TARGET_MULTICAST 1
 #define HV_DEVICE_INTERRUPT_TARGET_PROCESSOR_SET 2
+#define HV_DEVICE_INTERRUPT_TARGET_PROXY_REDIRECT 4
 
 typedef union _HV_DEVICE_INTERRUPT_TARGET_FLAGS
 {
@@ -1655,7 +1658,8 @@ typedef union _HV_DEVICE_INTERRUPT_TARGET_FLAGS
     {
         HV_UINT32 Multicast : 1;
         HV_UINT32 ProcessorSet : 1;
-        HV_UINT32 Reserved : 30;
+        HV_UINT32 ProxyRedirect : 1;
+        HV_UINT32 Reserved : 29;
     };
 } HV_DEVICE_INTERRUPT_TARGET_FLAGS, *PHV_DEVICE_INTERRUPT_TARGET_FLAGS;
 

@@ -3553,6 +3553,11 @@ typedef struct _RNDIS_RECEIVE_SCALE_PARAMETERS
 
 #define RNDIS_ENCAPSULATION_IEEE_802_3 2
 
+// Use the same minimum as vmswitch.
+#define LSO_MIN_SEGMENT_COUNT 2
+// Use the same maximum as vmswitch.
+#define LSO_MAX_OFFLOAD_SIZE 0xF53C
+
 typedef struct _RNDIS_TCP_IP_CHECKSUM_OFFLOAD
 {
     struct
