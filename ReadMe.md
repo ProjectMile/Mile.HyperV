@@ -16,7 +16,7 @@ needed to your C/C++ projects.
   - Only depend on stdint.h if Mile.Mobility.Portable.Types.h if not available.
 - Mile.HyperV.Guest.Interface.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/mu_msvm/tree/9dd44d82aaa513e58913616f3a5a567112039574
+    https://github.com/microsoft/mu_msvm/tree/04548fca3cb84b03b3ceebd0e01972e6254eeb6d
     - MsvmPkg\Include\Hv\HvStatus.h
     - MsvmPkg\Include\Hv\HvGuest.h
     - MsvmPkg\Include\Hv\HvGuestCpuid.h
@@ -32,7 +32,7 @@ needed to your C/C++ projects.
     - vm\hv1\hvdef\src\vbs.rs
 - Mile.HyperV.Guest.Protocols.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/mu_msvm/tree/9dd44d82aaa513e58913616f3a5a567112039574
+    https://github.com/microsoft/mu_msvm/tree/04548fca3cb84b03b3ceebd0e01972e6254eeb6d
     - MsvmPkg\MsvmPkg.dec
     - MsvmPkg\Include\Vmbus\NtStatus.h
     - MsvmPkg\Include\MsvmBase.h
