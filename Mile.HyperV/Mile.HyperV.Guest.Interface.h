@@ -4436,6 +4436,8 @@ typedef enum _HV_CALL_CODE
     // V8 Intercept Completion.
     HvCallGetInterceptData = 0x00DF,
 
+    HvCallRestorePartitionTime = 0x0103,
+
     // Memory Mapped IO
 
     HvCallMemoryMappedIoRead = 0x0106,
@@ -4893,6 +4895,17 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
     // Supplies an array of GPA page numbers to modify.
     HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
 } HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY, *PHV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY;
+
+// HvCallRestorePartitionTime | 0x0103
+
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RESTORE_PARTITION_TIME
+{
+    HV_PARTITION_ID PartitionId;
+    HV_UINT32 TscSequence;
+    HV_UINT32 ReservedZ;
+    HV_UINT64 ReferenceTime; // in 100ns
+    HV_UINT64 Tsc;
+} HV_INPUT_RESTORE_PARTITION_TIME, *PHV_INPUT_RESTORE_PARTITION_TIME;
 
 // HvCallMemoryMappedIoRead | 0x0106
 

@@ -8956,7 +8956,6 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallSetDeviceCapabilities = 0x0100, // Symbols
     HvCallGetPartitionPropertyEx = 0x0101, // Symbols
     HvCallGetGpaRangesAccessState = 0x0102, // Symbols
-    HvCallRestorePartitionTime = 0x0103, // Symbols
     HvCallQueryAssociatedLpsForMcaEx = 0x0104, // Symbols
     HvCallQueryPartitionReservedPages = 0x0105, // Symbols
     HvCallMapDmaRange = 0x0108, // Symbols
@@ -11485,14 +11484,7 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_GET_GPA_RANGES_ACCESS_STATE
 
 // HvCallRestorePartitionTime | 0x0103
 
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_RESTORE_PARTITION_TIME
-{
-    HV_UINT64 PartitionId;
-    HV_UINT32 TscSequence;
-    HV_UINT32 ReservedZ;
-    HV_UINT64 ReferenceTime;
-    HV_UINT64 Tsc;
-} HV_INPUT_RESTORE_PARTITION_TIME, *PHV_INPUT_RESTORE_PARTITION_TIME;
+// Already defined in Mile.HyperV.Guest.Interface.h.
 
 // HvCallQueryAssociatedLpsForMcaEx | 0x0104
 

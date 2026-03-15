@@ -4129,6 +4129,8 @@ typedef enum _VPCI_MESSAGE
     VpciMsgCreateInterruptMessage3,
     // Reset a device
     VpciMsgResetDevice,
+    // TDISP command from guest to host
+    VpciMsgTdispCommand,
 } VPCI_MESSAGE, *PVPCI_MESSAGE;
 
 typedef struct _VPCI_PACKET_HEADER
@@ -4616,6 +4618,50 @@ typedef struct _VPCI_PDO_MESSAGE
     // PCI slot number of the target device
     PCI_SLOT_NUMBER Slot;
 } VPCI_PDO_MESSAGE, *PVPCI_PDO_MESSAGE;
+
+// A TDISP packet being sent to the host.
+typedef struct _VPCI_TDISP_COMMAND_HEADER
+{
+    // Type of message (must be VpciMsgTdispCommand)
+    VPCI_PACKET_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Length of the data payload to follow
+    HV_UINT64 DataLength;
+    // Followed by DataLength bytes of data
+    // Commented out because VPCI_TDISP_COMMAND includes the data payload as a
+    // byte array, so this is just informational.
+    //HV_UINT8 Data[HV_ANYSIZE_ARRAY];
+} VPCI_TDISP_COMMAND_HEADER, *PVPCI_TDISP_COMMAND_HEADER;
+
+// A TDISP packet response from the host to the guest.
+typedef struct _VPCI_TDISP_COMMAND_HEADER_REPLY
+{
+    // Status of the translation operation
+    VPCI_REPLY_HEADER Header;
+    // PCI slot number of the target device
+    PCI_SLOT_NUMBER Slot;
+    // Length of the data payload to follow
+    HV_UINT64 DataLength;
+    // Followed by DataLength bytes of data
+    // Commented out because VPCI_TDISP_COMMAND includes the data payload as a
+    // byte array, so this is just informational.
+    //HV_UINT8 Data[HV_ANYSIZE_ARRAY];
+} VPCI_TDISP_COMMAND_HEADER_REPLY, *PVPCI_TDISP_COMMAND_HEADER_REPLY;
+
+// A serialized TDISP VPCI VMBUS command packet.
+typedef struct _VPCI_TDISP_COMMAND
+{
+    // Header of the VMBUS packet
+    VPCI_TDISP_COMMAND_HEADER Header;
+    // The payload of the command (serialized to a byte array)
+    HV_UINT8 Data[HV_ANYSIZE_ARRAY];
+} VPCI_TDISP_COMMAND, *PVPCI_TDISP_COMMAND;
+
+// Maximum size of a TDISP command in bytes. Property of the VMBUS
+// implementation on the host.
+#define VPCI_MAX_TDISP_COMMAND_SIZE ( \
+    VPCI_MAXIMUM_PACKET_SIZE - sizeof(VPCI_TDISP_COMMAND_HEADER))
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus File System
