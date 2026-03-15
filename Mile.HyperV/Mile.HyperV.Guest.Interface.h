@@ -1360,7 +1360,7 @@ typedef union _HV_REGISTER_VSM_CAPABILITIES
         HV_UINT64 InterceptSystemResetAvailable : 1;
         HV_UINT64 Reserved1 : 1;
         HV_UINT64 ProxyInterruptRedirectAvailable : 1;
-        HV_UINT64 Reserved1 : 29;
+        HV_UINT64 Reserved2 : 29;
     };
 } HV_REGISTER_VSM_CAPABILITIES, *PHV_REGISTER_VSM_CAPABILITIES;
 
