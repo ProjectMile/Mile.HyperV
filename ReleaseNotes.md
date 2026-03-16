@@ -1,5 +1,15 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.907.0**
+
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/openvmm/tree/3a79304b0705f38965a37c3cc692439050ffc94f.
+- Revise all Mile.HyperV definitions via
+  https://github.com/microsoft/mu_msvm/tree/e2299ff8cbb2e6fe79042be09a6b550a19957d41.
+- Update Mile.Project.Configurations to 1.0.1917.
+- Update Mile.Mobility to 1.0.372.
+- Migrate solution from sln to slnx.
+
 **Mile.HyperV 1.2.764.0**
 
 - Revise all Mile.HyperV definitions via
