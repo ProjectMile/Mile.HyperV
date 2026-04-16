@@ -27,7 +27,7 @@ needed to your C/C++ projects.
     https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
     - src\windows\inc\wdk.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/3a79304b0705f38965a37c3cc692439050ffc94f
+    https://github.com/microsoft/openvmm/tree/52302e44c6ec35abb8cb1d316cca43326a7495e7
     - vm\hv1\hvdef\src\lib.rs
     - vm\hv1\hvdef\src\vbs.rs
 - Mile.HyperV.Guest.Protocols.h
@@ -50,7 +50,7 @@ needed to your C/C++ projects.
     - MsvmPkg\VpcivscDxe\PciBars.h
     - MsvmPkg\Include\Protocol\VmbusFileSystem.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/3a79304b0705f38965a37c3cc692439050ffc94f
+    https://github.com/microsoft/openvmm/tree/52302e44c6ec35abb8cb1d316cca43326a7495e7
     - vm\devices\vmbus\vmbfs\src\protocol.rs
     - vm\devices\vmbus\vmbus_ring\src\lib.rs
     - vm\devices\vmbus\vmbus_core\src\protocol.rs

@@ -1815,17 +1815,14 @@ typedef enum _HV_PROCESSOR_VENDOR
 } HV_PROCESSOR_VENDOR, *PHV_PROCESSOR_VENDOR;
 
 #if defined(_M_ARM64)
+
 #define HV_PARTITION_PROCESSOR_FEATURES_BANKS 1
-#elif defined(_M_AMD64) || defined(_M_IX86)
-#define HV_PARTITION_PROCESSOR_FEATURES_BANKS 2
-#endif
 
 // Define the structure defining the processor related features that may be
 // de-featured.
 typedef union _HV_PARTITION_PROCESSOR_FEATURES
 {
     HV_UINT64 AsUINT64[HV_PARTITION_PROCESSOR_FEATURES_BANKS];
-#if defined(_M_ARM64)
     struct
     {
         HV_UINT64 Asid16 : 1;
@@ -1935,104 +1932,9 @@ typedef union _HV_PARTITION_PROCESSOR_FEATURES
         HV_UINT64 SpecFpacc : 1;
         HV_UINT64 ReservedBank1 : 23;
     };
-#elif defined(_M_AMD64) || defined(_M_IX86)
-    struct
-    {
-        HV_UINT64 Sse3Support : 1;
-        HV_UINT64 LahfSahfSupport : 1;
-        HV_UINT64 Ssse3Support : 1;
-        HV_UINT64 Sse4_1Support : 1;
-        HV_UINT64 Sse4_2Support : 1;
-        HV_UINT64 Sse4aSupport : 1;
-        HV_UINT64 XopSupport : 1;
-        HV_UINT64 PopCntSupport : 1;
-        HV_UINT64 Cmpxchg16bSupport : 1;
-        HV_UINT64 Altmovcr8Support : 1;
-        HV_UINT64 LzcntSupport : 1;
-        HV_UINT64 MisAlignSseSupport : 1;
-        HV_UINT64 MmxExtSupport : 1;
-        HV_UINT64 Amd3DNowSupport : 1;
-        HV_UINT64 ExtendedAmd3DNowSupport : 1;
-        HV_UINT64 Page1GBSupport : 1;
-        HV_UINT64 AesSupport : 1;
-        HV_UINT64 PclmulqdqSupport : 1;
-        HV_UINT64 PcidSupport : 1;
-        HV_UINT64 Fma4Support : 1;
-        HV_UINT64 F16cSupport : 1;
-        HV_UINT64 RdRandSupport : 1;
-        HV_UINT64 RdWrFsGsSupport : 1;
-        HV_UINT64 SmepSupport : 1;
-        HV_UINT64 EnhancedFastStringSupport : 1;
-        HV_UINT64 Bmi1Support : 1;
-        HV_UINT64 Bmi2Support : 1;
-        HV_UINT64 HleSupportDeprecated : 1;
-        HV_UINT64 RtmSupportDeprecated : 1;
-        HV_UINT64 MovbeSupport : 1;
-        HV_UINT64 Npiep1Support : 1;
-        HV_UINT64 DepX87FpuSaveSupport : 1;
-        HV_UINT64 RdSeedSupport : 1;
-        HV_UINT64 AdxSupport : 1;
-        HV_UINT64 IntelPrefetchSupport : 1;
-        HV_UINT64 SmapSupport : 1;
-        HV_UINT64 HleSupport : 1;
-        HV_UINT64 RtmSupport : 1;
-        HV_UINT64 RdtscpSupport : 1;
-        HV_UINT64 ClflushoptSupport : 1;
-        HV_UINT64 ClwbSupport : 1;
-        HV_UINT64 ShaSupport : 1;
-        HV_UINT64 X87PointersSavedSupport : 1;
-        HV_UINT64 InvpcidSupport : 1;
-        HV_UINT64 IbrsSupport : 1;
-        HV_UINT64 StibpSupport : 1;
-        HV_UINT64 IbpbSupport : 1;
-        HV_UINT64 UnrestrictedGuestSupport : 1;
-        HV_UINT64 MddSupport : 1;
-        HV_UINT64 FastShortRepMovSupport : 1;
-        HV_UINT64 L1dcacheFlushSupport : 1;
-        HV_UINT64 RdclNoSupport : 1;
-        HV_UINT64 IbrsAllSupport : 1;
-        HV_UINT64 SkipL1dfSupport : 1;
-        HV_UINT64 SsbNoSupport : 1;
-        HV_UINT64 RsbANoSupport : 1;
-        HV_UINT64 VirtSpecCtrlSupport : 1;
-        HV_UINT64 RdPidSupport : 1;
-        HV_UINT64 UmipSupport : 1;
-        HV_UINT64 MbsNoSupport : 1;
-        HV_UINT64 MbClearSupport : 1;
-        HV_UINT64 TaaNoSupport : 1;
-        HV_UINT64 TsxCtrlSupport : 1;
-        // N.B. The final processor feature bit in bank 0 is reserved to
-        // simplify potential downlevel backports.
-        HV_UINT64 ReservedBank0 : 1;
-
-        // N.B. Begin bank 1 processor features.
-        HV_UINT64 AcountMcountSupport : 1;
-        HV_UINT64 TscInvariantSupport : 1;
-        HV_UINT64 ClZeroSupport : 1;
-        HV_UINT64 RdpruSupport : 1;
-        HV_UINT64 La57Support : 1;
-        HV_UINT64 MbecSupport : 1;
-        HV_UINT64 NestedVirtSupport : 1;
-        HV_UINT64 PsfdSupport : 1;
-        HV_UINT64 CetSsSupport : 1;
-        HV_UINT64 CetIbtSupport : 1;
-        HV_UINT64 VmxExceptionInjectSupport : 1;
-        HV_UINT64 EnqcmdSupport : 1;
-        HV_UINT64 UmwaitTpauseSupport : 1;
-        HV_UINT64 MovdiriSupport : 1;
-        HV_UINT64 Movdir64bSupport : 1;
-        HV_UINT64 CldemoteSupport : 1;
-        HV_UINT64 SerializeSupport : 1;
-        HV_UINT64 TscDeadlineTmrSupport : 1;
-        HV_UINT64 TscAdjustSupport : 1;
-        HV_UINT64 FzlrepMovsb : 1;
-        HV_UINT64 FsrepStosb : 1;
-        HV_UINT64 FsrepCmpsb : 1;
-        HV_UINT64 ReservedBank1 : 42;
-    };
-#endif
 } HV_PARTITION_PROCESSOR_FEATURES, *PHV_PARTITION_PROCESSOR_FEATURES;
 typedef const HV_PARTITION_PROCESSOR_FEATURES* PCHV_PARTITION_PROCESSOR_FEATURES;
+#endif
 
 // Define the processor features avaialble in Intel and AMD compatibility mode.
 
@@ -2076,22 +1978,6 @@ typedef const HV_PARTITION_PROCESSOR_FEATURES* PCHV_PARTITION_PROCESSOR_FEATURES
     0, /* Page1GBSupport */ \
     0  /* Reserved1 */ \
 }
-
-// Define the structure defining the processor XSAVE related features that may
-// be de-featured.
-typedef union _HV_PARTITION_PROCESSOR_XSAVE_FEATURES
-{
-#if defined(_M_AMD64) || defined(_M_IX86)
-    struct
-    {
-        HV_UINT64 XsaveSupport : 1;
-        HV_UINT64 XsaveoptSupport : 1;
-        HV_UINT64 AvxSupport : 1;
-        HV_UINT64 Reserved1 : 61;
-    };
-#endif
-    HV_UINT64 AsUINT64;
-} HV_PARTITION_PROCESSOR_XSAVE_FEATURES, *PHV_PARTITION_PROCESSOR_XSAVE_FEATURES;
 
 // Define the processor features avaialble in Intel and AMD compatibility mode.
 
@@ -2382,10 +2268,6 @@ typedef enum _HV_CACHE_TYPE_PRIVATE
 
 // Define the expected SynIC version.
 #define HV_SYNIC_VERSION_1 (0x1)
-
-// Define synthetic interrupt controller message constants.
-
-#define HV_ANY_VP (0xFFFFFFFF)
 
 // Define lowest permissible vector that can be sent or received by the local
 // APIC.
@@ -4978,111 +4860,6 @@ typedef enum _HV_PARTITION_ISOLATION_STATE
     HvPartitionIsolationSecureTerminating = 5,
 } HV_PARTITION_ISOLATION_STATE, *PHV_PARTITION_ISOLATION_STATE;
 
-#define HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS 1
-
-typedef union _HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES
-{
-    HV_UINT64 AsUINT64[HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES_BANKS];
-    struct
-    {
-        // Report a hypervisor is present. CPUID leaves 0x40000000 and
-        // 0x40000001 are supported.
-        HV_UINT64 HypervisorPresent : 1;
-
-        // Features associated with HV#1:
-
-        // Report support for Hv1 (CPUID leaves 0x40000000 - 0x40000006).
-        HV_UINT64 Hv1 : 1;
-        // Access to HV_X64_MSR_VP_RUNTIME.
-        // Corresponds to AccessVpRunTimeReg privilege.
-        HV_UINT64 AccessVpRunTimeReg : 1;
-        // Access to HV_X64_MSR_TIME_REF_COUNT.
-        // Corresponds to AccessPartitionReferenceCounter privilege.
-        HV_UINT64 AccessPartitionReferenceCounter : 1;
-        // Access to SINT-related registers (HV_X64_MSR_SCONTROL through
-        // HV_X64_MSR_EOM and HV_X64_MSR_SINT0 through HV_X64_MSR_SINT15).
-        // Corresponds to AccessSynicRegs privilege.
-        HV_UINT64 AccessSynicRegs : 1;
-        // Access to synthetic timers and associated MSRs
-        // (HV_X64_MSR_STIMER0_CONFIG through HV_X64_MSR_STIMER3_COUNT).
-        // Corresponds to AccessSyntheticTimerRegs privilege.
-        HV_UINT64 AccessSyntheticTimerRegs : 1;
-        // Access to APIC MSRs (HV_X64_MSR_EOI, HV_X64_MSR_ICR and
-        // HV_X64_MSR_TPR) as well as the VP assist page.
-        // Corresponds to AccessIntrCtrlRegs privilege.
-        HV_UINT64 AccessIntrCtrlRegs : 1;
-        // Access to registers associated with hypercalls
-        // (HV_X64_MSR_GUEST_OS_ID and HV_X64_MSR_HYPERCALL).
-        // Corresponds to AccessHypercallMsrs privilege.
-        HV_UINT64 AccessHypercallMsrs : 1;
-        // VP index can be queried. corresponds to AccessVpIndex privilege.
-        HV_UINT64 AccessVpIndex : 1;
-        // Access to the reference TSC. Corresponds to
-        // AccessPartitionReferenceTsc privilege.
-        HV_UINT64 AccessPartitionReferenceTsc : 1;
-        // Partition has access to the guest idle reg. Corresponds to
-        // AccessGuestIdleReg privilege.
-        HV_UINT64 AccessGuestIdleReg : 1;
-        // Partition has access to frequency regs. corresponds to
-        // AccessFrequencyRegs privilege.
-        HV_UINT64 AccessFrequencyRegs : 1;
-        // Reserved for AccessReenlightenmentControls.
-        HV_UINT64 ReservedZ12 : 1;
-        // Reserved for AccessRootSchedulerReg.
-        HV_UINT64 ReservedZ13 : 1;
-        // Reserved for AccessTscInvariantControls.
-        HV_UINT64 ReservedZ14 : 1;
-        // Extended GVA ranges for HvCallFlushVirtualAddressList hypercall.
-        // Corresponds to privilege.
-        HV_UINT64 EnableExtendedGvaRangesForFlushVirtualAddressList : 1;
-        // Reserved for AccessVsm.
-        HV_UINT64 ReservedZ16 : 1;
-        // Reserved for AccessVpRegisters.
-        HV_UINT64 ReservedZ17 : 1;
-        // Use fast hypercall output. Corresponds to privilege.
-        HV_UINT64 FastHypercallOutput : 1;
-        // Reserved for EnableExtendedHypercalls.
-        HV_UINT64 ReservedZ19 : 1;
-        // HvStartVirtualProcessor can be used to start virtual processors.
-        // Corresponds to privilege.
-        HV_UINT64 StartVirtualProcessor : 1;
-        // Reserved for Isolation.
-        HV_UINT64 ReservedZ21 : 1;
-        // Synthetic timers in direct mode.
-        HV_UINT64 DirectSyntheticTimers : 1;
-        // Reserved for synthetic time unhalted timer
-        HV_UINT64 ReservedZ23 : 1;
-        // Use extended processor masks.
-        HV_UINT64 ExtendedProcessorMasks : 1;
-        // HvCallFlushVirtualAddressSpace / HvCallFlushVirtualAddressList are
-        // supported.
-        HV_UINT64 TbFlushHypercalls : 1;
-        // HvCallSendSyntheticClusterIpi is supported.
-        HV_UINT64 SyntheticClusterIpi : 1;
-        // HvCallNotifyLongSpinWait is supported.
-        HV_UINT64 NotifyLongSpinWait : 1;
-        // HvCallQueryNumaDistance is supported.
-        HV_UINT64 QueryNumaDistance : 1;
-        // HvCallSignalEvent is supported. Corresponds to privilege.
-        HV_UINT64 SignalEvents : 1;
-        // HvCallRetargetDeviceInterrupt is supported.
-        HV_UINT64 RetargetDeviceInterrupt : 1;
-        // HvCallRestorePartitionTime is supported.
-        HV_UINT64 RestoreTime : 1;
-        // EnlightenedVmcs nested enlightenment is supported.
-        HV_UINT64 EnlightenedVmcs : 1;
-        HV_UINT64 ReservedZ33 : 1;
-        HV_UINT64 ReservedZ34 : 1;
-        HV_UINT64 ReservedZ35 : 1;
-        HV_UINT64 RegisterInterceptsV1 : 1;
-        HV_UINT64 WakeVps : 1;
-        HV_UINT64 AccessVpRegs : 1;
-        HV_UINT64 SyncContext : 1;
-        HV_UINT64 ManagementVtlSynicSupport : 1;
-        HV_UINT64 Reserved : 23;
-    };
-} HV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES, *PHV_PARTITION_SYNTHETIC_PROCESSOR_FEATURES;
-
 #define HV_MAKE_COMPATIBILITY_VERSION(Major, Minor) \
 	((HV_UINT32)((Major) << 8 | (Minor)))
 
@@ -5232,29 +5009,6 @@ typedef struct _HV_SYNTHETIC_TIMERS_STATE_PRIVATE
 } HV_SYNTHETIC_TIMERS_STATE_PRIVATE, *PHV_SYNTHETIC_TIMERS_STATE_PRIVATE;
 
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef struct _HV_REGISTER_X64_CPUID_RESULT_PARAMETERS
-{
-    struct
-    {
-        HV_UINT32 Eax;
-        HV_UINT32 Ecx;
-        HV_UINT8 SubleafSpecific;
-        HV_UINT8 AlwaysOverride;
-        HV_UINT16 Padding;
-    } Input;
-    struct
-    {
-        HV_UINT32 Eax;
-        HV_UINT32 EaxMask;
-        HV_UINT32 Ebx;
-        HV_UINT32 EbxMask;
-        HV_UINT32 Ecx;
-        HV_UINT32 EcxMask;
-        HV_UINT32 Edx;
-        HV_UINT32 EdxMask;
-    } Result;
-} HV_REGISTER_X64_CPUID_RESULT_PARAMETERS, *PHV_REGISTER_X64_CPUID_RESULT_PARAMETERS;
-
 typedef struct _HV_REGISTER_X64_MSR_RESULT_PARAMETERS
 {
     HV_UINT32 MsrIndex;
@@ -5262,11 +5016,10 @@ typedef struct _HV_REGISTER_X64_MSR_RESULT_PARAMETERS
     HV_UNIMPLEMENTED_MSR_ACTION Action;
 } HV_REGISTER_X64_MSR_RESULT_PARAMETERS, *PHV_REGISTER_X64_MSR_RESULT_PARAMETERS;
 
-typedef union _HV_REGISTER_INTERCEPT_RESULT_PARAMETERS
+typedef union _HV_REGISTER_INTERCEPT_RESULT_PARAMETERS_PRIVATE
 {
-    HV_REGISTER_X64_CPUID_RESULT_PARAMETERS Cpuid;
     HV_REGISTER_X64_MSR_RESULT_PARAMETERS Msr;
-} HV_REGISTER_INTERCEPT_RESULT_PARAMETERS, *PHV_REGISTER_INTERCEPT_RESULT_PARAMETERS;
+} HV_REGISTER_INTERCEPT_RESULT_PARAMETERS_PRIVATE, *PHV_REGISTER_INTERCEPT_RESULT_PARAMETERS_PRIVATE;
 #endif
 
 typedef struct _HV_ASYNC_COMPLETION_MESSAGE_PAYLOAD
@@ -10309,14 +10062,16 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGES
 
 // HvCallRegisterInterceptResult | 0x0091
 
+// Already partially defined in Mile.HyperV.Guest.Interface.h.
+
 #if defined(_M_AMD64) || defined(_M_IX86)
-typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT
+typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_REGISTER_INTERCEPT_RESULT_PRIVATE
 {
     HV_PARTITION_ID PartitionId;
     HV_VP_INDEX VpIndex;
     HV_INTERCEPT_TYPE InterceptType;
-    HV_REGISTER_INTERCEPT_RESULT_PARAMETERS Parameters;
-} HV_INPUT_REGISTER_INTERCEPT_RESULT, *PHV_INPUT_REGISTER_INTERCEPT_RESULT;
+    HV_REGISTER_INTERCEPT_RESULT_PARAMETERS_PRIVATE Parameters;
+} HV_INPUT_REGISTER_INTERCEPT_RESULT_PRIVATE, *PHV_INPUT_REGISTER_INTERCEPT_RESULT_PRIVATE;
 #endif
 
 // HvCallUnregisterInterceptResult | 0x0092
