@@ -27,6 +27,8 @@ typedef MO_UINT16 HV_UINT16, *PHV_UINT16;
 typedef MO_UINT32 HV_UINT32, *PHV_UINT32;
 typedef MO_UINT64 HV_UINT64, *PHV_UINT64;
 
+typedef MO_CHAR HV_CHAR;
+
 typedef MO_WIDE_CHAR HV_WCHAR;
 
 typedef MO_GUID HV_GUID, *PHV_GUID;
@@ -73,6 +75,8 @@ typedef uint8_t HV_UINT8, *PHV_UINT8;
 typedef uint16_t HV_UINT16, *PHV_UINT16;
 typedef uint32_t HV_UINT32, *PHV_UINT32;
 typedef uint64_t HV_UINT64, *PHV_UINT64;
+
+typedef char HV_CHAR;
 
 #ifdef _WCHAR_T_DEFINED
 typedef wchar_t HV_WCHAR;

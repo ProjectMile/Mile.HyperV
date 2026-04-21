@@ -49,6 +49,11 @@ needed to your C/C++ projects.
     - MsvmPkg\VpcivscDxe\VpciProtocol.h
     - MsvmPkg\VpcivscDxe\PciBars.h
     - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+    - MsvmPkg\Include\BiosInterface.h
+    - MsvmPkg\MsvmPkgAARCH64.dsc
+    - MsvmPkg\MsvmPkgX64.dsc
+    - MsvmPkg\Include\BiosEventLogInterface.h
+    - MsvmPkg\Include\BiosBootLogInterface.h
   - Include Hyper-V related definitions from
     https://github.com/microsoft/openvmm/tree/52302e44c6ec35abb8cb1d316cca43326a7495e7
     - vm\devices\vmbus\vmbfs\src\protocol.rs

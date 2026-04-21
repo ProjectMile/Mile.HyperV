@@ -26,6 +26,11 @@
 //   - MsvmPkg\VpcivscDxe\VpciProtocol.h
 //   - MsvmPkg\VpcivscDxe\PciBars.h
 //   - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+//   - MsvmPkg\Include\BiosInterface.h
+//   - MsvmPkg\MsvmPkgAARCH64.dsc
+//   - MsvmPkg\MsvmPkgX64.dsc
+//   - MsvmPkg\Include\BiosEventLogInterface.h
+//   - MsvmPkg\Include\BiosBootLogInterface.h
 // - OpenVMM
 //   - vm\devices\vmbus\vmbfs\src\protocol.rs
 //   - vm\devices\vmbus\vmbus_ring\src\lib.rs
@@ -5513,6 +5518,964 @@ const HV_GUID INHERITED_ACTIVATION_CLASS_ID =
     0x9E15,
     0x4B30,
     { 0xB7, 0x65, 0x67, 0xAC, 0xB1, 0x0D, 0x60, 0x7B }
+};
+
+// *****************************************************************************
+// Microsoft Hyper-V BIOS Virtual Device
+//
+
+// According to OpenVMM's vm\devices\firmware\firmware_uefi\src\lib.rs (not the
+// definition reference), we can see:
+// > NOTE: Unlike Hyper-V's implementation, this device is _not_ responsible for
+// > injecting UEFI config blobs into guest memory (i.e: things like VM topology
+// > information, device enablement info, etc...). That happens _outside_ this
+// > device, as part of VM initialization, in tandem with loading the UEFI image
+// > itself.
+// So, we should only reference implementations in Hyper-V Generation 2 Virtual
+// Machine UEFI Firmware because it's more professional and more reliable than
+// the OpenVMM's implementation for the BIOS Virtual Device field.
+
+// BIOS Interface constants
+typedef enum _BIOS_INTERFACE_CONSTANTS
+{
+    BiosInterfaceMaximumProcessorNumber = 64,
+    BiosInterfaceEntropyTableSize = 64,
+    BiosInterfaceGenerationIdSize = 16,
+    BiosInterfaceSmbiosStringMax = 32
+} BIOS_INTERFACE_CONSTANTS, *PBIOS_INTERFACE_CONSTANTS;
+
+// BIOS configuration ports.
+#if defined(_M_ARM64)
+#define BIOS_INTERFACE_BASE_ADDRESS 0xEFFED000
+#elif defined(_M_AMD64) || defined(_M_IX86)
+#define BIOS_INTERFACE_BASE_ADDRESS 0x28
+#endif
+
+// Values/Selectors for the BIOS configuration ports. Existing values can not
+// change after Hyper-V is released. Only new values can be added if they were
+// previously unused.
+typedef enum _BIOS_INTERFACE_SELECTORS
+{
+    BiosConfigFirstMemoryBlockSize = 0x00,
+    BiosConfigNumLockEnabled = 0x01,
+    BiosConfigBiosGuid = 0x02,
+    BiosConfigBiosSystemSerialNumber = 0x03,
+    BiosConfigBiosBaseSerialNumber = 0x04,
+    BiosConfigBiosChassisSerialNumber = 0x05,
+    BiosConfigBiosChassisAssetTag = 0x06,
+    BiosConfigBootDeviceOrder = 0x07,
+    BiosConfigBiosProcessorCount = 0x08,
+    BiosConfigProcessorLocalApicId = 0x09,
+    BiosConfigSratSize = 0x0A,
+    BiosConfigSratOffset = 0x0B,
+    BiosConfigSratData = 0x0C,
+    BiosConfigMemoryAmountAbove4Gb = 0x0D,
+    BiosConfigGenerationIdPtrLow = 0x0E,
+    BiosConfigGenerationIdPtrHigh = 0x0F,
+
+    // intentional gap here - obsolete values
+
+    BiosConfigPciIoGapStart = 0x12,
+    BiosConfigProcessorReplyStatusIndex = 0x13,
+    BiosConfigProcessorReplyStatus = 0x14,
+    BiosConfigProcessorMatEnable = 0x15,
+    BiosConfigProcessorStaEnable = 0x16,
+    BiosConfigWaitNano100 = 0x17,
+    BiosConfigWait1Millisecond = 0x18,
+    BiosConfigWait10Milliseconds = 0x19,
+    BiosConfigBootFinalize = 0x1A,
+    BiosConfigWait2Millisecond = 0x1B,
+    BiosConfigBiosLockString = 0x1C,
+    BiosConfigProcessorDMTFTable = 0x1D,
+    BiosConfigEntropyTable = 0x1E,
+    BiosConfigMemoryAboveHighMmio = 0x1F,
+    BiosConfigHighMmioGapBaseInMb = 0x20,
+    BiosConfigHighMmioGapLengthInMb = 0x21,
+    BiosConfigE820Entry = 0x22,
+    BiosConfigInitialMegabytesBelowGap = 0x23,
+
+    // Values added in Windows Blue
+
+    BiosConfigNvramCommand = 0x24,
+    BiosConfigWriteConfigPage = 0x25,
+    BiosConfigCryptoCommand = 0x26,
+
+    // Watchdog device (Windows 8.1 MQ)
+
+    BiosConfigWatchdogConfig = 0x27,
+    BiosConfigWatchdogResolution = 0x28,
+    BiosConfigWatchdogCount = 0x29,
+
+    // Memory Map Size
+    BiosConfigMemoryMapSize = 0x2A,
+
+    // EFI Diagnostics (set by UEFI firmware)
+
+    BiosConfigSetEfiDiagnosticsGpa = 0x2B,
+    BiosConfigProcessEfiDiagnostics = 0x2C,
+
+    // Event Logging (Windows 8.1 MQ/M0)
+    BiosConfigEventLogFlush = 0x30,
+
+    // Set MOR bit variable. Triggered by TPM _DSM Memory Clear Interface. In
+    // real hardware, _DSM triggers CPU SMM. UEFI SMM driver sets the MOR state
+    // via variable service. Hypervisor does not support virtual SMM, so _DSM is
+    // not able to trigger SMI in Hyper-V virtualization. The alternative is to
+    // send an IO port command to BIOS device and persist the MOR state in UEFI
+    // NVRAM via variable service on host.
+    BiosConfigMorSetVariable = 0x31,
+
+    // VDev version. (Windows Threshold)
+    BiosConfigVdevVersion = 0x32,
+
+    // Memory Map. (Windows Threshold)
+    BiosConfigMemoryMap = 0x33,
+
+    // ARM64 RTC GetTime SetTime (RS2)
+
+    BiosConfigGetTime = 0x34,
+    BiosConfigSetTime = 0x35,
+
+    // Debugger output
+    BiosDebugOutputString = 0x36,
+
+    // vPMem NFIT (RS3)
+
+    BiosConfigNfitSize = 0x37,
+    BiosConfigNfitPopulate = 0x38,
+    BiosConfigVpmemSetACPIBuffer = 0x39,
+
+    // This value should be the maximum possible value for the address register
+    // with the exception of BiosConfigDebug.
+    BiosConfigMaxValue = BiosConfigVpmemSetACPIBuffer,
+} BIOS_INTERFACE_SELECTORS, *PBIOS_INTERFACE_SELECTORS;
+
+#pragma pack(push, 1)
+// Common SMBIOS structure header.
+typedef struct _SMBIOS_HEADER
+{
+    HV_UINT8 Type;
+    HV_UINT8 Length;
+    HV_UINT16 Handle;
+} SMBIOS_HEADER, *PSMBIOS_HEADER;
+#pragma pack(pop)
+
+// Other string to use as default string.
+
+#define SMBIOS_NONE_STRING "None"
+#define SMBIOS_NONE_STRING_SIZE sizeof(SMBIOS_NONE_STRING)
+
+// Maximum length of a string in v2.4 SMBIOS structure.
+#define MAX_SMBIOS_STRING_LENGTH 64
+
+// SMBIOS v2.4 CPU Information structure.
+#pragma pack(push, 1)
+
+typedef struct _SMBIOS_CPU_INFO_FORMATTED
+{
+    SMBIOS_HEADER Header;
+    HV_UINT8 SocketDesignation;
+    HV_UINT8 ProcessorType;
+    HV_UINT8 ProcessorFamily;
+    HV_UINT8 ProcessorManufacturer;
+    HV_UINT64 ProcessorId;
+    HV_UINT8 ProcessorVersion;
+    HV_UINT8 Voltage;
+    HV_UINT16 ExternalClock;
+    HV_UINT16 MaxSpeed;
+    HV_UINT16 CurrentSpeed;
+    HV_UINT8 Status;
+    HV_UINT8 Upgrade;
+    HV_UINT16 L1Handle;
+    HV_UINT16 L2Handle;
+    HV_UINT16 L3Handle;
+    HV_UINT8 SerialNumber;
+    HV_UINT8 AssetTag;
+    HV_UINT8 PartNumber;
+} SMBIOS_CPU_INFO_FORMATTED, *PSMBIOS_CPU_INFO_FORMATTED;
+
+typedef struct _SMBIOS_CPU_INFO_STRINGS
+{
+    // CPU Information structure string table.
+    // Sized for:
+    //  4 "None" strings.
+    //  2 strings obtained from host that are max 64 chars each.
+    //  1 empty string to terminate the table.
+    HV_CHAR StringTable[
+        (4 * SMBIOS_NONE_STRING_SIZE) +
+        ((MAX_SMBIOS_STRING_LENGTH + 1) * 2) +
+        1];
+} SMBIOS_CPU_INFO_STRINGS, *PSMBIOS_CPU_INFO_STRINGS;
+
+typedef struct _SMBIOS_CPU_INFO_STRINGS_LEGACY
+{
+    // CPU Information structure string table for legacy BIOS.
+    // Sized for:
+    //  1 "None" strings.
+    //  2 strings obtained from host that are max 64 chars each.
+    //  1 empty string to terminate the table.
+    HV_CHAR StringTable[
+        SMBIOS_NONE_STRING_SIZE +
+        ((MAX_SMBIOS_STRING_LENGTH + 1) * 2) +
+        1];
+} SMBIOS_CPU_INFO_STRINGS_LEGACY, *PSMBIOS_CPU_INFO_STRINGS_LEGACY;
+
+typedef struct _SMBIOS_CPU_INFORMATION
+{
+    SMBIOS_CPU_INFO_FORMATTED Formatted;
+    SMBIOS_CPU_INFO_STRINGS Unformatted;
+} SMBIOS_CPU_INFORMATION, *PSMBIOS_CPU_INFORMATION;
+
+typedef struct _SMBIOS_CPU_INFORMATION_LEGACY
+{
+    SMBIOS_CPU_INFO_FORMATTED Formatted;
+    SMBIOS_CPU_INFO_STRINGS_LEGACY Unformatted;
+} SMBIOS_CPU_INFORMATION_LEGACY, *PSMBIOS_CPU_INFORMATION_LEGACY;
+
+#pragma pack(pop)
+
+// Memory map for VDev versions 2-4
+typedef struct _VM_MEMORY_RANGE
+{
+    HV_UINT64 BaseAddress;
+    HV_UINT64 Length;
+} VM_MEMORY_RANGE, *PVM_MEMORY_RANGE;
+
+// Memory map beginning with VDev version 5
+
+#define VM_MEMORY_RANGE_FLAG_PLATFORM_RESERVED 0x1
+#define VM_MEMORY_RANGE_FLAG_PERSISTENT_MEMORY 0x2
+#define VM_MEMORY_RANGE_FLAG_SPECIFIC_PURPOSE 0x4
+
+typedef struct _VM_MEMORY_RANGE_V5
+{
+    HV_UINT64 BaseAddress;
+    HV_UINT64 Length;
+    HV_UINT32 Flags;
+    HV_UINT32 Reserved;
+} VM_MEMORY_RANGE_V5, *PVM_MEMORY_RANGE_V5;
+
+// Command types for NVRAM_COMMAND_DESCRIPTOR. These correlate with the
+// semantics of the UEFI runtime variable services.
+typedef enum _NVRAM_COMMAND
+{
+    NvramGetVariableCommand,
+    NvramSetVariableCommand,
+    NvramGetFirstVariableNameCommand,
+    NvramGetNextVariableNameCommand,
+    NvramQueryInfoCommand,
+    NvramSignalRuntimeCommand,
+    NvramDebugStringCommand
+} NVRAM_COMMAND, *PNVRAM_COMMAND;
+
+// The maximum sizes in bytes for EFI Variable Name and Data. The Data size must
+// be minimum 32K for secure boot databases.
+
+#define EFI_MAX_VARIABLE_NAME_SIZE (2 * 1024)
+#define EFI_MAX_VARIABLE_DATA_SIZE (32 * 1024)
+
+#pragma pack(push, 1)
+// In-memory descriptor used to pass NVRAM variable requests from the UEFI
+// firmware to the BIOS VDev.
+typedef struct _NVRAM_COMMAND_DESCRIPTOR
+{
+    NVRAM_COMMAND Command;
+    // Status of the processed command.
+    HV_UINT64 Status;
+    union
+    {
+        struct
+        {
+            // UEFI variable attributes associated with the variable: access
+            // rights (RT/BS). Used as input for the SetVariable command. Used
+            // as output for the GetVariable command.
+            HV_UINT32 VariableAttributes;
+            // GPA of the buffer containing a 16-bit unicode variable name.
+            // Memory at this location is read for the GetVariable, SetVariable,
+            // GetNextVariable command. Memory at this location is written to
+            // for the GetNextVariable command.
+            HV_UINT64 VariableNameAddress;
+            // Size in bytes of the buffer at VariableNameAddress. Used as input
+            // for GetVariable, SetVariable, and GetNextVariable commands. Used
+            // as output for the GetNextVariable command.
+            HV_UINT32 VariableNameBytes;
+            // A GUID comprising the other half of the variable name. Used as
+            // input for GetVariable, SetVariable, and GetNextVariable commands.
+            // Used as output for the GetNextVariable command.
+            HV_GUID VariableVendorGuid;
+            // GPA of the buffer containing variable data. Memory at this
+            // location is written to for the GetVariable command. Memory at
+            // this location is read for the SetVariable command.
+            HV_UINT64 VariableDataAddress;
+            // Size of the buffer at VariableDataAddress. Used as input for the
+            // GetVariable command. Used as output for the GetVariable and
+            // SetVariable commands.
+            HV_UINT32 VariableDataBytes;
+        } VariableCommand;
+        struct
+        {
+            // Attribute mask, controls variable type for which the information
+            // is returned. Used as an input for the QueryInfo command.
+            HV_UINT32 Attributes;
+
+            // These are outputs for the QueryInfo command.
+
+            HV_UINT64 MaximumVariableStorage;
+            HV_UINT64 RemainingVariableStorage;
+            HV_UINT64 MaximumVariableSize;
+        } QueryInfo;
+        union
+        {
+            struct
+            {
+                HV_UINT64 VsmAware : 1;
+                HV_UINT64 Unused : 63;
+            } S;
+            HV_UINT64 AsUINT64;
+        }SignalRuntimeCommand;
+    } U;
+} NVRAM_COMMAND_DESCRIPTOR, *PNVRAM_COMMAND_DESCRIPTOR;
+#pragma pack(pop)
+
+#define CRYPT_HASH_CONTEXT_SIZE (2 * sizeof(HV_UINT64))
+
+typedef enum _HASH_ALG_ID
+{
+    HashAlgSha1,
+    HashAlgSha256
+} HASH_ALG_ID, *PHASH_ALG_ID;
+
+typedef enum _CRYPTO_COMMAND
+{
+    CryptoComputeHash,
+    CryptoVerifyRsaPkcs1,
+    CryptoVerifyPkcs7,
+    CryptoVerifyAuthenticode,
+    CryptoLogEvent,
+    CryptoGetRandomNumber
+} CRYPTO_COMMAND, *PCRYPTO_COMMAND;
+
+typedef enum _SECUREBOOT_EVENT_INFO
+{
+    ImageFailedVerification,
+    ImageFailedVerificationUnsignedAndHashNotInDb,
+    ImageFailedVerificationHashInDbx,
+    ImageFailedVerificationNeitherCertNorHashInDb,
+    ImageFailedVerificationCertInDbx,
+    ImageFailedVerificationNotValidPeOrCoff
+} SECUREBOOT_EVENT_INFO, *PSECUREBOOT_EVENT_INFO;
+
+#pragma pack(push, 1)
+typedef struct _CRYPTO_COMMAND_DESCRIPTOR
+{
+    CRYPTO_COMMAND Command;
+    HV_UINT64 Status;
+    union
+    {
+        struct
+        {
+            HASH_ALG_ID HashAlgorithm;
+            HV_UINT64 DataAddress;
+            HV_UINT32 DataLength;
+            HV_UINT64 ValueAddress;
+            HV_UINT32 ValueLength;
+        }
+        ComputeHashParams;
+        struct
+        {
+            HV_UINT64 RsaContextAddress;
+            HV_UINT32 RsaContextLength;
+            HV_UINT64 MessageHashAddress;
+            HV_UINT32 MessageHashLength;
+            HV_UINT64 SignatureAddress;
+            HV_UINT32 SignatureLength;
+        }
+        RsaPkcs1Params;
+        struct
+        {
+            HV_UINT64 AuthDataAddress;
+            HV_UINT32 AuthDataSize;
+            HV_UINT64 TrustedCertAddress;
+            HV_UINT32 TrustedCertSize;
+            HV_UINT64 HashOrPkcsDataAddress;
+            HV_UINT32 HashOrPkcsDataSize;
+        }AuthenticodeOrPkcs7Params;
+        struct
+        {
+            SECUREBOOT_EVENT_INFO EventInfo;
+        }
+        LogEventParams;
+        struct
+        {
+            HV_UINT64 BufferAddress;
+            HV_UINT32 BufferSize;
+        }
+        GetRandomNumberParams;
+    } U;
+} CRYPTO_COMMAND_DESCRIPTOR, *PCRYPTO_COMMAND_DESCRIPTOR;
+#pragma pack(pop)
+
+// Value returned to for any watchdog register reads if the BIOS watchdog timer
+// is disabled.
+#define BIOS_WATCHDOG_NOT_ENABLED ((HV_UINT32)0xFFFFFFFF)
+
+// Values for the BiosConfigWatchdogConfig DWORD. Update
+// BIOS_WATCHDOG_VALID_CONFIG_BITS as new values are added.
+
+#define BIOS_WATCHDOG_CONFIGURED 0x00000001
+#define BIOS_WATCHDOG_ENABLED 0x00000002
+#define BIOS_WATCHDOG_ONE_SHOT 0x00000010
+#define BIOS_WATCHDOG_BOOT_STATUS 0x00000100
+#define BIOS_WATCHDOG_FOR_GUEST 0x00001000
+
+#define BIOS_WATCHDOG_RUNNING (BIOS_WATCHDOG_CONFIGURED | BIOS_WATCHDOG_ENABLED)
+
+#pragma pack(push, 1)
+
+// Common config header.
+// NOTE: Length is the length of the overall structure in bytes, including the
+// header.
+typedef struct _UEFI_CONFIG_HEADER
+{
+    HV_UINT32 Type;
+    HV_UINT32 Length;
+} UEFI_CONFIG_HEADER;
+
+// Config structure types.
+typedef enum _UEFI_CONFIG_STRUCTURE_TYPE
+{
+    UefiConfigStructureCount = 0x00,
+    UefiConfigBiosInformation = 0x01,
+    UefiConfigSrat = 0x02,
+    UefiConfigMemoryMap = 0x03,
+    UefiConfigEntropy = 0x04,
+    UefiConfigBiosGuid = 0x05,
+    UefiConfigSmbiosSystemSerialNumber = 0x06,
+    UefiConfigSmbiosBaseSerialNumber = 0x07,
+    UefiConfigSmbiosChassisSerialNumber = 0x08,
+    UefiConfigSmbiosChassisAssetTag = 0x09,
+    UefiConfigSmbiosBiosLockString = 0x0A,
+    UefiConfigSmbios31ProcessorInformation = 0x0B,
+    UefiConfigSmbiosSocketDesignation = 0x0C,
+    UefiConfigSmbiosProcessorManufacturer = 0x0D,
+    UefiConfigSmbiosProcessorVersion = 0x0E,
+    UefiConfigSmbiosProcessorSerialNumber = 0x0F,
+    UefiConfigSmbiosProcessorAssetTag = 0x10,
+    UefiConfigSmbiosProcessorPartNumber = 0x11,
+    UefiConfigFlags = 0x12,
+    UefiConfigProcessorInformation = 0x13,
+    UefiConfigMmioRanges = 0x14,
+    UefiConfigAARCH64MPIDR = 0x15, // to remove
+    UefiConfigAcpiTable = 0x16,
+    UefiConfigNvdimmCount = 0x17,
+    UefiConfigMadt = 0x18,
+    UefiConfigVpciInstanceFilter = 0x19,
+    UefiConfigSmbiosSystemManufacturer = 0x1A,
+    UefiConfigSmbiosSystemProductName = 0x1B,
+    UefiConfigSmbiosSystemVersion = 0x1C,
+    UefiConfigSmbiosSystemSKUNumber = 0x1D,
+    UefiConfigSmbiosSystemFamily = 0x1E,
+    UefiConfigSmbiosMemoryDeviceSerialNumber = 0x1F,
+    UefiConfigSlit = 0x20,
+    UefiConfigAspt = 0x21,
+    UefiConfigPptt = 0x22,
+    UefiConfigGic = 0x23,
+    UefiConfigMcfg = 0x24,
+    UefiConfigSsdt = 0x25,
+    UefiConfigHmat = 0x26,
+    UefiConfigIort = 0x27,
+    UefiConfigPcieBarApertures = 0x28,
+} UEFI_CONFIG_STRUCTURE_TYPE, *PUEFI_CONFIG_STRUCTURE_TYPE;
+
+// Config Structures.
+// NOTE: All config structures _must_ be aligned to 8 bytes, as AARCH64 does not
+// support unaligned accesses. For variable length structures, they must be
+// padded appropriately to 8 byte boundaries.
+
+// NOTE: TotalStructureCount is the count of all structures in the config blob,
+// including this structure.
+// NOTE: TotalConfigBlobSize is in bytes.
+typedef struct _UEFI_CONFIG_STRUCTURE_COUNT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT32 TotalStructureCount;
+    HV_UINT32 TotalConfigBlobSize;
+} UEFI_CONFIG_STRUCTURE_COUNT, *PUEFI_CONFIG_STRUCTURE_COUNT;
+
+typedef struct _UEFI_CONFIG_BIOS_INFORMATION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT32 BiosSizePages;
+    struct
+    {
+        HV_UINT32 LegacyMemoryMap : 1;
+        HV_UINT32 Reserved : 31;
+    } Flags;
+} UEFI_CONFIG_BIOS_INFORMATION, *PUEFI_CONFIG_BIOS_INFORMATION;
+
+typedef struct _UEFI_CONFIG_MADT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Madt[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_MADT, *PUEFI_CONFIG_MADT;
+
+typedef struct _UEFI_CONFIG_SRAT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Srat[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SRAT, *PUEFI_CONFIG_SRAT;
+
+typedef struct _UEFI_CONFIG_SLIT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Slit[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SLIT, *PUEFI_CONFIG_SLIT;
+
+typedef struct _UEFI_CONFIG_PPTT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Pptt[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_PPTT, *PUEFI_CONFIG_PPTT;
+
+typedef struct _UEFI_CONFIG_HMAT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Hmat[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_HMAT, *PUEFI_CONFIG_HMAT;
+
+typedef struct _UEFI_CONFIG_MEMORY_MAP
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 MemoryMap[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_MEMORY_MAP, *PUEFI_CONFIG_MEMORY_MAP;
+
+typedef struct _UEFI_CONFIG_ENTROPY
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Entropy[BiosInterfaceEntropyTableSize];
+} UEFI_CONFIG_ENTROPY, *PUEFI_CONFIG_ENTROPY;
+
+typedef struct _UEFI_CONFIG_BIOS_GUID
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 BiosGuid[sizeof(HV_GUID)];
+} UEFI_CONFIG_BIOS_GUID, *PUEFI_CONFIG_BIOS_GUID;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_MANUFACTURER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemManufacturer[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_MANUFACTURER, *PUEFI_CONFIG_SMBIOS_SYSTEM_MANUFACTURER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_PRODUCT_NAME
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemProductName[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_PRODUCT_NAME, *PUEFI_CONFIG_SMBIOS_SYSTEM_PRODUCT_NAME;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_VERSION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemVersion[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_VERSION, *PUEFI_CONFIG_SMBIOS_SYSTEM_VERSION;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_SERIAL_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemSerialNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_SERIAL_NUMBER, *PUEFI_CONFIG_SMBIOS_SYSTEM_SERIAL_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_SKU_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemSKUNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_SKU_NUMBER, *PUEFI_CONFIG_SMBIOS_SYSTEM_SKU_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SYSTEM_FAMILY
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SystemFamily[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SYSTEM_FAMILY, *PUEFI_CONFIG_SMBIOS_SYSTEM_FAMILY;
+
+typedef struct _UEFI_CONFIG_SMBIOS_BASE_SERIAL_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 BaseSerialNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_BASE_SERIAL_NUMBER, *PUEFI_CONFIG_SMBIOS_BASE_SERIAL_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_CHASSIS_SERIAL_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ChassisSerialNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_CHASSIS_SERIAL_NUMBER, *PUEFI_CONFIG_SMBIOS_CHASSIS_SERIAL_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_CHASSIS_ASSET_TAG
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ChassisAssetTag[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_CHASSIS_ASSET_TAG, *PUEFI_CONFIG_SMBIOS_CHASSIS_ASSET_TAG;
+
+typedef struct _UEFI_CONFIG_SMBIOS_BIOS_LOCK_STRING
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 BiosLockString[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_BIOS_LOCK_STRING, *PUEFI_CONFIG_SMBIOS_BIOS_LOCK_STRING;
+
+typedef struct _UEFI_CONFIG_SMBIOS_MEMORY_DEVICE_SERIAL_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 MemoryDeviceSerialNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_MEMORY_DEVICE_SERIAL_NUMBER, *PUEFI_CONFIG_SMBIOS_MEMORY_DEVICE_SERIAL_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_3_1_PROCESSOR_INFORMATION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT64 ProcessorID;
+    HV_UINT16 ExternalClock;
+    HV_UINT16 MaxSpeed;
+    HV_UINT16 CurrentSpeed;
+    HV_UINT16 ProcessorCharacteristics;
+    HV_UINT16 ProcessorFamily2;
+    HV_UINT8 ProcessorType;
+    HV_UINT8 Voltage;
+    HV_UINT8 Status;
+    HV_UINT8 ProcessorUpgrade;
+    HV_UINT16 Reserved;
+} UEFI_CONFIG_SMBIOS_3_1_PROCESSOR_INFORMATION, *PUEFI_CONFIG_SMBIOS_3_1_PROCESSOR_INFORMATION;
+
+typedef struct _UEFI_CONFIG_SMBIOS_SOCKET_DESIGNATION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 SocketDesignation[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_SOCKET_DESIGNATION, *PUEFI_CONFIG_SMBIOS_SOCKET_DESIGNATION;
+
+typedef struct _UEFI_CONFIG_SMBIOS_PROCESSOR_MANUFACTURER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ProcessorManufacturer[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_PROCESSOR_MANUFACTURER, *PUEFI_CONFIG_SMBIOS_PROCESSOR_MANUFACTURER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_PROCESSOR_VERSION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ProcessorVersion[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_PROCESSOR_VERSION, *PUEFI_CONFIG_SMBIOS_PROCESSOR_VERSION;
+
+typedef struct _UEFI_CONFIG_SMBIOS_PROCESSOR_SERIAL_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ProcessorSerialNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_PROCESSOR_SERIAL_NUMBER, *PUEFI_CONFIG_SMBIOS_PROCESSOR_SERIAL_NUMBER;
+
+typedef struct _UEFI_CONFIG_SMBIOS_PROCESSOR_ASSET_TAG
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ProcessorAssetTag[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_PROCESSOR_ASSET_TAG, *PUEFI_CONFIG_SMBIOS_PROCESSOR_ASSET_TAG;
+
+typedef struct _UEFI_CONFIG_SMBIOS_PROCESSOR_PART_NUMBER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 ProcessorPartNumber[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SMBIOS_PROCESSOR_PART_NUMBER, *PUEFI_CONFIG_SMBIOS_PROCESSOR_PART_NUMBER;
+
+typedef struct _UEFI_CONFIG_FLAGS
+{
+    UEFI_CONFIG_HEADER Header;
+    struct
+    {
+        HV_UINT64 SerialControllersEnabled : 1;
+        HV_UINT64 PauseAfterBootFailure : 1;
+        HV_UINT64 PxeIpV6 : 1;
+        HV_UINT64 DebuggerEnabled : 1;
+        HV_UINT64 LoadOempTable : 1;
+        HV_UINT64 TpmEnabled : 1;
+        HV_UINT64 HibernateEnabled : 1;
+        HV_UINT64 ConsoleMode : 2;
+        HV_UINT64 MemoryAttributesTableEnabled : 1;
+        HV_UINT64 VirtualBatteryEnabled : 1;
+        HV_UINT64 SgxMemoryEnabled : 1;
+        HV_UINT64 IsVmbfsBoot : 1;
+        HV_UINT64 MeasureAdditionalPcrs : 1;
+        HV_UINT64 DisableFrontpage : 1;
+        HV_UINT64 DefaultBootAlwaysAttempt : 1;
+        HV_UINT64 LowPowerS0IdleEnabled : 1;
+        HV_UINT64 VpciBootEnabled : 1;
+        HV_UINT64 ProcIdleEnabled : 1;
+        HV_UINT64 DisableSha384Pcr : 1;
+        HV_UINT64 MediaPresentEnabledByDefault : 1;
+        HV_UINT64 MemoryProtectionMode : 2;
+        HV_UINT64 EnableIMCWhenIsolated : 1;
+        HV_UINT64 WatchdogEnabled : 1;
+        HV_UINT64 TpmLocalityRegsEnabled : 1;
+        HV_UINT64 Dhcp6DuidTypeLlt : 1;
+        HV_UINT64 CxlMemoryEnabled : 1;
+        HV_UINT64 MtrrsInitializedAtLoad : 1;
+        HV_UINT64 Reserved : 35;
+    } Flags;
+} UEFI_CONFIG_FLAGS, *PUEFI_CONFIG_FLAGS;
+
+typedef struct _UEFI_CONFIG_PROCESSOR_INFORMATION
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT32 MaxProcessorCount;
+    HV_UINT32 ProcessorCount;
+    HV_UINT32 ProcessorsPerVirtualSocket;
+    HV_UINT32 ThreadsPerProcessor;
+} UEFI_CONFIG_PROCESSOR_INFORMATION, *PUEFI_CONFIG_PROCESSOR_INFORMATION;
+
+typedef struct _UEFI_CONFIG_MMIO
+{
+    HV_UINT64 MmioPageNumberStart;
+    HV_UINT64 MmioSizeInPages;
+} UEFI_CONFIG_MMIO, *PUEFI_CONFIG_MMIO;
+
+typedef struct _UEFI_CONFIG_MMIO_RANGES
+{
+    UEFI_CONFIG_HEADER Header;
+    UEFI_CONFIG_MMIO Ranges[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_MMIO_RANGES, *PUEFI_CONFIG_MMIO_RANGES;
+
+// Dynamically sized structure for MPIDR values for AARCH64
+typedef struct _UEFI_CONFIG_AARCH64_MPIDR
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT64 ProcessorMPIDRValues[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_AARCH64_MPIDR, *PUEFI_CONFIG_AARCH64_MPIDR;
+
+// Dynamically sized structure for binary blob that is an ACPI table.
+// Only used internally for testing, gated behind velocity.
+typedef struct _UEFI_CONFIG_ACPI_TABLE
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 AcpiTableData[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_ACPI_TABLE, *PUEFI_CONFIG_ACPI_TABLE;
+
+typedef struct _UEFI_CONFIG_NVDIMM_COUNT
+{
+    UEFI_CONFIG_HEADER Header;
+    union
+    {
+        HV_UINT64 Padding;
+        HV_UINT16 Count;
+    };
+} UEFI_CONFIG_NVDIMM_COUNT, *PUEFI_CONFIG_NVDIMM_COUNT;
+
+typedef struct _UEFI_CONFIG_VPCI_INSTANCE_FILTER
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 InstanceGuid[sizeof(HV_GUID)];
+} UEFI_CONFIG_VPCI_INSTANCE_FILTER, *PUEFI_CONFIG_VPCI_INSTANCE_FILTER;
+
+typedef struct _UEFI_CONFIG_AMD_ASPT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Aspt[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_AMD_ASPT, *PUEFI_CONFIG_AMD_ASPT;
+
+typedef struct _UEFI_CONFIG_GIC
+{
+    UEFI_CONFIG_HEADER Header;
+    // GICD
+    HV_UINT64 GicDistributorBase;
+    // Redistributor block containing the BSP's GICR
+    HV_UINT64 GicRedistributorsBase;
+} UEFI_CONFIG_GIC, *PUEFI_CONFIG_GIC;
+
+typedef struct _UEFI_CONFIG_MCFG
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Mcfg[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_MCFG, *PUEFI_CONFIG_MCFG;
+
+typedef struct _UEFI_CONFIG_SSDT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Ssdt[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_SSDT, *PUEFI_CONFIG_SSDT;
+
+typedef struct _UEFI_CONFIG_IORT
+{
+    UEFI_CONFIG_HEADER Header;
+    HV_UINT8 Iort[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_IORT, *PUEFI_CONFIG_IORT;
+
+// Describes the BAR Aperture for each PCIe Root Complex / Host bridge. There
+// should be one entry per host bridge that UEFI should enumerate. The MCFG
+// table may contain additional segments that are not described to UEFI via
+// these structures, which UEFI will ignore.
+// This structure is used to pass this information to UEFI instead of having
+// UEFI parse the SSDT.
+typedef struct _PCIE_BAR_APERTURE_ENTRY
+{
+    HV_UINT16 Segment;
+    HV_UINT8 StartBus;
+    HV_UINT8 EndBus;
+    /// The UID here must match the UID described in the SSDT for the
+    /// corresponding host bridge.
+    HV_UINT32 Uid;
+    HV_UINT64 LowMmioBase;
+    HV_UINT64 LowMmioLength;
+    HV_UINT64 HighMmioBase;
+    HV_UINT64 HighMmioLength;
+} PCIE_BAR_APERTURE_ENTRY, *PPCIE_BAR_APERTURE_ENTRY;
+
+// PCIE_BAR_APERTURE_ENTRY must be 40 bytes
+HV_STATIC_ASSERT(sizeof(PCIE_BAR_APERTURE_ENTRY) == 40);
+
+typedef struct _UEFI_CONFIG_PCIE_BAR_APERTURES
+{
+    UEFI_CONFIG_HEADER Header;
+    PCIE_BAR_APERTURE_ENTRY Entries[HV_ANYSIZE_ARRAY];
+} UEFI_CONFIG_PCIE_BAR_APERTURES, *PUEFI_CONFIG_PCIE_BAR_APERTURES;
+
+// UEFI configuration information for direct parsing of IGVM parameters.
+typedef struct _UEFI_IGVM_PARAMETER_INFO
+{
+    HV_UINT32 ParameterPageCount;
+    HV_UINT32 CpuidPagesOffset;
+    HV_UINT64 VpContextPageNumber;
+    HV_UINT32 LoaderBlockOffset;
+    HV_UINT32 CommandLineOffset;
+    HV_UINT32 CommandLinePageCount;
+    HV_UINT32 MemoryMapOffset;
+    HV_UINT32 MemoryMapPageCount;
+    HV_UINT32 MadtOffset;
+    HV_UINT32 MadtPageCount;
+    HV_UINT32 SratOffset;
+    HV_UINT32 SratPageCount;
+    HV_UINT32 MaximumProcessorCount;
+    HV_UINT32 UefiMemoryMapOffset;
+    HV_UINT32 UefiMemoryMapPageCount;
+    HV_UINT32 UefiIgvmConfigurationFlags;
+    HV_UINT32 SecretsPageOffset;
+} UEFI_IGVM_PARAMETER_INFO, *PUEFI_IGVM_PARAMETER_INFO;
+
+// Various flags for UefiIgvmConfigurationFlags
+#define UEFI_IGVM_CONFIGURATION_ENABLE_HOST_EMULATORS 0x00000001
+
+typedef struct _UEFI_IGVM_LOADER_BLOCK
+{
+    HV_UINT32 NumberOfProcessors;
+} UEFI_IGVM_LOADER_BLOCK, *PUEFI_IGVM_LOADER_BLOCK;
+
+#pragma pack(pop)
+
+// Indicates that the event is pending and the associated data may be updated at
+// later time.
+#define EVENT_FLAG_PENDING 0x00000001
+
+// Indicates that the event is potentially incomplete because it was committed
+// as result of another action e.g. forced commit because of a channel flush.
+#define EVENT_FLAG_INCOMPLETE 0x00000002
+
+// Describes an event log entry. Event specific data may follow immediately
+// after the header.
+typedef struct _EFI_EVENT_DESCRIPTOR
+{
+    // Optional GUID identifing the producer of the event
+    HV_GUID Producer;
+    // Optional GUID used to correlate an event entry with another event entry
+    HV_GUID CorrelationId;
+    // Timestamp when the event was created
+    HV_UINT64 CreateTime;
+    // Timestamp when the event was committed (may be the same as CreateTime)
+    HV_UINT64 CommitTime;
+    // Producer specific identifier
+    HV_UINT32 EventId;
+    // See EVENT_FLAG_nnnnn
+    HV_UINT32 Flags;
+    // Size of this header structure
+    HV_UINT32 HeaderSize;
+    // Associated Data Size
+    HV_UINT32 DataSize;
+    // New fields should be added here.
+} EFI_EVENT_DESCRIPTOR, *PEFI_EVENT_DESCRIPTOR;
+
+#define SIZEOF_EFI_EVENT_DESCRIPTOR_REVISION_1 \
+    (HV_FIELD_SIZE_THROUGH(EFI_EVENT_DESCRIPTOR, DataSize))
+
+// Represents an event channel plus data. This is used when flushing a UEFI
+// event channel to the BIOS device. Data is series of EFI_EVENT_DESCRIPTORs
+// with variable sized data.
+typedef struct _BIOS_EVENT_CHANNEL
+{
+    HV_GUID Channel;
+    HV_UINT32 EventsWritten;
+    HV_UINT32 EventsLost;
+    HV_UINT32 DataSize;
+    HV_UINT8 Data[HV_ANYSIZE_ARRAY];
+} BIOS_EVENT_CHANNEL, *PBIOS_EVENT_CHANNEL;
+
+// Device status code groups
+typedef enum _BOOT_DEVICE_STATUS_GROUP
+{
+    DeviceStatusBootGroup = 0x00010000,
+    DeviceStatusSecureBootGroup = 0x00020000,
+    DeviceStatusNetworkGroup = 0x00030000
+} BOOT_DEVICE_STATUS_GROUP, *PBOOT_DEVICE_STATUS_GROUP;
+
+// Device failure reason codes. Status codes are made up of a group ID in the
+// high word and a status code in the low word. If items are added to this enum
+// the UEFI string mapping function PlatformConsoleDeviceStatusString and the
+// corresponding string table in PlatformBdsString.uni must be updated.
+typedef enum _BOOT_DEVICE_STATUS
+{
+    BootPending = 0,
+    BootDeviceNoFilesystem = DeviceStatusBootGroup,
+    BootDeviceNoLoader,
+    BootDeviceIncompatibleLoader,
+    BootDeviceReturnedFailure,
+    BootDeviceOsNotLoaded,
+    BootDeviceOsLoaded,
+    BootDeviceNoDevices,
+    BootDeviceLoadError,
+    SecureBootFailed = DeviceStatusSecureBootGroup,
+    SecureBootPolicyDenied,
+    SecureBootHashDenied,
+    SecureBootCertDenied,
+    SecureBootInvalidImage,
+    SecureBootUnsignedHashNotInDb,
+    SecureBootSignedHashNotFound,
+    SecureBootNeitherCertNorHashInDb,
+    NetworkBootMediaDisconnected = DeviceStatusNetworkGroup,
+    NetworkBootDhcpFailed,
+    NetworkBootNoResponse,
+    NetworkBootBufferTooSmall,
+    NetworkBootDeviceError,
+    NetworkBootNoResources,
+    NetworkBootServerTimeout,
+    NetworkBootCancelled,
+    NetworkBootIcmpError,
+    NetworkBootTftpError,
+    NetworkBootNoBootFile,
+    NetworkBootUnexpectedFailure
+} BOOT_DEVICE_STATUS, *PBOOT_DEVICE_STATUS;
+
+// Returns the group portion of a BOOT_DEVICE_STATUS.
+// See BOOT_DEVICE_STATUS_GROUP.
+#define GET_BOOT_DEVICE_STATUS_GROUP(Status) ((Status) & 0xFFFF0000)
+
+// Event Id for Device Boot Attempts
+#define BOOT_DEVICE_EVENT_ID 1
+
+// Information logged for a boot device.
+typedef struct _BOOTEVENT_DEVICE_ENTRY
+{
+    BOOT_DEVICE_STATUS Status;
+    HV_UINT64 ExtendedStatus; // EFI_STATUS
+    HV_UINT16 BootVariableNumber;
+    HV_UINT32 DevicePathSize;
+    HV_UINT8 DevicePath[HV_ANYSIZE_ARRAY];
+} BOOTEVENT_DEVICE_ENTRY, *PBOOTEVENT_DEVICE_ENTRY;
+
+// {8CC6713B-360D-4406-9268-F6B0CFDFCA91}
+const HV_GUID BOOT_EVENT_CHANNEL_GUID =
+{
+    0x8CC6713B,
+    0x360D,
+    0x4406,
+    { 0x92, 0x68, 0xF6, 0xB0, 0xCF, 0xDF, 0xCA, 0x91 }
 };
 
 #ifdef _MSC_VER

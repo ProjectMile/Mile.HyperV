@@ -138,6 +138,11 @@ https://github.com/microsoft/mu_msvm/tree/v26.0.0
 - MsvmPkg\VpcivscDxe\VpciProtocol.h
 - MsvmPkg\VpcivscDxe\PciBars.h
 - MsvmPkg\Include\Protocol\VmbusFileSystem.h
+- MsvmPkg\Include\BiosInterface.h
+- MsvmPkg\MsvmPkgAARCH64.dsc
+- MsvmPkg\MsvmPkgX64.dsc
+- MsvmPkg\Include\BiosEventLogInterface.h
+- MsvmPkg\Include\BiosBootLogInterface.h
 
 ## Windows Subsystem for Linux
 
