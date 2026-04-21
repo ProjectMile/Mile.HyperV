@@ -1472,6 +1472,12 @@ typedef union _HV_REGISTER_VSM_VP_WAIT_FOR_TLB_LOCK
 } HV_REGISTER_VSM_VP_WAIT_FOR_TLB_LOCK, *PHV_REGISTER_VSM_VP_WAIT_FOR_TLB_LOCK;
 
 #if defined(_M_AMD64) || defined(_M_IX86)
+typedef HV_UINT32 HV_APIC_ID, *PHV_APIC_ID;
+#elif defined(_M_ARM64)
+typedef HV_UINT64 HV_PROCESSOR_HW_ID, *PHV_PROCESSOR_HW_ID;
+#endif
+
+#if defined(_M_AMD64) || defined(_M_IX86)
 
 typedef struct _HV_X64_SEGMENT_REGISTER
 {
@@ -1564,6 +1570,35 @@ typedef union _HV_REGISTER_CR_INTERCEPT_CONTROL
         HV_UINT64 RsvdZ : 35;
     };
 } HV_REGISTER_CR_INTERCEPT_CONTROL, *PHV_REGISTER_CR_INTERCEPT_CONTROL;
+
+typedef struct _HV_LOCAL_INTERRUPT_CONTROLLER_STATE
+{
+    // HV_X64_INTERRUPT_CONTROLLER_STATE
+
+    HV_APIC_ID ApicId;
+    HV_UINT32 ApicVersion;
+    HV_UINT32 ApicLdr;
+    HV_UINT32 ApicDfr;
+    HV_UINT32 ApicSpurious;
+    HV_UINT32 ApicIsr[8];
+    HV_UINT32 ApicTmr[8];
+    HV_UINT32 ApicIrr[8];
+    HV_UINT32 ApicEsr;
+    HV_UINT32 ApicIcrHigh;
+    HV_UINT32 ApicIcrLow;
+    HV_UINT32 ApicLvtTimer;
+    HV_UINT32 ApicLvtThermal;
+    HV_UINT32 ApicLvtPerfmon;
+    HV_UINT32 ApicLvtLint0;
+    HV_UINT32 ApicLvtLint1;
+    HV_UINT32 ApicLvtError;
+    HV_UINT32 ApicLvtCmci;
+    HV_UINT32 ApicErrorStatus;
+    HV_UINT32 ApicInitialCount;
+    HV_UINT32 ApicCounterValue;
+    HV_UINT32 ApicDivideConfiguration;
+    HV_UINT32 ApicRemoteRead;
+} HV_LOCAL_INTERRUPT_CONTROLLER_STATE, *PHV_LOCAL_INTERRUPT_CONTROLLER_STATE;
 
 #endif
 
@@ -1808,12 +1843,6 @@ typedef struct _HV_INITIAL_VP_CONTEXT
     HV_UINT64 MsrCrPat;
 #endif
 } HV_INITIAL_VP_CONTEXT, *PHV_INITIAL_VP_CONTEXT;
-
-#if defined(_M_AMD64) || defined(_M_IX86)
-typedef HV_UINT32 HV_APIC_ID, *PHV_APIC_ID;
-#elif defined(_M_ARM64)
-typedef HV_UINT64 HV_PROCESSOR_HW_ID, *PHV_PROCESSOR_HW_ID;
-#endif
 
 // Define the intercept access types.
 

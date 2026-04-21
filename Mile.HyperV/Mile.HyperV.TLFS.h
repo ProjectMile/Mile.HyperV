@@ -4952,37 +4952,6 @@ typedef union _HV_SYNIC_SIRBP
     };
 } HV_SYNIC_SIRBP, *PHV_SYNIC_SIRBP;
 
-#if defined(_M_AMD64) || defined(_M_IX86)
-typedef struct _HV_LOCAL_INTERRUPT_CONTROLLER_STATE
-{
-    // HV_X64_INTERRUPT_CONTROLLER_STATE
-
-    HV_APIC_ID ApicId;
-    HV_UINT32 ApicVersion;
-    HV_UINT32 ApicLdr;
-    HV_UINT32 ApicDfr;
-    HV_UINT32 ApicSpurious;
-    HV_UINT32 ApicIsr[8];
-    HV_UINT32 ApicTmr[8];
-    HV_UINT32 ApicIrr[8];
-    HV_UINT32 ApicEsr;
-    HV_UINT32 ApicIcrHigh;
-    HV_UINT32 ApicIcrLow;
-    HV_UINT32 ApicLvtTimer;
-    HV_UINT32 ApicLvtThermal;
-    HV_UINT32 ApicLvtPerfmon;
-    HV_UINT32 ApicLvtLint0;
-    HV_UINT32 ApicLvtLint1;
-    HV_UINT32 ApicLvtError;
-    HV_UINT32 ApicLvtCmci;
-    HV_UINT32 ApicErrorStatus;
-    HV_UINT32 ApicInitialCount;
-    HV_UINT32 ApicCounterValue;
-    HV_UINT32 ApicDivideConfiguration;
-    HV_UINT32 ApicRemoteRead;
-} HV_LOCAL_INTERRUPT_CONTROLLER_STATE, *PHV_LOCAL_INTERRUPT_CONTROLLER_STATE;
-#endif
-
 typedef struct _HV_STIMER_STATE_PRIVATE
 {
     struct
