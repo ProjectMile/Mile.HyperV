@@ -9,6 +9,5 @@
  */
 
 #include <Mile.Mobility.Portable.Types.h>
-#include <sal.h>
 
 #include "Mile.HyperV.VMBus.h"
