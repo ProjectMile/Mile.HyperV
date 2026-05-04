@@ -5,42 +5,34 @@
   <PropertyGroup>
     <SolutionPath>$(MSBuildThisFileDirectory)Mile.HyperV.slnx</SolutionPath>
   </PropertyGroup>
-  <Target Name="Restore">
-    <ItemGroup>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Debug;Platform=x86</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Release;Platform=x86</AdditionalProperties>   
-      </ProjectReference>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Debug;Platform=x86</AdditionalProperties>   
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Release;Platform=x86</AdditionalProperties>   
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Debug;Platform=x64</AdditionalProperties>   
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Release;Platform=x64</AdditionalProperties>   
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Debug;Platform=ARM64</AdditionalProperties>   
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionPath)">
+      <AdditionalProperties>Configuration=Release;Platform=ARM64</AdditionalProperties>   
+    </ProjectReference>
+  </ItemGroup>
+  <Target Name="Restore" >
     <MSBuild
       Projects="@(ProjectReference)"
       Targets="Restore"
       StopOnFirstFailure="True"
       Properties="PreferredToolArchitecture=x64" />
   </Target>
-  <Target Name="Build">
-    <ItemGroup>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Debug;Platform=x86</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Release;Platform=x86</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Debug;Platform=x64</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Release;Platform=x64</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Debug;Platform=ARM64</AdditionalProperties>   
-      </ProjectReference>
-      <ProjectReference Include="$(SolutionPath)">
-        <AdditionalProperties>Configuration=Release;Platform=ARM64</AdditionalProperties>   
-      </ProjectReference>
-    </ItemGroup>
+  <Target Name="Build" >
     <MSBuild
       Projects="@(ProjectReference)"
       Targets="Build"
