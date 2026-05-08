@@ -1,5 +1,14 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.960.0**
+
+- Revise the definitions via
+  https://github.com/microsoft/mu_msvm/tree/v26.0.3.
+- Revise the definitions via 
+  https://github.com/microsoft/openvmm/tree/8289be0034e3e2dd3d53d8eedb995e6f9112281d.
+- Update Mile.Mobility to 1.1.544.
+- Fix several issues for Mile.HyperV.Test project.
+
 **Mile.HyperV 1.2.943.0**
 
 - Add protocol definitions for Microsoft Hyper-V BIOS Virtual Device.
