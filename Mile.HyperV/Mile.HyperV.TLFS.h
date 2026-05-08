@@ -1806,14 +1806,6 @@ typedef HV_UINT32 HV_SAVE_RESTORE_STATE_FLAGS, *PHV_SAVE_RESTORE_STATE_FLAGS;
 #define HV_SAVE_RESTORE_STATE_START 0x00000001
 #define HV_SAVE_RESTORE_STATE_SUMMARY 0x00000002
 
-typedef enum _HV_PROCESSOR_VENDOR
-{
-    HvProcessorVendorAmd = 0x0,
-    HvProcessorVendorIntel = 0x1,
-    HvProcessorVendorHygon = 0x2,
-    HvProcessorVendorArm = 0x10,
-} HV_PROCESSOR_VENDOR, *PHV_PROCESSOR_VENDOR;
-
 #if defined(_M_ARM64)
 
 #define HV_PARTITION_PROCESSOR_FEATURES_BANKS 1
@@ -3142,137 +3134,34 @@ typedef enum _HV_GUEST_OS_VENDOR_PRIVATE
 
 typedef HV_UINT64 HV_PARTITION_PROPERTY, *PHV_PARTITION_PROPERTY;
 
-typedef enum _HV_PARTITION_PROPERTY_CODE
+typedef enum _HV_PARTITION_PROPERTY_CODE_PRIVATE
 {
-    // Privilege properties
-
-    HvPartitionPropertyPrivilegeFlags = 0x00010000,
-    HvPartitionPropertySyntheticProcFeatures = 0x00010001,
-    HvPartitionPropertyAllowedParentUserModeHypercalls = 0x00010002,
-
-    // Scheduling properties
-
-    HvPartitionPropertySuspend = 0x00020000,
-    HvPartitionPropertyCpuReserve = 0x00020001,
-    HvPartitionPropertyCpuCap = 0x00020002,
-    HvPartitionPropertyCpuWeight = 0x00020003,
-    HvPartitionPropertyCpuGroupId = 0x00020004,
-
     // Timer assist properties
 
     HvPartitionPropertyEmulatedTimerPeriod = 0x00030000,
     HvPartitionPropertyEmulatedTimerControl = 0x00030001,
     HvPartitionPropertyPmTimerAssist = 0x00030002,
-    HvPartitionPropertyTimeFreeze = 0x00030003,
-    HvPartitionPropertyApicFrequency = 0x00030004,
-    HvPartitionPropertyReferenceTime = 0x00030005,
-
-    // Debugging properties
-
-    HvPartitionPropertyDebugChannelId = 0x00040000,
 
     // Resource properties
 
-    HvPartitionPropertyVirtualTlbPageCount = 0x00050000,
-    HvPartitionPropertyVsmConfig = 0x00050001,
-    HvPartitionPropertyZeroMemoryOnReset = 0x00050002,
-    HvPartitionPropertyProcessorsPerSocket = 0x00050003,
-    HvPartitionPropertyNestedTlbSize = 0x00050004,
-    HvPartitionPropertyGpaPageAccessTracking = 0x00050005,
-    HvPartitionPropertyVsmPermissionsDirtySinceLastQuery = 0x00050006,
-    HvPartitionPropertySgxLaunchControlConfig = 0x00050007,
-    HvPartitionPropertyDefaultSgxLaunchControl0 = 0x00050008,
-    HvPartitionPropertyDefaultSgxLaunchControl1 = 0x00050009,
-    HvPartitionPropertyDefaultSgxLaunchControl2 = 0x0005000A,
-    HvPartitionPropertyDefaultSgxLaunchControl3 = 0x0005000B,
-    HvPartitionPropertyIsolationState = 0x0005000C,
-    HvPartitionPropertyIsolationControl = 0x0005000D,
-    HvPartitionPropertyAllocationId = 0x0005000E,
-    HvPartitionPropertyMonitoringId = 0x0005000F,
-    HvPartitionPropertyImplementedPhysicalAddressBits = 0x00050010,
-    HvPartitionPropertyNonArchitecturalCoreSharing = 0x00050011,
-    HvPartitionPropertyHypercallDoorbellPage = 0x00050012,
-    HvPartitionPropertyCppcRequestValue = 0x00050013,
-    HvPartitionPropertyIsolationPolicy = 0x00050014,
-    HvPartitionPropertyDmaCapableDevices = 0x00050015,
-    HvPartitionPropertyProcessorsPerL3 = 0x00050016,
-    HvPartitionPropertyUnimplementedMsrAction = 0x00050017,
-    HvPartitionPropertyAmdNodesPerSocket = 0x00050018,
-    HvPartitionPropertyReferenceTscPageActive = 0x00050019,
-    HvPartitionPropertyAutoEoiEnabled = 0x0005001A,
-    HvPartitionPropertyL3CacheWays = 0x0005001B,
-    HvPartitionPropertyIsolationType = 0x0005001C,
-    HvPartitionPropertyPerfmonMode = 0x0005001D,
-    HvPartitionPropertyDepositStatus = 0x0005001E,
-    HvPartitionPropertyMirroring = 0x0005001F,
-    HvPartitionPropertyMirrorState = 0x00050020,
-    HvPartitionPropertyMgmtVtlMaxMemorySections = 0x00050021,
-    HvPartitionPropertySevVmgexitOffloads = 0x00050022,
-    HvPartitionPropertyPenalizeBusLock = 0x00050023,
-    HvPartitionPropertyTopologyApicIdOptIn = 0x00050024,
-    HvPartitionPropertyCppcResourcePrioritiesValue = 0x00050025,
-    HvPartitionPropertyPartitionDiagBufferConfig = 0x00050026,
     HvPartitionPropertyTerminateOnInstructionTimeout = 0x00050027,
 
     // Compatibility properties
 
-    HvPartitionPropertyProcessorVendor = 0x00060000,
-    HvPartitionPropertyProcessorFeaturesDeprecated = 0x00060001,
-    HvPartitionPropertyProcessorXsaveFeatures = 0x00060002,
-    HvPartitionPropertyProcessorCLFlushSize = 0x00060003,
-    HvPartitionPropertyEnlightenmentModifications = 0x00060004,
-    HvPartitionPropertyCompatibilityVersion = 0x00060005,
-    HvPartitionPropertyPhysicalAddressWidth = 0x00060006,
-    HvPartitionPropertyXsaveStates = 0x00060007,
-    HvPartitionPropertyMaxXsaveDataSize = 0x00060008,
-    HvPartitionPropertyProcessorClockFrequency = 0x00060009,
-    HvPartitionPropertyProcessorFeatures0 = 0x0006000A,
-    HvPartitionPropertyProcessorFeatures1 = 0x0006000B,
     HvPartitionPropertyProcessorInstructionCLFlushSize = 0x0006000C,
     HvPartitionPropertyProcessorZeroDataCacheBs = 0x0006000D,
     HvPartitionPropertyProcessorPREbits = 0x0006000E,
     HvPartitionPropertyProcessorPRIbits = 0x0006000F,
-    HvPartitionPropertyRootProcessorFeatures0 = 0x00060010,
-    HvPartitionPropertyRootProcessorFeatures1 = 0x00060011,
-    HvPartitionPropertyRootProcessorXsaveFeatures = 0x00060012,
-    HvPartitionPropertyRootSyntheticProcFeatures = 0x00060013,
-    HvPartitionPropertyPhysicalAddressSize = 0x00060014,
 
-    HvPartitionPropertyGuestOsId = 0x00070000,
+    // Nested virtualization properties
 
-    HvPartitionPropertyProcessorVirtualizationFeatures = 0x00080000,
-    HvPartitionPropertyMaxHardwareIsolatedGuests = 0x00080001,
-    HvPartitionPropertySnpEnabled = 0x00080002,
-    HvPartitionPropertyNestedVmxBasic = 0x00080003,
-    HvPartitionPropertyNestedVmxPinbasedCtls = 0x00080004,
-    HvPartitionPropertyNestedVmxProcbasedCtls = 0x00080005,
-    HvPartitionPropertyNestedVmxExitCtls = 0x00080006,
-    HvPartitionPropertyNestedVmxEntryCtls = 0x00080007,
-    HvPartitionPropertyNestedVmxMisc = 0x00080008,
-    HvPartitionPropertyNestedVmxCr0Fixed0 = 0x00080009,
-    HvPartitionPropertyNestedVmxCr0Fixed1 = 0x0008000A,
-    HvPartitionPropertyNestedVmxCr4Fixed0 = 0x0008000B,
-    HvPartitionPropertyNestedVmxCr4Fixed1 = 0x0008000C,
-    HvPartitionPropertyNestedVmxVmcsEnum = 0x0008000D,
-    HvPartitionPropertyNestedVmxProcbasedCtls2 = 0x0008000E,
-    HvPartitionPropertyNestedVmxEptVpidCap = 0x0008000F,
-    HvPartitionPropertyNestedVmxTruePinbasedCtls = 0x00080010,
-    HvPartitionPropertyNestedVmxTrueProcbasedCtls = 0x00080011,
-    HvPartitionPropertyNestedVmxTrueExitCtls = 0x00080012,
-    HvPartitionPropertyNestedVmxTrueEntryCtls = 0x00080013,
     HvPartitionPropertyVhChildrenState = 0x00080100,
-    HvPartitionPropertyMaxHierarchicalPartitionCount = 0x00080101,
-    HvPartitionPropertyMaxHierarchicalVpCount = 0x00080102,
 
-    HvPartitionPropertyInheritedDeviceDomainReservedRegions = 0x00090000,
-    HvPartitionPropertyTdMrConfigId = 0x00090001,
-    HvPartitionPropertyTdMrOwner = 0x00090002,
-    HvPartitionPropertyTdMrOwnerConfig = 0x00090003,
+    // Extended properties with larger property values
+
     HvPartitionPropertyExRootProcessorFeaturesExperimental = 0x00090004,
-    HvPartitionPropertyRootVpSharedPages = 0x00090005,
 
-    HVPartitionPropertyExtendedProperyMax = 0x000A0000,
-} HV_PARTITION_PROPERTY_CODE, *PHV_PARTITION_PROPERTY_CODE;
+} HV_PARTITION_PROPERTY_CODE_PRIVATE, *PHV_PARTITION_PROPERTY_CODE_PRIVATE;
 
 // Partition scheduling property ranges
 
@@ -8663,7 +8552,6 @@ typedef enum _HV_CALL_CODE_PRIVATE
     HvCallCompleteIsolatedImport = 0x00F1, // Symbols
     HvCallIssueSnpPspGuestRequest = 0x00F2, // Symbols
     HvCallRootSignalEvent = 0x00F3, // Symbols
-    HvCallGetVpCpuidValues = 0x00F4, // Undocumented
     HvCallReadSystemMemory = 0x00F5, // Symbols
     HvCallSetHwWatchdogConfig = 0x00F6, // Symbols
     HvCallRemovePhysicalMemory = 0x00F7, // Symbols
