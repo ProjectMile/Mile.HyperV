@@ -3245,8 +3245,24 @@ typedef struct _RNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO
     };
 } RNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO, *PRNDIS_TCP_LARGE_SEND_OFFLOAD_NET_BUFFER_LIST_INFO;
 
+typedef struct _RNDIS_VLAN_NET_BUFFER_LIST_INFO
+{
+    union
+    {
+        struct
+        {
+            HV_UINT32 Priority : 3;
+            HV_UINT32 DropEligibleIndicator : 1;
+            HV_UINT32 VlanId : 12;
+            HV_UINT32 Reserved : 16;
+        } Transmit;
+        HV_UINT32 Value;
+    };
+} RNDIS_VLAN_NET_BUFFER_LIST_INFO, *PRNDIS_VLAN_NET_BUFFER_LIST_INFO;
+
 #define RNDIS_PPI_TCP_IP_CHECKSUM 0
 #define RNDIS_PPI_LARGE_SEND_OFFLOAD 2
+#define RNDIS_PPI_VLAN 6
 
 // Values for ParameterType in ConfigParameterInfo
 
