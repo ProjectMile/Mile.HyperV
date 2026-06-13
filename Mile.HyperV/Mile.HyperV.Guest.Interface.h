@@ -2892,16 +2892,34 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
     HV_UINT32 UseIntForMbecSystemCalls : 1;
     HV_UINT32 UseVmcsEnlightenments : 1;
     HV_UINT32 UseSyncedTimeline : 1;
-    // Was UseReferencePageForSyncedTimeline but never consumed.
     HV_UINT32 CoreSchedulerRequested : 1;
     HV_UINT32 UseDirectLocalFlushEntire : 1;
     HV_UINT32 NoNonArchitecturalCoreSharing : 1;
+    // Recommend using (architectural) x2APIC mode
     HV_UINT32 UseX2Apic : 1;
+    // Time restoration when resuming from hibernation is available.
     HV_UINT32 RestoreTimeOnResume : 1;
+    // MMIO hypercall is supported.
     HV_UINT32 UseHypercallForMmioAccess : 1;
+    // GPA Pin/Unpin interface available, as well as
+    // HvQueryGpaRangeAlwaysPinnedSubranges.
     HV_UINT32 UseGpaPinningHypercall : 1;
+    // Wake VPs hypercall is available.
     HV_UINT32 WakeVps : 1;
-    HV_UINT32 Reserved : 8;
+    // Hypervisor supports guest mechanism to signal pending interrupts to
+    // paravisor.
+    HV_UINT32 ProxyInterruptDoorbellSupport : 1;
+    // Hypervisor supports memory type locking hypercalls.
+    HV_UINT32 MemoryTypeLockingSupport : 1;
+    // Hypervisor supports HvCallMapPartitionEventLogBuffer.
+    HV_UINT32 MapPartitionEventLogBuffer : 1;
+    // Hypervisor supports VTL0 guest request.
+    HV_UINT32 LowerVtlGuestRequestSupport : 1;
+    // Hypervisor supports HvQueryGpaRangeHeatHintBeneficialSubranges.
+    HV_UINT32 HeatHintBeneficialSupport : 1;
+    // Hypervisor supports ring-buffer message ports
+    HV_UINT32 RingBufferMessagePortSupport : 1;
+    HV_UINT32 Reserved : 2;
 
     // Ebx
     HV_UINT32 LongSpinWaitCount;
@@ -2916,25 +2934,50 @@ typedef struct _HV_X64_ENLIGHTENMENT_INFORMATION
 typedef HV_X64_ENLIGHTENMENT_INFORMATION _HV_ENLIGHTENMENT_INFORMATION;
 typedef HV_X64_ENLIGHTENMENT_INFORMATION HV_ENLIGHTENMENT_INFORMATION;
 typedef PHV_X64_ENLIGHTENMENT_INFORMATION PHV_ENLIGHTENMENT_INFORMATION;
+HV_STATIC_ASSERT(
+    sizeof(HV_X64_ENLIGHTENMENT_INFORMATION) == 4 * sizeof(HV_UINT32));
 #elif defined(_M_ARM64)
 typedef struct _HV_ARM64_ENLIGHTENMENT_INFORMATION
 {
+    // Eax
+
     HV_UINT32 UseHvRegisterForReset : 1;
     HV_UINT32 UseRelaxedTiming : 1;
     HV_UINT32 UseSyntheticClusterIpi : 1;
     HV_UINT32 UseExProcessorMasks : 1;
     HV_UINT32 Nested : 1;
     HV_UINT32 UseSyncedTimeline : 1;
-    HV_UINT32 Reserved : 26;
+    // Hypervisor supports ring-buffer message ports
+    HV_UINT32 RingBufferMessagePortSupport : 1;
+    HV_UINT32 Reserved01 : 14;
+    // MMIO hypercall is supported.
+    HV_UINT32 UseHypercallForMmioAccess : 1;
+    // GPA Pin/Unpin interface available, as well as
+    // HvQueryGpaRangeAlwaysPinnedSubranges.
+    HV_UINT32 UseGpaPinningHypercall : 1;
+    // Wake VPs hypercall is available.
+    HV_UINT32 WakeVps : 1;
+    HV_UINT32 Reserved02 : 2;
+    // Hypervisor supports HvCallMapPartitionEventLogBuffer.
+    HV_UINT32 MapPartitionEventLogBuffer : 1;
+    // Hypervisor supports HvQueryGpaRangeHeatHintBeneficialSubranges.
+    HV_UINT32 HeatHintBeneficialSupport : 1;
+    HV_UINT32 Reserved03 : 4;
 
+    // Ebx
     HV_UINT32 LongSpinWaitCount;
 
+    // Ecx
     HV_UINT32 Reserved0;
+
+    // Edx
     HV_UINT32 Reserved1;
 } HV_ARM64_ENLIGHTENMENT_INFORMATION, *PHV_ARM64_ENLIGHTENMENT_INFORMATION;
 typedef HV_ARM64_ENLIGHTENMENT_INFORMATION _HV_ENLIGHTENMENT_INFORMATION;
 typedef HV_ARM64_ENLIGHTENMENT_INFORMATION HV_ENLIGHTENMENT_INFORMATION;
 typedef PHV_ARM64_ENLIGHTENMENT_INFORMATION PHV_ENLIGHTENMENT_INFORMATION;
+HV_STATIC_ASSERT(
+    sizeof(HV_ARM64_ENLIGHTENMENT_INFORMATION) == 4 * sizeof(HV_UINT32));
 #endif
 
 // Implementation Limits - HvCpuIdFunctionMsHvImplementationLimits Leaf

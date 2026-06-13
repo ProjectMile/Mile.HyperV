@@ -6231,7 +6231,8 @@ typedef struct _UEFI_CONFIG_FLAGS
         HV_UINT64 HvSintEnabled : 1;
         HV_UINT64 VmbusDisabled : 1;
         HV_UINT64 PciResourcesPreAssigned : 1;
-        HV_UINT64 Reserved : 32;
+        HV_UINT64 ForceDmaBounceEnabled : 1;
+        HV_UINT64 Reserved : 31;
     } Flags;
 } UEFI_CONFIG_FLAGS, *PUEFI_CONFIG_FLAGS;
 
