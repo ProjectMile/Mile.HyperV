@@ -4188,6 +4188,15 @@ typedef struct _VPCI_QUERY_BUS_RELATIONS
     VPCI_DEVICE_DESCRIPTION Devices[HV_ANYSIZE_ARRAY];
 } VPCI_QUERY_BUS_RELATIONS, *PVPCI_QUERY_BUS_RELATIONS;
 
+// Flags for `VPCI_DEVICE_DESCRIPTION_2`.
+typedef struct _VPCI_DEVICE_DESCRIPTION_2_FLAGS
+{
+    // The `NumaNode` field contains valid NUMA affinity information.
+    HV_UINT32 NumaAffinitySpecified : 1;
+    // Reserved bits.
+    HV_UINT32 Reserved : 31;
+} VPCI_DEVICE_DESCRIPTION_2_FLAGS, *PVPCI_DEVICE_DESCRIPTION_2_FLAGS;
+
 // Extended device description (version 2).
 // This version adds support for NUMA node information and additional flags.
 typedef struct _VPCI_DEVICE_DESCRIPTION_2
@@ -4199,7 +4208,7 @@ typedef struct _VPCI_DEVICE_DESCRIPTION_2
     // Device serial number
     HV_UINT32 SerialNumber;
     // Device-specific flags
-    HV_UINT32 Flags;
+    VPCI_DEVICE_DESCRIPTION_2_FLAGS Flags;
     // NUMA node the device is associated with
     HV_UINT16 NumaNode;
     // Reserved field
