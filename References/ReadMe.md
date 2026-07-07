@@ -112,7 +112,7 @@ https://github.com/microsoft/mu_msvm
 
 ### Referenced Version
 
-https://github.com/microsoft/mu_msvm/tree/v26.0.15
+https://github.com/microsoft/mu_msvm/tree/v26.0.17
 
 ### Referenced by Mile.HyperV:
 
