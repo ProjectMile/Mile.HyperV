@@ -7901,9 +7901,7 @@ typedef struct _HV_HYPERVISOR_ISOLATION_CONFIGURATION_PRIVATE
 
 typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES_PRIVATE
 {
-    HV_UINT32 Reserved0 : 21;
-    HV_UINT32 DebugCtl : 1;
-    HV_UINT32 EnlightenedNptTlb : 1;
+    HV_UINT32 Reserved0 : 23;
     HV_UINT32 NoRmpTableRequired : 1;
     HV_UINT32 EnlightenedSevSwap : 1;
     HV_UINT32 Reserved1 : 7;

@@ -3154,7 +3154,9 @@ typedef struct _HV_HYPERVISOR_NESTED_VIRT_FEATURES
     HV_UINT32 FlushGuestPhysicalHypercall : 1;
     HV_UINT32 MsrBitmap : 1;
     HV_UINT32 VirtualizationException : 1;
-    HV_UINT32 Reserved0 : 11;
+    HV_UINT32 DebugCtl : 1;
+    HV_UINT32 EnlightenedNptTlb : 1;
+    HV_UINT32 Reserved0 : 9;
 
     // Ebx
     HV_UINT32 ReservedEbx;

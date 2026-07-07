@@ -27,7 +27,7 @@ needed to your C/C++ projects.
     https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
     - src\windows\inc\wdk.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/471042e776f721cfdfb4423aa284d15420f28600
+    https://github.com/microsoft/openvmm/tree/00693a5d2e4db2484c576abd0c3dee95632c9fcc
     - vm\hv1\hvdef\src\lib.rs
     - vm\hv1\hvdef\src\vbs.rs
 - Mile.HyperV.Guest.Protocols.h
@@ -55,7 +55,7 @@ needed to your C/C++ projects.
     - MsvmPkg\Include\BiosEventLogInterface.h
     - MsvmPkg\Include\BiosBootLogInterface.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/471042e776f721cfdfb4423aa284d15420f28600
+    https://github.com/microsoft/openvmm/tree/00693a5d2e4db2484c576abd0c3dee95632c9fcc
     - vm\devices\vmbus\vmbfs\src\protocol.rs
     - vm\devices\vmbus\vmbus_ring\src\lib.rs
     - vm\devices\vmbus\vmbus_core\src\protocol.rs
