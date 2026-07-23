@@ -1,5 +1,16 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.1037.0**
+
+- Revise the definitions via 
+  https://github.com/microsoft/mu_msvm/tree/v26.0.21.
+- Revise the definitions via 
+  https://github.com/microsoft/openvmm/tree/78f3f61409a93cab10e5366b033466eafd990a69.
+- Use global.json to simplify the MSBuild Project SDK version resolving.
+- Update Mile.Project.Configurations to 1.0.2075.
+- Update Mile.Mobility to 1.1.602.
+- Fix comment header indent.
+
 **Mile.HyperV 1.2.997.0**
 
 - Revise the definitions via
