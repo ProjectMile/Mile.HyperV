@@ -317,6 +317,10 @@ typedef struct _GPA_RANGE
 // `ParentToChildMonitorPageGpa` is optional and may be zero, in which case the
 // guest cannot cancel MNF interrupts from the host.
 #define VMBUS_FEATURE_FLAG_SERVER_SPECIFIED_MONITOR_PAGES 0x40
+// The guest supports channels that require the use of pinned memory. This
+// indicates that the `VMBUS_OFFER_FLAG_REQUIRE_PINNED_EXTERNAL_MEMORY` flag in
+// the channel offer message is supported.
+#define VMBUS_FEATURE_FLAG_GPA_PINNING 0x80
 
 #define VMBUS_SUPPORTED_FEATURE_FLAGS_COPPER \
     (VMBUS_FEATURE_FLAG_GUEST_SPECIFIED_SIGNAL_PARAMETERS | \
@@ -396,10 +400,13 @@ typedef struct _VMBUS_CHANNEL_MESSAGE_HEADER
 #define VMBUS_OFFER_FLAG_ENUMERATE_DEVICE_INTERFACE 0x1
 // This flag indicates that the channel is offered by the paravisor, and must
 // use encrypted memory for the channel ring buffer.
-#define VMBUS_OFFER_FLAG_CONFIDENTIAL_RING_BUFFER       0x2
+#define VMBUS_OFFER_FLAG_CONFIDENTIAL_RING_BUFFER 0x2
 // This flag indicates that the channel is offered by the paravisor, and must
 // use encrypted memory for GPA direct packets and additional GPADLs.
-#define VMBUS_OFFER_FLAG_CONFIDENTIAL_EXTERNAL_MEMORY   0x4
+#define VMBUS_OFFER_FLAG_CONFIDENTIAL_EXTERNAL_MEMORY 0x4
+// Indicates that additional GPADLs and GPA direct packets must use pinned GPA
+// ranges.
+#define VMBUS_OFFER_FLAG_REQUIRE_PINNED_EXTERNAL_MEMORY 0x8
 #define VMBUS_OFFER_FLAG_NAMED_PIPE_MODE 0x10
 #define VMBUS_OFFER_FLAG_TLNPI_PROVIDER 0x2000
 
@@ -420,10 +427,17 @@ typedef enum _HVSOCK_PIPE_TYPE
     VmbusHvsockPipeTypeMessage = 4,
 } HVSOCK_PIPE_TYPE, *PHVSOCK_PIPE_TYPE;
 
+// Indicates that the pipe supports GPA-direct transfers.
+#define HVSOCK_PIPE_FLAGS_GPA_DIRECT 0x1
+
 typedef struct _HVSOCK_PIPE_USER_DEFINED_PARAMETERS
 {
     HVSOCK_PIPE_TYPE PipeType;
+    HV_UINT8 UserDefined[112];
+    HV_UINT32 Flags;
 } HVSOCK_PIPE_USER_DEFINED_PARAMETERS, *PHVSOCK_PIPE_USER_DEFINED_PARAMETERS;
+HV_STATIC_ASSERT(
+    sizeof(HVSOCK_PIPE_USER_DEFINED_PARAMETERS) == MAX_USER_DEFINED_BYTES);
 
 typedef enum _HVSOCK_PARAMETERS_VERSION
 {
@@ -433,7 +447,7 @@ typedef enum _HVSOCK_PARAMETERS_VERSION
 
 typedef struct _HVSOCK_USER_DEFINED_PARAMETERS
 {
-    HVSOCK_PIPE_USER_DEFINED_PARAMETERS PipeParameters;
+    HVSOCK_PIPE_TYPE PipeType;
     HV_UINT8 IsForGuestAccept; // HV_BOOLEAN
     HV_UINT8 IsForGuestContainer; // HV_BOOLEAN
     HVSOCK_PARAMETERS_VERSION Version;
