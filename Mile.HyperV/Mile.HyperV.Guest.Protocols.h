@@ -6250,8 +6250,8 @@ typedef struct _UEFI_CONFIG_FLAGS
         HV_UINT64 Dhcp6DuidTypeLlt : 1;
         HV_UINT64 CxlMemoryEnabled : 1;
         HV_UINT64 MtrrsInitializedAtLoad : 1;
-        // Reserved; used by other codebase.
-        HV_UINT64 HvSintEnabled : 1;
+        // HvSintEnabled for other codebase.
+        HV_UINT64 DisableSha1Pcr : 1;
         HV_UINT64 VmbusDisabled : 1;
         HV_UINT64 PciResourcesPreAssigned : 1;
         HV_UINT64 ForceDmaBounceEnabled : 1;
