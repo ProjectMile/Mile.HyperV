@@ -1,11 +1,6 @@
 ﻿# Mile.HyperV Definition References
 
-Mile.HyperV uses Microsoft Hypervisor Wrappers, Microsoft Independent Guest
-Virtual Machine, Hypervisor Top Level Functional Specification v6.0b, hvgdk.h
-from Windows Driver Kit version 7.1.0, MIT licensed Hyper-V headers from
-Microsoft, Archive of Hypervisor (Windows Drivers) documentations from Microsoft
-in 2013, Geoff Chappell's hvgdk_mini researches, Windows symbols, FreeBSD and
-Hyper-V integration support for macOS to create the definition headers.
+The references used by Mile.HyperV are listed below.
 
 ## Microsoft Hypervisor Wrappers
 
