@@ -1262,6 +1262,7 @@ typedef enum _HV_REGISTER_NAME
 
     HvArm64RegisterMidr = 0x00040000,
     HvArm64RegisterMpidr = 0x00040001,
+    HvArm64RegisterMpidrEl1 = 0x00040001,
     HvArm64RegisterSctlr = 0x00040002,
     HvArm64RegisterSctlrEl1 = 0x00040002,
     HvArm64RegisterActlr = 0x00040003,

@@ -3486,7 +3486,6 @@ typedef enum _HV_REGISTER_NAME_PRIVATE
 
     // Arm64 Control Registers
 
-    HvArm64RegisterMpidrEl1 = 0x00040001,
     HvArm64RegisterActlrEl1 = 0x00040003,
     HvArm64RegisterCpacrEl1 = 0x00040004,
     HvArm64RegisterContextidrEl1 = 0x0004000D,
