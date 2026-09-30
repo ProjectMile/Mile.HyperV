@@ -42,11 +42,12 @@
 //   - vm\devices\hyperv_ic_protocol\src\timesync.rs
 //   - vm\devices\hyperv_ic_protocol\src\vss.rs
 //   - vm\devices\uidevices\src\video\protocol.rs
-//   - vm\devices\uidevices\src\keyboard\protocol.rs
+//   - vm\devices\input\hyperv_keyboard_protocol\src\lib.rs
 //   - vm\devices\uidevices\src\mouse\protocol.rs
 //   - vm\devices\storage\storvsp_protocol\src\lib.rs
-//   - vm\devices\net\netvsp\src\protocol.rs
-//   - vm\devices\net\netvsp\src\rndisprot.rs
+//   - vm\devices\net\netvsp_protocol\src\lib.rs
+//   - vm\devices\net\netvsp_protocol\src\protocol.rs
+//   - vm\devices\net\netvsp_protocol\src\rndisprot.rs
 //   - vm\devices\pci\vpci_protocol\src\lib.rs
 // - Symbols in Windows version 10.0.14347.0's icsvc.dll
 // - Symbols in Windows version 10.0.14347.0's icsvcext.dll
@@ -4092,6 +4093,9 @@ typedef struct _VPCI_PNP_ID
 #define VPCI_PROTOCOL_VERSION_GE 0x00010005
 // Windows DT version (allows Windows guests to dynamically map interrupts)
 #define VPCI_PROTOCOL_VERSION_DT 0x00010006
+// Windows RB version (adds TDISP support: `VPCI_TDISP_COMMAND` and
+// `VPCI_QUERY_ISOLATED_RESOURCES`).
+#define VPCI_PROTOCOL_VERSION_RB 0x00010007
 
 // Some definitions in mu_msvm.
 
@@ -4164,8 +4168,14 @@ typedef enum _VPCI_MESSAGE
     VpciMsgCreateInterruptMessage3,
     // Reset a device
     VpciMsgResetDevice,
-    // TDISP command from guest to host
+    // TDISP command from guest to host.
+    // Only valid on protocol version >= `VPCI_PROTOCOL_VERSION_RB`
     VpciMsgTdispCommand,
+    // Query per-BAR and DMA isolation state for a TDISP device.
+    // Paravisor-only: this message is intercepted by the OpenHCL paravisor on
+    // the guest-facing VPCI channel and is not forwarded to the host VSP.
+    // Only valid on protocol version >= `VPCI_PROTOCOL_VERSION_RB`.
+    VpciMsgQueryIsolatedResources,
 } VPCI_MESSAGE, *PVPCI_MESSAGE;
 
 typedef struct _VPCI_PACKET_HEADER
@@ -4706,6 +4716,50 @@ typedef struct _VPCI_TDISP_COMMAND
 // implementation on the host.
 #define VPCI_MAX_TDISP_COMMAND_SIZE ( \
     VPCI_MAXIMUM_PACKET_SIZE - sizeof(VPCI_TDISP_COMMAND_HEADER))
+
+// Isolation classification for a single VPCI resource (a BAR or DMA).
+// Returned per-entry in `VPCI_ISOLATED_RESOURCES_REPLY`.
+
+// Entry not populated / not applicable. On a `STATUS_SUCCESS` reply this marks
+// a slot that is not part of the device's BAR ID set, as described on
+// `VPCI_ISOLATED_RESOURCES_REPLY`.
+#define VPCI_RESOURCE_ISOLATION_INVALID 0
+// Host-visible, bounce-buffered.
+#define VPCI_RESOURCE_ISOLATION_SHARED 1
+// Host-inaccessible after TDI validation; backed by guest-private (encrypted)
+// memory.
+#define VPCI_RESOURCE_ISOLATION_PRIVATE 2
+
+// Request for `VpciMsgQueryIsolatedResources`.
+// Sent by the in-guest VPCI VSC to the OpenHCL paravisor to discover, for a
+// given device slot, which of the six BARs and whether the DMA path are
+// host-inaccessible (TDISP-bound) vs host-visible (bounce-buffered).
+// Only valid when the negotiated protocol version is
+// `>= VPCI_PROTOCOL_VERSION_RB`.
+typedef struct _VPCI_QUERY_ISOLATED_RESOURCES
+{
+    // Must be `VpciMsgQueryIsolatedResources`.
+    VPCI_PACKET_HEADER Header;
+    // Target device's PCI slot number.
+    PCI_SLOT_NUMBER Slot;
+} VPCI_QUERY_ISOLATED_RESOURCES, *PVPCI_QUERY_ISOLATED_RESOURCES;
+
+HV_STATIC_ASSERT(sizeof(VPCI_QUERY_ISOLATED_RESOURCES) == 8);
+
+// Reply to `VpciMsgQueryIsolatedResources`.
+// Synthesized entirely by the paravisor from local TDISP state.
+typedef struct _VPCI_ISOLATED_RESOURCES_REPLY
+{
+    // NTSTATUS. `STATUS_SUCCESS` means the per-resource fields are
+    // authoritative.
+    VPCI_REPLY_HEADER Header;
+    // Classification for each of the device's six BARs.
+    HV_UINT32 BarIsolation[PCI_MAX_BAR]; // VPCI_RESOURCE_ISOLATION_*
+    // Classification for the device's DMA path.
+    HV_UINT32 DmaIsolation; // VPCI_RESOURCE_ISOLATION_*
+} VPCI_ISOLATED_RESOURCES_REPLY, *PVPCI_ISOLATED_RESOURCES_REPLY;
+
+HV_STATIC_ASSERT(sizeof(VPCI_ISOLATED_RESOURCES_REPLY) == 32);
 
 // *****************************************************************************
 // Microsoft Hyper-V Virtual Machine Bus File System

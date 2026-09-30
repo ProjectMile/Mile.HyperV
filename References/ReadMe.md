@@ -157,7 +157,7 @@ https://github.com/microsoft/openvmm
 
 ### Referenced Version
 
-https://github.com/microsoft/openvmm/tree/e7de393fecd47371b589c8d82ce58fe39fe50345
+https://github.com/microsoft/openvmm/tree/e2423909df9a26fba8764ac1d87a33d91b794ee0
 
 ### Referenced by Mile.HyperV:
 
@@ -171,11 +171,12 @@ https://github.com/microsoft/openvmm/tree/e7de393fecd47371b589c8d82ce58fe39fe503
 - vm\devices\hyperv_ic_protocol\src\timesync.rs
 - vm\devices\hyperv_ic_protocol\src\vss.rs
 - vm\devices\uidevices\src\video\protocol.rs
-- vm\devices\uidevices\src\keyboard\protocol.rs
+- vm\devices\input\hyperv_keyboard_protocol\src\lib.rs
 - vm\devices\uidevices\src\mouse\protocol.rs
 - vm\devices\storage\storvsp_protocol\src\lib.rs
-- vm\devices\net\netvsp\src\protocol.rs
-- vm\devices\net\netvsp\src\rndisprot.rs
+- vm\devices\net\netvsp_protocol\src\lib.rs
+- vm\devices\net\netvsp_protocol\src\protocol.rs
+- vm\devices\net\netvsp_protocol\src\rndisprot.rs
 - vm\hv1\hvdef\src\lib.rs
 - vm\devices\pci\vpci_protocol\src\lib.rs
 - vm\hv1\hvdef\src\vbs.rs

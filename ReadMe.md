@@ -27,7 +27,7 @@ needed to your C/C++ projects.
     https://github.com/microsoft/WSL/tree/697572d664c9371abbc53cab9cf7b4b32be1980e
     - src\windows\inc\wdk.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/e7de393fecd47371b589c8d82ce58fe39fe50345
+    https://github.com/microsoft/openvmm/tree/e2423909df9a26fba8764ac1d87a33d91b794ee0
     - vm\hv1\hvdef\src\lib.rs
     - vm\hv1\hvdef\src\vbs.rs
 - Mile.HyperV.Guest.Protocols.h
@@ -55,7 +55,7 @@ needed to your C/C++ projects.
     - MsvmPkg\Include\BiosEventLogInterface.h
     - MsvmPkg\Include\BiosBootLogInterface.h
   - Include Hyper-V related definitions from
-    https://github.com/microsoft/openvmm/tree/e7de393fecd47371b589c8d82ce58fe39fe50345
+    https://github.com/microsoft/openvmm/tree/e2423909df9a26fba8764ac1d87a33d91b794ee0
     - vm\devices\vmbus\vmbfs\src\protocol.rs
     - vm\devices\vmbus\vmbus_ring\src\lib.rs
     - vm\devices\vmbus\vmbus_core\src\protocol.rs
@@ -66,11 +66,12 @@ needed to your C/C++ projects.
     - vm\devices\hyperv_ic_protocol\src\timesync.rs
     - vm\devices\hyperv_ic_protocol\src\vss.rs
     - vm\devices\uidevices\src\video\protocol.rs
-    - vm\devices\uidevices\src\keyboard\protocol.rs
+    - vm\devices\input\hyperv_keyboard_protocol\src\lib.rs
     - vm\devices\uidevices\src\mouse\protocol.rs
     - vm\devices\storage\storvsp_protocol\src\lib.rs
-    - vm\devices\net\netvsp\src\protocol.rs
-    - vm\devices\net\netvsp\src\rndisprot.rs
+    - vm\devices\net\netvsp_protocol\src\lib.rs
+    - vm\devices\net\netvsp_protocol\src\protocol.rs
+    - vm\devices\net\netvsp_protocol\src\rndisprot.rs
     - vm\devices\pci\vpci_protocol\src\lib.rs
   - Definitions conform with Windows 10 Build 14347's icsvc.dll
   - Definitions conform with Windows 10 Build 14347's icsvcext.dll
