@@ -5618,7 +5618,11 @@ typedef struct HV_CALL_ATTRIBUTES _HV_INPUT_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILI
     HV_PARTITION_ID TargetPartitionId;
     // Supplies the new host visibility. (HV_HOST_VISIBILITY_*)
     HV_UINT32 HostVisibility : 2;
-    HV_UINT32 Reserved0 : 30;
+    // Supplies the page immutability setting for SEV-TIO bring-up.
+    // Supported only on internal Hyper-V builds implementing this extension;
+    // otherwise, this field must be zero.
+    HV_UINT32 Immutability : 1;
+    HV_UINT32 Reserved0 : 29;
     HV_UINT32 Reserved1;
     // Supplies an array of GPA page numbers to modify.
     HV_CALL_ATTRIBUTES HV_GPA_PAGE_NUMBER GpaPageList[HV_ANYSIZE_ARRAY];
