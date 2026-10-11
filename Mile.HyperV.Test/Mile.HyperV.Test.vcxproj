@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClCompile Include="..\Mile.HyperV\Mile.HyperV.Windows.VMBusPipe.cpp" />
     <ClCompile Include="Mile.HyperV.Test.Mobility.cpp" />
+    <ClCompile Include="Mile.HyperV.Test.Mobility.Minimal.c" />
     <ClCompile Include="Mile.HyperV.Test.Windows.cpp" />
   </ItemGroup>
   <ItemGroup>

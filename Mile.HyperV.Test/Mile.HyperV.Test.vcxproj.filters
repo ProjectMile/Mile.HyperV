@@ -6,6 +6,7 @@
     </ClCompile>
     <ClCompile Include="Mile.HyperV.Test.Mobility.cpp" />
     <ClCompile Include="Mile.HyperV.Test.Windows.cpp" />
+    <ClCompile Include="Mile.HyperV.Test.Mobility.Minimal.c" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Mile.HyperV">
