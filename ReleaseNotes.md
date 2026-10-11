@@ -1,5 +1,16 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.1116.0**
+
+- Fix several pure C compatibility issues.
+- Add Mile.HyperV.Test.Mobility.Minimal.c to test the pure C compile mode
+  compatibility.
+- Revise the definitions via
+  https://github.com/microsoft/mu_msvm/tree/v26.0.39.
+- Revise the definitions via
+  https://github.com/microsoft/openvmm/tree/5b4656a86986dd6ec0c2a257bdc0c203ba2131a2.
+- Update Mile.Mobility to 1.1.678.
+
 **Mile.HyperV 1.2.1080.0**
 
 - Revise the definitions via
