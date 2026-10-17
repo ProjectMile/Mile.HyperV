@@ -157,7 +157,7 @@ https://github.com/microsoft/openvmm
 
 ### Referenced Version
 
-https://github.com/microsoft/openvmm/tree/7ac876f406377754bfee8953222556855e37e248
+https://github.com/microsoft/openvmm/tree/79013285114700cf3e13e2f39353d526791d833b
 
 ### Referenced by Mile.HyperV:
 
