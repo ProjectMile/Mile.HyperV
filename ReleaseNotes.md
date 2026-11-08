@@ -1,5 +1,16 @@
 ﻿# Mile.HyperV Release Notes
 
+**Mile.HyperV 1.2.1145.0**
+
+- Fix alignment issue for HV_OUTPUT_TRANSLATE_VIRTUAL_ADDRESS_EX_PRIVATE
+  structure when compiling with LLVM clang-cl toolset.
+- Add LLVM clang-cl toolset build test in BuildAllTargets script.
+- Revise the definitions via
+  https://github.com/microsoft/mu_msvm/tree/v26.0.43.
+- Revise the definitions via
+  https://github.com/microsoft/openvmm/tree/ba105dd7f00499acc1862456c179c0930cb2c8f7.
+- Update Mile.Mobility to 1.1.732.
+
 **Mile.HyperV 1.2.1116.0**
 
 - Fix several pure C compatibility issues.
